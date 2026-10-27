@@ -192,7 +192,8 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_0jf6im1pjt6",
@@ -216,7 +217,45 @@
             "column": 9
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode; params: Promise<{ locale: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            },
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "locale",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_01kdhdsgw4y",
@@ -241,7 +280,8 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_0nwenv6i3tq",
@@ -266,7 +306,37 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ locale: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "locale",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_2awb26rqgh7",
@@ -291,7 +361,38 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ searchParams: Promise<{ challenge?: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "searchParams",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "challenge",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        },
+                        "optional": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_0bpwse6tsg4",
@@ -317,6 +418,9 @@
             "column": 29
           }
         }
+      ],
+      "usedTypes": [
+        "typ_1tpxqokvkch"
       ]
     },
     {
@@ -330,7 +434,8 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": []
     },
     {
       "id": "cmp_1hlwjtaw6e6",
@@ -356,7 +461,101 @@
             "column": 12
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "VerifyOtpFormProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1c9vagn0sce",
+          "name": "VerifyOtpFormProps"
+        }
+      }
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1c9vagn0sce",
+      "name": "VerifyOtpFormProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/VerifyOtpForm.tsx",
+        "line": 8,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "challengeId",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                },
+                {
+                  "kind": "primitive",
+                  "name": "null"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1tpxqokvkch",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "role",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "admin"
+                },
+                {
+                  "kind": "literal",
+                  "value": "member"
+                }
+              ]
+            }
+          }
+        ]
+      }
     }
   ]
 }

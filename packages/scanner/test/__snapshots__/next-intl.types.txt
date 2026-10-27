@@ -1,0 +1,19 @@
+# Types
+
+VerifyOtpFormProps  interface  src/components/VerifyOtpForm.tsx:8
+  { challengeId: string | null }
+User  interface  src/types/auth.ts:1
+  { id: number; name: string; email: string; role: "admin" | "member" }
+
+# Component types
+
+LocaleLayout  src/app/[locale]/layout.tsx:11
+  props: { children: ReactNode; params: Promise<{ locale: string }> }
+HomePage  src/app/[locale]/page.tsx:4
+  props: { params: Promise<{ locale: string }> }
+VerifyPage  src/app/[locale]/verify/page.tsx:3
+  props: { searchParams: Promise<{ challenge?: string }> }
+DashboardProfile  src/components/DashboardProfile.tsx:10
+  uses: User
+VerifyOtpForm  src/components/VerifyOtpForm.tsx:13
+  props: VerifyOtpFormProps

@@ -147,7 +147,8 @@
       },
       "kind": "server",
       "clientBoundary": false,
-      "children": []
+      "children": [],
+      "usedTypes": []
     },
     {
       "id": "cmp_2dznycb4aq7",
@@ -171,7 +172,24 @@
             "column": 11
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_0ku4o3jpe9o",
@@ -196,7 +214,8 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_0vmo84pmvzo",
@@ -232,7 +251,37 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_0yr9r67zb7l",
@@ -245,7 +294,16 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "DeleteUserButtonProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0ywmxvblq29",
+          "name": "DeleteUserButtonProps"
+        }
+      }
     },
     {
       "id": "cmp_256fhhuhol5",
@@ -258,7 +316,18 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": [
+        "typ_1tfsxfuhjes"
+      ],
+      "propsType": {
+        "text": "ProfileCardProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_12vhl9gsqi3",
+          "name": "ProfileCardProps"
+        }
+      }
     },
     {
       "id": "cmp_1i8zxr0i8pg",
@@ -282,7 +351,199 @@
             "column": 11
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "UserListProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1biwb76ctp8",
+          "name": "UserListProps"
+        }
+      }
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_0ywmxvblq29",
+      "name": "DeleteUserButtonProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "components/DeleteUserButton.tsx",
+        "line": 7,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_12vhl9gsqi3",
+      "name": "ProfileCardProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "components/ProfileCard.tsx",
+        "line": 7,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "user",
+            "type": {
+              "kind": "ref",
+              "typeId": "typ_0857a9l1j3p",
+              "name": "User"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1biwb76ctp8",
+      "name": "UserListProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "components/UserList.tsx",
+        "line": 4,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "users",
+            "type": {
+              "kind": "array",
+              "element": {
+                "kind": "ref",
+                "typeId": "typ_0857a9l1j3p",
+                "name": "User"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_243k6cp1cea",
+      "name": "Role",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "types/user.ts",
+        "line": 1,
+        "column": 13
+      },
+      "shape": {
+        "kind": "union",
+        "types": [
+          {
+            "kind": "literal",
+            "value": "admin"
+          },
+          {
+            "kind": "literal",
+            "value": "member"
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0857a9l1j3p",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "types/user.ts",
+        "line": 3,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "role",
+            "type": {
+              "kind": "ref",
+              "typeId": "typ_243k6cp1cea",
+              "name": "Role"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1tfsxfuhjes",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "types/user.ts",
+        "line": 10,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
     }
   ]
 }

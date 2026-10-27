@@ -58,13 +58,18 @@ describe('cli scan', () => {
   it('writes .flow-checker/model.json', async () => {
     const root = project({
       'app/layout.tsx': 'export default function Root({ children }) { return <html>{children}</html> }',
-      'app/page.tsx': 'export default function Home() { return <main /> }',
+      'app/page.tsx': [
+        'interface Props { params: Promise<{ id: string }> }',
+        'export default function Home(_: Props) { return <main /> }',
+      ].join('\n'),
       'app/api/ping/route.ts': 'export function GET() { return new Response() }',
     })
     const { io, out } = capture()
-    expect(await runCli(['scan', '--root', root, '--tree'], io)).toBe(0)
+    expect(await runCli(['scan', '--root', root, '--tree', '--types'], io)).toBe(0)
     const output = out.join('\n')
-    expect(output).toContain('Scanned 1 page, 1 route handler and 2 components')
+    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components and 1 type')
+    expect(output).toContain('# Types')
+    expect(output).toContain('Props  interface  app/page.tsx:1')
     expect(output).toContain('# Route tree')
 
     const modelFile = join(root, '.flow-checker', 'model.json')

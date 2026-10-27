@@ -26,6 +26,7 @@ Options:
   --root <dir>      Project root (default: current directory)
   --app-dir <dir>   App Router directory, relative to the root (default: src/app or app)
   --tree            scan: also print the route and component trees
+  --types           scan: also print the resolved types
   -h, --help        Show help
   -v, --version     Show version
 `
@@ -69,7 +70,10 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
   }
 
   if (command === 'scan') {
-    return scanCommand({ root: values.root, appDir: values['app-dir'], tree: values.tree }, io)
+    return scanCommand(
+      { root: values.root, appDir: values['app-dir'], tree: values.tree, types: values.types },
+      io,
+    )
   }
 
   io.err(`"${command}" is not implemented yet.`)
@@ -87,6 +91,7 @@ function parse(argv: string[]) {
       root: { type: 'string' },
       'app-dir': { type: 'string' },
       tree: { type: 'boolean' },
+      types: { type: 'boolean' },
     },
   })
 }

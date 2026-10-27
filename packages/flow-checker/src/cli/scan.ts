@@ -1,13 +1,14 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { ScanError, scanProject } from '@flow-checker/scanner'
-import { formatModel } from '@flow-checker/shared'
+import { formatModel, formatTypes } from '@flow-checker/shared'
 import type { CliIO } from './run'
 
 export interface ScanCommandOptions {
   root?: string
   appDir?: string
   tree?: boolean
+  types?: boolean
 }
 
 /** `flow-checker scan`: scans the project and writes `.flow-checker/model.json`. */
@@ -32,13 +33,15 @@ export function scanCommand(options: ScanCommandOptions, io: CliIO): number {
   writeFileSync(outFile, `${JSON.stringify(model, null, 2)}\n`)
 
   if (options.tree) io.out(formatModel(model))
+  if (options.types) io.out(formatTypes(model))
 
   const pages = model.routes.filter((r) => r.kind === 'page').length
   const handlers = model.routes.length - pages
   const ms = Math.round(performance.now() - started)
   io.out(
-    `Scanned ${pages} page${pages === 1 ? '' : 's'}, ${handlers} route handler${handlers === 1 ? '' : 's'} and ` +
-      `${model.components.length} component${model.components.length === 1 ? '' : 's'} in ${ms} ms.`,
+    `Scanned ${pages} page${pages === 1 ? '' : 's'}, ${handlers} route handler${handlers === 1 ? '' : 's'}, ` +
+      `${model.components.length} component${model.components.length === 1 ? '' : 's'} and ` +
+      `${model.types.length} type${model.types.length === 1 ? '' : 's'} in ${ms} ms.`,
   )
   io.out(`Wrote ${relative(process.cwd(), outFile) || outFile}`)
   return 0

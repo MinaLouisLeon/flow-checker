@@ -13,6 +13,7 @@ import { discoverProject } from './discovery'
 import { relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { walkRoutes } from './routes'
+import { TypeResolver } from './types'
 
 export interface ScanOptions {
   /** Project root (the directory with package.json / next.config). */
@@ -32,7 +33,8 @@ export function scanProject(options: ScanOptions): AppModel {
   const project = createProject(discovery, fs)
   const { tree, routes: found } = walkRoutes(fs, root, discovery.appDir)
 
-  const graph = new ComponentGraph(root)
+  const types = new TypeResolver(root)
+  const graph = new ComponentGraph(root, types)
   const fileComponents = new Map<string, string | undefined>()
   const componentOf = (relFile: string) => {
     if (!fileComponents.has(relFile)) {
@@ -75,6 +77,7 @@ export function scanProject(options: ScanOptions): AppModel {
     routeTree: tree,
     routes,
     components: graph.components(roots),
+    types: types.types(),
   }
 }
 

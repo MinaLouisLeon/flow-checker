@@ -1,0 +1,20 @@
+# Types
+
+Product  type-alias  src/lib/schemas.ts:15
+  { id: number; name: string; price: number; stock: number }
+CreateProductInput  type-alias  src/lib/schemas.ts:16
+  { name: string; price: number; stock?: number }
+ApiError  interface  src/lib/schemas.ts:18
+  { error: string; issues?: { path: string; message: string }[] }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:5
+  props: { children: ReactNode }
+ProductPage  src/app/products/[id]/page.tsx:8
+  props: { params: Promise<{ id: string }> }
+  uses: Product
+CreateProductForm  src/components/CreateProductForm.tsx:8
+  uses: ApiError, CreateProductInput, Product
+ProductsTable  src/components/ProductsTable.tsx:8
+  uses: Product
