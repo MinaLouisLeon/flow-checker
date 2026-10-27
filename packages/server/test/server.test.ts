@@ -113,7 +113,9 @@ describe('startServer', () => {
 
     const server = await startServer({ root: '/p', model: model(), port: taken })
     try {
-      expect(server.port).toBe(taken + 1)
+      // Usually taken + 1, but that port can be busy too on a shared CI runner.
+      expect(server.port).toBeGreaterThan(taken)
+      expect(server.url).toBe(`http://127.0.0.1:${server.port}`)
       const res = await fetch(`${server.url}/api/health`)
       expect(await res.json()).toEqual({ ok: true })
     } finally {
