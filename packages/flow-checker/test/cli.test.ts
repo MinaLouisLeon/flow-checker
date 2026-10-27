@@ -1,8 +1,10 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import type { AppModel } from '@flow-checker/shared'
 import { afterEach, describe, expect, it } from 'vitest'
 import pkg from '../package.json' with { type: 'json' }
+import { startDev } from '../src/cli/dev'
 import { type CliIO, runCli } from '../src/cli/run'
 
 function capture() {
@@ -82,6 +84,51 @@ describe('cli scan', () => {
     const root = project({ 'pages/index.tsx': 'export default () => null' })
     const { io, err } = capture()
     expect(await runCli(['scan', '--root', root], io)).toBe(1)
+    expect(err.join('\n')).toContain('App Router')
+  })
+})
+
+describe('cli dev', () => {
+  const dirs: string[] = []
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true })
+  })
+
+  it('scans, serves the model and re-scans on request', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'flow-checker-dev-'))
+    dirs.push(root)
+    mkdirSync(join(root, 'app', 'about'), { recursive: true })
+    writeFileSync(join(root, 'app', 'page.tsx'), 'export default function Home() { return <main /> }')
+
+    const { io, out } = capture()
+    const server = await startDev({ root, port: 0, open: false }, io)
+    if (typeof server === 'number') throw new Error(`startDev failed with ${server}`)
+    try {
+      expect(out.join('\n')).toContain('Dashboard: http://localhost:')
+      expect(existsSync(join(root, '.flow-checker', 'model.json'))).toBe(true)
+
+      const model = (await (await fetch(`${server.url}/api/model`)).json()) as AppModel
+      expect(model.routes.map((r) => r.path)).toEqual(['/'])
+
+      writeFileSync(join(root, 'app', 'about', 'page.tsx'), 'export default function About() { return null }')
+      const rescanned = (await (await fetch(`${server.url}/api/scan`, { method: 'POST' })).json()) as AppModel
+      expect(rescanned.routes.map((r) => r.path)).toEqual(['/', '/about'])
+    } finally {
+      await server.close()
+    }
+  })
+
+  it('rejects invalid ports', async () => {
+    const { io, err } = capture()
+    expect(await runCli(['dev', '--port', 'abc'], io)).toBe(1)
+    expect(err.join('\n')).toContain('--port must be a port number')
+  })
+
+  it('fails like scan when there is no app directory', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'flow-checker-dev-'))
+    dirs.push(root)
+    const { io, err } = capture()
+    expect(await startDev({ root, port: 0, open: false }, io)).toBe(1)
     expect(err.join('\n')).toContain('App Router')
   })
 })

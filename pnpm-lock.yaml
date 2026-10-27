@@ -9,6 +9,9 @@ catalogs:
     "@biomejs/biome":
       specifier: 2.6.3
       version: 2.6.3
+    "@hono/node-server":
+      specifier: ^2.1.0
+      version: 2.1.5
     "@tanstack/react-query":
       specifier: ^5.105.0
       version: 5.105.0
@@ -24,9 +27,15 @@ catalogs:
     "@vitejs/plugin-react":
       specifier: ^6.1.2
       version: 6.1.2
+    "@xyflow/react":
+      specifier: ^12.12.0
+      version: 12.12.0
     axios:
       specifier: ^1.20.0
       version: 1.20.0
+    hono:
+      specifier: ^4.13.0
+      version: 4.13.14
     next:
       specifier: 16.4.3
       version: 16.4.3
@@ -227,6 +236,12 @@ importers:
       "@flow-checker/shared":
         specifier: workspace:*
         version: link:../shared
+      "@tanstack/react-query":
+        specifier: "catalog:"
+        version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
+      "@xyflow/react":
+        specifier: "catalog:"
+        version: 12.12.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: "catalog:"
         version: 19.3.1
@@ -255,6 +270,12 @@ importers:
 
   packages/flow-checker:
     dependencies:
+      "@hono/node-server":
+        specifier: "catalog:"
+        version: 2.1.5(hono@4.13.14)
+      hono:
+        specifier: "catalog:"
+        version: 4.13.14
       next:
         specifier: ">=13.4.0"
         version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -265,6 +286,9 @@ importers:
         specifier: "catalog:"
         version: 4.6.7
     devDependencies:
+      "@flow-checker/dashboard":
+        specifier: workspace:*
+        version: link:../dashboard
       "@flow-checker/exporter":
         specifier: workspace:*
         version: link:../exporter
@@ -304,6 +328,12 @@ importers:
       "@flow-checker/shared":
         specifier: workspace:*
         version: link:../shared
+      "@hono/node-server":
+        specifier: "catalog:"
+        version: 2.1.5(hono@4.13.14)
+      hono:
+        specifier: "catalog:"
+        version: 4.13.14
 
   packages/shared:
     dependencies:
@@ -707,6 +737,15 @@ packages:
       {
         integrity: sha512-8O7V38QmbB11+ryJ3KM/znrzXtiqgpXzqNoqDsndHZZ5/zDKTTL+cf5F0mzXkQEwhx8IlWnqYvEovf2S5EwLTw==,
       }
+
+  "@hono/node-server@2.1.5":
+    resolution:
+      {
+        integrity: sha512-MgP/I06GdvsilDspMk/qmRzpk8LOUStP6jFAbSRi40W09DhoyUn+Mj7eyKICPqeYKybOjVFLVIAQzvu1bfIa7Q==,
+      }
+    engines: { node: ">=20" }
+    peerDependencies:
+      hono: ^4 || ^5.0.0-0
 
   "@img/colour@1.1.0":
     resolution:
@@ -1735,6 +1774,42 @@ packages:
         integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==,
       }
 
+  "@types/d3-color@3.1.3":
+    resolution:
+      {
+        integrity: sha512-iO90scth9WAbmgv7ogoq57O9YpKmFBbmoEoCHDB2xMBY0+/KVrqAaCDyCE16dUspeOvIxFFRI+0sEtqDqy2b4A==,
+      }
+
+  "@types/d3-drag@3.0.7":
+    resolution:
+      {
+        integrity: sha512-HE3jVKlzU9AaMazNufooRJ5ZpWmLIoc90A37WU2JMmeq28w1FQqCZswHZ3xR+SuxYftzHq6WU6KJHvqxKzTxxQ==,
+      }
+
+  "@types/d3-interpolate@3.0.4":
+    resolution:
+      {
+        integrity: sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA==,
+      }
+
+  "@types/d3-selection@3.0.12":
+    resolution:
+      {
+        integrity: sha512-Qe/KWYhEiIIxGs7HrAAjMfShxKldx19SJtr5zu53f3afPsdZNz7HHtdTLXo/kqeiWNXVycI24kSnfzBYkTzpgw==,
+      }
+
+  "@types/d3-transition@3.0.9":
+    resolution:
+      {
+        integrity: sha512-uZS5shfxzO3rGlu0cC3bjmMFKsXv+SmZZcgp0KD22ts4uGXp5EVYGzu/0YdwZeKmddhcAccYtREJKkPfXkZuCg==,
+      }
+
+  "@types/d3-zoom@3.0.9":
+    resolution:
+      {
+        integrity: sha512-0sE1406XBYJGiqD3AusTl9ZqC//2mIXix51tbom25gDCA8ri4xnSZg28CaSE8Srl6FClqABUKfsn0qghgdepMA==,
+      }
+
   "@types/deep-eql@4.0.2":
     resolution:
       {
@@ -1804,6 +1879,28 @@ packages:
     resolution:
       {
         integrity: sha512-lwJRExuH417257Q5wv9QYugN9IMJkoxcrKrYxGPQkBzl7wlNpTUxD/5yNX4ESKVUIShKPgkGchYPFMWOOk0wzw==,
+      }
+
+  "@xyflow/react@12.12.0":
+    resolution:
+      {
+        integrity: sha512-74oXI0Rgm1Eu33cHQAd74J6oVgCH9mbFyTVQbsGgp2kmWwh0HdtBr2VP04z8mbPD+M/xO69nqG5dDEt7/EN2rQ==,
+      }
+    peerDependencies:
+      "@types/react": ">=17"
+      "@types/react-dom": ">=17"
+      react: ">=17"
+      react-dom: ">=17"
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      "@types/react-dom":
+        optional: true
+
+  "@xyflow/system@0.0.83":
+    resolution:
+      {
+        integrity: sha512-a//eDjez3WZF47aaPTfVUDD0OINOq+WVwBZCRTqG+m0a5euX8EwlJ4jMY1Wxz0Ocj4xOeekJ70V22Pq0ll8RJw==,
       }
 
   acorn@8.19.0:
@@ -1911,6 +2008,12 @@ packages:
       }
     engines: { node: ">= 20.19.0" }
 
+  classcat@5.0.5:
+    resolution:
+      {
+        integrity: sha512-JhZUT7JFcQy/EzW605k/ktHtncoo9vnyW/2GspNYwFlN1C/WmjuV/xtS04e9SOkL2sTdw0VAZ2UGCcQ9lR6p6w==,
+      }
+
   client-only@0.0.1:
     resolution:
       {
@@ -1962,6 +2065,71 @@ packages:
       {
         integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==,
       }
+
+  d3-color@3.1.0:
+    resolution:
+      {
+        integrity: sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA==,
+      }
+    engines: { node: ">=12" }
+
+  d3-dispatch@3.0.1:
+    resolution:
+      {
+        integrity: sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg==,
+      }
+    engines: { node: ">=12" }
+
+  d3-drag@3.0.0:
+    resolution:
+      {
+        integrity: sha512-pWbUJLdETVA8lQNJecMxoXfH6x+mO2UQo8rSmZ+QqxcbyA3hfeprFgIT//HW2nlHChWeIIMwS2Fq+gEARkhTkg==,
+      }
+    engines: { node: ">=12" }
+
+  d3-ease@3.0.1:
+    resolution:
+      {
+        integrity: sha512-wR/XK3D3XcLIZwpbvQwQ5fK+8Ykds1ip7A2Txe0yxncXSdq1L9skcG7blcedkOX+ZcgxGAmLX1FrRGbADwzi0w==,
+      }
+    engines: { node: ">=12" }
+
+  d3-interpolate@3.0.1:
+    resolution:
+      {
+        integrity: sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==,
+      }
+    engines: { node: ">=12" }
+
+  d3-selection@3.0.0:
+    resolution:
+      {
+        integrity: sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==,
+      }
+    engines: { node: ">=12" }
+
+  d3-timer@3.0.1:
+    resolution:
+      {
+        integrity: sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==,
+      }
+    engines: { node: ">=12" }
+
+  d3-transition@3.0.1:
+    resolution:
+      {
+        integrity: sha512-ApKvfjsSR6tg06xrL434C0WydLr7JewBB3V+/39RMHsaXTOG0zmt/OAXeng5M5LBm0ojmxJrpomQVZ1aPvBL4w==,
+      }
+    engines: { node: ">=12" }
+    peerDependencies:
+      d3-selection: 2 - 3
+
+  d3-zoom@3.0.0:
+    resolution:
+      {
+        integrity: sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw==,
+      }
+    engines: { node: ">=12" }
 
   debug@4.4.3:
     resolution:
@@ -2150,6 +2318,13 @@ packages:
         integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==,
       }
     engines: { node: ">= 0.4" }
+
+  hono@4.13.14:
+    resolution:
+      {
+        integrity: sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==,
+      }
+    engines: { node: ">=16.9.0" }
 
   https-proxy-agent@5.0.1:
     resolution:
@@ -2890,6 +3065,24 @@ packages:
         integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==,
       }
 
+  zustand@4.5.7:
+    resolution:
+      {
+        integrity: sha512-CHOUy7mu3lbD6o6LJLfllpjkzhHXSBlX8B9+qPddUsIfeF5S/UZ5q0kmCsnRqT1UHFQZchNFDDzMbQsuesHWlw==,
+      }
+    engines: { node: ">=12.7.0" }
+    peerDependencies:
+      "@types/react": ">=16.8"
+      immer: ">=9.0.6"
+      react: ">=16.8"
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+
 snapshots:
   "@biomejs/biome@2.6.3":
     optionalDependencies:
@@ -3045,6 +3238,10 @@ snapshots:
   "@formatjs/intl-localematcher@0.8.14":
     dependencies:
       "@formatjs/fast-memoize": 3.1.7
+
+  "@hono/node-server@2.1.5(hono@4.13.14)":
+    dependencies:
+      hono: 4.13.14
 
   "@img/colour@1.1.0":
     optional: true
@@ -3463,6 +3660,27 @@ snapshots:
       "@types/deep-eql": 4.0.2
       assertion-error: 2.0.1
 
+  "@types/d3-color@3.1.3": {}
+
+  "@types/d3-drag@3.0.7":
+    dependencies:
+      "@types/d3-selection": 3.0.12
+
+  "@types/d3-interpolate@3.0.4":
+    dependencies:
+      "@types/d3-color": 3.1.3
+
+  "@types/d3-selection@3.0.12": {}
+
+  "@types/d3-transition@3.0.9":
+    dependencies:
+      "@types/d3-selection": 3.0.12
+
+  "@types/d3-zoom@3.0.9":
+    dependencies:
+      "@types/d3-interpolate": 3.0.4
+      "@types/d3-selection": 3.0.12
+
   "@types/deep-eql@4.0.2": {}
 
   "@types/estree@1.0.9": {}
@@ -3494,6 +3712,31 @@ snapshots:
       vite: 8.3.5(@types/node@22.20.5)(esbuild@0.28.2)
 
   "@vitest/spy@5.0.5": {}
+
+  "@xyflow/react@12.12.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)":
+    dependencies:
+      "@xyflow/system": 0.0.83
+      classcat: 5.0.5
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+      zustand: 4.5.7(@types/react@19.3.0)(react@19.3.1)
+    optionalDependencies:
+      "@types/react": 19.3.0
+      "@types/react-dom": 19.3.0(@types/react@19.3.0)
+    transitivePeerDependencies:
+      - immer
+
+  "@xyflow/system@0.0.83":
+    dependencies:
+      "@types/d3-drag": 3.0.7
+      "@types/d3-interpolate": 3.0.4
+      "@types/d3-selection": 3.0.12
+      "@types/d3-transition": 3.0.9
+      "@types/d3-zoom": 3.0.9
+      d3-drag: 3.0.0
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-zoom: 3.0.0
 
   acorn@8.19.0: {}
 
@@ -3547,6 +3790,8 @@ snapshots:
     dependencies:
       readdirp: 5.1.1
 
+  classcat@5.0.5: {}
+
   client-only@0.0.1: {}
 
   code-block-writer@13.0.3: {}
@@ -3564,6 +3809,42 @@ snapshots:
   content-type@2.1.0: {}
 
   csstype@3.2.3: {}
+
+  d3-color@3.1.0: {}
+
+  d3-dispatch@3.0.1: {}
+
+  d3-drag@3.0.0:
+    dependencies:
+      d3-dispatch: 3.0.1
+      d3-selection: 3.0.0
+
+  d3-ease@3.0.1: {}
+
+  d3-interpolate@3.0.1:
+    dependencies:
+      d3-color: 3.1.0
+
+  d3-selection@3.0.0: {}
+
+  d3-timer@3.0.1: {}
+
+  d3-transition@3.0.1(d3-selection@3.0.0):
+    dependencies:
+      d3-color: 3.1.0
+      d3-dispatch: 3.0.1
+      d3-ease: 3.0.1
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-timer: 3.0.1
+
+  d3-zoom@3.0.0:
+    dependencies:
+      d3-dispatch: 3.0.1
+      d3-drag: 3.0.0
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-transition: 3.0.1(d3-selection@3.0.0)
 
   debug@4.4.3:
     dependencies:
@@ -3689,6 +3970,8 @@ snapshots:
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
+
+  hono@4.13.14: {}
 
   https-proxy-agent@5.0.1:
     dependencies:
@@ -4142,3 +4425,10 @@ snapshots:
   why-is-node-running@3.2.1: {}
 
   zod@4.6.7: {}
+
+  zustand@4.5.7(@types/react@19.3.0)(react@19.3.1):
+    dependencies:
+      use-sync-external-store: 1.7.0(react@19.3.1)
+    optionalDependencies:
+      "@types/react": 19.3.0
+      react: 19.3.1

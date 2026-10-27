@@ -3,7 +3,7 @@
 // the bin runs, and the public entry points import and typecheck.
 // Run after `pnpm build`: node scripts/verify-package.mjs
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -31,10 +31,14 @@ function fail(message) {
 
 try {
   // 1. No private package references in the built output.
-  for (const file of readdirSync(join(pkgDir, 'dist'))) {
-    const text = readFileSync(join(pkgDir, 'dist', file), 'utf8')
+  // Only code files: the dashboard's assets folder also holds fonts and images.
+  const dist = join(pkgDir, 'dist')
+  for (const file of readdirSync(dist, { recursive: true })) {
+    if (!/\.(m?js|d\.ts|html)$/.test(file)) continue
+    const text = readFileSync(join(dist, file), 'utf8')
     if (text.includes('@flow-checker/')) fail(`dist/${file} references a private @flow-checker/* package`)
   }
+  if (!existsSync(join(dist, 'dashboard', 'index.html'))) fail('dist/dashboard/index.html is missing')
 
   // 2. Pack and check the published manifest.
   run('pnpm', ['pack', '--pack-destination', work], pkgDir)

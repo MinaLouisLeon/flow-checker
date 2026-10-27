@@ -2,7 +2,7 @@
 
 Maps a Next.js App Router project: its pages, components, requests, types and user flows. It verifies that map against real traffic while you use the app, and exports it as documentation.
 
-> Status: early development. M1 (routes + components scan) is done: `flow-checker scan` writes `.flow-checker/model.json`. The plan is in [docs/PLAN.md](docs/PLAN.md).
+> Status: early development. The scan covers routes, components and types (M1, M3): `flow-checker scan` writes `.flow-checker/model.json`, and `flow-checker dev` serves a read-only dashboard of it (M4). The plan is in [docs/PLAN.md](docs/PLAN.md).
 
 Published as [`@integr8/flow-checker`](packages/flow-checker). The command is `flow-checker`.
 
@@ -29,7 +29,8 @@ Requires Node 22.12+ and pnpm 11.
 pnpm install
 pnpm check              # everything CI runs: lint, typecheck, fixture typecheck, test, build
 pnpm test:watch         # vitest in watch mode
-pnpm --filter @flow-checker/dashboard dev   # dashboard UI on :4401
+node packages/flow-checker/dist/cli.js dev --root fixtures/bff   # after pnpm build: dashboard on :4400
+pnpm --filter @flow-checker/dashboard dev   # dashboard with hot reload on :4401 (API proxied to :4400)
 ```
 
 The repo tooling is pinned to TypeScript 6.x because TypeScript 7 (the native compiler) has no stable JavaScript API yet, and tsup's declaration build needs one. The scanner uses `ts-morph`, which ships its own compiler.

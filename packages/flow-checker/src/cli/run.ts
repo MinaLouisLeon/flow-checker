@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util'
 import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
+import { devCommand } from './dev'
 import { scanCommand } from './scan'
 
 const COMMANDS = {
@@ -25,6 +26,9 @@ ${Object.entries(COMMANDS)
 Options:
   --root <dir>      Project root (default: current directory)
   --app-dir <dir>   App Router directory, relative to the root (default: src/app or app)
+  --port <n>        dev: dashboard port (default: 4400)
+  --app-port <n>    dev: port your Next.js app runs on (default: 3000)
+  --no-open         dev: don't open the browser
   --tree            scan: also print the route and component trees
   --types           scan: also print the resolved types
   -h, --help        Show help
@@ -76,6 +80,13 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
     )
   }
 
+  if (command === 'dev') {
+    const port = toPort(values.port, '--port', io)
+    const appPort = toPort(values['app-port'], '--app-port', io)
+    if (port === null || appPort === null) return 1
+    return devCommand({ root: values.root, appDir: values['app-dir'], port, appPort, open: values.open }, io)
+  }
+
   io.err(`"${command}" is not implemented yet.`)
   return 1
 }
@@ -84,6 +95,7 @@ function parse(argv: string[]) {
   return parseArgs({
     args: argv,
     allowPositionals: true,
+    allowNegative: true,
     strict: true,
     options: {
       help: { type: 'boolean', short: 'h' },
@@ -92,8 +104,22 @@ function parse(argv: string[]) {
       'app-dir': { type: 'string' },
       tree: { type: 'boolean' },
       types: { type: 'boolean' },
+      port: { type: 'string' },
+      'app-port': { type: 'string' },
+      open: { type: 'boolean', default: true },
     },
   })
+}
+
+/** Parses a port option. `undefined` when not given, `null` (after printing why) when invalid. */
+function toPort(value: string | undefined, flag: string, io: CliIO): number | undefined | null {
+  if (value === undefined) return undefined
+  const port = Number(value)
+  if (!Number.isInteger(port) || port < 0 || port > 65535) {
+    io.err(`${flag} must be a port number, got "${value}".`)
+    return null
+  }
+  return port
 }
 
 function isCommand(value: string): value is Command {
