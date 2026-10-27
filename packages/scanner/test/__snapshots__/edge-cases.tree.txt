@@ -1,0 +1,100 @@
+# Route tree
+
+src/app [layout, page]
+├─ (shop) (group)
+│  └─ shop
+│     └─ [...slug] (catch-all) [page]
+├─ @modal (slot) [default]
+│  └─ (.)photo (intercepts (.))
+│     └─ [id] (dynamic) [page]
+├─ api
+│  └─ hello [route]
+├─ dashboard [layout, template, page]
+├─ docs
+│  └─ [[...path]] (optional-catch-all) [page]
+├─ feed [page]
+│  └─ (..)photo (intercepts (..))
+│     └─ [id] (dynamic) [page]
+├─ memo [page]
+├─ no-default [page]
+└─ photo
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/api/hello  route GET,POST  src/app/api/hello/route.ts
+/dashboard  page  src/app/dashboard/page.tsx
+/docs/[[...path]]  page  src/app/docs/[[...path]]/page.tsx
+/feed  page  src/app/feed/page.tsx
+/memo  page  src/app/memo/page.tsx
+/no-default  page  src/app/no-default/page.tsx
+/photo/[id]  page  src/app/@modal/(.)photo/[id]/page.tsx  (slot @modal, intercepts from / (.))
+/photo/[id]  page  src/app/feed/(..)photo/[id]/page.tsx  (intercepts from /feed (..))
+/photo/[id]  page  src/app/photo/[id]/page.tsx
+/shop/[...slug]  page  src/app/(shop)/shop/[...slug]/page.tsx
+
+# Layouts
+
+DashLayout  server  src/app/dashboard/layout.tsx:1
+
+DashTemplate  server  src/app/dashboard/template.tsx:1
+
+RootLayout  server  src/app/layout.tsx:2
+└─ Shell  server  src/ui/Shell.tsx:1
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+Home  server  src/app/page.tsx:13
+├─ UI.Button = Button  server  src/ui/Button.tsx:1
+├─ Memoized  server  src/components/wrapped.tsx:2  [conditional]
+├─ Fwd  server  src/components/wrapped.tsx:3  [conditional]
+├─ LazyPanel  server  src/components/Lazy.tsx:1  [conditional, dynamic]
+├─ NamedLazy = Named  server  src/components/Named.tsx:1  [dynamic]
+├─ Tree  server  src/components/Tree.tsx:1
+│  └─ Tree  server  src/components/Tree.tsx:1  [conditional] (cycle)
+├─ Shared  shared  src/components/Shared.tsx:1
+├─ ClientBox  client (use client)  src/components/ClientBox.tsx:4
+│  ├─ Shared  shared  src/components/Shared.tsx:1
+│  └─ Inner  client  src/components/Inner.tsx:1
+├─ Local  server  src/app/page.tsx:12
+├─ Image  external next/image
+└─ Missing  unresolved ./missing
+
+## /dashboard  src/app/dashboard/page.tsx
+layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx > src/app/dashboard/template.tsx
+Dash  server  src/app/dashboard/page.tsx:1
+
+## /docs/[[...path]]  src/app/docs/[[...path]]/page.tsx
+layouts: src/app/layout.tsx
+Docs  server  src/app/docs/[[...path]]/page.tsx:1
+
+## /feed  src/app/feed/page.tsx
+layouts: src/app/layout.tsx
+Feed  server  src/app/feed/page.tsx:1
+
+## /memo  src/app/memo/page.tsx
+layouts: src/app/layout.tsx
+MemoPage  server  src/app/memo/page.tsx:2
+
+## /no-default  src/app/no-default/page.tsx
+layouts: src/app/layout.tsx
+(no component)
+
+## /photo/[id] @modal  src/app/@modal/(.)photo/[id]/page.tsx
+layouts: src/app/layout.tsx
+PhotoModal  server  src/app/@modal/(.)photo/[id]/page.tsx:1
+
+## /photo/[id]  src/app/feed/(..)photo/[id]/page.tsx
+layouts: src/app/layout.tsx
+FeedPhoto  server  src/app/feed/(..)photo/[id]/page.tsx:1
+
+## /photo/[id]  src/app/photo/[id]/page.tsx
+layouts: src/app/layout.tsx
+Photo  server  src/app/photo/[id]/page.tsx:1
+
+## /shop/[...slug]  src/app/(shop)/shop/[...slug]/page.tsx
+layouts: src/app/layout.tsx
+Shop  server  src/app/(shop)/shop/[...slug]/page.tsx:1

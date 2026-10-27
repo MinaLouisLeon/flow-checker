@@ -1,2 +1,3 @@
-// Placeholder. Implemented in a later milestone (see docs/PLAN.md section 14).
-export const PACKAGE = '@flow-checker/scanner'
+export { ComponentGraph, directives } from './components'
+export { type Discovery, discoverProject, ScanError } from './discovery'
+export { type ScanOptions, scanProject } from './scan'

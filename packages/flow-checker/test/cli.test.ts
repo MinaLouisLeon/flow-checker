@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it } from 'vitest'
 import pkg from '../package.json' with { type: 'json' }
 import { type CliIO, runCli } from '../src/cli/run'
 
@@ -34,5 +37,46 @@ describe('cli', () => {
     const { io, err } = capture()
     expect(await runCli(['--nope'], io)).toBe(1)
     expect(err.join('\n')).toContain('--help')
+  })
+})
+
+describe('cli scan', () => {
+  const dirs: string[] = []
+  const project = (files: Record<string, string>) => {
+    const dir = mkdtempSync(join(tmpdir(), 'flow-checker-cli-'))
+    dirs.push(dir)
+    for (const [path, text] of Object.entries(files)) {
+      mkdirSync(join(dir, path, '..'), { recursive: true })
+      writeFileSync(join(dir, path), text)
+    }
+    return dir
+  }
+  afterEach(() => {
+    for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true })
+  })
+
+  it('writes .flow-checker/model.json', async () => {
+    const root = project({
+      'app/layout.tsx': 'export default function Root({ children }) { return <html>{children}</html> }',
+      'app/page.tsx': 'export default function Home() { return <main /> }',
+      'app/api/ping/route.ts': 'export function GET() { return new Response() }',
+    })
+    const { io, out } = capture()
+    expect(await runCli(['scan', '--root', root, '--tree'], io)).toBe(0)
+    const output = out.join('\n')
+    expect(output).toContain('Scanned 1 page, 1 route handler and 2 components')
+    expect(output).toContain('# Route tree')
+
+    const modelFile = join(root, '.flow-checker', 'model.json')
+    expect(existsSync(modelFile)).toBe(true)
+    const model = JSON.parse(readFileSync(modelFile, 'utf8'))
+    expect(model.routes.map((r: { path: string }) => r.path)).toEqual(['/', '/api/ping'])
+  })
+
+  it('fails with a clear message when there is no app directory', async () => {
+    const root = project({ 'pages/index.tsx': 'export default () => null' })
+    const { io, err } = capture()
+    expect(await runCli(['scan', '--root', root], io)).toBe(1)
+    expect(err.join('\n')).toContain('App Router')
   })
 })

@@ -64,5 +64,9 @@
     "@flow-checker/server": "workspace:*",
     "@flow-checker/shared": "workspace:*",
     "tsup": "catalog:"
+  },
+  "dependencies": {
+    "ts-morph": "catalog:",
+    "zod": "catalog:"
   }
 }
