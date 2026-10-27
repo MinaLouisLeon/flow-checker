@@ -42,6 +42,9 @@ catalogs:
     swr:
       specifier: ^2.5.1
       version: 2.5.1
+    ts-morph:
+      specifier: ^28.0.0
+      version: 28.0.0
     tsup:
       specifier: ^9.0.0
       version: 9.0.0
@@ -255,6 +258,12 @@ importers:
       next:
         specifier: ">=13.4.0"
         version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      ts-morph:
+        specifier: "catalog:"
+        version: 28.0.0
+      zod:
+        specifier: "catalog:"
+        version: 4.6.7
     devDependencies:
       "@flow-checker/exporter":
         specifier: workspace:*
@@ -286,6 +295,9 @@ importers:
       "@flow-checker/shared":
         specifier: workspace:*
         version: link:../shared
+      ts-morph:
+        specifier: "catalog:"
+        version: 28.0.0
 
   packages/server:
     dependencies:
@@ -293,7 +305,11 @@ importers:
         specifier: workspace:*
         version: link:../shared
 
-  packages/shared: {}
+  packages/shared:
+    dependencies:
+      zod:
+        specifier: "catalog:"
+        version: 4.6.7
 
 packages:
   "@biomejs/biome@2.6.3":
@@ -1707,6 +1723,12 @@ packages:
       "@types/react":
         optional: true
 
+  "@ts-morph/common@0.29.0":
+    resolution:
+      {
+        integrity: sha512-35oUmphHbJvQ/+UTwFNme/t2p3FoKiGJ5auTjjpNTop2dyREspirjMy82PLSC1pnDJ8ah1GU98hwpVt64YXQsg==,
+      }
+
   "@types/chai@5.2.3":
     resolution:
       {
@@ -1824,6 +1846,13 @@ packages:
         integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==,
       }
 
+  balanced-match@4.0.4:
+    resolution:
+      {
+        integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==,
+      }
+    engines: { node: 18 || 20 || >=22 }
+
   baseline-browser-mapping@2.11.33:
     resolution:
       {
@@ -1831,6 +1860,13 @@ packages:
       }
     engines: { node: ">=6.0.0" }
     hasBin: true
+
+  brace-expansion@5.0.12:
+    resolution:
+      {
+        integrity: sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==,
+      }
+    engines: { node: 20 || >=22 }
 
   bundle-require@5.1.0:
     resolution:
@@ -1879,6 +1915,12 @@ packages:
     resolution:
       {
         integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==,
+      }
+
+  code-block-writer@13.0.3:
+    resolution:
+      {
+        integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==,
       }
 
   combined-stream@1.0.8:
@@ -2312,6 +2354,13 @@ packages:
       }
     engines: { node: ">= 0.6" }
 
+  minimatch@10.2.6:
+    resolution:
+      {
+        integrity: sha512-vpLQEs+VLCr1nU0BXS07maYoFwlDAH0gngQuuttxIwutDFEMHq2blX+8vpgxDdK3J1PwjCJiep77OitTZ4Ll1A==,
+      }
+    engines: { node: 18 || 20 || >=22 }
+
   mlly@1.8.2:
     resolution:
       {
@@ -2407,6 +2456,12 @@ packages:
         integrity: sha512-5vvB5+W7ePv+p3uqxi+RcW1XAzLW0/hxt3/4X4Lc4qHudzOhmBiBwOY6DRob4WnanAEGvNcLjF+KNOufrUoEQw==,
       }
     engines: { node: ">=12.20.0" }
+
+  path-browserify@1.0.1:
+    resolution:
+      {
+        integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==,
+      }
 
   pathe@2.0.3:
     resolution:
@@ -2655,6 +2710,12 @@ packages:
     resolution:
       {
         integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==,
+      }
+
+  ts-morph@28.0.0:
+    resolution:
+      {
+        integrity: sha512-Wp3tnZ2bzwxyTZMtgWVzXDfm7lB1Drz+y9DmmYH/L702PQhPyVrp3pkou3yIz4qjS14GY9kcpmLiOOMvl8oG1g==,
       }
 
   tslib@2.8.1:
@@ -3391,6 +3452,12 @@ snapshots:
     optionalDependencies:
       "@types/react": 19.3.0
 
+  "@ts-morph/common@0.29.0":
+    dependencies:
+      minimatch: 10.2.6
+      path-browserify: 1.0.1
+      tinyglobby: 0.2.17
+
   "@types/chai@5.2.3":
     dependencies:
       "@types/deep-eql": 4.0.2
@@ -3452,7 +3519,13 @@ snapshots:
       - debug
       - supports-color
 
+  balanced-match@4.0.4: {}
+
   baseline-browser-mapping@2.11.33: {}
+
+  brace-expansion@5.0.12:
+    dependencies:
+      balanced-match: 4.0.4
 
   bundle-require@5.1.0(esbuild@0.28.2):
     dependencies:
@@ -3475,6 +3548,8 @@ snapshots:
       readdirp: 5.1.1
 
   client-only@0.0.1: {}
+
+  code-block-writer@13.0.3: {}
 
   combined-stream@1.0.8:
     dependencies:
@@ -3710,6 +3785,10 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
+  minimatch@10.2.6:
+    dependencies:
+      brace-expansion: 5.0.12
+
   mlly@1.8.2:
     dependencies:
       acorn: 8.19.0
@@ -3782,6 +3861,8 @@ snapshots:
   object-assign@4.1.1: {}
 
   obug@3.0.0: {}
+
+  path-browserify@1.0.1: {}
 
   pathe@2.0.3: {}
 
@@ -3969,6 +4050,11 @@ snapshots:
   tree-kill@1.2.2: {}
 
   ts-interface-checker@0.1.13: {}
+
+  ts-morph@28.0.0:
+    dependencies:
+      "@ts-morph/common": 0.29.0
+      code-block-writer: 13.0.3
 
   tslib@2.8.1: {}
 

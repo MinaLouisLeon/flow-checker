@@ -1,0 +1,33 @@
+# Route tree
+
+src/app [layout, page]
+├─ api
+│  └─ products [route]
+│     └─ [id] (dynamic) [route]
+└─ products
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/api/products  route GET,POST  src/app/api/products/route.ts
+/api/products/[id]  route GET  src/app/api/products/[id]/route.ts
+/products/[id]  page  src/app/products/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:5
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+HomePage  server  src/app/page.tsx:4
+├─ CreateProductForm  client (use client)  src/components/CreateProductForm.tsx:8
+└─ ProductsTable  client (use client)  src/components/ProductsTable.tsx:8
+   └─ Link  external next/link
+
+## /products/[id]  src/app/products/[id]/page.tsx
+layouts: src/app/layout.tsx
+ProductPage  client (use client)  src/app/products/[id]/page.tsx:8
+└─ Link  external next/link

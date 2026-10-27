@@ -2,7 +2,7 @@
 
 Maps a Next.js App Router project: its pages, components, requests, types and user flows. It verifies that map against real traffic while you use the app, and exports it as documentation.
 
-> Status: early development (milestone M0, project setup). The plan is in [docs/PLAN.md](docs/PLAN.md).
+> Status: early development. M1 (routes + components scan) is done: `flow-checker scan` writes `.flow-checker/model.json`. The plan is in [docs/PLAN.md](docs/PLAN.md).
 
 Published as [`@integr8/flow-checker`](packages/flow-checker). The command is `flow-checker`.
 

@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util'
 import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
+import { scanCommand } from './scan'
 
 const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
@@ -22,8 +23,11 @@ ${Object.entries(COMMANDS)
   .join('\n')}
 
 Options:
-  -h, --help     Show help
-  -v, --version  Show version
+  --root <dir>      Project root (default: current directory)
+  --app-dir <dir>   App Router directory, relative to the root (default: src/app or app)
+  --tree            scan: also print the route and component trees
+  -h, --help        Show help
+  -v, --version     Show version
 `
 
 export interface CliIO {
@@ -64,6 +68,10 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
     return 1
   }
 
+  if (command === 'scan') {
+    return scanCommand({ root: values.root, appDir: values['app-dir'], tree: values.tree }, io)
+  }
+
   io.err(`"${command}" is not implemented yet.`)
   return 1
 }
@@ -76,6 +84,9 @@ function parse(argv: string[]) {
     options: {
       help: { type: 'boolean', short: 'h' },
       version: { type: 'boolean', short: 'v' },
+      root: { type: 'string' },
+      'app-dir': { type: 'string' },
+      tree: { type: 'boolean' },
     },
   })
 }

@@ -1,0 +1,36 @@
+# Route tree
+
+app [layout, page]
+├─ (marketing) (group)
+│  └─ about [page]
+└─ users
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  app/page.tsx
+/about  page  app/(marketing)/about/page.tsx
+/users/[id]  page  app/users/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  app/layout.tsx:6
+└─ Link  external next/link
+
+# Pages
+
+## /  app/page.tsx
+layouts: app/layout.tsx
+HomePage  server  app/page.tsx:7
+└─ UserList  server  components/UserList.tsx:9
+   └─ Link  external next/link
+
+## /about  app/(marketing)/about/page.tsx
+layouts: app/layout.tsx
+AboutPage  server  app/(marketing)/about/page.tsx:2
+
+## /users/[id]  app/users/[id]/page.tsx
+layouts: app/layout.tsx
+UserPage  server  app/users/[id]/page.tsx:8
+├─ ProfileCard  client (use client)  components/ProfileCard.tsx:12
+└─ DeleteUserButton  client (use client)  components/DeleteUserButton.tsx:12
