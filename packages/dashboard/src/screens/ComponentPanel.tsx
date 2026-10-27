@@ -6,7 +6,13 @@ import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 export function ComponentPanel({ componentId, routeId }: { componentId: string; routeId?: string }) {
   const { index } = useData()
   const component = index.components.get(componentId)
-  if (!component) return <Empty>This component is not in the current scan.</Empty>
+  if (!component) {
+    return (
+      <Empty>
+        This component is not in the current scan. <a href={href({ name: 'overview' })}>Back to overview</a>
+      </Empty>
+    )
+  }
 
   const parents = index.renderedBy.get(component.id) ?? []
   const routeIds = index.routesOf.get(component.id) ?? []

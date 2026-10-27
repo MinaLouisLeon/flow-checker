@@ -112,7 +112,6 @@ function RouteGraphView({ q }: { q: string }) {
           fitView
           fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
           minZoom={0.2}
-          proOptions={{ hideAttribution: true }}
           onNodeClick={(_, node) => {
             const route = (node as RouteNode).data.route
             if (route.kind === 'page') window.location.hash = href({ name: 'page', routeId: route.id })
