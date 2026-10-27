@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+coverage/
+.flow-checker/
+.env*.local
+.DS_Store
+*.log

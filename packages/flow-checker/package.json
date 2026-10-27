@@ -1,0 +1,68 @@
+{
+  "name": "@integr8/flow-checker",
+  "version": "0.0.0",
+  "description": "Map a Next.js App Router project: pages, components, requests, types and flows, verified against live traffic and exported as documentation.",
+  "keywords": [
+    "nextjs",
+    "app-router",
+    "documentation",
+    "api",
+    "flows",
+    "devtools"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "flow-checker": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
+    },
+    "./runtime/client": {
+      "types": "./dist/runtime-client.d.ts",
+      "default": "./dist/runtime-client.js"
+    },
+    "./runtime/server": {
+      "types": "./dist/runtime-server.d.ts",
+      "default": "./dist/runtime-server.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "peerDependencies": {
+    "next": ">=13.4.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@flow-checker/exporter": "workspace:*",
+    "@flow-checker/runtime": "workspace:*",
+    "@flow-checker/scanner": "workspace:*",
+    "@flow-checker/server": "workspace:*",
+    "@flow-checker/shared": "workspace:*",
+    "tsup": "catalog:"
+  }
+}

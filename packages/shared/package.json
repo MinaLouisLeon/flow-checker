@@ -1,0 +1,13 @@
+{
+  "name": "@flow-checker/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Data model, schemas and utilities shared by every flow-checker package (internal).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "Home": {
+    "title": "Welcome",
+    "signIn": "Sign in"
+  },
+  "Login": {
+    "title": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Continue"
+  },
+  "Verify": {
+    "title": "Enter your code",
+    "code": "6-digit code",
+    "submit": "Verify",
+    "missingChallenge": "Start by signing in."
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "greeting": "Hello, {name}",
+    "signOut": "Sign out",
+    "notSignedIn": "You are not signed in."
+  }
+}

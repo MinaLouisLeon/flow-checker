@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Lets the .d.ts bundler find internal package sources so their types get inlined.
+    "paths": {
+      "@flow-checker/runtime/client": ["../runtime/src/client.ts"],
+      "@flow-checker/runtime/server": ["../runtime/src/server.ts"],
+      "@flow-checker/*": ["../*/src/index.ts"]
+    }
+  },
+  "include": ["src", "test", "tsup.config.ts"]
+}

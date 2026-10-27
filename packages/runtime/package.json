@@ -1,0 +1,18 @@
+{
+  "name": "@flow-checker/runtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Dev-only capture runtime injected into the analyzed Next.js app (internal).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./server": "./src/server.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flow-checker/shared": "workspace:*"
+  }
+}

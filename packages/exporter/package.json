@@ -1,0 +1,16 @@
+{
+  "name": "@flow-checker/exporter",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Markdown and static HTML export (internal).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flow-checker/shared": "workspace:*"
+  }
+}

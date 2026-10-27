@@ -1,0 +1,26 @@
+{
+  "name": "flow-checker-monorepo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "pnpm --filter \"./packages/**\" --stream build",
+    "typecheck": "pnpm --filter \"./packages/**\" typecheck",
+    "typecheck:fixtures": "pnpm --filter \"./fixtures/**\" typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "check": "pnpm lint && pnpm typecheck && pnpm typecheck:fixtures && pnpm test && pnpm build && pnpm verify:package",
+    "verify:package": "node scripts/verify-package.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

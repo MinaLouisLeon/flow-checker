@@ -1,0 +1,24 @@
+{
+  "name": "@flow-checker/dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker dashboard UI, a React SPA served by the tool server (internal).",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flow-checker/shared": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "vite": "catalog:"
+  }
+}

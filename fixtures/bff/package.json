@@ -1,0 +1,24 @@
+{
+  "name": "@fixtures/bff",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: Route handlers as a BFF forwarding to an external API; zod schemas with z.infer.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}
