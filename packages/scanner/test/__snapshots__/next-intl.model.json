@@ -556,6 +556,302 @@
           }
         ]
       }
+    },
+    {
+      "id": "typ_0soatqi8re7",
+      "name": "LoginRequest",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "password",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1ywasj4ylf5",
+      "name": "LoginResponse",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 13,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "otpRequired",
+            "type": {
+              "kind": "literal",
+              "value": true
+            }
+          },
+          {
+            "name": "challengeId",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0picqcg78cw",
+      "name": "VerifyOtpRequest",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 18,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "challengeId",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "code",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1pi4a892sek",
+      "name": "VerifyOtpResponse",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 23,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "token",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "user",
+            "type": {
+              "kind": "ref",
+              "typeId": "typ_1tpxqokvkch",
+              "name": "User"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1ostg0bhzmk",
+      "origin": "component",
+      "componentId": "cmp_0bpwse6tsg4",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/me`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/me"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 15,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "User | null",
+        "shape": {
+          "kind": "union",
+          "types": [
+            {
+              "kind": "ref",
+              "typeId": "typ_1tpxqokvkch",
+              "name": "User"
+            },
+            {
+              "kind": "primitive",
+              "name": "null"
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 16,
+          "column": 5,
+          "callee": "getMe"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 25,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": []
+    },
+    {
+      "id": "req_0ldgejuv5rs",
+      "origin": "component",
+      "componentId": "cmp_0skl5lm1a9a",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/auth/login"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/LoginForm.tsx",
+          "line": 29,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "LoginRequest",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0soatqi8re7",
+          "name": "LoginRequest"
+        }
+      },
+      "responseType": {
+        "text": "LoginResponse",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1ywasj4ylf5",
+          "name": "LoginResponse"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/LoginForm.tsx",
+          "line": 18,
+          "column": 37,
+          "callee": "login"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 17,
+          "column": 47,
+          "callee": "post"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": []
+    },
+    {
+      "id": "req_0ivpze9dolu",
+      "origin": "component",
+      "componentId": "cmp_1hlwjtaw6e6",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/auth/verify-otp"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 36,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "VerifyOtpRequest",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0picqcg78cw",
+          "name": "VerifyOtpRequest"
+        }
+      },
+      "responseType": {
+        "text": "VerifyOtpResponse",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1pi4a892sek",
+          "name": "VerifyOtpResponse"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 27,
+          "column": 31,
+          "callee": "verifyOtp"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 20,
+          "column": 3,
+          "callee": "post"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": []
     }
   ]
 }

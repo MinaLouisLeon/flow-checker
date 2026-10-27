@@ -1,0 +1,39 @@
+# Requests
+
+## route handler GET /api/products/[id]  src/app/api/products/[id]/route.ts
+GET {BACKEND_URL ?? http://localhost:4010}/products/:id  fetch  route-handler
+  response: Product
+  via: backend src/app/api/products/[id]/route.ts:8 > fetch src/lib/backend.ts:5
+
+## route handler GET /api/products  src/app/api/products/route.ts
+GET {BACKEND_URL ?? http://localhost:4010}/products  fetch  route-handler
+  response: Product[]
+  via: backend src/app/api/products/route.ts:7 > fetch src/lib/backend.ts:5
+
+## route handler POST /api/products  src/app/api/products/route.ts
+POST {BACKEND_URL ?? http://localhost:4010}/products  fetch  route-handler
+  body: { name: string; price: number; stock: number; }
+  response: Product
+  via: backend src/app/api/products/route.ts:23 > fetch src/lib/backend.ts:5
+
+## ProductPage  src/app/products/[id]/page.tsx:8
+GET /api/products/:id  fetch  effect
+  response: Product
+  handled by: src/app/api/products/[id]/route.ts
+  then: GET {BACKEND_URL ?? http://localhost:4010}/products/:id
+  via: fetch src/app/products/[id]/page.tsx:13
+
+## CreateProductForm  src/components/CreateProductForm.tsx:8
+POST /api/products  fetch  event onSubmit
+  body: CreateProductInput
+  response: Product
+  handled by: src/app/api/products/route.ts
+  then: POST {BACKEND_URL ?? http://localhost:4010}/products
+  via: fetch src/components/CreateProductForm.tsx:21
+
+## ProductsTable  src/components/ProductsTable.tsx:8
+GET /api/products  fetch  effect
+  response: Product[]
+  handled by: src/app/api/products/route.ts
+  then: GET {BACKEND_URL ?? http://localhost:4010}/products
+  via: fetch src/components/ProductsTable.tsx:12

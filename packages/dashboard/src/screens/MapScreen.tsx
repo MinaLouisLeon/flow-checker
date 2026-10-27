@@ -114,7 +114,7 @@ function RouteGraphView({ q }: { q: string }) {
           minZoom={0.2}
           onNodeClick={(_, node) => {
             const route = (node as RouteNode).data.route
-            if (route.kind === 'page') window.location.hash = href({ name: 'page', routeId: route.id })
+            window.location.hash = href({ name: 'page', routeId: route.id })
           }}
         >
           <Background gap={24} />
@@ -212,21 +212,22 @@ function TreeNode({
         <span className="files">
           {files.map(([kind, file]) => {
             const route = routeByFile.get(file)
-            if (route?.kind === 'page') {
+            if (route) {
               return (
                 <a
                   key={kind}
-                  className="file-chip file-chip-page"
+                  className={`file-chip ${route.kind === 'page' ? 'file-chip-page' : 'file-chip-route'}`}
                   href={href({ name: 'page', routeId: route.id })}
+                  title={route.file}
                 >
                   {kind}
+                  {route.methods?.length ? ` ${route.methods.join(' ')}` : ''}
                 </a>
               )
             }
             return (
-              <span key={kind} className={`file-chip${route ? ' file-chip-route' : ''}`} title={file}>
+              <span key={kind} className="file-chip" title={file}>
                 {kind}
-                {route?.methods?.length ? ` ${route.methods.join(' ')}` : ''}
               </span>
             )
           })}

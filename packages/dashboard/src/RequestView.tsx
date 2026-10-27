@@ -1,0 +1,243 @@
+// One request site: method + URL, how and when it is sent, body and response types,
+// the server hops it leads to, and the call stack from the component down to the network call.
+import { type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
+import { useData } from './context'
+import { href } from './router'
+import { TypeShapeView } from './TypeShapeView'
+import { Badge, Empty, SourceLink } from './ui'
+
+const TRIGGER_LABEL: Record<Trigger['kind'], string> = {
+  'server-render': 'server render',
+  'page-load': 'page load',
+  effect: 'effect',
+  event: 'event',
+  'route-handler': 'route handler',
+  'server-action': 'server action',
+  unknown: 'unknown trigger',
+}
+
+const TRIGGER_TITLE: Record<Trigger['kind'], string> = {
+  'server-render': 'Sent while a server component renders',
+  'page-load': 'Sent when the client component renders (query hooks, render-time calls)',
+  effect: 'Sent from useEffect after the component mounts',
+  event: 'Sent when the user interacts',
+  'route-handler': 'Sent by a route handler when it is called',
+  'server-action': 'Sent by a server action when it is called',
+  unknown: 'The scan could not tell what starts this request',
+}
+
+export function triggerLabel(trigger: Trigger): string {
+  return trigger.kind === 'event' && trigger.event ? trigger.event : TRIGGER_LABEL[trigger.kind]
+}
+
+export function RequestList({
+  sites,
+  empty,
+  open,
+}: {
+  sites: RequestSite[]
+  empty: string
+  /** Expand the details. Default: when there are three or fewer. */
+  open?: boolean
+}) {
+  if (sites.length === 0) return <Empty>{empty}</Empty>
+  return (
+    <ul className="requests">
+      {sites.map((site) => (
+        <li key={site.id}>
+          <RequestItem site={site} open={open ?? sites.length <= 3} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function RequestSummary({ site }: { site: RequestSite }) {
+  return (
+    <span className="request-summary">
+      <span className={`method method-${(site.method ?? 'unknown').toLowerCase()}`}>
+        {site.method ?? '?'}
+      </span>
+      {site.transport === 'server-action' ? (
+        <code className="request-url">{site.serverAction?.name ?? '?'}</code>
+      ) : (
+        <code className="request-url" title={site.url?.text}>
+          {site.url ? urlText(site.url) : '?'}
+        </code>
+      )}
+    </span>
+  )
+}
+
+function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
+  const { index } = useData()
+  const target = site.targetRouteId ? index.routes.get(site.targetRouteId) : undefined
+  const chain = (site.chain ?? []).map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
+
+  return (
+    <details className="request" open={open}>
+      <summary>
+        <RequestSummary site={site} />
+        <span className="spacer" />
+        <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
+          {site.transport === 'server-action' ? 'server action' : site.transport}
+          {site.hook ? ` · ${site.hook.name}` : ''}
+        </Badge>
+        <Badge
+          tone={site.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
+          title={TRIGGER_TITLE[site.trigger.kind]}
+        >
+          {triggerLabel(site.trigger)}
+        </Badge>
+        {site.flags.length > 0 && (
+          <Badge tone="warn" title={site.flags.map((f) => f.message).join('\n')}>
+            ⚠ {site.flags.length}
+          </Badge>
+        )}
+      </summary>
+
+      <div className="request-body">
+        {site.flags.length > 0 && (
+          <ul className="notes">
+            {site.flags.map((f) => (
+              <li key={f.kind}>⚠ {f.message}</li>
+            ))}
+          </ul>
+        )}
+        <dl className="request-facts">
+          {site.url?.baseEnv && (
+            <>
+              <dt>Base URL</dt>
+              <dd>
+                <code>process.env.{site.url.baseEnv}</code>
+                {site.url.base && !site.url.base.startsWith('{') && (
+                  <span className="muted">
+                    {' '}
+                    falls back to <code>{site.url.base}</code>
+                  </span>
+                )}
+              </dd>
+            </>
+          )}
+          {site.url && site.url.confidence !== 'exact' && (
+            <>
+              <dt>URL as written</dt>
+              <dd>
+                <code>{site.url.text}</code>
+              </dd>
+            </>
+          )}
+          {site.hook?.key && (
+            <>
+              <dt>Key</dt>
+              <dd>
+                <code>{site.hook.key}</code>
+              </dd>
+            </>
+          )}
+          {site.serverAction && (
+            <>
+              <dt>{site.transport === 'server-action' ? 'Action' : 'Runs in action'}</dt>
+              <dd>
+                <code>{site.serverAction.name}</code>{' '}
+                <SourceLink
+                  file={site.serverAction.loc.file}
+                  line={site.serverAction.loc.line}
+                  column={site.serverAction.loc.column}
+                />
+              </dd>
+            </>
+          )}
+          {site.trigger.loc && (
+            <>
+              <dt>Trigger</dt>
+              <dd>
+                {triggerLabel(site.trigger)}{' '}
+                <SourceLink
+                  file={site.trigger.loc.file}
+                  line={site.trigger.loc.line}
+                  column={site.trigger.loc.column}
+                />
+              </dd>
+            </>
+          )}
+          {target && (
+            <>
+              <dt>Handled by</dt>
+              <dd>
+                <a href={href({ name: 'page', routeId: target.id })}>
+                  <code>{target.path}</code>
+                </a>{' '}
+                <span className="muted">route handler</span>
+              </dd>
+            </>
+          )}
+        </dl>
+
+        <TypeBlock title="Request body" text={site.bodyType?.text} shape={site.bodyType?.shape} />
+        <TypeBlock
+          title="Response"
+          text={site.responseType?.text}
+          shape={site.responseType?.shape}
+          empty="Not found in the code. Live capture will fill it in."
+        />
+
+        {chain.length > 0 && (
+          <div className="request-chain">
+            <h4>Then on the server</h4>
+            <ul>
+              {chain.map((hop) => (
+                <li key={hop.id}>
+                  <RequestSummary site={hop} />
+                  {hop.responseType && <span className="muted"> → {hop.responseType.text}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="request-stack">
+          <h4>Call path</h4>
+          <ol>
+            {site.callStack.map((frame) => (
+              <li key={`${frame.file}:${frame.line}:${frame.column}`}>
+                <code>{frame.callee}</code>
+                <span className="spacer" />
+                <SourceLink file={frame.file} line={frame.line} column={frame.column} />
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </details>
+  )
+}
+
+function TypeBlock({
+  title,
+  text,
+  shape,
+  empty,
+}: {
+  title: string
+  text?: string
+  shape?: Parameters<typeof TypeShapeView>[0]['shape']
+  empty?: string
+}) {
+  if (!shape) {
+    return empty ? (
+      <div className="request-type">
+        <h4>{title}</h4>
+        <Empty>{empty}</Empty>
+      </div>
+    ) : null
+  }
+  return (
+    <div className="request-type">
+      <h4>
+        {title} <code className="muted">{text}</code>
+      </h4>
+      <TypeShapeView shape={shape} />
+    </div>
+  )
+}

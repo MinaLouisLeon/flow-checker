@@ -119,6 +119,11 @@ export class TypeResolver {
       const named = this.#namedFromReference(node, type)
       if (named) return this.#ref(named, type, node)
     }
+    // Same for elements: `Product[]` where `type Product = z.infer<...>` keeps the name.
+    if (N.isArrayTypeNode(node) && depth <= this.#maxDepth) {
+      return { kind: 'array', element: this.#fromTypeNode(node.getElementTypeNode(), depth + 1) }
+    }
+    if (N.isParenthesizedTypeNode(node)) return this.#fromTypeNode(node.getTypeNode(), depth)
     return this.#shape(type, node, depth)
   }
 

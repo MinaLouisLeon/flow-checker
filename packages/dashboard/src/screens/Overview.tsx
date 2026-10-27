@@ -7,6 +7,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
+  request: 'Requests the scan could not fully resolve',
 }
 
 export function Overview() {
@@ -15,6 +16,14 @@ export function Overview() {
   const pages = model.routes.filter((r) => r.kind === 'page')
   const handlers = model.routes.filter((r) => r.kind === 'route-handler')
   const byKind = (kind: string) => model.components.filter((c) => c.kind === kind).length
+  const clientRequests = model.requests.filter((s) => s.origin === 'component')
+  const onLoad = clientRequests.filter((s) =>
+    ['server-render', 'page-load', 'effect'].includes(s.trigger.kind),
+  ).length
+  const onEvent = clientRequests.filter((s) => s.trigger.kind === 'event').length
+  const serverHops = model.requests.length - clientRequests.length
+  const verified = model.requests.filter((s) => s.status === 'verified').length
+  const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
     <div className="screen">
@@ -31,23 +40,33 @@ export function Overview() {
           detail={`${byKind('server')} server · ${byKind('client')} client · ${byKind('shared')} shared`}
         />
         <Stat label="Types" value={model.types.length} link={href({ name: 'types', q: '' })} />
-        <Stat label="Requests" value="—" detail="Not scanned yet" />
+        <Stat
+          label="Requests"
+          value={model.requests.length}
+          detail={`${onLoad} on load · ${onEvent} on events · ${serverHops} server-side`}
+        />
         <Stat label="Flows" value="—" detail="Not scanned yet" />
       </div>
 
       <Section title="Verification">
-        <div className="progress" role="progressbar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100}>
-          <div className="progress-bar" style={{ width: '0%' }} />
+        <div
+          className="progress"
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <div className="progress-bar" style={{ width: `${percent}%` }} />
         </div>
         <p className="muted">
-          Everything on this map comes from the code scan. Requests become verified once live capture records
-          them while you use the app.
+          {verified} of {model.requests.length} requests verified. Everything on this map comes from the code
+          scan. Requests become verified once live capture records them while you use the app.
         </p>
       </Section>
 
       <Section title="To check" aside={<span className="count">{index.notes.length}</span>}>
         {index.notes.length === 0 ? (
-          <Empty>The scan resolved every page, component and type.</Empty>
+          <Empty>The scan resolved every page, component, type and request.</Empty>
         ) : (
           <NoteGroups notes={index.notes} />
         )}

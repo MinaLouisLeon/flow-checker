@@ -1,0 +1,36 @@
+# Requests
+
+## server action createProduct  src/actions/products.ts:9
+POST {API_URL ?? http://localhost:4010}/products  fetch  server-action
+  body: CreateProductInput
+  response: Product
+  via: insertProduct src/actions/products.ts:21 > fetch src/lib/backend.ts:17
+
+## server action deleteProduct  src/actions/products.ts:30
+DELETE {API_URL ?? http://localhost:4010}/products/:id  fetch  server-action
+  response: void
+  via: removeProduct src/actions/products.ts:31 > fetch src/lib/backend.ts:27
+
+## ProductPage  src/app/products/[id]/page.tsx:7
+GET {API_URL ?? http://localhost:4010}/products/:id  fetch  server-render
+  response: Product | null
+  via: getProduct src/app/products/[id]/page.tsx:9 > fetch src/lib/backend.ts:12
+
+## ProductsPage  src/app/products/page.tsx:7
+GET {API_URL ?? http://localhost:4010}/products  fetch  server-render
+  response: Product[]
+  via: listProducts src/app/products/page.tsx:8 > fetch src/lib/backend.ts:7
+
+## CreateProductForm  src/components/CreateProductForm.tsx:10
+POST server action createProduct  server-action  event action
+  body: FormData
+  response: FormState
+  then: POST {API_URL ?? http://localhost:4010}/products
+  via: useActionState src/components/CreateProductForm.tsx:11
+
+## DeleteProductButton  src/components/DeleteProductButton.tsx:7
+POST server action deleteProduct  server-action  event onClick
+  body: number
+  response: void
+  then: DELETE {API_URL ?? http://localhost:4010}/products/:id
+  via: deleteProduct src/components/DeleteProductButton.tsx:11

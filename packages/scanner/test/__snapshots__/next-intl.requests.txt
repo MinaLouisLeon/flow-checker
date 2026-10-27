@@ -1,0 +1,18 @@
+# Requests
+
+## DashboardProfile  src/components/DashboardProfile.tsx:10
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/me  fetch  effect
+  response: User | null
+  via: getMe src/components/DashboardProfile.tsx:16 > fetch src/lib/auth-api.ts:25
+
+## LoginForm  src/components/LoginForm.tsx:9
+POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/auth/login  fetch  event onSubmit
+  body: LoginRequest
+  response: LoginResponse
+  via: login src/components/LoginForm.tsx:18 > post src/lib/auth-api.ts:17 > fetch src/lib/auth-api.ts:7
+
+## VerifyOtpForm  src/components/VerifyOtpForm.tsx:13
+POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/auth/verify-otp  fetch  event onSubmit
+  body: VerifyOtpRequest
+  response: VerifyOtpResponse
+  via: verifyOtp src/components/VerifyOtpForm.tsx:27 > post src/lib/auth-api.ts:20 > fetch src/lib/auth-api.ts:7

@@ -62,14 +62,15 @@ describe('cli scan', () => {
       'app/layout.tsx': 'export default function Root({ children }) { return <html>{children}</html> }',
       'app/page.tsx': [
         'interface Props { params: Promise<{ id: string }> }',
-        'export default function Home(_: Props) { return <main /> }',
+        'export default async function Home(_: Props) { await fetch("https://api.test/items"); return <main /> }',
       ].join('\n'),
       'app/api/ping/route.ts': 'export function GET() { return new Response() }',
     })
     const { io, out } = capture()
-    expect(await runCli(['scan', '--root', root, '--tree', '--types'], io)).toBe(0)
+    expect(await runCli(['scan', '--root', root, '--tree', '--types', '--requests'], io)).toBe(0)
     const output = out.join('\n')
-    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components and 1 type')
+    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components, 1 type and 1 request')
+    expect(output).toContain('GET https://api.test/items  fetch  server-render')
     expect(output).toContain('# Types')
     expect(output).toContain('Props  interface  app/page.tsx:1')
     expect(output).toContain('# Route tree')

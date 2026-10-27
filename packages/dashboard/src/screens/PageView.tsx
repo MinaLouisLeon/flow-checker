@@ -1,7 +1,8 @@
-import type { ComponentRef } from '@flow-checker/shared'
+import type { ComponentRef, RequestSite, Route } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
-import { appUrl } from '../model-index'
+import { appUrl, type ModelIndex } from '../model-index'
+import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 import { ComponentPanel } from './ComponentPanel'
@@ -21,6 +22,10 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
 
   const selected = componentId ?? route.componentId
   const open = appUrl(route, meta.appPort)
+  if (route.kind === 'route-handler') return <RouteHandlerView route={route} index={index} />
+  const requests = pageRequests(index, routeId)
+  const onLoad = requests.filter((s) => LOAD_TRIGGERS.has(s.trigger.kind))
+  const onEvent = requests.filter((s) => !LOAD_TRIGGERS.has(s.trigger.kind))
 
   return (
     <div className="screen screen-split">
@@ -85,9 +90,15 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
           )}
         </Section>
 
-        <Section title="Page-load requests">
-          <Empty>Request detection is not part of the scan yet.</Empty>
+        <Section title="Page-load requests" aside={<span className="count">{onLoad.length}</span>}>
+          <RequestList sites={onLoad} empty="Nothing is fetched when this page loads." open={false} />
         </Section>
+
+        {onEvent.length > 0 && (
+          <Section title="Requests on interaction" aside={<span className="count">{onEvent.length}</span>}>
+            <RequestList sites={onEvent} empty="" open={false} />
+          </Section>
+        )}
 
         <Section title="Component tree">
           {route.componentId ? (
@@ -116,6 +127,70 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
   )
 }
 
+const LOAD_TRIGGERS = new Set<RequestSite['trigger']['kind']>(['server-render', 'page-load', 'effect'])
+
+/** Requests started by the page's components and layouts. */
+function pageRequests(index: ModelIndex, routeId: string): RequestSite[] {
+  return index.model.requests.filter(
+    (s) => s.componentId && (index.routesOf.get(s.componentId) ?? []).includes(routeId),
+  )
+}
+
+function RouteHandlerView({ route, index }: { route: Route; index: ModelIndex }) {
+  const sends = index.handlerRequests.get(route.id) ?? []
+  const callers = index.handlerCallers.get(route.id) ?? []
+  return (
+    <div className="screen">
+      <header className="page-head">
+        <h1>
+          <code>{route.path}</code>
+        </h1>
+        <Badge>route handler</Badge>
+        {(route.methods ?? []).map((m) => (
+          <span key={m} className={`method method-${m.toLowerCase()}`}>
+            {m}
+          </span>
+        ))}
+      </header>
+      <div className="page-file">
+        <SourceLink file={route.file} />
+      </div>
+
+      <Section title="Called from" aside={<span className="count">{callers.length}</span>}>
+        {callers.length === 0 ? (
+          <Empty>No component in the scan calls this route.</Empty>
+        ) : (
+          <ul className="list">
+            {callers.map((site) => {
+              const c = site.componentId ? index.components.get(site.componentId) : undefined
+              return (
+                <li key={site.id}>
+                  <span className={`method method-${(site.method ?? 'unknown').toLowerCase()}`}>
+                    {site.method ?? '?'}
+                  </span>
+                  {c ? <a href={href({ name: 'component', componentId: c.id })}>{c.name}</a> : <span>?</span>}
+                  <span className="spacer" />
+                  {site.callStack[0] && (
+                    <SourceLink
+                      file={site.callStack[0].file}
+                      line={site.callStack[0].line}
+                      column={site.callStack[0].column}
+                    />
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </Section>
+
+      <Section title="Requests it sends" aside={<span className="count">{sends.length}</span>}>
+        <RequestList sites={sends} empty="This handler sends no requests to other services." />
+      </Section>
+    </div>
+  )
+}
+
 function TreeItem({
   componentId,
   routeId,
@@ -138,6 +213,7 @@ function TreeItem({
   const nextAncestors = new Set(ancestors).add(componentId)
   const hasChildren = !cycle && component.children.length > 0
   const noteCount = index.notes.filter((n) => n.componentId === componentId).length
+  const requestCount = index.requestsByComponent.get(componentId)?.length ?? 0
 
   return (
     <li>
@@ -158,6 +234,11 @@ function TreeItem({
         <a href={href({ name: 'page', routeId, componentId })}>{component.name}</a>
         <KindBadge component={component} />
         {site && <RefBadges site={site} />}
+        {requestCount > 0 && (
+          <Badge tone="neutral" title={`Sends ${requestCount} request${requestCount === 1 ? '' : 's'}`}>
+            ⇄ {requestCount}
+          </Badge>
+        )}
         {noteCount > 0 && <Badge tone="warn">⚠ {noteCount}</Badge>}
         {cycle && <Badge tone="muted">recursive</Badge>}
       </div>

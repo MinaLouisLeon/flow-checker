@@ -1,5 +1,5 @@
 // The scan result written to `.flow-checker/model.json` (docs/PLAN.md section 5).
-// M1 covers routes and components, M3 types. Request sites and flows are added by later milestones.
+// M1 covers routes and components, M2 request sites, M3 types. Flows are added by a later milestone.
 // All file paths are project-relative and use forward slashes.
 import { z } from 'zod'
 import { MODEL_VERSION } from './constants'
@@ -312,6 +312,111 @@ export const ComponentSchema = z.object({
 })
 export type Component = z.infer<typeof ComponentSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Request sites (M2, docs/PLAN.md 6.4): every place the app sends a request, traced back from
+// the network call (fetch, axios, server action) through wrapper functions to the component,
+// route handler or server action it runs in, and to what starts it.
+
+export const CallFrameSchema = SourceLocSchema.extend({
+  /** The callee as written, e.g. `getUsers`, `api.delete`, `fetch`. */
+  callee: z.string(),
+})
+export type CallFrame = z.infer<typeof CallFrameSchema>
+
+export const RequestUrlSchema = z.object({
+  /** The URL expression as written where the request is sent. */
+  text: z.string(),
+  /**
+   * `exact`: fully resolved. `pattern`: resolved with `:param` placeholders for values only
+   * known at runtime. `unknown`: the path could not be resolved.
+   */
+  confidence: z.enum(['exact', 'pattern', 'unknown']),
+  /** Origin or base URL, e.g. `http://localhost:4010`. Absent for same-origin paths like `/api/x`. */
+  base: z.string().optional(),
+  /** Environment variable the base comes from, e.g. `NEXT_PUBLIC_API_URL`. `base` is then its fallback. */
+  baseEnv: z.string().optional(),
+  /** Path pattern, e.g. `/users/:id`. Absent when unknown. */
+  path: z.string().optional(),
+  /** Query string pattern without `?`, e.g. `userId=:userId`. */
+  query: z.string().optional(),
+})
+export type RequestUrl = z.infer<typeof RequestUrlSchema>
+
+export const TriggerSchema = z.object({
+  /**
+   * `server-render`: a server component fetching while it renders.
+   * `page-load`: a client component on render (query hooks, render-time calls).
+   * `effect`: inside `useEffect` / `useLayoutEffect`.
+   * `event`: a user interaction, see `event`.
+   * `route-handler` / `server-action`: runs when the handler or action is called (second hop).
+   */
+  kind: z.enum([
+    'server-render',
+    'page-load',
+    'effect',
+    'event',
+    'route-handler',
+    'server-action',
+    'unknown',
+  ]),
+  /** Event prop, e.g. `onSubmit`, `onClick`, or `action` for `<form action={...}>`. */
+  event: z.string().optional(),
+  /** Where the trigger is: the JSX attribute, the effect call, ... */
+  loc: SourceLocSchema.optional(),
+})
+export type Trigger = z.infer<typeof TriggerSchema>
+
+export const FlagSchema = z.object({
+  kind: z.enum(['dynamic-url', 'unknown-method', 'unknown-response', 'unknown-trigger']),
+  message: z.string(),
+})
+export type Flag = z.infer<typeof FlagSchema>
+
+export const ServerActionRefSchema = z.object({
+  name: z.string(),
+  loc: SourceLocSchema,
+})
+export type ServerActionRef = z.infer<typeof ServerActionRefSchema>
+
+export const RequestSiteSchema = z.object({
+  id: z.string(),
+  /** Where the code that sends the request runs. */
+  origin: z.enum(['component', 'route-handler', 'server-action']),
+  /** Origin `component`: the component. */
+  componentId: z.string().optional(),
+  /** Origin `route-handler`: the handler's route and exported method. */
+  routeId: z.string().optional(),
+  handlerMethod: HttpMethodSchema.optional(),
+  /** Transport `server-action`: the action called. Origin `server-action`: the action it runs in. */
+  serverAction: ServerActionRefSchema.optional(),
+  transport: z.enum(['fetch', 'axios', 'server-action']),
+  /** Set when a data-fetching hook runs the request. `key` is the query/SWR key as written. */
+  hook: z
+    .object({
+      name: z.string(),
+      module: z.string(),
+      key: z.string().optional(),
+    })
+    .optional(),
+  /** Absent when it could not be resolved. Server actions are always `POST`. */
+  method: HttpMethodSchema.optional(),
+  /** Absent for server actions, which post to the current page. */
+  url: RequestUrlSchema.optional(),
+  trigger: TriggerSchema,
+  bodyType: TypeRefSchema.optional(),
+  responseType: TypeRefSchema.optional(),
+  /** From the call in the origin (outermost) down to the network call. */
+  callStack: z.array(CallFrameSchema),
+  /** For a request to one of the app's route handlers: that route. */
+  targetRouteId: z.string().optional(),
+  /** Requests this one leads to on the server: route handler (BFF) hops or fetches in the server action. */
+  chain: z.array(z.string()).optional(),
+  /** `inferred` until live capture confirms it (M6). */
+  status: z.enum(['inferred', 'verified', 'needs-recheck', 'mismatch']),
+  flags: z.array(FlagSchema),
+})
+export type RequestSite = z.infer<typeof RequestSiteSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -327,7 +432,9 @@ export const AppModelSchema = z.object({
   routeTree: RouteTreeNodeSchema,
   routes: z.array(RouteSchema),
   components: z.array(ComponentSchema),
-  /** Named project types referenced from components (and, later, request sites). Sorted by file. */
+  /** Named project types referenced from components and request sites. Sorted by file. */
   types: z.array(NamedTypeSchema),
+  /** Request sites, sorted by where they start. Defaults to empty for models written before M2. */
+  requests: z.array(RequestSiteSchema).default([]),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

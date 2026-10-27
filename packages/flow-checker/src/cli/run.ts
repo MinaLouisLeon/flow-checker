@@ -31,6 +31,7 @@ Options:
   --no-open         dev: don't open the browser
   --tree            scan: also print the route and component trees
   --types           scan: also print the resolved types
+  --requests        scan: also print the request sites
   -h, --help        Show help
   -v, --version     Show version
 `
@@ -75,7 +76,13 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
 
   if (command === 'scan') {
     return scanCommand(
-      { root: values.root, appDir: values['app-dir'], tree: values.tree, types: values.types },
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        tree: values.tree,
+        types: values.types,
+        requests: values.requests,
+      },
       io,
     )
   }
@@ -104,6 +111,7 @@ function parse(argv: string[]) {
       'app-dir': { type: 'string' },
       tree: { type: 'boolean' },
       types: { type: 'boolean' },
+      requests: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },
       open: { type: 'boolean', default: true },

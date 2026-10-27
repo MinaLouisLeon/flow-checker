@@ -52,6 +52,21 @@ describe('buildIndex on fixtures', () => {
     )
   })
 
+  it('indexes requests by component, route handler and type (bff)', () => {
+    const index = buildIndex(fixture('bff'))
+    const table = index.model.components.find((c) => c.name === 'ProductsTable')
+    const handler = index.model.routes.find((r) => r.path === '/api/products')
+    const product = index.model.types.find((t) => t.name === 'Product')
+    const own = index.requestsByComponent.get(table?.id ?? '') ?? []
+    expect(own.map((s) => s.url?.path)).toEqual(['/api/products'])
+    expect((index.handlerRequests.get(handler?.id ?? '') ?? []).map((s) => s.handlerMethod)).toEqual([
+      'GET',
+      'POST',
+    ])
+    expect(index.handlerCallers.get(handler?.id ?? '')).toHaveLength(2)
+    expect(index.typeUsage.get(product?.id ?? '')?.requests).toContain(own[0]?.id)
+  })
+
   it('has no scan notes for the clean fixtures', () => {
     for (const name of ['basic', 'bff', 'next-intl', 'react-query', 'server-actions']) {
       expect(buildIndex(fixture(name)).notes, name).toEqual([])
@@ -80,13 +95,32 @@ describe('scan notes', () => {
       routes: [route('/', { componentId: 'cmp_page' }), route('/empty')],
       components: [page],
       types: [],
+      requests: [
+        {
+          id: 'req_1',
+          origin: 'component',
+          componentId: 'cmp_page',
+          transport: 'fetch',
+          url: { text: 'url', confidence: 'unknown' },
+          trigger: { kind: 'server-render' },
+          callStack: [{ ...loc, callee: 'fetch' }],
+          status: 'inferred',
+          flags: [{ kind: 'dynamic-url', message: 'The URL could not be resolved: url' }],
+        },
+      ],
     })
     expect(index.notes.map((n) => n.kind)).toEqual([
       'missing-page-component',
       'unresolved-component',
       'unresolved-type',
+      'request',
     ])
     expect(index.notes[1]?.message).toContain('<Mystery>')
+    expect(index.notes[3]).toMatchObject({
+      message: '? ? url: The URL could not be resolved: url',
+      componentId: 'cmp_page',
+      requestId: 'req_1',
+    })
   })
 })
 

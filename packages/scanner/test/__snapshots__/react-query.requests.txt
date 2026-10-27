@@ -1,0 +1,21 @@
+# Requests
+
+## AddTodoForm  src/components/AddTodoForm.tsx:9
+POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useMutation  event onSubmit
+  body: NewTodo
+  response: Todo
+  via: useMutation src/components/AddTodoForm.tsx:14 > http src/services/todos.ts:25 > fetch src/services/todos.ts:7
+
+## TodoDetail  src/components/TodoDetail.tsx:13
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useSWR(['todo', id])  page-load
+  response: Todo
+  via: useSWR src/components/TodoDetail.tsx:14 > fetchTodo src/components/TodoDetail.tsx:14 > http src/services/todos.ts:22 > fetch src/services/todos.ts:7
+
+## TodoList  src/components/TodoList.tsx:9
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useQuery(todoKeys.all)  page-load
+  response: Todo[]
+  via: useQuery src/components/TodoList.tsx:11 > http src/services/todos.ts:20 > fetch src/services/todos.ts:7
+PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useMutation  event onChange
+  body: TodoPatch
+  response: Todo
+  via: useMutation src/components/TodoList.tsx:13 > updateTodo src/components/TodoList.tsx:14 > http src/services/todos.ts:28 > fetch src/services/todos.ts:7
