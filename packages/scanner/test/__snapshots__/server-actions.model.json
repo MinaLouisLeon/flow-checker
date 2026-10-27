@@ -1,0 +1,356 @@
+{
+  "version": 1,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        "dir": "src/app/products",
+        "files": {
+          "page": "src/app/products/page.tsx"
+        },
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/products/[id]",
+            "files": {
+              "page": "src/app/products/[id]/page.tsx"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "new",
+              "kind": "static",
+              "name": "new"
+            },
+            "dir": "src/app/products/new",
+            "files": {
+              "page": "src/app/products/new/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bvhjg8zu96"
+    },
+    {
+      "id": "rt_0te2vdgan2u",
+      "path": "/products",
+      "kind": "page",
+      "file": "src/app/products/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_115a9noj763"
+    },
+    {
+      "id": "rt_1kdazzrvrkg",
+      "path": "/products/[id]",
+      "kind": "page",
+      "file": "src/app/products/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0w4ykuez903"
+    },
+    {
+      "id": "rt_0pq5p0nm2h4",
+      "path": "/products/new",
+      "kind": "page",
+      "file": "src/app/products/new/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        {
+          "raw": "new",
+          "kind": "static",
+          "name": "new"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1s7kl9nj8so"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1bvhjg8zu96",
+      "name": "Home",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0w4ykuez903",
+      "name": "ProductPage",
+      "file": "src/app/products/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/products/[id]/page.tsx",
+        "line": 7,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/products/[id]/page.tsx",
+            "line": 18,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1s7kl9nj8so",
+      "name": "NewProductPage",
+      "file": "src/app/products/new/page.tsx",
+      "loc": {
+        "file": "src/app/products/new/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "CreateProductForm",
+          "resolution": "project",
+          "componentId": "cmp_014pegw9zf7",
+          "module": "@/components/CreateProductForm",
+          "loc": {
+            "file": "src/app/products/new/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_115a9noj763",
+      "name": "ProductsPage",
+      "file": "src/app/products/page.tsx",
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 7,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 12,
+            "column": 7
+          }
+        },
+        {
+          "name": "DeleteProductButton",
+          "resolution": "project",
+          "componentId": "cmp_0jz34mtqlno",
+          "module": "@/components/DeleteProductButton",
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 17,
+            "column": 13
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_014pegw9zf7",
+      "name": "CreateProductForm",
+      "file": "src/components/CreateProductForm.tsx",
+      "loc": {
+        "file": "src/components/CreateProductForm.tsx",
+        "line": 10,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0jz34mtqlno",
+      "name": "DeleteProductButton",
+      "file": "src/components/DeleteProductButton.tsx",
+      "loc": {
+        "file": "src/components/DeleteProductButton.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "types": []
+}

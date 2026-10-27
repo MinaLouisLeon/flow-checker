@@ -1,0 +1,411 @@
+{
+  "version": 1,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        "dir": "src/app/todos",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/todos/[id]",
+            "files": {
+              "page": "src/app/todos/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bn0u7kkfdm"
+    },
+    {
+      "id": "rt_0rsc27vk284",
+      "path": "/todos/[id]",
+      "kind": "page",
+      "file": "src/app/todos/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1an2304y5ca"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 6,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Providers",
+          "resolution": "project",
+          "componentId": "cmp_27t3g1lua9i",
+          "module": "./providers",
+          "loc": {
+            "file": "src/app/layout.tsx",
+            "line": 10,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1bn0u7kkfdm",
+      "name": "TodosPage",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "AddTodoForm",
+          "resolution": "project",
+          "componentId": "cmp_0r1iugj2rde",
+          "module": "@/components/AddTodoForm",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        },
+        {
+          "name": "TodoList",
+          "resolution": "project",
+          "componentId": "cmp_0l3kw3n479w",
+          "module": "@/components/TodoList",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_27t3g1lua9i",
+      "name": "Providers",
+      "file": "src/app/providers.tsx",
+      "loc": {
+        "file": "src/app/providers.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "QueryClientProvider",
+          "resolution": "external",
+          "module": "@tanstack/react-query",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 8,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1an2304y5ca",
+      "name": "TodoPage",
+      "file": "src/app/todos/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/todos/[id]/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "TodoDetail",
+          "resolution": "project",
+          "componentId": "cmp_1gqfw2iamk9",
+          "module": "@/components/TodoDetail",
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0r1iugj2rde",
+      "name": "AddTodoForm",
+      "file": "src/components/AddTodoForm.tsx",
+      "loc": {
+        "file": "src/components/AddTodoForm.tsx",
+        "line": 9,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1gqfw2iamk9",
+      "name": "TodoDetail",
+      "file": "src/components/TodoDetail.tsx",
+      "loc": {
+        "file": "src/components/TodoDetail.tsx",
+        "line": 13,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "conditional": true,
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 23,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [
+        "typ_0fc96ucq8sd"
+      ],
+      "propsType": {
+        "text": "TodoDetailProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_28rtveus0ih",
+          "name": "TodoDetailProps"
+        }
+      }
+    },
+    {
+      "id": "cmp_0l3kw3n479w",
+      "name": "TodoList",
+      "file": "src/components/TodoList.tsx",
+      "loc": {
+        "file": "src/components/TodoList.tsx",
+        "line": 9,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "conditional": true,
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 26,
+            "column": 11
+          }
+        }
+      ],
+      "usedTypes": [
+        "typ_0fc96ucq8sd"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_28rtveus0ih",
+      "name": "TodoDetailProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/TodoDetail.tsx",
+        "line": 8,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0fc96ucq8sd",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/todo.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

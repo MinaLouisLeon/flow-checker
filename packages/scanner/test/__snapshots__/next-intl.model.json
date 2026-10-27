@@ -1,0 +1,561 @@
+{
+  "version": 1,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {},
+    "children": [
+      {
+        "segment": {
+          "raw": "[locale]",
+          "kind": "dynamic",
+          "name": "locale"
+        },
+        "dir": "src/app/[locale]",
+        "files": {
+          "layout": "src/app/[locale]/layout.tsx",
+          "page": "src/app/[locale]/page.tsx"
+        },
+        "children": [
+          {
+            "segment": {
+              "raw": "dashboard",
+              "kind": "static",
+              "name": "dashboard"
+            },
+            "dir": "src/app/[locale]/dashboard",
+            "files": {
+              "page": "src/app/[locale]/dashboard/page.tsx"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "login",
+              "kind": "static",
+              "name": "login"
+            },
+            "dir": "src/app/[locale]/login",
+            "files": {
+              "page": "src/app/[locale]/login/page.tsx"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "verify",
+              "kind": "static",
+              "name": "verify"
+            },
+            "dir": "src/app/[locale]/verify",
+            "files": {
+              "page": "src/app/[locale]/verify/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_27sgeyuy9pv",
+      "path": "/[locale]",
+      "kind": "page",
+      "file": "src/app/[locale]/page.tsx",
+      "segments": [
+        {
+          "raw": "[locale]",
+          "kind": "dynamic",
+          "name": "locale"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/[locale]/layout.tsx",
+          "componentId": "cmp_0jf6im1pjt6"
+        }
+      ],
+      "componentId": "cmp_0nwenv6i3tq"
+    },
+    {
+      "id": "rt_0nr7aw4u4g0",
+      "path": "/[locale]/dashboard",
+      "kind": "page",
+      "file": "src/app/[locale]/dashboard/page.tsx",
+      "segments": [
+        {
+          "raw": "[locale]",
+          "kind": "dynamic",
+          "name": "locale"
+        },
+        {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/[locale]/layout.tsx",
+          "componentId": "cmp_0jf6im1pjt6"
+        }
+      ],
+      "componentId": "cmp_1uzxf8sin17"
+    },
+    {
+      "id": "rt_1cprhxt7jgk",
+      "path": "/[locale]/login",
+      "kind": "page",
+      "file": "src/app/[locale]/login/page.tsx",
+      "segments": [
+        {
+          "raw": "[locale]",
+          "kind": "dynamic",
+          "name": "locale"
+        },
+        {
+          "raw": "login",
+          "kind": "static",
+          "name": "login"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/[locale]/layout.tsx",
+          "componentId": "cmp_0jf6im1pjt6"
+        }
+      ],
+      "componentId": "cmp_01kdhdsgw4y"
+    },
+    {
+      "id": "rt_0s0435jzyyw",
+      "path": "/[locale]/verify",
+      "kind": "page",
+      "file": "src/app/[locale]/verify/page.tsx",
+      "segments": [
+        {
+          "raw": "[locale]",
+          "kind": "dynamic",
+          "name": "locale"
+        },
+        {
+          "raw": "verify",
+          "kind": "static",
+          "name": "verify"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/[locale]/layout.tsx",
+          "componentId": "cmp_0jf6im1pjt6"
+        }
+      ],
+      "componentId": "cmp_2awb26rqgh7"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_1uzxf8sin17",
+      "name": "DashboardPage",
+      "file": "src/app/[locale]/dashboard/page.tsx",
+      "loc": {
+        "file": "src/app/[locale]/dashboard/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "DashboardProfile",
+          "resolution": "project",
+          "componentId": "cmp_0bpwse6tsg4",
+          "module": "@/components/DashboardProfile",
+          "loc": {
+            "file": "src/app/[locale]/dashboard/page.tsx",
+            "line": 6,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0jf6im1pjt6",
+      "name": "LocaleLayout",
+      "file": "src/app/[locale]/layout.tsx",
+      "loc": {
+        "file": "src/app/[locale]/layout.tsx",
+        "line": 11,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "NextIntlClientProvider",
+          "resolution": "external",
+          "module": "next-intl",
+          "loc": {
+            "file": "src/app/[locale]/layout.tsx",
+            "line": 25,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode; params: Promise<{ locale: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            },
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "locale",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_01kdhdsgw4y",
+      "name": "LoginPage",
+      "file": "src/app/[locale]/login/page.tsx",
+      "loc": {
+        "file": "src/app/[locale]/login/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "LoginForm",
+          "resolution": "project",
+          "componentId": "cmp_0skl5lm1a9a",
+          "module": "@/components/LoginForm",
+          "loc": {
+            "file": "src/app/[locale]/login/page.tsx",
+            "line": 6,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0nwenv6i3tq",
+      "name": "HomePage",
+      "file": "src/app/[locale]/page.tsx",
+      "loc": {
+        "file": "src/app/[locale]/page.tsx",
+        "line": 4,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "@/i18n/navigation",
+          "factory": "next-intl/navigation",
+          "loc": {
+            "file": "src/app/[locale]/page.tsx",
+            "line": 12,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ locale: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "locale",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_2awb26rqgh7",
+      "name": "VerifyPage",
+      "file": "src/app/[locale]/verify/page.tsx",
+      "loc": {
+        "file": "src/app/[locale]/verify/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "VerifyOtpForm",
+          "resolution": "project",
+          "componentId": "cmp_1hlwjtaw6e6",
+          "module": "@/components/VerifyOtpForm",
+          "loc": {
+            "file": "src/app/[locale]/verify/page.tsx",
+            "line": 11,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ searchParams: Promise<{ challenge?: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "searchParams",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "challenge",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        },
+                        "optional": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0bpwse6tsg4",
+      "name": "DashboardProfile",
+      "file": "src/components/DashboardProfile.tsx",
+      "loc": {
+        "file": "src/components/DashboardProfile.tsx",
+        "line": 10,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "@/i18n/navigation",
+          "factory": "next-intl/navigation",
+          "conditional": true,
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 25,
+            "column": 29
+          }
+        }
+      ],
+      "usedTypes": [
+        "typ_1tpxqokvkch"
+      ]
+    },
+    {
+      "id": "cmp_0skl5lm1a9a",
+      "name": "LoginForm",
+      "file": "src/components/LoginForm.tsx",
+      "loc": {
+        "file": "src/components/LoginForm.tsx",
+        "line": 9,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1hlwjtaw6e6",
+      "name": "VerifyOtpForm",
+      "file": "src/components/VerifyOtpForm.tsx",
+      "loc": {
+        "file": "src/components/VerifyOtpForm.tsx",
+        "line": 13,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "@/i18n/navigation",
+          "factory": "next-intl/navigation",
+          "conditional": true,
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 19,
+            "column": 12
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "VerifyOtpFormProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1c9vagn0sce",
+          "name": "VerifyOtpFormProps"
+        }
+      }
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1c9vagn0sce",
+      "name": "VerifyOtpFormProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/VerifyOtpForm.tsx",
+        "line": 8,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "challengeId",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                },
+                {
+                  "kind": "primitive",
+                  "name": "null"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1tpxqokvkch",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "role",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "admin"
+                },
+                {
+                  "kind": "literal",
+                  "value": "member"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

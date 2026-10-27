@@ -1,0 +1,11 @@
+# Types
+
+
+# Component types
+
+RootLayout  src/app/layout.tsx:5
+  props: { children: ReactNode }
+ProductPage  src/app/products/[id]/page.tsx:7
+  props: { params: Promise<{ id: string }> }
+DeleteProductButton  src/components/DeleteProductButton.tsx:7
+  props: { id: number }

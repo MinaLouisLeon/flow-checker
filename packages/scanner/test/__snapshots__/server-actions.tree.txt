@@ -1,0 +1,39 @@
+# Route tree
+
+src/app [layout, page]
+└─ products [page]
+   ├─ [id] (dynamic) [page]
+   └─ new [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/products  page  src/app/products/page.tsx
+/products/[id]  page  src/app/products/[id]/page.tsx
+/products/new  page  src/app/products/new/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:5
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+Home  server  src/app/page.tsx:3
+
+## /products  src/app/products/page.tsx
+layouts: src/app/layout.tsx
+ProductsPage  server  src/app/products/page.tsx:7
+├─ Link  external next/link
+└─ DeleteProductButton  client (use client)  src/components/DeleteProductButton.tsx:7
+
+## /products/[id]  src/app/products/[id]/page.tsx
+layouts: src/app/layout.tsx
+ProductPage  server  src/app/products/[id]/page.tsx:7
+└─ Link  external next/link
+
+## /products/new  src/app/products/new/page.tsx
+layouts: src/app/layout.tsx
+NewProductPage  server  src/app/products/new/page.tsx:3
+└─ CreateProductForm  client (use client)  src/components/CreateProductForm.tsx:10

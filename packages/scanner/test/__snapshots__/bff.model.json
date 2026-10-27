@@ -1,0 +1,475 @@
+{
+  "version": 1,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        "dir": "src/app/api",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "products",
+              "kind": "static",
+              "name": "products"
+            },
+            "dir": "src/app/api/products",
+            "files": {
+              "route": "src/app/api/products/route.ts"
+            },
+            "children": [
+              {
+                "segment": {
+                  "raw": "[id]",
+                  "kind": "dynamic",
+                  "name": "id"
+                },
+                "dir": "src/app/api/products/[id]",
+                "files": {
+                  "route": "src/app/api/products/[id]/route.ts"
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        "dir": "src/app/products",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/products/[id]",
+            "files": {
+              "page": "src/app/products/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_2flvqsq9ypc"
+    },
+    {
+      "id": "rt_1kkymdue03z",
+      "path": "/api/products",
+      "kind": "route-handler",
+      "file": "src/app/api/products/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "id": "rt_0g0grflp887",
+      "path": "/api/products/[id]",
+      "kind": "route-handler",
+      "file": "src/app/api/products/[id]/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "rt_1kdazzrvrkg",
+      "path": "/products/[id]",
+      "kind": "page",
+      "file": "src/app/products/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0w4ykuez903"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_2flvqsq9ypc",
+      "name": "HomePage",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "CreateProductForm",
+          "resolution": "project",
+          "componentId": "cmp_014pegw9zf7",
+          "module": "@/components/CreateProductForm",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        },
+        {
+          "name": "ProductsTable",
+          "resolution": "project",
+          "componentId": "cmp_04zm0jsozsm",
+          "module": "@/components/ProductsTable",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0w4ykuez903",
+      "name": "ProductPage",
+      "file": "src/app/products/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/products/[id]/page.tsx",
+        "line": 8,
+        "column": 25
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/products/[id]/page.tsx",
+            "line": 22,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [
+        "typ_1rwhmsgdwtz"
+      ],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_014pegw9zf7",
+      "name": "CreateProductForm",
+      "file": "src/components/CreateProductForm.tsx",
+      "loc": {
+        "file": "src/components/CreateProductForm.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_2bhrdzxr8wt",
+        "typ_2g53pdr4pws",
+        "typ_1rwhmsgdwtz"
+      ]
+    },
+    {
+      "id": "cmp_04zm0jsozsm",
+      "name": "ProductsTable",
+      "file": "src/components/ProductsTable.tsx",
+      "loc": {
+        "file": "src/components/ProductsTable.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/components/ProductsTable.tsx",
+            "line": 23,
+            "column": 15
+          }
+        }
+      ],
+      "usedTypes": [
+        "typ_1rwhmsgdwtz"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1rwhmsgdwtz",
+      "name": "Product",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/lib/schemas.ts",
+        "line": 15,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_2g53pdr4pws",
+      "name": "CreateProductInput",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/lib/schemas.ts",
+        "line": 16,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            },
+            "optional": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_2bhrdzxr8wt",
+      "name": "ApiError",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/schemas.ts",
+        "line": 18,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "error",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "issues",
+            "type": {
+              "kind": "array",
+              "element": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "path",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "message",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "optional": true
+          }
+        ]
+      }
+    }
+  ]
+}

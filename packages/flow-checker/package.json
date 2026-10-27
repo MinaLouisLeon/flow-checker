@@ -58,11 +58,18 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@flow-checker/dashboard": "workspace:*",
     "@flow-checker/exporter": "workspace:*",
     "@flow-checker/runtime": "workspace:*",
     "@flow-checker/scanner": "workspace:*",
     "@flow-checker/server": "workspace:*",
     "@flow-checker/shared": "workspace:*",
     "tsup": "catalog:"
+  },
+  "dependencies": {
+    "@hono/node-server": "catalog:",
+    "hono": "catalog:",
+    "ts-morph": "catalog:",
+    "zod": "catalog:"
   }
 }

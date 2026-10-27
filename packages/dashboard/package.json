@@ -13,7 +13,9 @@
   "dependencies": {
     "@flow-checker/shared": "workspace:*",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "@xyflow/react": "catalog:",
+    "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",
