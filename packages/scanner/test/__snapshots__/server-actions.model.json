@@ -159,7 +159,24 @@
       },
       "kind": "server",
       "clientBoundary": false,
-      "children": []
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_1bvhjg8zu96",
@@ -172,7 +189,8 @@
       },
       "kind": "server",
       "clientBoundary": false,
-      "children": []
+      "children": [],
+      "usedTypes": []
     },
     {
       "id": "cmp_0w4ykuez903",
@@ -196,7 +214,37 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_1s7kl9nj8so",
@@ -221,7 +269,8 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_115a9noj763",
@@ -256,7 +305,8 @@
             "column": 13
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_014pegw9zf7",
@@ -269,7 +319,8 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": []
     },
     {
       "id": "cmp_0jz34mtqlno",
@@ -282,7 +333,24 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      }
     }
-  ]
+  ],
+  "types": []
 }

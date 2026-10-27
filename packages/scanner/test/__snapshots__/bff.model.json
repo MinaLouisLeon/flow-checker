@@ -184,7 +184,24 @@
       },
       "kind": "server",
       "clientBoundary": false,
-      "children": []
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_2flvqsq9ypc",
@@ -220,7 +237,8 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_0w4ykuez903",
@@ -244,7 +262,39 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [
+        "typ_1rwhmsgdwtz"
+      ],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_014pegw9zf7",
@@ -257,7 +307,12 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": [
+        "typ_2bhrdzxr8wt",
+        "typ_2g53pdr4pws",
+        "typ_1rwhmsgdwtz"
+      ]
     },
     {
       "id": "cmp_04zm0jsozsm",
@@ -281,7 +336,140 @@
             "column": 15
           }
         }
+      ],
+      "usedTypes": [
+        "typ_1rwhmsgdwtz"
       ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1rwhmsgdwtz",
+      "name": "Product",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/lib/schemas.ts",
+        "line": 15,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_2g53pdr4pws",
+      "name": "CreateProductInput",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/lib/schemas.ts",
+        "line": 16,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            },
+            "optional": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_2bhrdzxr8wt",
+      "name": "ApiError",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/schemas.ts",
+        "line": 18,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "error",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "issues",
+            "type": {
+              "kind": "array",
+              "element": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "path",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "message",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "optional": true
+          }
+        ]
+      }
     }
   ]
 }

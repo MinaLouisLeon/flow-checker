@@ -1,0 +1,28 @@
+# Types
+
+DeleteUserButtonProps  interface  components/DeleteUserButton.tsx:7
+  { userId: number }
+ProfileCardProps  interface  components/ProfileCard.tsx:7
+  { user: User }
+UserListProps  interface  components/UserList.tsx:4
+  { users: User[] }
+Role  type-alias  types/user.ts:1
+  "admin" | "member"
+User  interface  types/user.ts:3
+  { id: number; name: string; email: string; role: Role }
+Todo  interface  types/user.ts:10
+  { id: number; userId: number; title: string; done: boolean }
+
+# Component types
+
+RootLayout  app/layout.tsx:6
+  props: { children: ReactNode }
+UserPage  app/users/[id]/page.tsx:8
+  props: { params: Promise<{ id: string }> }
+DeleteUserButton  components/DeleteUserButton.tsx:12
+  props: DeleteUserButtonProps
+ProfileCard  components/ProfileCard.tsx:12
+  props: ProfileCardProps
+  uses: Todo
+UserList  components/UserList.tsx:9
+  props: UserListProps

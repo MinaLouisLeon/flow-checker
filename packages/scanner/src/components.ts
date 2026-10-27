@@ -13,6 +13,7 @@ import {
   ts,
 } from 'ts-morph'
 import { compare, relativeTo } from './paths'
+import { TypeResolver } from './types'
 
 /** A resolved component declaration: the node whose body holds its JSX. */
 interface Declaration {
@@ -36,9 +37,11 @@ export class ComponentGraph {
   readonly #byNode = new Map<Node, string>()
   readonly #components = new Map<string, Component>()
   readonly #directiveCache = new Map<SourceFile, boolean>()
+  readonly #types: TypeResolver
 
-  constructor(root: string) {
+  constructor(root: string, types: TypeResolver = new TypeResolver(root)) {
     this.#root = root
+    this.#types = types
   }
 
   /** Adds the default-export component of a page/layout file. Returns its id. */
@@ -74,12 +77,27 @@ export class ComponentGraph {
       kind: 'server',
       clientBoundary: this.#isClientFile(file),
       children: [],
+      usedTypes: [],
     }
     // Register before walking children so recursive components terminate.
     this.#byNode.set(key, id)
     this.#components.set(id, component)
     component.children = this.#children(decl.body)
+    const props = propsOf(decl.body)
+    if (props) component.propsType = this.#types.fromNode(props)
+    component.usedTypes = this.#usedTypes(decl.body, props)
     return id
+  }
+
+  /** Named project types written in the component (annotations, generics, casts), in order. */
+  #usedTypes(body: Node, props: Node | undefined): string[] {
+    const ids = new Set<string>()
+    for (const ref of body.getDescendantsOfKind(ts.SyntaxKind.TypeReference)) {
+      if (props && ref.getPos() >= props.getPos() && ref.getEnd() <= props.getEnd()) continue
+      const id = this.#types.namedTypeIdOf(ref)
+      if (id) ids.add(id)
+    }
+    return [...ids]
   }
 
   #children(body: Node): ComponentRef[] {
@@ -272,6 +290,18 @@ function fromExpression(expr: Node, name: string, anchor: Node, depth: number): 
   }
   if (N.isAsExpression(expr) || N.isParenthesizedExpression(expr) || N.isSatisfiesExpression(expr)) {
     return fromExpression(expr.getExpression(), name, anchor, depth)
+  }
+  return undefined
+}
+
+/**
+ * The node whose type is the component's props: the first parameter of a function
+ * component, or `P` in `class X extends Component<P>`.
+ */
+function propsOf(body: Node): Node | undefined {
+  if (N.isFunctionLikeDeclaration(body)) return body.getParameters()[0]
+  if (N.isClassDeclaration(body) || N.isClassExpression(body)) {
+    return body.getExtends()?.getTypeArguments()[0]
   }
   return undefined
 }

@@ -110,7 +110,24 @@
             "column": 9
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_1bn0u7kkfdm",
@@ -146,7 +163,8 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": []
     },
     {
       "id": "cmp_27t3g1lua9i",
@@ -170,7 +188,24 @@
             "column": 10
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_1an2304y5ca",
@@ -195,7 +230,37 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
     },
     {
       "id": "cmp_0r1iugj2rde",
@@ -208,7 +273,8 @@
       },
       "kind": "client",
       "clientBoundary": true,
-      "children": []
+      "children": [],
+      "usedTypes": []
     },
     {
       "id": "cmp_1gqfw2iamk9",
@@ -233,7 +299,18 @@
             "column": 7
           }
         }
-      ]
+      ],
+      "usedTypes": [
+        "typ_0fc96ucq8sd"
+      ],
+      "propsType": {
+        "text": "TodoDetailProps",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_28rtveus0ih",
+          "name": "TodoDetailProps"
+        }
+      }
     },
     {
       "id": "cmp_0l3kw3n479w",
@@ -258,7 +335,77 @@
             "column": 11
           }
         }
+      ],
+      "usedTypes": [
+        "typ_0fc96ucq8sd"
       ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_28rtveus0ih",
+      "name": "TodoDetailProps",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/TodoDetail.tsx",
+        "line": 8,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0fc96ucq8sd",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/todo.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
     }
   ]
 }
