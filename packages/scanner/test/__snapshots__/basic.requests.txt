@@ -1,0 +1,21 @@
+# Requests
+
+## HomePage  app/page.tsx:7
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch  server-render
+  response: User[]
+  via: getUsers app/page.tsx:8 > fetch lib/api.ts:14
+
+## UserPage  app/users/[id]/page.tsx:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch  server-render
+  response: User
+  via: getUser app/users/[id]/page.tsx:10 > fetch lib/api.ts:20
+
+## DeleteUserButton  components/DeleteUserButton.tsx:12
+DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  axios  event onClick
+  response: void
+  via: deleteUser components/DeleteUserButton.tsx:18 > api.delete lib/api.ts:9
+
+## ProfileCard  components/ProfileCard.tsx:12
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  fetch  effect
+  response: Todo[]
+  via: getTodos components/ProfileCard.tsx:16 > fetch lib/api.ts:26

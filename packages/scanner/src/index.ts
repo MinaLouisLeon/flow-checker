@@ -1,4 +1,5 @@
 export { ComponentGraph, directives } from './components'
 export { type Discovery, discoverProject, ScanError } from './discovery'
+export { RequestScanner } from './requests'
 export { type ScanOptions, scanProject } from './scan'
 export { TypeResolver, type TypeResolverOptions } from './types'

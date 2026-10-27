@@ -1,5 +1,14 @@
 // Lookup tables and derived facts the screens need, built once per model.
-import type { AppModel, Component, ComponentRef, NamedType, Route, TypeShape } from '@flow-checker/shared'
+import {
+  type AppModel,
+  type Component,
+  type ComponentRef,
+  type NamedType,
+  type RequestSite,
+  type Route,
+  type TypeShape,
+  urlText,
+} from '@flow-checker/shared'
 
 export interface RenderSite {
   /** The component that renders this one. */
@@ -14,9 +23,11 @@ export interface TypeUsage {
   usedBy: string[]
   /** Other named types that refer to this one. */
   inTypes: string[]
+  /** Requests whose body or response refers to this type. */
+  requests: string[]
 }
 
-export type NoteKind = 'unresolved-component' | 'unresolved-type' | 'missing-page-component'
+export type NoteKind = 'unresolved-component' | 'unresolved-type' | 'missing-page-component' | 'request'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -28,6 +39,7 @@ export interface ScanNote {
   routeId?: string
   componentId?: string
   typeId?: string
+  requestId?: string
 }
 
 export interface ModelIndex {
@@ -35,6 +47,12 @@ export interface ModelIndex {
   routes: Map<string, Route>
   components: Map<string, Component>
   types: Map<string, NamedType>
+  requests: Map<string, RequestSite>
+  /** Component id -> requests that start in it. */
+  requestsByComponent: Map<string, RequestSite[]>
+  /** Route id -> requests a route handler sends (origin) and requests sent to it (callers). */
+  handlerRequests: Map<string, RequestSite[]>
+  handlerCallers: Map<string, RequestSite[]>
   /** Component id → where it is rendered. */
   renderedBy: Map<string, RenderSite[]>
   /** Component id → routes whose page or layouts render it (directly or further down). */
@@ -48,6 +66,15 @@ export function buildIndex(model: AppModel): ModelIndex {
   const routes = new Map(model.routes.map((r) => [r.id, r]))
   const components = new Map(model.components.map((c) => [c.id, c]))
   const types = new Map(model.types.map((t) => [t.id, t]))
+  const requests = new Map(model.requests.map((s) => [s.id, s]))
+  const requestsByComponent = new Map<string, RequestSite[]>()
+  const handlerRequests = new Map<string, RequestSite[]>()
+  const handlerCallers = new Map<string, RequestSite[]>()
+  for (const site of model.requests) {
+    if (site.componentId) push(requestsByComponent, site.componentId, site)
+    if (site.origin === 'route-handler' && site.routeId) push(handlerRequests, site.routeId, site)
+    if (site.targetRouteId) push(handlerCallers, site.targetRouteId, site)
+  }
 
   const renderedBy = new Map<string, RenderSite[]>()
   for (const parent of model.components) {
@@ -69,7 +96,7 @@ export function buildIndex(model: AppModel): ModelIndex {
   const usage = (id: string) => {
     let u = typeUsage.get(id)
     if (!u) {
-      u = { props: [], usedBy: [], inTypes: [] }
+      u = { props: [], usedBy: [], inTypes: [], requests: [] }
       typeUsage.set(id, u)
     }
     return u
@@ -81,8 +108,26 @@ export function buildIndex(model: AppModel): ModelIndex {
   for (const t of model.types) {
     for (const id of typeRefs(t.shape)) if (id !== t.id) addOnce(usage(id).inTypes, t.id)
   }
+  for (const site of model.requests) {
+    for (const ref of [site.bodyType, site.responseType]) {
+      if (ref) for (const id of typeRefs(ref.shape)) addOnce(usage(id).requests, site.id)
+    }
+  }
 
-  return { model, routes, components, types, renderedBy, routesOf, typeUsage, notes: scanNotes(model) }
+  return {
+    model,
+    routes,
+    components,
+    types,
+    requests,
+    requestsByComponent,
+    handlerRequests,
+    handlerCallers,
+    renderedBy,
+    routesOf,
+    typeUsage,
+    notes: scanNotes(model),
+  }
 }
 
 /** Ids of the named types a shape refers to, in order, without repeats. */
@@ -182,6 +227,20 @@ function scanNotes(model: AppModel): ScanNote[] {
       })
     }
   }
+  for (const site of model.requests) {
+    const first = site.callStack[0]
+    for (const flag of site.flags) {
+      notes.push({
+        kind: 'request',
+        message: `${requestLabel(site)}: ${flag.message}`,
+        file: first?.file ?? '',
+        ...(first ? { line: first.line, column: first.column } : {}),
+        ...(site.componentId ? { componentId: site.componentId } : {}),
+        ...(site.origin === 'route-handler' && site.routeId ? { routeId: site.routeId } : {}),
+        requestId: site.id,
+      })
+    }
+  }
   for (const t of model.types) {
     if (!hasUnresolved(t.shape)) continue
     notes.push({
@@ -232,4 +291,11 @@ export function editorUrl(root: string | undefined, file: string, line = 1, colu
     .replaceAll('#', '%23')
     .replaceAll('?', '%3F')
   return `vscode://file/${encoded}:${line}:${column}`
+}
+
+/** Short label for a request, e.g. `GET /users/:id` or `POST createProduct (server action)`. */
+export function requestLabel(site: RequestSite): string {
+  const method = site.method ?? '?'
+  if (site.transport === 'server-action') return `${method} ${site.serverAction?.name ?? '?'} (server action)`
+  return `${method} ${site.url ? urlText(site.url) : '?'}`
 }

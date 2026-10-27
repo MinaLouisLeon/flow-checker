@@ -4,6 +4,14 @@ VerifyOtpFormProps  interface  src/components/VerifyOtpForm.tsx:8
   { challengeId: string | null }
 User  interface  src/types/auth.ts:1
   { id: number; name: string; email: string; role: "admin" | "member" }
+LoginRequest  interface  src/types/auth.ts:8
+  { email: string; password: string }
+LoginResponse  interface  src/types/auth.ts:13
+  { otpRequired: true; challengeId: string }
+VerifyOtpRequest  interface  src/types/auth.ts:18
+  { challengeId: string; code: string }
+VerifyOtpResponse  interface  src/types/auth.ts:23
+  { token: string; user: User }
 
 # Component types
 

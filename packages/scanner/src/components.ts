@@ -52,6 +52,11 @@ export class ComponentGraph {
     return decl ? this.#visit(decl.body, decl) : undefined
   }
 
+  /** Component id -> the node holding its body (function, arrow, class). */
+  bodies(): Map<string, Node> {
+    return new Map([...this.#byNode].map(([node, id]) => [id, node]))
+  }
+
   /** Final component list, with `kind` computed from the given render roots. */
   components(roots: string[]): Component[] {
     this.#computeKinds(roots)
@@ -252,7 +257,7 @@ export function directives(file: SourceFile): string[] {
   return out
 }
 
-function unalias(symbol: TsSymbol): TsSymbol {
+export function unalias(symbol: TsSymbol): TsSymbol {
   return symbol.isAlias() ? (symbol.getAliasedSymbol() ?? symbol) : symbol
 }
 
@@ -348,7 +353,7 @@ function isIntrinsic(tag: JsxTagNameExpression): boolean {
 }
 
 /** Module specifier of the import that brought the leftmost identifier of `node` into scope. */
-function importModuleOf(node: Node): string | undefined {
+export function importModuleOf(node: Node): string | undefined {
   let left: Node = node
   while (N.isPropertyAccessExpression(left)) left = left.getExpression()
   if (!N.isIdentifier(left)) return undefined
@@ -374,7 +379,7 @@ function packageFactoryOf(node: Node): string | undefined {
 }
 
 /** Bare package specifiers (`next/link`, `@scope/pkg/x`), not relative paths or `@/` aliases. */
-function isPackage(specifier: string): boolean {
+export function isPackage(specifier: string): boolean {
   return /^(@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*(\/.*)?$/i.test(specifier)
 }
 

@@ -12,6 +12,7 @@ import { ComponentGraph } from './components'
 import { discoverProject } from './discovery'
 import { relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
+import { RequestScanner } from './requests'
 import { walkRoutes } from './routes'
 import { TypeResolver } from './types'
 
@@ -66,6 +67,22 @@ export function scanProject(options: ScanOptions): AppModel {
   })
 
   const roots = [...fileComponents.values()].filter((id): id is string => !!id)
+  const components = graph.components(roots)
+
+  // Requests come after components (client/server kinds decide what a server action call is)
+  // and before types are collected (request body and response types join the type table).
+  const requests = new RequestScanner(root, types)
+  const bodies = graph.bodies()
+  for (const component of components) {
+    const body = bodies.get(component.id)
+    if (body) requests.addComponent(component, body)
+  }
+  for (const route of routes) {
+    if (route.kind !== 'route-handler') continue
+    const file = sourceFile(project, resolveFrom(root, route.file))
+    if (file) requests.addRouteHandler(route, file)
+  }
+
   return {
     version: MODEL_VERSION,
     project: {
@@ -76,8 +93,9 @@ export function scanProject(options: ScanOptions): AppModel {
     },
     routeTree: tree,
     routes,
-    components: graph.components(roots),
+    components,
     types: types.types(),
+    requests: requests.sites(routes),
   }
 }
 

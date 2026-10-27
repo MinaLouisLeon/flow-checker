@@ -1,5 +1,11 @@
 # Types
 
+Product  interface  src/types/product.ts:1
+  { id: number; name: string; price: number; stock: number }
+CreateProductInput  type-alias  src/types/product.ts:8
+  { name: string; price: number; stock: number }
+FormState  interface  src/types/product.ts:10
+  { error?: string; fieldErrors?: { name?: string; price?: string; stock?: string } }
 
 # Component types
 

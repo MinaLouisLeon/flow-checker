@@ -4,6 +4,10 @@ TodoDetailProps  interface  src/components/TodoDetail.tsx:8
   { id: number }
 Todo  interface  src/types/todo.ts:1
   { id: number; userId: number; title: string; done: boolean }
+NewTodo  type-alias  src/types/todo.ts:8
+  { title: string }
+TodoPatch  type-alias  src/types/todo.ts:10
+  { title?: string; done?: boolean }
 
 # Component types
 
