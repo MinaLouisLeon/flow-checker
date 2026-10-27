@@ -37,7 +37,9 @@ export async function startServer(options: StartOptions): Promise<RunningServer>
   }
 
   return {
-    url: `http://localhost:${port}`,
+    // Use the bound address, not "localhost": it can resolve to ::1 first, where
+    // another process may own the same port.
+    url: `http://${HOST}:${port}`,
     port,
     close: () =>
       new Promise((resolve, reject) => {

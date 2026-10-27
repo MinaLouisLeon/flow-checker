@@ -104,7 +104,7 @@ describe('cli dev', () => {
     const server = await startDev({ root, port: 0, open: false }, io)
     if (typeof server === 'number') throw new Error(`startDev failed with ${server}`)
     try {
-      expect(out.join('\n')).toContain('Dashboard: http://localhost:')
+      expect(out.join('\n')).toContain('Dashboard: http://127.0.0.1:')
       expect(existsSync(join(root, '.flow-checker', 'model.json'))).toBe(true)
 
       const model = (await (await fetch(`${server.url}/api/model`)).json()) as AppModel
