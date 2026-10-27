@@ -5,16 +5,18 @@ import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { ComponentPanel } from './screens/ComponentPanel'
+import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
 import { TypesScreen } from './screens/TypesScreen'
 import { Empty } from './ui'
 
-const NAV: { label: string; screen: Screen; match: Screen['name'][] }[] = [
+const NAV: { label: string; screen: Screen; match: Screen['name'][]; needsCapture?: boolean }[] = [
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page', 'component'] },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
+  { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
 ]
 
 export function App() {
@@ -32,7 +34,7 @@ export function App() {
           {CLI_NAME}
         </a>
         <nav className="nav">
-          {NAV.map((item) => (
+          {NAV.filter((item) => !item.needsCapture || meta.data?.capture).map((item) => (
             <a
               key={item.label}
               href={href(item.screen)}
@@ -98,6 +100,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       )
     case 'types':
       return <TypesScreen typeId={screen.typeId} q={screen.q} />
+    case 'live':
+      return <LiveScreen captureId={screen.captureId} q={screen.q} />
     case 'not-found':
       return (
         <div className="screen">

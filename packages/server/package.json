@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@flow-checker/runtime": "workspace:*",
     "@flow-checker/shared": "workspace:*",
     "hono": "catalog:",
     "@hono/node-server": "catalog:"

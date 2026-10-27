@@ -8,3 +8,8 @@ coverage/
 .env*.local
 .DS_Store
 *.log
+# Playwright output
+test-results/
+playwright-report/
+# Next.js 16 writes this on `next dev` in each fixture app
+fixtures/*/AGENTS.md

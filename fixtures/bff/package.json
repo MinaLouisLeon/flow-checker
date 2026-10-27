@@ -16,6 +16,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@integr8/flow-checker": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

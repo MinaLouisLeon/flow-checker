@@ -1,34 +1,70 @@
 import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { randomBytes } from 'node:crypto'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/runtime/options'
 import { ScanError, scanProject } from '@flow-checker/scanner'
-import { type RunningServer, startServer } from '@flow-checker/server'
-import { DEFAULT_PORTS } from '@flow-checker/shared'
+import { CaptureStore, startServer } from '@flow-checker/server'
+import { DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
+import { type AppProcess, startApp } from './app-process'
+import { ConfigError, loadConfig } from './config'
+import { defaultDevCommand, ensureGitignore, hookStatus } from './project'
 import type { CliIO } from './run'
 import { summary, writeModel } from './scan'
 
 export interface DevCommandOptions {
   root?: string
   appDir?: string
+  /** Config file, relative to the root. Default: `flow-checker.config.*` in the root. */
+  config?: string
   /** Dashboard port. */
   port?: number
-  /** Port of the user's Next.js app, for "open in app" links. */
+  /** Port of the user's Next.js app. */
   appPort?: number
   /** Open the dashboard in the browser. Default: true. */
   open?: boolean
+  /** Start the user's app with capture on. Default: false here, true from the CLI. */
+  app?: boolean
+  /** Command that starts the app. Default: the `dev` script, or `next dev`. */
+  devCommand?: string
+}
+
+export interface DevSession {
+  url: string
+  port: number
+  /** Ingest endpoint the runtime posts to. */
+  ingestUrl: string
+  /** Env the app runs with (also handy to start it yourself). */
+  appEnv: Record<string, string>
+  close: () => Promise<void>
 }
 
 /**
- * `flow-checker dev`: scans, writes the model, serves the dashboard and opens it.
- * Running the app with capture comes with M5. Returns the server, or an exit code on failure.
+ * `flow-checker dev`: scans, serves the dashboard and the ingest endpoint, and starts the app
+ * with capture on. Returns the running session, or an exit code on failure.
  */
-export async function startDev(options: DevCommandOptions, io: CliIO): Promise<RunningServer | number> {
+export async function startDev(options: DevCommandOptions, io: CliIO): Promise<DevSession | number> {
   const root = resolve(options.root ?? process.cwd())
+
+  let config: FlowCheckerConfig
+  try {
+    const loaded = await loadConfig(root, options.config)
+    config = loaded.config
+    if (loaded.file) io.out(`Config: ${loaded.file}`)
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      io.err(error.message)
+      return 1
+    }
+    throw error
+  }
+
+  const appDir = options.appDir ?? config.appDir
   const scan = () => {
     const started = performance.now()
-    const model = scanProject({ root, appDir: options.appDir })
+    const model = scanProject({ root, appDir })
     writeModel(root, model)
     io.out(summary(model, performance.now() - started))
     return model
@@ -45,6 +81,19 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<R
     throw error
   }
 
+  const captureOptions = resolveCaptureOptions(config.capture)
+  if (captureOptions.storeRaw) {
+    io.err(
+      'Warning: capture.storeRaw is on. Captured requests are saved WITHOUT masking passwords and tokens.',
+    )
+  }
+  const added = ensureGitignore(root)
+  if (added.length > 0) io.out(`Added ${added.join(', ')} to .gitignore`)
+
+  const store = new CaptureStore({ root }).load()
+  const token = ingestToken(root)
+  const appPort = options.appPort ?? config.ports?.app ?? DEFAULT_PORTS.app
+
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')
 
@@ -53,26 +102,90 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<R
     model,
     rescan: scan,
     dashboardDir,
-    appPort: options.appPort ?? DEFAULT_PORTS.app,
+    appPort,
     version,
-    port: options.port ?? DEFAULT_PORTS.dashboard,
+    port: options.port ?? config.ports?.dashboard ?? DEFAULT_PORTS.dashboard,
+    capture: { store, token, options: captureOptions },
   })
   io.out(`Dashboard: ${server.url}`)
+
+  const ingestUrl = `${server.url}/ingest`
+  const runtimeConfig: RuntimeConfig = { ingest: ingestUrl, token, capture: captureOptions }
+  const json = JSON.stringify(runtimeConfig)
+  const appEnv: Record<string, string> = {
+    [ENV.enabled]: '1',
+    [ENV.server]: json,
+    [ENV.client]: json,
+    PORT: String(appPort),
+  }
+
+  let app: AppProcess | undefined
+  if (options.app) {
+    const hooks = hookStatus(root, model.project.appDir ? resolve(root, model.project.appDir) : root)
+    if (!hooks.client || !hooks.server) {
+      const missing = [!hooks.client && 'browser', !hooks.server && 'server'].filter(Boolean).join(' and ')
+      io.err(
+        `The ${missing} capture hook is missing, so those requests won't be captured. Run "flow-checker init".`,
+      )
+    }
+    const command = options.devCommand ?? config.devCommand ?? defaultDevCommand(root)
+    io.out(`Starting your app: ${command} (port ${appPort})`)
+    app = startApp({
+      command,
+      cwd: root,
+      env: appEnv,
+      onLine: (line, stream) => (stream === 'err' ? io.err : io.out)(`[app] ${line}`),
+      onExit: (code) => {
+        if (code !== null && code !== 0) io.err(`[app] exited with code ${code}`)
+      },
+    })
+  }
+
   if (options.open !== false) openBrowser(server.url)
-  return server
+
+  return {
+    url: server.url,
+    port: server.port,
+    ingestUrl,
+    appEnv,
+    close: async () => {
+      await app?.stop()
+      store.writeSessions()
+      await server.close()
+    },
+  }
 }
 
-/** CLI entry: starts the dashboard and keeps running until Ctrl+C. */
+/** CLI entry: runs until Ctrl+C. */
 export async function devCommand(options: DevCommandOptions, io: CliIO): Promise<number> {
-  const result = await startDev(options, io)
+  const result = await startDev({ app: true, ...options }, io)
   if (typeof result === 'number') return result
+  let closing = false
   const stop = () => {
+    if (closing) return
+    closing = true
     void result.close().finally(() => process.exit(0))
   }
   process.once('SIGINT', stop)
   process.once('SIGTERM', stop)
   io.out('Press Ctrl+C to stop.')
   return 0
+}
+
+/**
+ * Secret the runtime sends with each batch, so other local pages can't write captures.
+ * Kept per project (gitignored), so Next's compile cache stays valid across runs.
+ */
+function ingestToken(root: string): string {
+  const file = join(root, '.flow-checker', 'cache', 'ingest-token')
+  try {
+    const existing = readFileSync(file, 'utf8').trim()
+    if (/^[a-f0-9]{32}$/.test(existing)) return existing
+  } catch {}
+  const token = randomBytes(16).toString('hex')
+  mkdirSync(join(root, '.flow-checker', 'cache'), { recursive: true })
+  writeFileSync(file, token)
+  return token
 }
 
 /** The built dashboard: next to the bundled CLI, or in the workspace when run from source. */

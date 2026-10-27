@@ -12,6 +12,9 @@ catalogs:
     "@hono/node-server":
       specifier: ^2.1.0
       version: 2.1.5
+    "@playwright/test":
+      specifier: ^1.64.1
+      version: 1.64.1
     "@tanstack/react-query":
       specifier: ^5.105.0
       version: 5.105.0
@@ -76,6 +79,9 @@ importers:
       "@biomejs/biome":
         specifier: "catalog:"
         version: 2.6.3
+      "@playwright/test":
+        specifier: "catalog:"
+        version: 1.64.1
       "@types/node":
         specifier: "catalog:"
         version: 22.20.5
@@ -93,7 +99,7 @@ importers:
         version: 1.20.0(debug@4.4.3)
       next:
         specifier: "catalog:"
-        version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: "catalog:"
         version: 19.3.1
@@ -101,6 +107,9 @@ importers:
         specifier: "catalog:"
         version: 19.3.1(react@19.3.1)
     devDependencies:
+      "@integr8/flow-checker":
+        specifier: workspace:*
+        version: link:../../packages/flow-checker
       "@types/node":
         specifier: "catalog:"
         version: 22.20.5
@@ -118,7 +127,7 @@ importers:
     dependencies:
       next:
         specifier: "catalog:"
-        version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: "catalog:"
         version: 19.3.1
@@ -129,6 +138,9 @@ importers:
         specifier: "catalog:"
         version: 4.6.7
     devDependencies:
+      "@integr8/flow-checker":
+        specifier: workspace:*
+        version: link:../../packages/flow-checker
       "@types/node":
         specifier: "catalog:"
         version: 22.20.5
@@ -148,10 +160,10 @@ importers:
     dependencies:
       next:
         specifier: "catalog:"
-        version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next-intl:
         specifier: "catalog:"
-        version: 4.14.9(@swc/helpers@0.5.23)(@types/react@19.3.0)(next@16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
+        version: 4.14.9(@swc/helpers@0.5.23)(@types/react@19.3.0)(next@16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1)
       react:
         specifier: "catalog:"
         version: 19.3.1
@@ -159,6 +171,9 @@ importers:
         specifier: "catalog:"
         version: 19.3.1(react@19.3.1)
     devDependencies:
+      "@integr8/flow-checker":
+        specifier: workspace:*
+        version: link:../../packages/flow-checker
       "@types/node":
         specifier: "catalog:"
         version: 22.20.5
@@ -179,7 +194,7 @@ importers:
         version: 5.105.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: "catalog:"
-        version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: "catalog:"
         version: 19.3.1
@@ -190,6 +205,9 @@ importers:
         specifier: "catalog:"
         version: 2.5.1(react@19.3.1)
     devDependencies:
+      "@integr8/flow-checker":
+        specifier: workspace:*
+        version: link:../../packages/flow-checker
       "@types/node":
         specifier: "catalog:"
         version: 22.20.5
@@ -207,7 +225,7 @@ importers:
     dependencies:
       next:
         specifier: "catalog:"
-        version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: "catalog:"
         version: 19.3.1
@@ -218,6 +236,9 @@ importers:
         specifier: ^0.0.1
         version: 0.0.1
     devDependencies:
+      "@integr8/flow-checker":
+        specifier: workspace:*
+        version: link:../../packages/flow-checker
       "@types/node":
         specifier: "catalog:"
         version: 22.20.5
@@ -278,7 +299,7 @@ importers:
         version: 4.13.14
       next:
         specifier: ">=13.4.0"
-        version: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       ts-morph:
         specifier: "catalog:"
         version: 28.0.0
@@ -325,6 +346,9 @@ importers:
 
   packages/server:
     dependencies:
+      "@flow-checker/runtime":
+        specifier: workspace:*
+        version: link:../runtime
       "@flow-checker/shared":
         specifier: workspace:*
         version: link:../shared
@@ -1233,6 +1257,14 @@ packages:
         integrity: sha512-7FNeNl8NCE7aINx7WXiKQrPYZWC/hvrTsmk6zmxbI7LTXE7hVek/n8AfVgpe2y82zl3w0HvCHN0bVKMBoJcC0w==,
       }
     engines: { node: ">= 10.0.0" }
+
+  "@playwright/test@1.64.1":
+    resolution:
+      {
+        integrity: sha512-IaYGml/nSOiZWROfPtuIL7neuu9qDOZ3TNvNljUIrhDMxiGTgPjzj/g9p9RxpS2tSepPDRY+UwAaEeiKtUvIAg==,
+      }
+    engines: { node: ">=20" }
+    hasBin: true
 
   "@rolldown/binding-android-arm-eabi@1.2.15":
     resolution:
@@ -2670,6 +2702,22 @@ packages:
         integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==,
       }
 
+  playwright-core@1.64.1:
+    resolution:
+      {
+        integrity: sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ==,
+      }
+    engines: { node: ">=20" }
+    hasBin: true
+
+  playwright@1.64.1:
+    resolution:
+      {
+        integrity: sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA==,
+      }
+    engines: { node: ">=20" }
+    hasBin: true
+
   po-parser@2.2.0:
     resolution:
       {
@@ -3451,6 +3499,10 @@ snapshots:
       "@parcel/watcher-win32-arm64": 2.6.0
       "@parcel/watcher-win32-x64": 2.6.0
 
+  "@playwright/test@1.64.1":
+    dependencies:
+      playwright: 1.64.1
+
   "@rolldown/binding-android-arm-eabi@1.2.15":
     optional: true
 
@@ -4095,7 +4147,7 @@ snapshots:
 
   next-intl-swc-plugin-extractor@4.14.9: {}
 
-  next-intl@4.14.9(@swc/helpers@0.5.23)(@types/react@19.3.0)(next@16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1):
+  next-intl@4.14.9(@swc/helpers@0.5.23)(@types/react@19.3.0)(next@16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(react@19.3.1):
     dependencies:
       "@eloqnt/config": 0.1.1
       "@eloqnt/format-json": 0.1.0
@@ -4105,7 +4157,7 @@ snapshots:
       "@swc/core": 1.16.20(@swc/helpers@0.5.23)
       icu-minify: 4.14.9
       negotiator: 1.1.0
-      next: 16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      next: 16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next-intl-swc-plugin-extractor: 4.14.9
       react: 19.3.1
       use-intl: 4.14.9(@types/react@19.3.0)(react@19.3.1)
@@ -4114,7 +4166,7 @@ snapshots:
     transitivePeerDependencies:
       - "@swc/helpers"
 
-  next@16.4.3(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  next@16.4.3(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       "@next/env": 16.4.3
       "@swc/helpers": 0.5.23
@@ -4133,6 +4185,7 @@ snapshots:
       "@next/swc-linux-x64-musl": 16.4.3
       "@next/swc-win32-arm64-msvc": 16.4.3
       "@next/swc-win32-x64-msvc": 16.4.3
+      "@playwright/test": 1.64.1
       sharp: 0.35.5(@types/node@22.20.5)
     transitivePeerDependencies:
       - "@babel/core"
@@ -4160,6 +4213,12 @@ snapshots:
       confbox: 0.1.8
       mlly: 1.8.2
       pathe: 2.0.3
+
+  playwright-core@1.64.1: {}
+
+  playwright@1.64.1:
+    dependencies:
+      playwright-core: 1.64.1
 
   po-parser@2.2.0: {}
 

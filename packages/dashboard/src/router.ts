@@ -7,6 +7,7 @@ export type Screen =
   | { name: 'page'; routeId: string; componentId?: string }
   | { name: 'component'; componentId: string }
   | { name: 'types'; typeId?: string; q: string }
+  | { name: 'live'; captureId?: string; q: string }
   | { name: 'not-found' }
 
 export function parseHash(hash: string): Screen {
@@ -28,6 +29,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'component', componentId: parts[1] }
     case 'types':
       return { name: 'types', typeId: parts[1], q: params.get('q') ?? '' }
+    case 'live':
+      return { name: 'live', captureId: parts[1], q: params.get('q') ?? '' }
   }
   return { name: 'not-found' }
 }
@@ -51,6 +54,10 @@ export function href(screen: Screen): string {
       return `#/component/${encodeURIComponent(screen.componentId)}`
     case 'types':
       return withQuery(screen.typeId ? `/types/${encodeURIComponent(screen.typeId)}` : '/types', {
+        q: screen.q,
+      })
+    case 'live':
+      return withQuery(screen.captureId ? `/live/${encodeURIComponent(screen.captureId)}` : '/live', {
         q: screen.q,
       })
     case 'not-found':
