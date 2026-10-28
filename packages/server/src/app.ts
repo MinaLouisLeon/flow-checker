@@ -7,10 +7,13 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
 import type { CaptureStore } from './store'
+import { Verifier } from './verify'
 
 /** Largest ingest batch accepted, in bytes. */
 const MAX_INGEST_BYTES = 20_000_000
 const SSE_PING_MS = 20_000
+/** Batch verification updates sent over the live feed. */
+const VERIFICATION_EVENT_MS = 150
 
 export interface CaptureOptions {
   store: CaptureStore
@@ -65,6 +68,11 @@ export function createApp(options: AppOptions): Hono {
   let model = options.model
   let scannedAt = new Date().toISOString()
   let scanning: Promise<AppModel> | undefined
+  const verifier = options.capture
+    ? new Verifier({ root: options.root, model, store: options.capture.store })
+    : undefined
+  // With capture on, sites matched by a capture are served as `verified`.
+  const served = () => verifier?.servedModel() ?? model
 
   const app = new Hono()
 
@@ -75,7 +83,7 @@ export function createApp(options: AppOptions): Hono {
 
   app.get('/api/health', (c) => c.json({ ok: true }))
 
-  app.get('/api/model', (c) => c.json(model))
+  app.get('/api/model', (c) => c.json(served()))
 
   app.get('/api/meta', (c) =>
     c.json({
@@ -100,13 +108,14 @@ export function createApp(options: AppOptions): Hono {
     try {
       model = await scanning
       scannedAt = new Date().toISOString()
-      return c.json(model)
+      verifier?.setModel(model)
+      return c.json(served())
     } catch (error) {
       return c.json({ error: (error as Error).message }, 500)
     }
   })
 
-  if (options.capture) mountCapture(app, options.capture)
+  if (options.capture && verifier) mountCapture(app, options.capture, verifier)
 
   app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
 
@@ -129,7 +138,7 @@ export function createApp(options: AppOptions): Hono {
 }
 
 /** `/ingest` for the runtime, and the capture API for the dashboard. */
-function mountCapture(app: Hono, capture: CaptureOptions) {
+function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier) {
   const { store, token } = capture
   const rules = compileRules(capture.options.redact)
 
@@ -152,10 +161,8 @@ function mountCapture(app: Hono, capture: CaptureOptions) {
     const batch = parsed.data
     if (batch.token !== token) return c.json({ error: 'Invalid token' }, 403)
 
-    for (const item of batch.captures) {
-      // Safety net: the runtime already redacted, unless it was misconfigured.
-      store.add(redactCapture(item, rules, capture.options.storeRaw))
-    }
+    // Safety net: the runtime already redacted, unless it was misconfigured.
+    verifier.ingest(batch.captures.map((item) => redactCapture(item, rules, capture.options.storeRaw)))
     if (batch.sessionId) store.addEvents(batch.sessionId, batch.events)
     return c.body(null, 204)
   })
@@ -171,14 +178,50 @@ function mountCapture(app: Hono, capture: CaptureOptions) {
   })
 
   app.delete('/api/captures', (c) => {
-    store.clear()
+    verifier.clear()
     return c.body(null, 204)
   })
 
   app.get('/api/captures/:id', (c) => {
     const found = store.get(c.req.param('id'))
     if (!found) return c.json({ error: 'Capture not found' }, 404)
-    return c.json({ capture: found, children: store.children(found.id) })
+    return c.json({ capture: found, children: store.children(found.id).map(summarizeCapture) })
+  })
+
+  // Manual assignment: `{ "siteId": "req_..." }`, or `null` for "no site". Remembered for
+  // captures like this one in overrides.json.
+  app.put('/api/captures/:id/match', async (c) => {
+    const body = (await c.req.json().catch(() => undefined)) as { siteId?: unknown } | undefined
+    const siteId = body?.siteId
+    if (!(typeof siteId === 'string' || siteId === null)) {
+      return c.json({ error: 'Expected { "siteId": string | null }' }, 400)
+    }
+    try {
+      const updated = verifier.assign(c.req.param('id'), siteId)
+      if (!updated) return c.json({ error: 'Capture not found' }, 404)
+      return c.json(summarizeCapture(updated))
+    } catch (error) {
+      return c.json({ error: (error as Error).message }, 400)
+    }
+  })
+
+  // Back to automatic matching.
+  app.delete('/api/captures/:id/match', (c) => {
+    const updated = verifier.assign(c.req.param('id'), undefined)
+    if (!updated) return c.json({ error: 'Capture not found' }, 404)
+    return c.json(summarizeCapture(updated))
+  })
+
+  app.get('/api/verification', (c) => c.json(verifier.summary()))
+
+  app.get('/api/sites/:id/captures', (c) => {
+    const id = c.req.param('id')
+    const list = store
+      .all()
+      .filter((item) => item.match?.status === 'matched' && item.match.siteId === id)
+      .map(summarizeCapture)
+      .reverse()
+    return c.json(list)
   })
 
   app.get('/api/sessions/:id', (c) => {
@@ -186,12 +229,27 @@ function mountCapture(app: Hono, capture: CaptureOptions) {
     return session ? c.json(session) : c.json({ error: 'Session not found' }, 404)
   })
 
-  // Live feed for the dashboard: one `capture` event per new capture.
+  // Live feed for the dashboard: a `capture` event per new or re-matched capture, and a
+  // `verification` event when site statuses may have changed.
   app.get('/api/live', (c) =>
     streamSSE(c, async (stream) => {
-      const unsubscribe = store.subscribe((item) => {
+      let timer: ReturnType<typeof setTimeout> | undefined
+      const stopCaptures = store.subscribe((item) => {
         void stream.writeSSE({ event: 'capture', data: JSON.stringify(summarizeCapture(item)) })
       })
+      const stopVerification = verifier.subscribe(() => {
+        timer ??= setTimeout(() => {
+          timer = undefined
+          if (!stream.aborted) {
+            void stream.writeSSE({ event: 'verification', data: JSON.stringify(verifier.summary()) })
+          }
+        }, VERIFICATION_EVENT_MS)
+      })
+      const unsubscribe = () => {
+        stopCaptures()
+        stopVerification()
+        if (timer) clearTimeout(timer)
+      }
       stream.onAbort(unsubscribe)
       await stream.writeSSE({ event: 'ready', data: '{}' })
       while (!stream.aborted && !stream.closed) {

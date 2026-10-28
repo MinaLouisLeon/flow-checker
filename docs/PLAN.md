@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M5 done (scanner, types, read-only dashboard, runtime capture). M6 (matching + verification) is next. Updated: 2026-10-27.
+> Status: M0–M6 done (scanner, types, read-only dashboard, runtime capture, matching + verification). M7 (flows) is next. Updated: 2026-10-28.
 
 ## 1. Goal
 
@@ -119,7 +119,7 @@ Flow           { id, name, steps: FlowStep[], source: inferred|recorded|both, st
 FlowStep       { order, routeId, componentId, action, requestSiteId?, onSuccess?: next, onError?: next }
 Capture        { id, sessionId, timestamp, routeUrl, request{method,url,headers,body},
                  response{status,headers,body,durationMs}, origin: browser|server,
-                 attribution{ stack[], componentChain[], interaction? }, matchedSiteId?, matchScore,
+                 attribution{ stack[], componentChain[], interaction? }, sourceStack?, match?{status,siteId,score,candidates},
                  redacted: boolean, typeCheck?: Mismatch[] }
 Session        { id, startedAt, events: (navigation|interaction|capture)[] }   // used to record flows
 Flag           { kind: unknown-response|dynamic-url|unconfirmed-flow|type-mismatch|unmatched-capture|stale, message }
@@ -211,7 +211,8 @@ The tool runs the dev command with `FLOW_CHECKER=1`, `PORT=<app port>`, and the 
 - `globalThis.fetch` is wrapped through a property accessor. Next's dev server puts the native fetch back on hot reload (`resetFetch` in `router-server`), so a plain wrapper would silently disappear; the accessor wraps whatever gets assigned, except Next's patched fetch (which already calls ours).
 - Node's `http`/`https` (axios on Node) are captured through the `http.client.request.start` / `http.client.response.finish` diagnostics channels. Request bodies are tapped on `ClientRequest.prototype.write/end`, response bodies by tapping `emit('data')` (no extra listener, so streams keep their mode).
 - `http.server.request.start` puts the incoming request into an `AsyncLocalStorage`, so each outgoing call records its `parent` (method, URL, `Next-Action` id, and the browser capture from `x-flow-checker-link`). This is how the **BFF two-hop chain** and server component fetches get linked.
-- **Server Actions:** map the action ID to its file and export using `.next/server/server-reference-manifest.json`. Moved to M6 (matching); M5 records the action ID.
+- **Server Actions:** the runtime records the action ID. The tool server maps it to its file and export with `server-reference-manifest.json` (`.next/dev/server/` on Next 16, `.next/server/` before), re-read when it changes.
+- Next's own RSC requests (`RSC: 1`, e.g. the page Next fetches from itself after a server action redirects) are skipped, as in the browser.
 - Edge runtime: best effort (`fetch` patch only). This is documented as a limit.
 
 ### 7.4 Redaction (default ON)
@@ -252,6 +253,16 @@ Captures are matched to scanned request sites with a score:
 - Best score above the threshold → matched. The site becomes `verified` and the capture is attached as an example.
 - Two sites with similar scores → "ambiguous" flag, and you pick the right one in the UI. Your choice is remembered.
 - No match → `unmatched-capture` flag. This usually means the scanner missed something, so it's reported as a scanner gap.
+
+**Built in M6** (`packages/server`: `matcher.ts`, `verify.ts`, `stack.ts`, `actions.ts`):
+
+- **Hard filters first.** A site is only a candidate if it fits: same side (browser or server, from the trigger), same method, URL matches the pattern (a base from an env variable is not enforced), a browser Server Action call only matches server-action sites (and the right action when the manifest resolves it), a hop inside a route handler only matches sites of that handler and method.
+- **Points** (`MATCH_THRESHOLD` 40, `MATCH_MARGIN` 15): action id → manifest 100 (60 for fetches inside the action), source-mapped stack frames on the site's call path 25 each (max 75), URL 35–40 (+5 same fixed base, +3 per query key), interaction component 15–30, parent request matched to a site whose `chain` leads here 40, route handler 40, route 15 (25 for server render), stack function names 5–20, trigger fit −10…+10.
+- **Source maps:** the server resolves frames through the dev build's `.map` files (Turbopack index maps and webpack `webpack-internal://` frames) **when the capture arrives**, and stores them as `sourceStack`, because chunks change on rebuild.
+- **Ambiguous** when the best two are closer than the margin. **Unmatched** when nothing reaches the threshold. Both stay in `captures/_unmatched/`. Matched captures are filed under `captures/<siteId>/`.
+- **Manual assignment** (`PUT/DELETE /api/captures/:id/match`) is saved in `overrides.json` by fingerprint (side, method, URL shape, action, incoming request, nearest component), so it applies to similar captures later.
+- **Status:** `/api/model` serves sites with a matched capture as `verified`. Captures are matched again after each re-scan, and server hops again once their browser request is matched. The live feed sends `verification` events, and the dashboard shows match badges, evidence, an assign control, verified badges and route colors.
+- **Check:** `scripts/record-captures.mjs` records real captures from every fixture (`packages/server/test/recordings/`). `matching.test.ts` requires ≥95% auto-matched (currently all of them, each to the right site per the snapshot), and ≥90% even without source maps or the manifest.
 
 **Type check:** the captured response and body are validated against the site's `TypeShape`. The results are `ok`, `missing field`, `extra field`, `wrong type`, or `null where non-null`. Any mismatch flags the site, and the UI shows the difference.
 
@@ -336,7 +347,7 @@ export default defineConfig({
 .flow-checker/
 ├─ model.json          # scan result (safe to commit)
 ├─ overrides.json      # user decisions: renamed flows, manual matches (safe to commit)
-├─ captures/<siteId>/<captureId>.json   # gitignored by default (`_unmatched/` until M6 matches them)
+├─ captures/<siteId>/<captureId>.json   # gitignored by default (`_unmatched/` until matched to a site)
 ├─ sessions/<sessionId>.json            # gitignored by default
 └─ cache/              # scan cache keyed by file hash (gitignored)
 ```
@@ -353,7 +364,7 @@ Every file is checked against a zod schema with a `version` field, so the format
 | M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      | ✅ Done |
 | M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done |
 | M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done |
-| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | To do   |
+| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done |
 | M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | To do   |
 | M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | To do   |
 | M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | To do   |

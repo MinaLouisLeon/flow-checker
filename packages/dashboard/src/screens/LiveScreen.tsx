@@ -1,8 +1,33 @@
-import type { CapturedBody, CaptureSummary } from '@flow-checker/shared'
-import { type LiveStatus, useCapture, useCaptures, useClearCaptures, useLiveFeed } from '../api'
+import type { Capture, CapturedBody, CaptureSummary, MatchSignal, RequestSite } from '@flow-checker/shared'
+import { useState } from 'react'
+import { type LiveStatus, useAssignMatch, useCapture, useCaptures, useClearCaptures } from '../api'
 import { useData } from '../context'
-import { href, replaceScreen } from '../router'
+import { siteHref, siteLabel, siteOwner } from '../RequestView'
+import { href, type MatchFilter, replaceScreen } from '../router'
 import { Badge, Empty, matches, SearchBox, Section } from '../ui'
+
+const FILTERS: { value: MatchFilter | undefined; label: string }[] = [
+  { value: undefined, label: 'All' },
+  { value: 'matched', label: 'Matched' },
+  { value: 'ambiguous', label: 'Ambiguous' },
+  { value: 'unmatched', label: 'Unmatched' },
+]
+
+const SIGNAL_LABEL: Record<MatchSignal, string> = {
+  'server-action': 'server action',
+  'stack-source': 'source line',
+  'stack-name': 'stack name',
+  url: 'URL',
+  component: 'component',
+  route: 'route',
+  parent: 'parent request',
+  trigger: 'trigger',
+  manual: 'manual',
+}
+
+function matchStatus(c: CaptureSummary): MatchFilter {
+  return c.match?.status ?? 'unmatched'
+}
 
 const STATUS_TEXT: Record<LiveStatus, string> = {
   connecting: 'Connecting…',
@@ -10,11 +35,19 @@ const STATUS_TEXT: Record<LiveStatus, string> = {
   offline: 'Offline',
 }
 
-export function LiveScreen({ captureId, q }: { captureId?: string; q: string }) {
-  const { meta } = useData()
+export function LiveScreen({
+  captureId,
+  q,
+  filter,
+}: {
+  captureId?: string
+  q: string
+  filter?: MatchFilter
+}) {
+  const { meta, index, live } = useData()
   const enabled = Boolean(meta.capture)
   const captures = useCaptures(enabled)
-  const status = useLiveFeed(enabled)
+  const status = live ?? 'connecting'
   const clear = useClearCaptures()
 
   if (!enabled) {
@@ -26,7 +59,21 @@ export function LiveScreen({ captureId, q }: { captureId?: string; q: string }) 
   }
 
   const all = captures.data ?? []
-  const list = all.filter((c) => matches(q, c.method, c.url, c.component, c.pageUrl, String(c.status ?? '')))
+  const counts = { matched: 0, ambiguous: 0, unmatched: 0 }
+  for (const c of all) counts[matchStatus(c)]++
+  const list = all.filter((c) => {
+    if (filter && matchStatus(c) !== filter) return false
+    const site = c.match?.siteId ? index.requests.get(c.match.siteId) : undefined
+    return matches(
+      q,
+      c.method,
+      c.url,
+      c.component,
+      c.pageUrl,
+      String(c.status ?? ''),
+      site && siteOwner(site, index),
+    )
+  })
   const appUrl = meta.appPort ? `http://localhost:${meta.appPort}` : undefined
 
   return (
@@ -35,9 +82,22 @@ export function LiveScreen({ captureId, q }: { captureId?: string; q: string }) 
         <div className="toolbar">
           <SearchBox
             value={q}
-            onChange={(next) => replaceScreen({ name: 'live', captureId, q: next })}
+            onChange={(next) => replaceScreen({ name: 'live', captureId, q: next, filter })}
             placeholder="Search method, URL, component"
           />
+          <fieldset className="segmented match-filter" aria-label="Match status">
+            {FILTERS.map((f) => (
+              <button
+                key={f.label}
+                type="button"
+                aria-pressed={filter === f.value}
+                onClick={() => replaceScreen({ name: 'live', captureId, q, filter: f.value })}
+              >
+                {f.label}
+                {f.value && <span className="count">{counts[f.value]}</span>}
+              </button>
+            ))}
+          </fieldset>
           <span className={`live-status live-${status}`} title="Live feed from the capture runtime">
             <span className="dot" /> {STATUS_TEXT[status]}
           </span>
@@ -74,7 +134,7 @@ export function LiveScreen({ captureId, q }: { captureId?: string; q: string }) 
         ) : (
           <ul className="list capture-list">
             {list.map((c) => (
-              <CaptureRow key={c.id} capture={c} selected={c.id === captureId} q={q} />
+              <CaptureRow key={c.id} capture={c} selected={c.id === captureId} q={q} filter={filter} />
             ))}
           </ul>
         )}
@@ -91,7 +151,17 @@ export function LiveScreen({ captureId, q }: { captureId?: string; q: string }) 
   )
 }
 
-function CaptureRow({ capture: c, selected, q }: { capture: CaptureSummary; selected: boolean; q: string }) {
+function CaptureRow({
+  capture: c,
+  selected,
+  q,
+  filter,
+}: {
+  capture: CaptureSummary
+  selected: boolean
+  q: string
+  filter?: MatchFilter
+}) {
   const { meta } = useData()
   return (
     <li className={selected ? 'selected' : undefined}>
@@ -102,12 +172,13 @@ function CaptureRow({ capture: c, selected, q }: { capture: CaptureSummary; sele
           ↳
         </span>
       )}
-      <a className="capture-link" href={href({ name: 'live', captureId: c.id, q })} title={c.url}>
+      <a className="capture-link" href={href({ name: 'live', captureId: c.id, q, filter })} title={c.url}>
         <code className="method">{c.serverActionId ? 'ACTION' : c.method}</code>{' '}
         <code>{shortUrl(c.url, meta.appPort)}</code>
       </a>
       <span className="spacer" />
       {c.component && <span className="muted capture-component">{c.component}</span>}
+      <MatchBadge match={c.match} />
       <StatusBadge status={c.status} error={c.error} />
       <span className="muted capture-duration">{c.durationMs} ms</span>
     </li>
@@ -211,6 +282,10 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
         </dl>
       </Section>
 
+      <Section title="Request site">
+        <MatchPanel capture={c} />
+      </Section>
+
       {children.length > 0 && (
         <Section title="Server requests it caused">
           <ul className="list">
@@ -244,6 +319,174 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
         </details>
       )}
     </div>
+  )
+}
+
+function MatchBadge({ match }: { match: CaptureSummary['match'] }) {
+  const { index } = useData()
+  if (match?.status === 'matched' && match.siteId) {
+    const site = index.requests.get(match.siteId)
+    return (
+      <Badge tone="ok" title={site ? siteLabel(site, index) : match.siteId}>
+        ✓ {site ? siteOwner(site, index) : 'matched'}
+        {match.by === 'manual' ? ' (you)' : ''}
+      </Badge>
+    )
+  }
+  if (match?.status === 'ambiguous') {
+    return (
+      <Badge tone="warn" title="Several request sites fit. Pick one.">
+        ? ambiguous
+      </Badge>
+    )
+  }
+  return (
+    <Badge
+      tone="warn"
+      title={
+        match?.by === 'manual'
+          ? 'You marked this as not belonging to any request site'
+          : 'No scanned request site fits: probably a scanner gap'
+      }
+    >
+      ✗ unmatched
+    </Badge>
+  )
+}
+
+/** Which request site the capture is, why, and manual assignment. */
+function MatchPanel({ capture }: { capture: Capture }) {
+  const { index } = useData()
+  const assign = useAssignMatch()
+  const [picked, setPicked] = useState('')
+  const match = capture.match
+  const current = match?.siteId ? index.requests.get(match.siteId) : undefined
+  const method = capture.request.method.toUpperCase()
+  // Same method first, then everything else.
+  const options = [...index.model.requests].sort(
+    (a, b) =>
+      Number(b.method === method) - Number(a.method === method) ||
+      siteLabel(a, index).localeCompare(siteLabel(b, index)),
+  )
+  const set = (siteId: string | null | undefined) => assign.mutate({ captureId: capture.id, siteId })
+
+  return (
+    <div className="match-panel">
+      {!match ? (
+        <p className="muted">Not matched yet.</p>
+      ) : match.status === 'matched' && current ? (
+        <p>
+          <Badge tone="ok">✓ matched</Badge> <SiteLink site={current} />{' '}
+          <span className="muted">{match.by === 'manual' ? 'assigned by you' : `score ${match.score}`}</span>
+        </p>
+      ) : match.status === 'ambiguous' ? (
+        <p>
+          <Badge tone="warn">? ambiguous</Badge> Several request sites fit about equally well. Pick the right
+          one below.
+        </p>
+      ) : (
+        <p>
+          <Badge tone="warn">✗ unmatched</Badge>{' '}
+          {match.by === 'manual'
+            ? 'You marked requests like this as not belonging to any request site.'
+            : 'No scanned request site fits. The scanner probably missed the code that sends it.'}
+        </p>
+      )}
+
+      {match && match.candidates.length > 0 && (
+        <ul className="list match-candidates">
+          {match.candidates.map((candidate) => {
+            const site = index.requests.get(candidate.siteId)
+            if (!site) return null
+            const chosen = match.status === 'matched' && match.siteId === site.id
+            return (
+              <li key={candidate.siteId} className={chosen ? 'selected' : undefined}>
+                <div className="match-candidate-head">
+                  <SiteLink site={site} />
+                  <span className="spacer" />
+                  <span className="muted">{candidate.score}</span>
+                  {!chosen && (
+                    <button
+                      type="button"
+                      className="button"
+                      disabled={assign.isPending}
+                      onClick={() => set(site.id)}
+                    >
+                      This one
+                    </button>
+                  )}
+                </div>
+                <ul className="chips">
+                  {candidate.evidence.map((e, i) => (
+                    <li
+                      key={`${e.signal}-${i}`}
+                      className={`chip${e.points < 0 ? ' chip-warn' : ''}`}
+                      title={e.detail}
+                    >
+                      {SIGNAL_LABEL[e.signal]} {e.points > 0 ? `+${e.points}` : e.points}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+
+      <div className="match-assign">
+        <select
+          aria-label="Assign to a request site"
+          value={picked}
+          onChange={(event) => setPicked(event.target.value)}
+        >
+          <option value="">Assign to another request site…</option>
+          {options.map((site) => (
+            <option key={site.id} value={site.id}>
+              {siteLabel(site, index)}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="button"
+          disabled={!picked || assign.isPending}
+          onClick={() => {
+            set(picked)
+            setPicked('')
+          }}
+        >
+          Assign
+        </button>
+        {!(match?.by === 'manual' && match.status === 'unmatched') && (
+          <button type="button" className="button" disabled={assign.isPending} onClick={() => set(null)}>
+            No site
+          </button>
+        )}
+        {match?.by === 'manual' && (
+          <button type="button" className="button" disabled={assign.isPending} onClick={() => set(undefined)}>
+            Back to automatic
+          </button>
+        )}
+      </div>
+      <p className="muted match-note">
+        Your choice is saved in <code>.flow-checker/overrides.json</code> and applies to requests like this
+        one.
+      </p>
+      {assign.error && <div className="banner banner-error">{assign.error.message}</div>}
+    </div>
+  )
+}
+
+function SiteLink({ site }: { site: RequestSite }) {
+  const { index } = useData()
+  const link = siteHref(site)
+  const label = siteLabel(site, index)
+  return link ? (
+    <a href={link}>
+      <code>{label}</code>
+    </a>
+  ) : (
+    <code>{label}</code>
   )
 }
 

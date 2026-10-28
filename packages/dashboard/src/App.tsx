@@ -1,6 +1,6 @@
 import { CLI_NAME } from '@flow-checker/shared'
 import { useMemo } from 'react'
-import { useMeta, useModel, useRescan } from './api'
+import { useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
@@ -24,6 +24,8 @@ export function App() {
   const meta = useMeta()
   const rescan = useRescan()
   const screen = useScreen()
+  const captureOn = Boolean(meta.data?.capture)
+  const live = useLiveFeed(captureOn)
   const index = useMemo(() => (model.data ? buildIndex(model.data) : undefined), [model.data])
 
   const error = model.error ?? meta.error
@@ -71,7 +73,7 @@ export function App() {
             <div className="banner banner-error">Could not load the scan: {error.message}</div>
           </div>
         ) : index && meta.data ? (
-          <DataContext.Provider value={{ index, meta: meta.data }}>
+          <DataContext.Provider value={{ index, meta: meta.data, live: captureOn ? live : undefined }}>
             <ScreenView screen={screen} />
           </DataContext.Provider>
         ) : (
@@ -101,7 +103,7 @@ function ScreenView({ screen }: { screen: Screen }) {
     case 'types':
       return <TypesScreen typeId={screen.typeId} q={screen.q} />
     case 'live':
-      return <LiveScreen captureId={screen.captureId} q={screen.q} />
+      return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
     case 'not-found':
       return (
         <div className="screen">

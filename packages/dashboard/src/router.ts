@@ -7,8 +7,12 @@ export type Screen =
   | { name: 'page'; routeId: string; componentId?: string }
   | { name: 'component'; componentId: string }
   | { name: 'types'; typeId?: string; q: string }
-  | { name: 'live'; captureId?: string; q: string }
+  | { name: 'live'; captureId?: string; q: string; filter?: MatchFilter }
   | { name: 'not-found' }
+
+/** Live screen: show only captures with this match status. */
+export type MatchFilter = 'matched' | 'ambiguous' | 'unmatched'
+const MATCH_FILTERS: MatchFilter[] = ['matched', 'ambiguous', 'unmatched']
 
 export function parseHash(hash: string): Screen {
   const raw = hash.replace(/^#/, '') || '/'
@@ -30,7 +34,12 @@ export function parseHash(hash: string): Screen {
     case 'types':
       return { name: 'types', typeId: parts[1], q: params.get('q') ?? '' }
     case 'live':
-      return { name: 'live', captureId: parts[1], q: params.get('q') ?? '' }
+      return {
+        name: 'live',
+        captureId: parts[1],
+        q: params.get('q') ?? '',
+        filter: MATCH_FILTERS.find((f) => f === params.get('match')),
+      }
   }
   return { name: 'not-found' }
 }
@@ -59,6 +68,7 @@ export function href(screen: Screen): string {
     case 'live':
       return withQuery(screen.captureId ? `/live/${encodeURIComponent(screen.captureId)}` : '/live', {
         q: screen.q,
+        match: screen.filter,
       })
     case 'not-found':
       return '#/'

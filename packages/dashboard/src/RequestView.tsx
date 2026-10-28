@@ -1,7 +1,9 @@
 // One request site: method + URL, how and when it is sent, body and response types,
 // the server hops it leads to, and the call stack from the component down to the network call.
 import { type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
+import { useSiteCaptures } from './api'
 import { useData } from './context'
+import type { ModelIndex } from './model-index'
 import { href } from './router'
 import { TypeShapeView } from './TypeShapeView'
 import { Badge, Empty, SourceLink } from './ui'
@@ -24,6 +26,34 @@ const TRIGGER_TITLE: Record<Trigger['kind'], string> = {
   'route-handler': 'Sent by a route handler when it is called',
   'server-action': 'Sent by a server action when it is called',
   unknown: 'The scan could not tell what starts this request',
+}
+
+/** Where a site starts plus what it sends, e.g. `LoginForm · POST /auth/login`. */
+export function siteLabel(site: RequestSite, index: ModelIndex): string {
+  const target =
+    site.transport === 'server-action'
+      ? `action ${site.serverAction?.name ?? '?'}`
+      : site.url
+        ? urlText(site.url)
+        : '?'
+  return `${siteOwner(site, index)} · ${site.method ?? '?'} ${target}`
+}
+
+/** The component, route handler or server action a site runs in. */
+export function siteOwner(site: RequestSite, index: ModelIndex): string {
+  if (site.componentId) return index.components.get(site.componentId)?.name ?? 'component'
+  if (site.origin === 'route-handler' && site.routeId) {
+    return `${site.handlerMethod ?? ''} ${index.routes.get(site.routeId)?.path ?? 'route handler'}`.trim()
+  }
+  if (site.origin === 'server-action') return `action ${site.serverAction?.name ?? '?'}`
+  return site.origin
+}
+
+/** Screen that shows the site: its component, or the route handler's page. */
+export function siteHref(site: RequestSite): string | undefined {
+  if (site.componentId) return href({ name: 'component', componentId: site.componentId })
+  if (site.routeId) return href({ name: 'page', routeId: site.routeId })
+  return undefined
 }
 
 export function triggerLabel(trigger: Trigger): string {
@@ -92,6 +122,11 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         {site.flags.length > 0 && (
           <Badge tone="warn" title={site.flags.map((f) => f.message).join('\n')}>
             ⚠ {site.flags.length}
+          </Badge>
+        )}
+        {site.status === 'verified' && (
+          <Badge tone="ok" title="Live capture recorded this request">
+            ✓ verified
           </Badge>
         )}
       </summary>
@@ -196,6 +231,8 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           </div>
         )}
 
+        {site.status === 'verified' && <SiteCaptures site={site} />}
+
         <div className="request-stack">
           <h4>Call path</h4>
           <ol>
@@ -210,6 +247,37 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         </div>
       </div>
     </details>
+  )
+}
+
+/** The newest captures matched to the site. */
+function SiteCaptures({ site }: { site: RequestSite }) {
+  const { meta } = useData()
+  const captures = useSiteCaptures(site.id, Boolean(meta.capture))
+  const list = captures.data ?? []
+  if (!meta.capture || list.length === 0) return null
+  return (
+    <div className="request-captures">
+      <h4>
+        Captured <span className="count">{list.length}</span>
+      </h4>
+      <ul>
+        {list.slice(0, 5).map((c) => (
+          <li key={c.id}>
+            <a href={href({ name: 'live', captureId: c.id, q: '' })}>
+              <code>
+                {c.method} {c.url}
+              </code>
+            </a>
+            <span className="spacer" />
+            <span className={c.status !== undefined && c.status < 400 ? 'muted' : 'warn'}>
+              {c.status ?? 'failed'}
+            </span>
+            <span className="muted"> · {new Date(c.timestamp).toLocaleTimeString()}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 

@@ -1,0 +1,81 @@
+## basic
+server GET localhost:4010/users
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+server GET localhost:4010/users/2 (in GET /users/2)
+  → matched UserPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/todos
+  → matched ProfileCard · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched ProfileCard · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser DELETE localhost:4010/users/2
+  → matched DeleteUserButton · DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+
+## react-query
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser PATCH localhost:4010/todos/2
+  → matched TodoList · PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser POST localhost:4010/todos
+  → matched AddTodoForm · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos/3
+  → matched TodoDetail · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+
+## server-actions
+server GET localhost:4010/products (in GET /products)
+  → matched ProductsPage · GET {API_URL ?? http://localhost:4010}/products
+server GET localhost:4010/products (in GET /products)
+  → matched ProductsPage · GET {API_URL ?? http://localhost:4010}/products
+server GET localhost:4010/products/3 (in GET /products/3)
+  → matched ProductPage · GET {API_URL ?? http://localhost:4010}/products/:id
+browser POST localhost:3077/products/new [action]
+  → matched CreateProductForm · POST action createProduct
+server POST localhost:4010/products (in POST /products/new)
+  → matched createProduct · POST {API_URL ?? http://localhost:4010}/products
+server GET localhost:4010/products (in GET /products)
+  → matched ProductsPage · GET {API_URL ?? http://localhost:4010}/products
+server GET localhost:4010/products (in POST /products)
+  → matched ProductsPage · GET {API_URL ?? http://localhost:4010}/products
+browser POST localhost:3077/products [action]
+  → matched DeleteProductButton · POST action deleteProduct
+server DELETE localhost:4010/products/1 (in POST /products)
+  → matched deleteProduct · DELETE {API_URL ?? http://localhost:4010}/products/:id
+
+## bff
+browser GET localhost:3077/api/products
+  → matched ProductsTable · GET /api/products
+server GET localhost:4010/products (in GET /api/products)
+  → matched GET /api/products · GET {BACKEND_URL ?? http://localhost:4010}/products
+browser GET localhost:3077/api/products
+  → matched ProductsTable · GET /api/products
+server GET localhost:4010/products (in GET /api/products)
+  → matched GET /api/products · GET {BACKEND_URL ?? http://localhost:4010}/products
+browser POST localhost:3077/api/products
+  → matched CreateProductForm · POST /api/products
+server POST localhost:4010/products (in POST /api/products)
+  → matched POST /api/products · POST {BACKEND_URL ?? http://localhost:4010}/products
+browser GET localhost:3077/api/products/3
+  → matched ProductPage · GET /api/products/:id
+server GET localhost:4010/products/3 (in GET /api/products/3)
+  → matched GET /api/products/[id] · GET {BACKEND_URL ?? http://localhost:4010}/products/:id
+browser GET localhost:3077/api/products/3
+  → matched ProductPage · GET /api/products/:id
+server GET localhost:4010/products/3 (in GET /api/products/3)
+  → matched GET /api/products/[id] · GET {BACKEND_URL ?? http://localhost:4010}/products/:id
+
+## next-intl
+browser POST localhost:4010/auth/login
+  → matched LoginForm · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/auth/login
+browser POST localhost:4010/auth/verify-otp
+  → matched VerifyOtpForm · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/auth/verify-otp
+browser GET localhost:4010/me
+  → matched DashboardProfile · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/me
+browser GET localhost:4010/me
+  → matched DashboardProfile · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/me

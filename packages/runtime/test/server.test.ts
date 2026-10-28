@@ -138,6 +138,16 @@ describe('registerServerRuntime', () => {
     expect(outer?.parent).toBeUndefined()
   })
 
+  it("skips Next's own RSC requests (e.g. the page it renders after a server action redirect)", async () => {
+    received.length = 0
+    await (await fetch(`${backendUrl}/products/3`, { headers: { rsc: '1' } })).text()
+    await (await fetch(`${backendUrl}/products/4`)).text()
+    await runtime?.flush()
+    const urls = received.map((c) => c.request.url)
+    expect(urls).toContain(`${backendUrl}/products/4`)
+    expect(urls).not.toContain(`${backendUrl}/products/3`)
+  })
+
   it('wraps fetch again after something puts the native fetch back (Next resetFetch)', async () => {
     const wrapped = globalThis.fetch
     const native = (wrapped as unknown as Record<symbol, typeof fetch>)[

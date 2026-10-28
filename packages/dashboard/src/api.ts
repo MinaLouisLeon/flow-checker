@@ -1,4 +1,4 @@
-import type { AppModel, Capture, CaptureSummary } from '@flow-checker/shared'
+import type { AppModel, Capture, CaptureSummary, VerificationSummary } from '@flow-checker/shared'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
@@ -72,6 +72,7 @@ export function useRescan() {
 // --- Live capture ---------------------------------------------------------------------------
 
 const CAPTURES_KEY = ['captures']
+const VERIFICATION_KEY = ['verification']
 /** Keep the newest captures in the list. */
 const MAX_LIST = 1000
 
@@ -100,9 +101,83 @@ export function useCapture(id: string | undefined) {
   })
 }
 
+export function useVerification(enabled: boolean) {
+  return useQuery({
+    queryKey: VERIFICATION_KEY,
+    queryFn: () => getJson<VerificationSummary>('api/verification'),
+    enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+  })
+}
+
+/** Captures matched to one request site, newest first. */
+export function useSiteCaptures(siteId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['site-captures', siteId],
+    queryFn: () => getJson<CaptureSummary[]>(`api/sites/${encodeURIComponent(siteId)}/captures`),
+    enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+  })
+}
+
+/** Sets each site's status from the verification summary (the server does the same for /api/model). */
+function applyVerification(model: AppModel, summary: VerificationSummary): AppModel {
+  let changed = false
+  const requests = model.requests.map((site) => {
+    const verified = Boolean(summary.sites[site.id])
+    if (site.status === 'inferred' && verified) {
+      changed = true
+      return { ...site, status: 'verified' as const }
+    }
+    if (site.status === 'verified' && !verified) {
+      changed = true
+      return { ...site, status: 'inferred' as const }
+    }
+    return site
+  })
+  return changed ? { ...model, requests } : model
+}
+
+function upsertCapture(client: ReturnType<typeof useQueryClient>, summary: CaptureSummary) {
+  client.setQueryData<CaptureSummary[]>(CAPTURES_KEY, (list = []) => {
+    const at = list.findIndex((c) => c.id === summary.id)
+    if (at < 0) return [summary, ...list].slice(0, MAX_LIST)
+    const next = [...list]
+    next[at] = summary
+    return next
+  })
+}
+
+/** Manual match: a site id, `null` for "no site", or `undefined` to go back to automatic. */
+export function useAssignMatch() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: ({ captureId, siteId }: { captureId: string; siteId: string | null | undefined }) =>
+      getJson<CaptureSummary>(
+        `api/captures/${encodeURIComponent(captureId)}/match`,
+        siteId === undefined
+          ? { method: 'DELETE' }
+          : {
+              method: 'PUT',
+              headers: { 'content-type': 'application/json' },
+              body: JSON.stringify({ siteId }),
+            },
+      ),
+    onSuccess: (summary) => {
+      upsertCapture(client, summary)
+      void client.invalidateQueries({ queryKey: ['capture'] })
+      void client.invalidateQueries({ queryKey: ['site-captures'] })
+      void client.invalidateQueries({ queryKey: VERIFICATION_KEY })
+    },
+  })
+}
+
 export type LiveStatus = 'connecting' | 'live' | 'offline'
 
-/** Subscribes to new captures (server-sent events) and adds them to the list. */
+/**
+ * Subscribes to the live feed (server-sent events): new and re-matched captures, and site
+ * verification changes, which also update the cached model's request statuses.
+ */
 export function useLiveFeed(enabled: boolean): LiveStatus {
   const client = useQueryClient()
   const [status, setStatus] = useState<LiveStatus>('connecting')
@@ -113,16 +188,22 @@ export function useLiveFeed(enabled: boolean): LiveStatus {
       setStatus('live')
       // Catch up on anything that arrived while disconnected.
       void client.invalidateQueries({ queryKey: CAPTURES_KEY })
+      void client.invalidateQueries({ queryKey: VERIFICATION_KEY })
     })
     source.addEventListener('capture', (event) => {
       const summary = JSON.parse((event as MessageEvent<string>).data) as CaptureSummary
-      client.setQueryData<CaptureSummary[]>(CAPTURES_KEY, (list = []) =>
-        [summary, ...list.filter((c) => c.id !== summary.id)].slice(0, MAX_LIST),
-      )
-      // A server hop may belong to a capture that is open.
+      upsertCapture(client, summary)
+      // The open capture may have been re-matched, or a server hop may belong to it.
+      void client.invalidateQueries({ queryKey: ['capture', summary.id] })
       if (summary.parentCaptureId) {
         void client.invalidateQueries({ queryKey: ['capture', summary.parentCaptureId] })
       }
+    })
+    source.addEventListener('verification', (event) => {
+      const summary = JSON.parse((event as MessageEvent<string>).data) as VerificationSummary
+      client.setQueryData(VERIFICATION_KEY, summary)
+      client.setQueryData<AppModel>(['model'], (model) => model && applyVerification(model, summary))
+      void client.invalidateQueries({ queryKey: ['site-captures'] })
     })
     source.onerror = () => setStatus(source.readyState === EventSource.CLOSED ? 'offline' : 'connecting')
     return () => source.close()
@@ -140,6 +221,9 @@ export function useClearCaptures() {
     onSuccess: () => {
       client.setQueryData(CAPTURES_KEY, [])
       client.removeQueries({ queryKey: ['capture'] })
+      void client.invalidateQueries({ queryKey: VERIFICATION_KEY })
+      void client.invalidateQueries({ queryKey: ['site-captures'] })
+      void client.invalidateQueries({ queryKey: ['model'] })
     },
   })
 }

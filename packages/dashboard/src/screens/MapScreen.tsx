@@ -21,6 +21,8 @@ interface RouteNodeData extends Record<string, unknown> {
   route: Route
   componentCount: number
   noteCount: number
+  /** Every request on the route was captured. */
+  verified: boolean
   dimmed: boolean
 }
 type RouteNode = Node<RouteNodeData, 'route'>
@@ -66,6 +68,19 @@ function RouteGraphView({ q }: { q: string }) {
     for (const [, routeIds] of index.routesOf) {
       for (const id of routeIds) componentCount.set(id, (componentCount.get(id) ?? 0) + 1)
     }
+    // Requests per route: from its components, or sent by its route handler.
+    const routeRequests = new Map<string, { total: number; verified: number }>()
+    const count = (routeId: string, verified: boolean) => {
+      const entry = routeRequests.get(routeId) ?? { total: 0, verified: 0 }
+      entry.total++
+      if (verified) entry.verified++
+      routeRequests.set(routeId, entry)
+    }
+    for (const site of index.model.requests) {
+      const verified = site.status === 'verified'
+      if (site.componentId) for (const id of index.routesOf.get(site.componentId) ?? []) count(id, verified)
+      else if (site.origin === 'route-handler' && site.routeId) count(site.routeId, verified)
+    }
     const nodes: RouteNode[] = graph.nodes.map((n) => ({
       id: n.route.id,
       type: 'route',
@@ -76,6 +91,7 @@ function RouteGraphView({ q }: { q: string }) {
         route: n.route,
         componentCount: componentCount.get(n.route.id) ?? 0,
         noteCount: notesByRoute.get(n.route.id) ?? 0,
+        verified: isVerified(routeRequests.get(n.route.id)),
         dimmed: false,
       },
     }))
@@ -137,12 +153,16 @@ function RouteGraphView({ q }: { q: string }) {
   )
 }
 
+function isVerified(entry: { total: number; verified: number } | undefined): boolean {
+  return Boolean(entry && entry.total > 0 && entry.verified === entry.total)
+}
+
 function RouteNodeView({ data }: NodeProps<RouteNode>) {
-  const { route, componentCount, noteCount, dimmed } = data
+  const { route, componentCount, noteCount, verified, dimmed } = data
   const handler = route.kind === 'route-handler'
   return (
     <div
-      className={`route-node status-inferred${handler ? ' route-node-handler' : ''}${dimmed ? ' dimmed' : ''}`}
+      className={`route-node ${verified ? 'status-verified' : 'status-inferred'}${handler ? ' route-node-handler' : ''}${dimmed ? ' dimmed' : ''}`}
       title={route.file}
     >
       <Handle type="target" position={Position.Left} isConnectable={false} />

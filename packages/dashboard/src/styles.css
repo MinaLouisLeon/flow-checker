@@ -918,3 +918,64 @@ a.stat:hover {
   font-size: 12px;
   margin-bottom: 6px;
 }
+
+/* Matching (M6) */
+.match-filter .count {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.match-panel p {
+  margin: 0 0 8px;
+}
+.match-candidates {
+  margin-bottom: 10px;
+}
+.match-candidates li {
+  display: block;
+}
+.match-candidate-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chip-warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+.match-assign {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.match-assign select {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.match-note {
+  margin-top: 6px;
+  font-size: 12px;
+}
+.request-captures ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.request-captures li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

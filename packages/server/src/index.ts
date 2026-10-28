@@ -1,3 +1,7 @@
+export { ServerActionResolver } from './actions'
 export { type AppOptions, type CaptureOptions, createApp, type ServerMeta } from './app'
 export { type RunningServer, type StartOptions, startServer } from './listen'
+export { fingerprint, MATCH_MARGIN, MATCH_THRESHOLD, Matcher } from './matcher'
+export { SourceMapper } from './stack'
 export { CaptureStore, type CaptureStoreOptions, UNMATCHED_DIR } from './store'
+export { Verifier } from './verify'

@@ -36,6 +36,27 @@ test('a login click shows up in the dashboard as a redacted capture', async ({ p
     .locator('pre.body')
     .first()
   await expect(responseBody).toContainText('"otpRequired": true')
+
+  // Matched to the scanned request site (M6).
+  await expect(row.locator('.badge-ok', { hasText: 'LoginForm' })).toBeVisible()
+  const site = detail.locator('.section', { has: page.locator('h2', { hasText: /^Request site$/ }) })
+  await expect(site).toContainText('✓ matched')
+  await expect(site).toContainText('LoginForm · POST')
+  await expect(site).toContainText('source line')
+})
+
+test('the matched request site shows as verified', async ({ page, request }) => {
+  const model = await (await request.get(`${dashboard}/api/model`)).json()
+  const components = new Map<string, string>(
+    model.components.map((c: { id: string; name: string }) => [c.id, c.name]),
+  )
+  const login = model.requests.find(
+    (s: { componentId?: string }) => components.get(s.componentId ?? '') === 'LoginForm',
+  )
+  expect(login?.status).toBe('verified')
+
+  await page.goto(`${dashboard}/#/component/${login.componentId}`)
+  await expect(page.locator('.request', { hasText: '/auth/login' })).toContainText('✓ verified')
 })
 
 test('the stored capture on disk is redacted too', async ({ request }) => {

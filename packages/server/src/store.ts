@@ -1,8 +1,8 @@
 // Captures and sessions on disk (docs/PLAN.md 13):
-//   .flow-checker/captures/<siteId>/<captureId>.json   (`_unmatched` until M6 matches them)
+//   .flow-checker/captures/<siteId>/<captureId>.json   (`_unmatched` until matched to a site)
 //   .flow-checker/sessions/<sessionId>.json
 // Everything is also kept in memory (newest `limit` captures) for the API.
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   type Capture,
@@ -31,6 +31,8 @@ export class CaptureStore {
   private readonly limit: number
   private captures: Capture[] = []
   private readonly byId = new Map<string, Capture>()
+  /** Capture id → folder its file is in. */
+  private readonly folders = new Map<string, string>()
   private readonly sessions = new Map<string, Session>()
   private readonly dirtySessions = new Set<string>()
   private sessionTimer: ReturnType<typeof setTimeout> | undefined
@@ -51,7 +53,9 @@ export class CaptureStore {
         for (const file of readdirSync(join(capturesDir, sub.name))) {
           if (!file.endsWith('.json')) continue
           const parsed = CaptureSchema.safeParse(readJson(join(capturesDir, sub.name, file)))
-          if (parsed.success) loaded.push(parsed.data)
+          if (!parsed.success) continue
+          loaded.push(parsed.data)
+          this.folders.set(parsed.data.id, sub.name)
         }
       }
     }
@@ -69,10 +73,26 @@ export class CaptureStore {
     return this
   }
 
+  /**
+   * Saves a new capture, or a changed one (e.g. matched to another site). The file goes to the
+   * folder of the site it matched, and moves when that changes.
+   */
   add(capture: Capture): void {
-    const folder = join(this.dir, 'captures', UNMATCHED_DIR)
+    const folderName =
+      capture.match?.status === 'matched' && capture.match.siteId
+        ? safeName(capture.match.siteId)
+        : UNMATCHED_DIR
+    const folder = join(this.dir, 'captures', folderName)
+    const fileName = `${safeName(capture.id)}.json`
     mkdirSync(folder, { recursive: true })
-    writeFileSync(join(folder, `${safeName(capture.id)}.json`), `${JSON.stringify(capture, null, 2)}\n`)
+    writeFileSync(join(folder, fileName), `${JSON.stringify(capture, null, 2)}\n`)
+    const previous = this.folders.get(capture.id)
+    if (previous && previous !== folderName) {
+      try {
+        unlinkSync(join(this.dir, 'captures', previous, fileName))
+      } catch {}
+    }
+    this.folders.set(capture.id, folderName)
     this.remember(capture)
     for (const listener of this.listeners) {
       try {
@@ -111,8 +131,13 @@ export class CaptureStore {
   }
 
   /** Captures the given browser capture led to on the server (BFF hops, action fetches). */
-  children(id: string): CaptureSummary[] {
-    return this.captures.filter((c) => c.parent?.captureId === id).map(summarizeCapture)
+  children(id: string): Capture[] {
+    return this.captures.filter((c) => c.parent?.captureId === id)
+  }
+
+  /** Every capture kept in memory, oldest first. */
+  all(): readonly Capture[] {
+    return this.captures
   }
 
   session(id: string): Session | undefined {
@@ -132,6 +157,7 @@ export class CaptureStore {
   clear(): void {
     this.captures = []
     this.byId.clear()
+    this.folders.clear()
     this.sessions.clear()
     this.dirtySessions.clear()
     rmSync(join(this.dir, 'captures'), { recursive: true, force: true })
@@ -160,7 +186,10 @@ export class CaptureStore {
     this.byId.set(capture.id, capture)
     while (this.captures.length > this.limit) {
       const dropped = this.captures.shift()
-      if (dropped) this.byId.delete(dropped.id)
+      if (dropped) {
+        this.byId.delete(dropped.id)
+        this.folders.delete(dropped.id)
+      }
     }
   }
 }

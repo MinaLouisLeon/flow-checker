@@ -68,6 +68,7 @@
   },
   "dependencies": {
     "@hono/node-server": "catalog:",
+    "@jridgewell/trace-mapping": "catalog:",
     "hono": "catalog:",
     "ts-morph": "catalog:",
     "zod": "catalog:"

@@ -2,7 +2,7 @@
 
 Maps a Next.js App Router project: its pages, components, requests, types and user flows. It verifies that map against real traffic while you use the app, and exports it as documentation.
 
-> Status: early development. The scan covers routes, components, request sites and types (M1–M3): `flow-checker scan` writes `.flow-checker/model.json` (add `--requests` to print the request sites), `flow-checker dev` serves a dashboard of it (M4), and also starts your app with request capture on: browser and server requests show up live in the dashboard, with passwords, tokens and auth headers masked (M5). `flow-checker init` adds the two capture hooks (`instrumentation.ts`, `instrumentation-client.ts`) and a config file. The plan is in [docs/PLAN.md](docs/PLAN.md).
+> Status: early development. The scan covers routes, components, request sites and types (M1–M3): `flow-checker scan` writes `.flow-checker/model.json` (add `--requests` to print the request sites), `flow-checker dev` serves a dashboard of it (M4), and also starts your app with request capture on: browser and server requests show up live in the dashboard, with passwords, tokens and auth headers masked (M5). Each captured request is matched to the request site in the code that sent it, which marks that site as verified; when it can't tell, you pick the site in the Live screen and the choice is remembered in `.flow-checker/overrides.json` (M6). `flow-checker init` adds the two capture hooks (`instrumentation.ts`, `instrumentation-client.ts`) and a config file. The plan is in [docs/PLAN.md](docs/PLAN.md).
 
 Published as [`@integr8/flow-checker`](packages/flow-checker). The command is `flow-checker`.
 
@@ -31,6 +31,7 @@ pnpm check              # everything CI runs: lint, typecheck, test, build, fixt
 pnpm test:watch         # vitest in watch mode
 node packages/flow-checker/dist/cli.js dev --root fixtures/bff   # after pnpm build: dashboard on :4400, app on :3000
 pnpm test:e2e           # after pnpm build: Playwright capture test (once: pnpm exec playwright install chromium)
+node scripts/record-captures.mjs   # after pnpm build: re-record the fixture captures the matcher tests use
 pnpm --filter @flow-checker/dashboard dev   # dashboard with hot reload on :4401 (API proxied to :4400)
 ```
 

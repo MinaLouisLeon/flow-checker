@@ -1,3 +1,4 @@
+import { useVerification } from '../api'
 import { useData } from '../context'
 import type { NoteKind, ScanNote } from '../model-index'
 import { href } from '../router'
@@ -11,7 +12,9 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
 }
 
 export function Overview() {
-  const { index } = useData()
+  const { index, meta } = useData()
+  const verification = useVerification(Boolean(meta.capture))
+  const counts = verification.data?.counts
   const { model } = index
   const pages = model.routes.filter((r) => r.kind === 'page')
   const handlers = model.routes.filter((r) => r.kind === 'route-handler')
@@ -62,6 +65,36 @@ export function Overview() {
           {verified} of {model.requests.length} requests verified. Everything on this map comes from the code
           scan. Requests become verified once live capture records them while you use the app.
         </p>
+        {counts && counts.matched + counts.ambiguous + counts.unmatched > 0 && (
+          <ul className="list">
+            <li>
+              <a href={href({ name: 'live', q: '', filter: 'matched' })}>
+                {counts.matched} captured requests matched to a request site
+              </a>
+              {counts.manual > 0 && <span className="muted"> ({counts.manual} assigned by you)</span>}
+            </li>
+            {counts.ambiguous > 0 && (
+              <li>
+                <span className="warn-icon" aria-hidden>
+                  ⚠
+                </span>
+                <a href={href({ name: 'live', q: '', filter: 'ambiguous' })}>
+                  {counts.ambiguous} could be more than one request site. Pick the right one.
+                </a>
+              </li>
+            )}
+            {counts.unmatched > 0 && (
+              <li>
+                <span className="warn-icon" aria-hidden>
+                  ⚠
+                </span>
+                <a href={href({ name: 'live', q: '', filter: 'unmatched' })}>
+                  {counts.unmatched} match no request site. The scanner probably missed them.
+                </a>
+              </li>
+            )}
+          </ul>
+        )}
       </Section>
 
       <Section title="To check" aside={<span className="count">{index.notes.length}</span>}>

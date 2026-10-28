@@ -1,0 +1,747 @@
+{
+  "fixture": "server-actions",
+  "actions": {
+    "40029b5fbbdb772b780480ca971c5c82d4e9e632e9": {
+      "filename": "fixtures/server-actions/src/actions/products.ts",
+      "exportedName": "deleteProduct"
+    },
+    "606e847d81ec6abfee1463e13cbec85d240ffaad9e": {
+      "filename": "fixtures/server-actions/src/actions/products.ts",
+      "exportedName": "createProduct"
+    }
+  },
+  "captures": [
+    {
+      "id": "cap_mvs0222tn9gfyq85",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:51.461Z",
+      "durationMs": 58,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:51 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async listProducts (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:91:17)",
+        "at async ProductsPage (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0aql73kvcd2sr._.js:22:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/backend.ts",
+          "line": 7,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 8,
+          "column": 20
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs022d7pqogk9yv",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:51.835Z",
+      "durationMs": 38,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:51 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async listProducts (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:91:17)",
+        "at async ProductsPage (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0aql73kvcd2sr._.js:22:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/backend.ts",
+          "line": 7,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 8,
+          "column": 20
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs027scd3jvgvu2",
+      "sessionId": "ses_mvs022lq1308pqq6",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:58.860Z",
+      "durationMs": 18,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/3",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 0,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products/3?_rsc",
+        "captureId": "cap_mvs026no4p15coso"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getProduct (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:97:17)",
+        "at async ProductPage (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ronxp5y32jb0._.js:29:21)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProduct",
+          "file": "src/lib/backend.ts",
+          "line": 12,
+          "column": 15
+        },
+        {
+          "fn": "ProductPage",
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 9,
+          "column": 19
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs026no4p15coso",
+      "sessionId": "ses_mvs022lq1308pqq6",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:57.396Z",
+      "durationMs": 1511,
+      "pageUrl": "http://localhost:3077/products/new",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/products/new",
+        "headers": {
+          "accept": "text/x-component",
+          "next-action": "606e847d81ec6abfee1463e13cbec85d240ffaad9e",
+          "next-router-state-tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22products%22%2C%7B%22children%22%3A%5B%22new%22%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C16%5D",
+          "x-nextjs-html-request-id": "weoCBmZ8cu5wEM8OrBFdi",
+          "x-nextjs-request-id": "1f573c24"
+        },
+        "body": {
+          "kind": "form",
+          "value": {
+            "0": "[{},\"$K1\"]",
+            "_1_$ACTION_REF_1": "",
+            "_1_$ACTION_1:0": "{\"id\":\"606e847d81ec6abfee1463e13cbec85d240ffaad9e\",\"bound\":\"$@1\"}",
+            "_1_$ACTION_1:1": "[{}]",
+            "_1_$ACTION_KEY": "kc796061555ae5a957e9949ace41126c9",
+            "_1_name": "Cable",
+            "_1_price": "9.5",
+            "_1_stock": "0"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "cache-control": "no-store",
+          "connection": "keep-alive",
+          "content-encoding": "gzip",
+          "content-type": "text/x-component",
+          "date": "Wed, 28 Oct 2026 10:56:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+          "x-action-redirect": "/products/3;push",
+          "x-action-revalidated": "1"
+        },
+        "body": {
+          "kind": "text",
+          "value": "2:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\"\n3:\"/_next/static/chunks/1ghd_next_dist_1kw6l690y4jc_._.js\"\n4:I[\"$2\",[\"$3\"],\"SegmentViewNode\"]\n6:\"$Sreact.fragment\"\n17:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\"\n18:I[\"$17\",[\"$3\"],\"default\"]\n1a:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\"\n1b:I[\"$1a\",[\"$3\"],\"default\"]\n44:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\"\n45:I[\"$44\",[\"$3\"],\"OutletBoundary\"]\n47:\"$Sreact.suspense\"\n54:\"ViewportBoundary\"\n55:I[\"$44\",[\"$3\"],\"$54\"]\n5e:\"MetadataBoundary\"\n5f:I[\"$44\",[\"$3\"],\"$5e\"]\n8:D\"$12\"\n8:D\"$9\"\n8:D\"$14\"\n1d:D\"$1f\"\n1d:D\"$1e\"\n1d:D\"$21\"\n1d:D\"$20\"\n1d:D\"$22\"\n1d:[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"},\"$20\",\"$23\",1],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}},\"$20\",\"$26\",1],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404},\"$20\",\"$27\",1],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"},\"$20\",\"$29\",1]},\"$20\",\"$28\",1]]},\"$20\",\"$25\",1]},\"$20\",\"$24\",1]]\n8:[\"$\",\"html\",null,{\"lang\":\"en\",\"children\":[\"$\",\"body\",null,{\"children\":[\"$\",\"$L18\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L1b\",null,{},null,\"$19\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[\"$\",\"$L4\",\"c-not-found\",{\"type\":\"not-found\",\"pagePath\":\"__next_builtin__not-found.js\",\"children\":[\"$1d\",[]]},null,\"$1c\",0],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[[\"$\",\"$L4\",null,{\"type\":\"boundary:not-found\",\"pagePath\":\"__next_builtin__not-found.js@boundary\"},null,\"$2a\",1],\"$undefined\",\"$undefined\",[\"$\",\"$L4\",null,{\"type\":\"boundary:global-error\",\"pagePath\":\"__next_builtin__global-error.js\"},null,\"$2b\",1]]},null,\"$16\",1]},\"$9\",\"$15\",1]},\"$9\",\"$13\",1]\n30:X\n38:D\"$3c\"\n38:D\"$39\"\n3e:D\"$41\"\n3e:D\"$3f\"\n3e:D\"$43\"\n3e:[\"$\",\"$L45\",null,{\"children\":[\"$\",\"$47\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@48\"},\"$3f\",\"$46\",1]},\"$3f\",\"$42\",1]\n35:[[\"children\",{\"s\":\"__PAGE__\",\"d\":{\"r\":[\"$\",\"$6\",\"c\",{\"children\":[[\"$\",\"$L4\",\"c-page\",{\"type\":\"page\",\"pagePath\":\"products/[id]/page.tsx\",\"children\":\"$L38\"},null,\"$37\",1],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/1ghd_next_dist_01f0h1eop3rqv._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$3d\",0]],\"$3e\"]},null,\"$36\",0],\"p\":false,\"v\":null}}]]\n31:[[\"children\",{\"s\":{\"n\":\"id\",\"t\":\"d\",\"k\":\"3\",\"s\":[\"new\"]},\"d\":{\"r\":[\"$\",\"$6\",\"c\",{\"children\":[null,[\"$\",\"$L18\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L1b\",null,{},null,\"$34\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[\"$undefined\",\"$undefined\",\"$undefined\",\"$undefined\"]},null,\"$33\",1]]},null,\"$32\",0],\"p\":false,\"v\":\"$30\"},\"c\":\"$Q35\"}]]\n2c:[[\"children\",{\"s\":\"products\",\"d\":{\"r\":[\"$\",\"$6\",\"c\",{\"children\":[null,[\"$\",\"$L18\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L1b\",null,{},null,\"$2f\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[\"$undefined\",\"$undefined\",\"$undefined\",\"$undefined\"]},null,\"$2e\",1]]},null,\"$2d\",0],\"p\":false,\"v\":\"$30\"},\"c\":\"$Q31\"}]]\n4a:D\"$4d\"\n4a:D\"$4b\"\n4a:D\"$4e\"\n4a:null\n4f:D\"$51\"\n4f:D\"$50\"\n4f:D\"$53\"\n56:D\"$58\"\n56:D\"$57\"\n4f:[\"$\",\"$L55\",\"1f573c24v\",{\"children\":\"$L56\"},\"$50\",\"$52\",1]\n59:D\"$5b\"\n59:D\"$5a\"\n59:D\"$5d\"\n62:D\"$64\"\n62:D\"$63\"\n65:D\"$67\"\n65:D\"$66\"\n65:D\"$68\"\n65:null\n59:[\"$\",\"$L5f\",\"1f573c24m\",{\"children\":[[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$47\",null,{\"name\":\"Next.Metadata\",\"children\":\"$L62\"},\"$5a\",\"$61\",1]},\"$5a\",\"$60\",1],\"$65\"]},\"$5a\",\"$5c\",1]\n0:{\"q\":\"\",\"i\":true,\"S\":false,\"r\":\"$undefined\",\"b\":\"development\",\"t\":{\"t\":{\"s\":\"\",\"h\":16,\"d\":{\"r\":[\"$\",\"$L4\",\"layout\",{\"type\":\"layout\",\"pagePath\":\"layout.tsx\",\"children\":[\"$\",\"$6\",\"c\",{\"children\":[[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/1ghd_next_dist_1kw6l690y4jc_._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$7\",0]],\"$8\"]},null,\"$5\",1]},null,\"$1\",0],\"p\":false,\"v\":null},\"c\":\"$Q2c\"},\"h\":{\"r\":[\"$\",\"$6\",\"h\",{\"children\":[\"$4a\",\"$4f\",\"$59\"]},null,\"$49\",0],\"p\":false,\"v\":null}}}\n30:C\n56:D\"$69\"\n56:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"},\"$3f\",\"$6a\",0],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"},\"$3f\",\"$6b\",0]]\n48:D\"$6c\"\n48:null\n62:D\"$6d\"\n62:[[\"$\",\"title\",\"0\",{\"children\":\"server-actions fixture\"},\"$3f\",\"$6e\",0]]\n8c:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)\"\n8d:\"/_next/static/chunks/1ghd_next_dist_01f0h1eop3rqv._.js\"\n8e:I[\"$8c\",[\"$3\",\"$8d\"],\"\"]\n38:D\"$72\"\n38:D\"$74\"\n38:D\"$75\"\n38:D\"$84\"\n87:D\"$89\"\n87:D\"$88\"\n87:D\"$8b\"\n87:[\"$\",\"$L8e\",null,{\"href\":\"/products\",\"children\":\"All products\"},\"$88\",\"$8a\",1]\n38:[\"$\",\"main\",null,{\"children\":[[\"$\",\"h1\",null,{\"children\":\"Cable\"},\"$39\",\"$85\",1],[\"$\",\"p\",null,{\"children\":[\"$$\",9.5,\" · \",0,\" in stock\"]},\"$39\",\"$86\",1],\"$87\"]},\"$39\",\"$83\",1]\n",
+          "size": 6542
+        }
+      },
+      "serverAction": {
+        "id": "606e847d81ec6abfee1463e13cbec85d240ffaad9e"
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Name Price Stock Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-28T10:56:57.376Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1m2u2uciaqp5i._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1m2u2uciaqp5i._.js:763:195)",
+        "at fetchInternal (http://localhost:3077/_next/static/chunks/1ghd_next_dist_client_0zeitm5npvybr._.js:11594:12)",
+        "at fetchServerAction (http://localhost:3077/_next/static/chunks/1ghd_next_dist_client_0zeitm5npvybr._.js:7444:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mvs026pcgvkd324w",
+      "sessionId": "ses_mvs022lq1308pqq6",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:57.456Z",
+      "durationMs": 8,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "name": "Cable",
+            "price": 9.5,
+            "stock": 0
+          },
+          "size": 38
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:57 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 0,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/products/new",
+        "captureId": "cap_mvs026no4p15coso",
+        "serverActionId": "606e847d81ec6abfee1463e13cbec85d240ffaad9e"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async insertProduct (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:103:17)",
+        "at async createProduct (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:50:15)",
+        "at async executeActionAndPrepareForRender (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:102:7916)",
+        "at async <repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:102:4545",
+        "at async handleAction (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:101:25072)",
+        "at async renderAppPage (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:323:4492)",
+        "at async doRender (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_07cqtfn-kaeki._.js:1302:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "insertProduct",
+          "file": "src/lib/backend.ts",
+          "line": 17,
+          "column": 15
+        },
+        {
+          "fn": "createProduct",
+          "file": "src/actions/products.ts",
+          "line": 21,
+          "column": 11
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs0292ego1k23rk",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:00.518Z",
+      "durationMs": 30,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:00 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            },
+            {
+              "id": 3,
+              "stock": 0,
+              "name": "Cable",
+              "price": 9.5
+            }
+          ],
+          "size": 145
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async listProducts (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:91:17)",
+        "at async ProductsPage (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0aql73kvcd2sr._.js:22:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/backend.ts",
+          "line": 7,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 8,
+          "column": 20
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02b5nig5igfha",
+      "sessionId": "ses_mvs022lq1308pqq6",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:03.227Z",
+      "durationMs": 26,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            },
+            {
+              "id": 3,
+              "stock": 0,
+              "name": "Cable",
+              "price": 9.5
+            }
+          ],
+          "size": 94
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/products",
+        "captureId": "cap_mvs02b3t4kswzebd",
+        "serverActionId": "40029b5fbbdb772b780480ca971c5c82d4e9e632e9"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async listProducts (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:91:17)",
+        "at async ProductsPage (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0aql73kvcd2sr._.js:22:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/backend.ts",
+          "line": 7,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 8,
+          "column": 20
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02b3t4kswzebd",
+      "sessionId": "ses_mvs022lq1308pqq6",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:03.161Z",
+      "durationMs": 82,
+      "pageUrl": "http://localhost:3077/products",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/products",
+        "headers": {
+          "accept": "text/x-component",
+          "next-action": "40029b5fbbdb772b780480ca971c5c82d4e9e632e9",
+          "next-router-state-tree": "%5B%22%22%2C%7B%22children%22%3A%5B%22products%22%2C%7B%22children%22%3A%5B%22__PAGE__%22%2C%7B%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C0%5D%7D%2Cnull%2Cnull%2C16%5D",
+          "x-nextjs-html-request-id": "Bsp2YuQQbr6nymsCmWmYF",
+          "x-nextjs-request-id": "f271984e"
+        },
+        "body": {
+          "kind": "json",
+          "value": [1],
+          "size": 3
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "cache-control": "no-store",
+          "connection": "keep-alive",
+          "content-encoding": "gzip",
+          "content-type": "text/x-component",
+          "date": "Wed, 28 Oct 2026 10:57:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding",
+          "x-action-revalidated": "1"
+        },
+        "body": {
+          "kind": "text",
+          "value": "3:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)\"\n4:\"/_next/static/chunks/1ghd_next_dist_1kw6l690y4jc_._.js\"\n5:I[\"$3\",[\"$4\"],\"SegmentViewNode\"]\n7:\"$Sreact.fragment\"\n18:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)\"\n19:I[\"$18\",[\"$4\"],\"default\"]\n1b:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)\"\n1c:I[\"$1b\",[\"$4\"],\"default\"]\n41:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)\"\n42:I[\"$41\",[\"$4\"],\"OutletBoundary\"]\n44:\"$Sreact.suspense\"\n51:\"ViewportBoundary\"\n52:I[\"$41\",[\"$4\"],\"$51\"]\n5b:\"MetadataBoundary\"\n5c:I[\"$41\",[\"$4\"],\"$5b\"]\n9:D\"$13\"\n9:D\"$a\"\n9:D\"$15\"\n1e:D\"$20\"\n1e:D\"$1f\"\n1e:D\"$22\"\n1e:D\"$21\"\n1e:D\"$23\"\n1e:[[\"$\",\"title\",null,{\"children\":\"404: This page could not be found.\"},\"$21\",\"$24\",1],[\"$\",\"div\",null,{\"style\":{\"fontFamily\":\"system-ui,\\\"Segoe UI\\\",Roboto,Helvetica,Arial,sans-serif,\\\"Apple Color Emoji\\\",\\\"Segoe UI Emoji\\\"\",\"height\":\"100vh\",\"textAlign\":\"center\",\"display\":\"flex\",\"flexDirection\":\"column\",\"alignItems\":\"center\",\"justifyContent\":\"center\"},\"children\":[\"$\",\"div\",null,{\"children\":[[\"$\",\"style\",null,{\"dangerouslySetInnerHTML\":{\"__html\":\"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}\"}},\"$21\",\"$27\",1],[\"$\",\"h1\",null,{\"className\":\"next-error-h1\",\"style\":{\"display\":\"inline-block\",\"margin\":\"0 20px 0 0\",\"padding\":\"0 23px 0 0\",\"fontSize\":24,\"fontWeight\":500,\"verticalAlign\":\"top\",\"lineHeight\":\"49px\"},\"children\":404},\"$21\",\"$28\",1],[\"$\",\"div\",null,{\"style\":{\"display\":\"inline-block\"},\"children\":[\"$\",\"h2\",null,{\"style\":{\"fontSize\":14,\"fontWeight\":400,\"lineHeight\":\"49px\",\"margin\":0},\"children\":\"This page could not be found.\"},\"$21\",\"$2a\",1]},\"$21\",\"$29\",1]]},\"$21\",\"$26\",1]},\"$21\",\"$25\",1]]\n9:[\"$\",\"html\",null,{\"lang\":\"en\",\"children\":[\"$\",\"body\",null,{\"children\":[\"$\",\"$L19\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L1c\",null,{},null,\"$1a\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":[\"$\",\"$L5\",\"c-not-found\",{\"type\":\"not-found\",\"pagePath\":\"__next_builtin__not-found.js\",\"children\":[\"$1e\",[]]},null,\"$1d\",0],\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[[\"$\",\"$L5\",null,{\"type\":\"boundary:not-found\",\"pagePath\":\"__next_builtin__not-found.js@boundary\"},null,\"$2b\",1],\"$undefined\",\"$undefined\",[\"$\",\"$L5\",null,{\"type\":\"boundary:global-error\",\"pagePath\":\"__next_builtin__global-error.js\"},null,\"$2c\",1]]},null,\"$17\",1]},\"$a\",\"$16\",1]},\"$a\",\"$14\",1]\n31:X\n35:D\"$39\"\n35:D\"$36\"\n3b:D\"$3e\"\n3b:D\"$3c\"\n3b:D\"$40\"\n3b:[\"$\",\"$L42\",null,{\"children\":[\"$\",\"$44\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@45\"},\"$3c\",\"$43\",1]},\"$3c\",\"$3f\",1]\n32:[[\"children\",{\"s\":\"__PAGE__\",\"d\":{\"r\":[\"$\",\"$7\",\"c\",{\"children\":[[\"$\",\"$L5\",\"c-page\",{\"type\":\"page\",\"pagePath\":\"products/page.tsx\",\"children\":\"$L35\"},null,\"$34\",1],[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/_1h7rz_9hpo7cd._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$3a\",0]],\"$3b\"]},null,\"$33\",0],\"p\":false,\"v\":null}}]]\n2d:[[\"children\",{\"s\":\"products\",\"d\":{\"r\":[\"$\",\"$7\",\"c\",{\"children\":[null,[\"$\",\"$L19\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L1c\",null,{},null,\"$30\",1],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\",\"segmentViewBoundaries\":[\"$undefined\",\"$undefined\",\"$undefined\",\"$undefined\"]},null,\"$2f\",1]]},null,\"$2e\",0],\"p\":false,\"v\":\"$31\"},\"c\":\"$Q32\"}]]\n47:D\"$4a\"\n47:D\"$48\"\n47:D\"$4b\"\n47:null\n4c:D\"$4e\"\n4c:D\"$4d\"\n4c:D\"$50\"\n53:D\"$55\"\n53:D\"$54\"\n4c:[\"$\",\"$L52\",\"f271984ev\",{\"children\":\"$L53\"},\"$4d\",\"$4f\",1]\n56:D\"$58\"\n56:D\"$57\"\n56:D\"$5a\"\n5f:D\"$61\"\n5f:D\"$60\"\n62:D\"$64\"\n62:D\"$63\"\n62:D\"$65\"\n62:null\n56:[\"$\",\"$L5c\",\"f271984em\",{\"children\":[[\"$\",\"div\",null,{\"hidden\":true,\"children\":[\"$\",\"$44\",null,{\"name\":\"Next.Metadata\",\"children\":\"$L5f\"},\"$57\",\"$5e\",1]},\"$57\",\"$5d\",1],\"$62\"]},\"$57\",\"$59\",1]\n0:{\"a\":\"$@1\",\"q\":\"\",\"i\":true,\"t\":{\"t\":{\"s\":\"\",\"h\":16,\"d\":{\"r\":[\"$\",\"$L5\",\"layout\",{\"type\":\"layout\",\"pagePath\":\"layout.tsx\",\"children\":[\"$\",\"$7\",\"c\",{\"children\":[[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/1ghd_next_dist_1kw6l690y4jc_._.js\",\"async\":true,\"nonce\":\"$undefined\"},null,\"$8\",0]],\"$9\"]},null,\"$6\",1]},null,\"$2\",0],\"p\":false,\"v\":null},\"c\":\"$Q2d\"},\"h\":{\"r\":[\"$\",\"$7\",\"h\",{\"children\":[\"$47\",\"$4c\",\"$56\"]},null,\"$46\",0],\"p\":false,\"v\":null}},\"b\":\"development\"}\n31:C\n1:D\"$66\"\n1:\"$undefined\"\n53:D\"$67\"\n53:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"},\"$3c\",\"$68\",0],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"},\"$3c\",\"$69\",0]]\n45:D\"$6a\"\n45:null\n5f:D\"$6b\"\n5f:[[\"$\",\"title\",\"0\",{\"children\":\"server-actions fixture\"},\"$3c\",\"$6c\",0]]\n89:\"[project]/node_modules/.pnpm/next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)\"\n8a:\"/_next/static/chunks/_1h7rz_9hpo7cd._.js\"\n8b:I[\"$89\",[\"$4\",\"$8a\"],\"\"]\n94:\"[project]/fixtures/server-actions/src/components/DeleteProductButton.tsx [app-client] (ecmascript)\"\n95:\"DeleteProductButton\"\n96:I[\"$94\",[\"$4\",\"$8a\"],\"$95\"]\n35:D\"$70\"\n35:D\"$72\"\n35:D\"$73\"\n35:D\"$82\"\n84:D\"$86\"\n84:D\"$85\"\n84:D\"$88\"\n84:[\"$\",\"$L8b\",null,{\"href\":\"/products/new\",\"children\":\"New product\"},\"$85\",\"$87\",1]\n8e:D\"$90\"\n8e:D\"$8f\"\n8e:D\"$92\"\n8e:[\"$\",\"$L8b\",null,{\"href\":\"/products/2\",\"children\":\"Mouse\"},\"$8f\",\"$91\",1]\n98:D\"$9a\"\n98:D\"$99\"\n98:D\"$9c\"\n98:[\"$\",\"$L8b\",null,{\"href\":\"/products/3\",\"children\":\"Cable\"},\"$99\",\"$9b\",1]\n35:[\"$\",\"main\",null,{\"children\":[[\"$\",\"h1\",null,{\"children\":\"Products\"},\"$36\",\"$83\",1],\"$84\",[\"$\",\"ul\",null,{\"children\":[[\"$\",\"li\",\"2\",{\"children\":[\"$8e\",\" $\",19.5,[\"$\",\"$L96\",null,{\"id\":2},\"$36\",\"$93\",1]]},\"$36\",\"$8d\",0],[\"$\",\"li\",\"3\",{\"children\":[\"$98\",\" $\",9.5,[\"$\",\"$L96\",null,{\"id\":3},\"$36\",\"$9d\",1]]},\"$36\",\"$97\",0]]},\"$36\",\"$8c\",1]]},\"$36\",\"$81\",1]\n",
+          "size": 6515
+        }
+      },
+      "serverAction": {
+        "id": "40029b5fbbdb772b780480ca971c5c82d4e9e632e9"
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteProductButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-28T10:57:03.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1m2u2uciaqp5i._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1m2u2uciaqp5i._.js:763:195)",
+        "at fetchInternal (http://localhost:3077/_next/static/chunks/1ghd_next_dist_client_0zeitm5npvybr._.js:11594:12)",
+        "at fetchServerAction (http://localhost:3077/_next/static/chunks/1ghd_next_dist_client_0zeitm5npvybr._.js:7444:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mvs02b4jthsdx0q5",
+      "sessionId": "ses_mvs022lq1308pqq6",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:03.187Z",
+      "durationMs": 3,
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:4010/products/1",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 204,
+        "statusText": "No Content",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "date": "Wed, 28 Oct 2026 10:57:03 GMT",
+          "keep-alive": "timeout=5"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/products",
+        "captureId": "cap_mvs02b3t4kswzebd",
+        "serverActionId": "40029b5fbbdb772b780480ca971c5c82d4e9e632e9"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async removeProduct (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:114:5)",
+        "at async deleteProduct (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\fixtures_server-actions_18xmdv90i8vat._.js:64:5)",
+        "at async executeActionAndPrepareForRender (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:102:7916)",
+        "at async <repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:102:4545",
+        "at async handleAction (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:101:25072)",
+        "at async renderAppPage (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:323:4492)",
+        "at async doRender (<repo>\\fixtures\\server-actions\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_07cqtfn-kaeki._.js:1302:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "removeProduct",
+          "file": "src/lib/backend.ts",
+          "line": 27,
+          "column": 3
+        },
+        {
+          "fn": "deleteProduct",
+          "file": "src/actions/products.ts",
+          "line": 31,
+          "column": 3
+        }
+      ]
+    }
+  ]
+}

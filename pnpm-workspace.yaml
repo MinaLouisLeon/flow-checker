@@ -27,6 +27,7 @@ catalog:
   ts-morph: ^28.0.0
   hono: ^4.13.0
   "@hono/node-server": ^2.1.0
+  "@jridgewell/trace-mapping": ^0.3.31
   "@xyflow/react": ^12.12.0
 
 # pnpm 11 blocks dependency install scripts unless listed here.

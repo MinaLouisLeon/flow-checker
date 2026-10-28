@@ -1,10 +1,12 @@
 import { createContext, useContext } from 'react'
-import type { Meta } from './api'
+import type { LiveStatus, Meta } from './api'
 import type { ModelIndex } from './model-index'
 
 export interface DashboardData {
   index: ModelIndex
   meta: Meta
+  /** Live feed connection, when capture is on. */
+  live?: LiveStatus
 }
 
 export const DataContext = createContext<DashboardData | null>(null)

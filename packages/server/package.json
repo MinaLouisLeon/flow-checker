@@ -13,7 +13,11 @@
   "dependencies": {
     "@flow-checker/runtime": "workspace:*",
     "@flow-checker/shared": "workspace:*",
-    "hono": "catalog:",
-    "@hono/node-server": "catalog:"
+    "@hono/node-server": "catalog:",
+    "@jridgewell/trace-mapping": "catalog:",
+    "hono": "catalog:"
+  },
+  "devDependencies": {
+    "@flow-checker/scanner": "workspace:*"
   }
 }

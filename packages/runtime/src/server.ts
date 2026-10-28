@@ -110,6 +110,9 @@ function start(config: RuntimeConfig): ServerRuntime {
     return !ignored(url)
   }
 
+  // Next's own RSC requests, e.g. the page it fetches from itself after a server action redirects.
+  const isNextInternal = (headers: Record<string, string>) => headers.rsc === '1'
+
   const baseCapture = (
     transport: Capture['transport'],
     method: string,
@@ -168,8 +171,10 @@ function start(config: RuntimeConfig): ServerRuntime {
       try {
         const request = input instanceof Request ? input : undefined
         const url = new URL(request ? request.url : String(input))
-        if (shouldCapture(url)) {
-          const headers = { ...headersToObject(request?.headers), ...headersToObject(init?.headers) }
+        const headers = shouldCapture(url)
+          ? { ...headersToObject(request?.headers), ...headersToObject(init?.headers) }
+          : undefined
+        if (headers && !isNextInternal(headers)) {
           capture = baseCapture(
             'fetch',
             (init?.method ?? request?.method ?? 'GET').toUpperCase(),
@@ -269,6 +274,7 @@ function start(config: RuntimeConfig): ServerRuntime {
       const url = new URL(`${protocol}//${host}${request.path}`)
       if (!shouldCapture(url)) return
       const headers = headersToObject(request.getHeaders())
+      if (isNextInternal(headers)) return
       const capture = baseCapture('http', request.method, url, headers)
       const state = { capture, started: performance.now() }
       clientRequests.set(request, state)
