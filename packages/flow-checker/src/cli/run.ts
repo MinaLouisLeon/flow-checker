@@ -1,7 +1,9 @@
+import { createInterface } from 'node:readline/promises'
 import { parseArgs } from 'node:util'
 import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { devCommand } from './dev'
+import { initCommand } from './init'
 import { scanCommand } from './scan'
 
 const COMMANDS = {
@@ -24,26 +26,42 @@ ${Object.entries(COMMANDS)
   .join('\n')}
 
 Options:
-  --root <dir>      Project root (default: current directory)
-  --app-dir <dir>   App Router directory, relative to the root (default: src/app or app)
-  --port <n>        dev: dashboard port (default: 4400)
-  --app-port <n>    dev: port your Next.js app runs on (default: 3000)
-  --no-open         dev: don't open the browser
-  --tree            scan: also print the route and component trees
-  --types           scan: also print the resolved types
-  --requests        scan: also print the request sites
-  -h, --help        Show help
-  -v, --version     Show version
+  --root <dir>            Project root (default: current directory)
+  --app-dir <dir>         App Router directory, relative to the root (default: src/app or app)
+  --config <file>         Config file (default: flow-checker.config.* in the root)
+  --port <n>              dev: dashboard port (default: 4400)
+  --app-port <n>          dev: port your Next.js app runs on (default: 3000)
+  --dev-command <cmd>     dev: command that starts your app (default: the "dev" script)
+  --no-app                dev: don't start your app (start it yourself with the printed env)
+  --no-open               dev: don't open the browser
+  -y, --yes               init: apply the changes without asking
+  --tree                  scan: also print the route and component trees
+  --types                 scan: also print the resolved types
+  --requests              scan: also print the request sites
+  -h, --help              Show help
+  -v, --version           Show version
 `
 
 export interface CliIO {
   out: (text: string) => void
   err: (text: string) => void
+  /** Asks a yes/no question. Absent when there is no terminal to ask in. */
+  confirm?: (question: string) => Promise<boolean>
 }
 
 const defaultIO: CliIO = {
   out: (text) => process.stdout.write(`${text}\n`),
   err: (text) => process.stderr.write(`${text}\n`),
+  confirm: process.stdin.isTTY
+    ? async (question) => {
+        const rl = createInterface({ input: process.stdin, output: process.stdout })
+        try {
+          return /^y(es)?$/i.test((await rl.question(`${question} [y/N] `)).trim())
+        } finally {
+          rl.close()
+        }
+      }
+    : undefined,
 }
 
 /** Runs the CLI and returns the exit code. */
@@ -91,7 +109,23 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
     const port = toPort(values.port, '--port', io)
     const appPort = toPort(values['app-port'], '--app-port', io)
     if (port === null || appPort === null) return 1
-    return devCommand({ root: values.root, appDir: values['app-dir'], port, appPort, open: values.open }, io)
+    return devCommand(
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        port,
+        appPort,
+        open: values.open,
+        app: values.app,
+        devCommand: values['dev-command'],
+      },
+      io,
+    )
+  }
+
+  if (command === 'init') {
+    return initCommand({ root: values.root, appDir: values['app-dir'], yes: values.yes }, io)
   }
 
   io.err(`"${command}" is not implemented yet.`)
@@ -114,7 +148,11 @@ function parse(argv: string[]) {
       requests: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },
+      config: { type: 'string' },
+      'dev-command': { type: 'string' },
+      app: { type: 'boolean', default: true },
       open: { type: 'boolean', default: true },
+      yes: { type: 'boolean', short: 'y' },
     },
   })
 }

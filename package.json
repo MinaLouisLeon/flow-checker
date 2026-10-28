@@ -12,13 +12,15 @@
     "typecheck:fixtures": "pnpm --filter \"./fixtures/**\" typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "check": "pnpm lint && pnpm typecheck && pnpm typecheck:fixtures && pnpm test && pnpm build && pnpm verify:package",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm typecheck:fixtures && pnpm verify:package",
     "verify:package": "node scripts/verify-package.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
+    "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

@@ -1,1 +1,1 @@
-export { installClientRuntime } from '@flow-checker/runtime/client'
+export { installClientRuntime, type RuntimeConfig } from '@flow-checker/runtime/client'

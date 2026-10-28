@@ -2,7 +2,7 @@
 
 Maps a Next.js App Router project: its pages, components, requests, types and user flows. It verifies that map against real traffic while you use the app, and exports it as documentation.
 
-> Status: early development. The scan covers routes, components, request sites and types (M1–M3): `flow-checker scan` writes `.flow-checker/model.json` (add `--requests` to print the request sites), and `flow-checker dev` serves a read-only dashboard of it (M4). The plan is in [docs/PLAN.md](docs/PLAN.md).
+> Status: early development. The scan covers routes, components, request sites and types (M1–M3): `flow-checker scan` writes `.flow-checker/model.json` (add `--requests` to print the request sites), `flow-checker dev` serves a dashboard of it (M4), and also starts your app with request capture on: browser and server requests show up live in the dashboard, with passwords, tokens and auth headers masked (M5). `flow-checker init` adds the two capture hooks (`instrumentation.ts`, `instrumentation-client.ts`) and a config file. The plan is in [docs/PLAN.md](docs/PLAN.md).
 
 Published as [`@integr8/flow-checker`](packages/flow-checker). The command is `flow-checker`.
 
@@ -27,9 +27,10 @@ Requires Node 22.12+ and pnpm 11.
 
 ```bash
 pnpm install
-pnpm check              # everything CI runs: lint, typecheck, fixture typecheck, test, build
+pnpm check              # everything CI runs: lint, typecheck, test, build, fixture typecheck
 pnpm test:watch         # vitest in watch mode
-node packages/flow-checker/dist/cli.js dev --root fixtures/bff   # after pnpm build: dashboard on :4400
+node packages/flow-checker/dist/cli.js dev --root fixtures/bff   # after pnpm build: dashboard on :4400, app on :3000
+pnpm test:e2e           # after pnpm build: Playwright capture test (once: pnpm exec playwright install chromium)
 pnpm --filter @flow-checker/dashboard dev   # dashboard with hot reload on :4401 (API proxied to :4400)
 ```
 

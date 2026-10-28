@@ -1,8 +1,24 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { AppModel } from '@flow-checker/shared'
+import type { RuntimeCaptureOptions } from '@flow-checker/runtime/options'
+import { compileRules, redactCapture } from '@flow-checker/runtime/redact'
+import { type AppModel, IngestBatchSchema, summarizeCapture } from '@flow-checker/shared'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
+import { streamSSE } from 'hono/streaming'
+import type { CaptureStore } from './store'
+
+/** Largest ingest batch accepted, in bytes. */
+const MAX_INGEST_BYTES = 20_000_000
+const SSE_PING_MS = 20_000
+
+export interface CaptureOptions {
+  store: CaptureStore
+  /** Per-run secret the runtime sends with every batch. */
+  token: string
+  /** Resolved capture settings. Captures are redacted again on arrival unless `storeRaw`. */
+  options: RuntimeCaptureOptions
+}
 
 export interface AppOptions {
   /** Absolute project root. Used for "open in editor" links. */
@@ -17,6 +33,8 @@ export interface AppOptions {
   appPort?: number
   /** Shown in the dashboard header. */
   version?: string
+  /** Live capture: the ingest endpoint and capture API. Without it, both are off. */
+  capture?: CaptureOptions
 }
 
 /** What the dashboard needs besides the model. */
@@ -28,6 +46,8 @@ export interface ServerMeta {
   /** ISO time of the last scan. */
   scannedAt: string
   canRescan: boolean
+  /** Present when live capture is on. */
+  capture?: { storeRaw: boolean }
 }
 
 // The server only listens on loopback. Checking the Host header as well blocks DNS
@@ -64,6 +84,7 @@ export function createApp(options: AppOptions): Hono {
       version: options.version,
       scannedAt,
       canRescan: Boolean(options.rescan),
+      capture: options.capture ? { storeRaw: options.capture.options.storeRaw } : undefined,
     } satisfies ServerMeta),
   )
 
@@ -85,6 +106,8 @@ export function createApp(options: AppOptions): Hono {
     }
   })
 
+  if (options.capture) mountCapture(app, options.capture)
+
   app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
 
   const dir = options.dashboardDir
@@ -103,4 +126,79 @@ export function createApp(options: AppOptions): Hono {
   }
 
   return app
+}
+
+/** `/ingest` for the runtime, and the capture API for the dashboard. */
+function mountCapture(app: Hono, capture: CaptureOptions) {
+  const { store, token } = capture
+  const rules = compileRules(capture.options.redact)
+
+  // The runtime posts text/plain (a CORS "simple" request, so browsers send it without a
+  // preflight). Nothing is returned to read, so no CORS headers are needed.
+  app.post('/ingest', async (c) => {
+    const length = Number(c.req.header('content-length'))
+    if (length > MAX_INGEST_BYTES) return c.json({ error: 'Batch too large' }, 413)
+    let json: unknown
+    try {
+      const text = await c.req.text()
+      if (text.length > MAX_INGEST_BYTES) return c.json({ error: 'Batch too large' }, 413)
+      json = JSON.parse(text)
+    } catch {
+      return c.json({ error: 'Invalid JSON' }, 400)
+    }
+    const parsed = IngestBatchSchema.safeParse(json)
+    if (!parsed.success)
+      return c.json({ error: 'Invalid batch', issues: parsed.error.issues.slice(0, 5) }, 400)
+    const batch = parsed.data
+    if (batch.token !== token) return c.json({ error: 'Invalid token' }, 403)
+
+    for (const item of batch.captures) {
+      // Safety net: the runtime already redacted, unless it was misconfigured.
+      store.add(redactCapture(item, rules, capture.options.storeRaw))
+    }
+    if (batch.sessionId) store.addEvents(batch.sessionId, batch.events)
+    return c.body(null, 204)
+  })
+
+  app.get('/api/captures', (c) => {
+    const limit = Number(c.req.query('limit') ?? 500)
+    return c.json(
+      store.list({
+        limit: Number.isFinite(limit) && limit > 0 ? limit : 500,
+        sessionId: c.req.query('session') || undefined,
+      }),
+    )
+  })
+
+  app.delete('/api/captures', (c) => {
+    store.clear()
+    return c.body(null, 204)
+  })
+
+  app.get('/api/captures/:id', (c) => {
+    const found = store.get(c.req.param('id'))
+    if (!found) return c.json({ error: 'Capture not found' }, 404)
+    return c.json({ capture: found, children: store.children(found.id) })
+  })
+
+  app.get('/api/sessions/:id', (c) => {
+    const session = store.session(c.req.param('id'))
+    return session ? c.json(session) : c.json({ error: 'Session not found' }, 404)
+  })
+
+  // Live feed for the dashboard: one `capture` event per new capture.
+  app.get('/api/live', (c) =>
+    streamSSE(c, async (stream) => {
+      const unsubscribe = store.subscribe((item) => {
+        void stream.writeSSE({ event: 'capture', data: JSON.stringify(summarizeCapture(item)) })
+      })
+      stream.onAbort(unsubscribe)
+      await stream.writeSSE({ event: 'ready', data: '{}' })
+      while (!stream.aborted && !stream.closed) {
+        await stream.sleep(SSE_PING_MS)
+        if (!stream.aborted) await stream.writeSSE({ event: 'ping', data: '{}' })
+      }
+      unsubscribe()
+    }),
+  )
 }
