@@ -14,6 +14,8 @@ const model: AppModel = {
   components: [],
   types: [],
   requests: [],
+  navigations: [],
+  flows: [],
 }
 
 const dirs: string[] = []

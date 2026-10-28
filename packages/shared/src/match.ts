@@ -2,6 +2,7 @@
 // The tool server scores each capture against every request site. The result is stored on the
 // capture (`Capture.match`), and sites with at least one matched capture become `verified`.
 import { z } from 'zod'
+import { RecordedFlowSchema } from './flow-runs'
 import type { RequestUrl } from './model'
 
 /** Evidence that links a capture to a request site. */
@@ -77,6 +78,10 @@ export const OverridesSchema = z.object({
       }),
     )
     .default([]),
+  /** Flow id -> the name you gave it (M7). */
+  flowNames: z.record(z.string(), z.string()).default({}),
+  /** Flows you recorded by name in the dashboard (M7). */
+  recordings: z.array(RecordedFlowSchema).default([]),
 })
 export type Overrides = z.infer<typeof OverridesSchema>
 

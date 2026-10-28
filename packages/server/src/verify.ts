@@ -1,18 +1,15 @@
 // Runs the matcher on captures as they arrive and after each re-scan, keeps your manual
 // decisions in `.flow-checker/overrides.json`, and derives each request site's status.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import {
-  type AppModel,
-  type Capture,
-  type CaptureMatch,
-  type Overrides,
-  OverridesSchema,
-  type SiteVerification,
-  type VerificationSummary,
+import type {
+  AppModel,
+  Capture,
+  CaptureMatch,
+  SiteVerification,
+  VerificationSummary,
 } from '@flow-checker/shared'
 import { ServerActionResolver } from './actions'
 import { fingerprint, Matcher } from './matcher'
+import { OverridesFile } from './overrides'
 import { SourceMapper } from './stack'
 import type { CaptureStore } from './store'
 
@@ -21,6 +18,8 @@ export interface VerifierOptions {
   root: string
   model: AppModel
   store: CaptureStore
+  /** Shared with the flow tracker. Default: a new one for `root`. */
+  overrides?: OverridesFile
 }
 
 export class Verifier {
@@ -29,8 +28,7 @@ export class Verifier {
   private readonly store: CaptureStore
   private readonly mapper: SourceMapper
   private readonly actions: ServerActionResolver
-  private readonly overridesFile: string
-  private overrides: Overrides
+  readonly overrides: OverridesFile
   private served: AppModel | undefined
   private readonly listeners = new Set<() => void>()
 
@@ -40,8 +38,7 @@ export class Verifier {
     this.store = options.store
     this.mapper = new SourceMapper(options.root)
     this.actions = new ServerActionResolver(options.root)
-    this.overridesFile = join(options.root, '.flow-checker', 'overrides.json')
-    this.overrides = readOverrides(this.overridesFile)
+    this.overrides = options.overrides ?? new OverridesFile(options.root)
     // Captures from earlier runs: match them against the current scan.
     this.rematch(this.store.all())
   }
@@ -78,10 +75,11 @@ export class Verifier {
     if (!capture) return undefined
     if (siteId && !this.matcher.hasSite(siteId)) throw new Error(`Unknown request site: ${siteId}`)
     const print = fingerprint(capture)
-    const matches = this.overrides.matches.filter((m) => m.fingerprint !== print)
-    if (siteId !== undefined) matches.push({ fingerprint: print, siteId, at: new Date().toISOString() })
-    this.overrides = { ...this.overrides, matches }
-    writeOverrides(this.overridesFile, this.overrides)
+    this.overrides.update((current) => {
+      const matches = current.matches.filter((m) => m.fingerprint !== print)
+      if (siteId !== undefined) matches.push({ fingerprint: print, siteId, at: new Date().toISOString() })
+      return { ...current, matches }
+    })
     this.rematch(this.store.all().filter((c) => fingerprint(c) === print))
     return this.store.get(captureId)
   }
@@ -140,7 +138,7 @@ export class Verifier {
 
   private matchOne(capture: Capture): CaptureMatch {
     const print = fingerprint(capture)
-    const decision = this.overrides.matches.find((m) => m.fingerprint === print)
+    const decision = this.overrides.get().matches.find((m) => m.fingerprint === print)
     const parentId = capture.origin === 'server' ? capture.parent?.captureId : undefined
     return this.matcher.match(capture, {
       frames: capture.sourceStack ?? [],
@@ -183,17 +181,4 @@ export class Verifier {
       } catch {}
     }
   }
-}
-
-function readOverrides(file: string): Overrides {
-  try {
-    const parsed = OverridesSchema.safeParse(JSON.parse(readFileSync(file, 'utf8')))
-    if (parsed.success) return parsed.data
-  } catch {}
-  return { version: 1, matches: [] }
-}
-
-function writeOverrides(file: string, overrides: Overrides) {
-  mkdirSync(dirname(file), { recursive: true })
-  writeFileSync(file, `${JSON.stringify(overrides, null, 2)}\n`)
 }

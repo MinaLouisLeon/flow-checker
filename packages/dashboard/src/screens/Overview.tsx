@@ -1,4 +1,4 @@
-import { useVerification } from '../api'
+import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import type { NoteKind, ScanNote } from '../model-index'
 import { href } from '../router'
@@ -14,6 +14,8 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
 export function Overview() {
   const { index, meta } = useData()
   const verification = useVerification(Boolean(meta.capture))
+  const flowRuns = useFlows(Boolean(meta.capture)).data
+  const confirmedFlows = index.model.flows.filter((f) => flowRuns?.flows[f.id]?.status === 'confirmed').length
   const counts = verification.data?.counts
   const { model } = index
   const pages = model.routes.filter((r) => r.kind === 'page')
@@ -48,7 +50,14 @@ export function Overview() {
           value={model.requests.length}
           detail={`${onLoad} on load · ${onEvent} on events · ${serverHops} server-side`}
         />
-        <Stat label="Flows" value="—" detail="Not scanned yet" />
+        <Stat
+          label="Flows"
+          value={model.flows.length}
+          detail={
+            meta.capture ? `${confirmedFlows} confirmed` : `${model.navigations.length} navigation links`
+          }
+          link={href({ name: 'flows', q: '' })}
+        />
       </div>
 
       <Section title="Verification">

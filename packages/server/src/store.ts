@@ -37,6 +37,7 @@ export class CaptureStore {
   private readonly dirtySessions = new Set<string>()
   private sessionTimer: ReturnType<typeof setTimeout> | undefined
   private readonly listeners = new Set<StoreListener>()
+  private readonly sessionListeners = new Set<(sessionId: string) => void>()
 
   constructor(options: CaptureStoreOptions) {
     this.dir = join(options.root, '.flow-checker')
@@ -113,6 +114,11 @@ export class CaptureStore {
     session.updatedAt = now
     this.dirtySessions.add(sessionId)
     this.sessionTimer ??= setTimeout(() => this.writeSessions(), SESSION_WRITE_MS)
+    for (const listener of this.sessionListeners) {
+      try {
+        listener(sessionId)
+      } catch {}
+    }
   }
 
   /** Newest first. */
@@ -142,6 +148,16 @@ export class CaptureStore {
 
   session(id: string): Session | undefined {
     return this.sessions.get(id)
+  }
+
+  allSessions(): Session[] {
+    return [...this.sessions.values()]
+  }
+
+  /** Called when a session gets new events. */
+  subscribeSessions(listener: (sessionId: string) => void): () => void {
+    this.sessionListeners.add(listener)
+    return () => this.sessionListeners.delete(listener)
   }
 
   get size(): number {

@@ -1,5 +1,5 @@
-// Positions for the route map graph. Until navigation edges are scanned (M7), routes are
-// linked to their closest parent route by URL path, laid out as a left-to-right tree.
+// Positions for the route map graph: routes are linked to their closest parent route by URL
+// path, laid out as a left-to-right tree. Navigation edges are drawn on top (MapScreen).
 import type { Route } from '@flow-checker/shared'
 
 export interface GraphNode {

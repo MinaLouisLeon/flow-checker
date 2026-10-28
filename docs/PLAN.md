@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M6 done (scanner, types, read-only dashboard, runtime capture, matching + verification). M7 (flows) is next. Updated: 2026-10-28.
+> Status: M0–M7 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows). M8 (type comparison) is next. Updated: 2026-10-28.
 
 ## 1. Goal
 
@@ -115,8 +115,11 @@ RequestSite    { id, componentId, routeId, trigger: page-load|event(onSubmit|onC
                  bodyType?: TypeRef, responseType?: TypeRef, chain?: RequestSiteId[],  // BFF hop
                  callStack: SourceLoc[], status: inferred|verified|needs-recheck|mismatch, flags: Flag[] }
 TypeRef        { name, definedAt: SourceLoc, resolved: TypeShape }   // TypeShape = JSON-like IR
-Flow           { id, name, steps: FlowStep[], source: inferred|recorded|both, status }
-FlowStep       { order, routeId, componentId, action, requestSiteId?, onSuccess?: next, onError?: next }
+Navigation     { id, origin: component|server-action, kind: link|push|replace|redirect|permanent-redirect,
+                 api: next|next-intl, href: RequestUrl, targetRouteId?, trigger, outcome?: success|error, loc }
+Flow           { id, name, routeId?, componentId, steps: FlowStep[], branches: { after, outcome: error, steps }[],
+                 routeIds[] }        // source + status (inferred|both, confirmed|partial) come from recording
+FlowStep       interaction{ routeId, componentId, event } | request{ siteId, onLoad? } | navigate{ navigationId, routeId? }
 Capture        { id, sessionId, timestamp, routeUrl, request{method,url,headers,body},
                  response{status,headers,body,durationMs}, origin: browser|server,
                  attribution{ stack[], componentChain[], interaction? }, sourceStack?, match?{status,siteId,score,candidates},
@@ -174,6 +177,14 @@ Detect each call, then **trace it back up the call graph** to the component and 
   `submit → mutation(POST /auth/login) → onSuccess → router.push('/verify') → [on /verify] page-load GET /me → …`
   Branches (`onError`, `if (res.ok)`) become alternative paths.
 - Flows are named from the starting component and route (e.g. "LoginForm submit"), and you can rename them in the UI.
+
+**Built in M7** (`packages/scanner`: `navigation.ts`, `flows.ts`):
+
+- Navigation is found on the request walk, so it gets the same origin, trigger and string resolution (`` `/verify?challenge=${id}` `` → `/verify?challenge=:id`). Supported: `next/link`, `next/navigation` (`useRouter().push/replace`, `redirect`, `permanentRedirect`) and next-intl `createNavigation()` wrappers, including renamed exports and `{ href }` / `{ pathname, params }` targets. Hrefs resolve to routes, static segments first. For next-intl the `[locale]` prefix is added.
+- **Outcome:** a navigation is on the `success` path in a `try` block, `onSuccess`, `.then`, or an `if` that checks a response (`res.ok`, `status`); on the `error` path in `catch`, `onError`, `.catch` or the failing side of that `if`. Mutation `onSuccess`/`onError`/`onSettled` callbacks are now walked too.
+- **Flows:** start at each event handler that sends a request. Steps: interaction → its requests (server action redirects included) → success navigation → the next page's load requests (its own component tree, not layouts) → the next page's handler that sends a request and moves on (forms first), and so on, until a page repeats. Error navigations become branches. A handler that only continues another flow is not listed separately (the OTP form is part of "LoginForm submit").
+- Middleware redirects are not scanned yet.
+- `flow-checker scan --flows` prints navigation and flows; snapshot `<fixture>.flows.txt`.
 
 ### 6.7 Incremental re-scan
 
@@ -271,6 +282,14 @@ Captures are matched to scanned request sites with a score:
 - If you took an unexpected path, it's added as a new `recorded` variant.
 - Inferred branches that were never exercised stay flagged as `unconfirmed`.
 
+**Built in M7** (`packages/server/src/flows.ts`):
+
+- Each session timeline (interactions, navigation, browser captures with their matched site) is checked against every inferred flow. A flow is split into segments, one per interaction. A segment's requests and navigation must show up after its interaction and before the next segment's interaction (any order, within 60 s; the next interaction within 10 min). Server-render requests aren't linked to a browser session, so they don't block confirmation.
+- Results (`GET /api/flows`, live `flows` event): `confirmed` (walked end to end, source `both`), `partial` (started, stopped early), `unconfirmed`. Error branches are marked seen when a session takes them.
+- A walk that navigates to a page the flow doesn't predict becomes a `variant` recorded flow.
+- **Named recording:** start/stop in the Live screen (`POST /api/recordings`, `POST /api/recordings/stop`). Everything in between is saved in `overrides.json`, linked to the inferred flow it walks. Flow renames are saved there too (`PUT /api/flows/:id/name`).
+- Dashboard: Flows screen (step list with done marks, branches, rename, recorded variants), flows per page, navigation edges on the map, flow count on the overview.
+
 ## 9. Dashboard (`packages/dashboard`)
 
 | Screen              | Content                                                                                                                                                                                                                                                                              |
@@ -365,7 +384,7 @@ Every file is checked against a zod schema with a `version` field, so the format
 | M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done |
 | M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done |
 | M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done |
-| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | To do   |
+| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done |
 | M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | To do   |
 | M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | To do   |
 | M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | To do   |

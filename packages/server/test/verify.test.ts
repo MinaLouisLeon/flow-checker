@@ -70,6 +70,8 @@ const model = (requests: RequestSite[]): AppModel => ({
   ],
   types: [],
   requests,
+  navigations: [],
+  flows: [],
 })
 
 const SITES = [

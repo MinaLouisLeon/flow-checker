@@ -59,6 +59,33 @@ test('the matched request site shows as verified', async ({ page, request }) => 
   await expect(page.locator('.request', { hasText: '/auth/login' })).toContainText('✓ verified')
 })
 
+test('login -> OTP -> dashboard is inferred as one flow and confirmed by walking it', async ({ page }) => {
+  await page.goto(`${app}/en/login`)
+  await page.fill('input[name=email]', 'ada@example.com')
+  await page.fill('input[name=password]', 'password')
+  await page.click('button[type=submit]')
+  await page.waitForURL(/\/verify\?challenge=/)
+  await page.fill('input[name=code]', '123456')
+  await page.click('button[type=submit]')
+  await page.waitForURL(/\/dashboard/)
+  await expect(page.locator('h1')).toBeVisible()
+
+  await page.goto(`${dashboard}/#/flows`)
+  const row = page.locator('.flow-list li', { hasText: 'LoginForm submit' })
+  await expect(row).toContainText('/[locale]/login → /[locale]/verify → /[locale]/dashboard')
+  await expect(row).toContainText('✓ confirmed')
+  await row.locator('a').first().click()
+
+  const detail = page.locator('.flow-detail')
+  await expect(detail).toContainText('inferred + recorded')
+  const steps = detail.locator('.flow-step')
+  await expect(steps).toHaveCount(7)
+  await expect(detail.locator('.flow-step-done')).toHaveCount(7)
+  await expect(steps.nth(0)).toContainText('LoginForm')
+  await expect(steps.nth(3)).toContainText('VerifyOtpForm')
+  await expect(steps.nth(6)).toContainText('/me')
+})
+
 test('the stored capture on disk is redacted too', async ({ request }) => {
   const list = (await (await request.get(`${dashboard}/api/captures`)).json()) as {
     id: string

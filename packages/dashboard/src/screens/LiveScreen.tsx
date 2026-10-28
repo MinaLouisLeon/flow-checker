@@ -1,6 +1,14 @@
 import type { Capture, CapturedBody, CaptureSummary, MatchSignal, RequestSite } from '@flow-checker/shared'
 import { useState } from 'react'
-import { type LiveStatus, useAssignMatch, useCapture, useCaptures, useClearCaptures } from '../api'
+import {
+  type LiveStatus,
+  useAssignMatch,
+  useCapture,
+  useCaptures,
+  useClearCaptures,
+  useFlows,
+  useRecording,
+} from '../api'
 import { useData } from '../context'
 import { siteHref, siteLabel, siteOwner } from '../RequestView'
 import { href, type MatchFilter, replaceScreen } from '../router'
@@ -105,6 +113,7 @@ export function LiveScreen({
             {list.length} of {all.length}
           </span>
           <span className="spacer" />
+          <RecordControl />
           <button
             type="button"
             className="button"
@@ -319,6 +328,55 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
         </details>
       )}
     </div>
+  )
+}
+
+/** Start and stop recording a named flow: everything you do in between is saved as one flow. */
+function RecordControl() {
+  const flows = useFlows(true)
+  const recording = useRecording()
+  const [name, setName] = useState('')
+  const current = flows.data?.recording
+  if (current) {
+    return (
+      <span className="record-control">
+        <span className="recording-dot" aria-hidden /> Recording <strong>{current.name}</strong>
+        <button
+          type="button"
+          className="button"
+          disabled={recording.isPending}
+          onClick={() =>
+            recording.mutate(undefined, {
+              onSuccess: (saved) => {
+                if (saved && 'id' in saved)
+                  window.location.hash = href({ name: 'flows', flowId: saved.id, q: '' })
+              },
+            })
+          }
+        >
+          Stop
+        </button>
+      </span>
+    )
+  }
+  return (
+    <form
+      className="record-control"
+      onSubmit={(event) => {
+        event.preventDefault()
+        recording.mutate(name || 'Recorded flow', { onSuccess: () => setName('') })
+      }}
+    >
+      <input
+        aria-label="Name of the flow to record"
+        placeholder="Flow name"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
+      <button type="submit" className="button" disabled={recording.isPending}>
+        ● Record
+      </button>
+    </form>
   )
 }
 

@@ -1,0 +1,18 @@
+# Navigation
+
+## ProductPage  src/app/products/[id]/page.tsx
+link / -> /  event onClick
+
+## CreateProductForm  src/components/CreateProductForm.tsx
+push /products/:id -> /products/[id]  event onSubmit  success
+
+## ProductsTable  src/components/ProductsTable.tsx
+link /products/:id -> /products/[id]  event onClick
+
+# Flows
+
+## CreateProductForm submit  (/ -> /products/[id])
+1. CreateProductForm onSubmit on /
+2. POST /api/products
+3. push -> /products/[id]
+4. load GET /api/products/:id

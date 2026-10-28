@@ -26,6 +26,25 @@ const route = (path: string, extra: Partial<Route> = {}): Route => ({
 })
 
 describe('buildIndex on fixtures', () => {
+  it('draws navigation edges from the page that navigates (basic, server-actions)', () => {
+    const edges = (name: string) => {
+      const index = buildIndex(fixture(name))
+      const path = (id: string) => index.routes.get(id)?.path
+      return index.navEdges.map((e) => `${path(e.source)} -> ${path(e.target)} ${e.kinds.join(',')}`).sort()
+    }
+    // Root layout links start from `/` only, not from every page below the layout.
+    expect(edges('basic')).toEqual(['/ -> /about link', '/ -> /users/[id] link', '/users/[id] -> / push'])
+    // The create form's server action redirects to the new product.
+    expect(edges('server-actions')).toContain('/products/new -> /products/[id] redirect')
+
+    const flows = buildIndex(fixture('next-intl')).flowsByRoute
+    expect([...flows.values()].map((list) => list.map((f) => f.name))).toEqual([
+      ['LoginForm submit'],
+      ['LoginForm submit'],
+      ['LoginForm submit'],
+    ])
+  })
+
   it('links components to the pages that render them (bff)', () => {
     const index = buildIndex(fixture('bff'))
     const home = index.model.routes.find((r) => r.path === '/')
@@ -108,6 +127,8 @@ describe('scan notes', () => {
           flags: [{ kind: 'dynamic-url', message: 'The URL could not be resolved: url' }],
         },
       ],
+      navigations: [],
+      flows: [],
     })
     expect(index.notes.map((n) => n.kind)).toEqual([
       'missing-page-component',
