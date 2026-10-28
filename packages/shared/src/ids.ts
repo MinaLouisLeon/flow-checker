@@ -14,7 +14,7 @@ function hash53(input: string, seed = 0): number {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0)
 }
 
-export type IdPrefix = 'rt' | 'cmp' | 'typ' | 'req'
+export type IdPrefix = 'rt' | 'cmp' | 'typ' | 'req' | 'nav' | 'flw'
 
 /**
  * Builds an id like `cmp_1x2y3z4w5v6u` from the parts that identify an entity

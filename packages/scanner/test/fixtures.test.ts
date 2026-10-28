@@ -1,5 +1,12 @@
 import { resolve } from 'node:path'
-import { type AppModel, AppModelSchema, formatModel, formatRequests, formatTypes } from '@flow-checker/shared'
+import {
+  type AppModel,
+  AppModelSchema,
+  formatFlows,
+  formatModel,
+  formatRequests,
+  formatTypes,
+} from '@flow-checker/shared'
 import { describe, expect, it } from 'vitest'
 import { scanProject } from '../src'
 
@@ -31,6 +38,10 @@ describe.each(FIXTURES)('fixture %s', (fixture) => {
 
   it('matches the request sites snapshot', async () => {
     await expect(formatRequests(scan(fixture))).toMatchFileSnapshot(`__snapshots__/${fixture}.requests.txt`)
+  })
+
+  it('matches the navigation and flows snapshot', async () => {
+    await expect(formatFlows(scan(fixture))).toMatchFileSnapshot(`__snapshots__/${fixture}.flows.txt`)
   })
 
   it('matches the model snapshot', async () => {

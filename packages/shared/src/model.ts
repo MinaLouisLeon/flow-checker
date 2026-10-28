@@ -417,6 +417,93 @@ export const RequestSiteSchema = z.object({
 })
 export type RequestSite = z.infer<typeof RequestSiteSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Navigation and flows (M7, docs/PLAN.md 6.6): where the app moves between pages, and the user
+// flows inferred from event handlers (event -> requests -> navigation -> next page -> ...).
+
+export const NavigationSchema = z.object({
+  id: z.string(),
+  /** Where the code that navigates runs. */
+  origin: z.enum(['component', 'server-action']),
+  componentId: z.string().optional(),
+  /** Origin `server-action`: the action that redirects. */
+  serverAction: ServerActionRefSchema.optional(),
+  /**
+   * `link`: a `<Link href>` the user can click. `push` / `replace`: `router.push()` / `.replace()`.
+   * `redirect` / `permanent-redirect`: `redirect()` / `permanentRedirect()` (server side).
+   */
+  kind: z.enum(['link', 'push', 'replace', 'redirect', 'permanent-redirect']),
+  /** `next` for next/link and next/navigation, `next-intl` for `createNavigation()` wrappers (locale prefix added). */
+  api: z.enum(['next', 'next-intl']),
+  /** The target as written, resolved like request URLs (`/users/:id`). */
+  href: RequestUrlSchema,
+  /** The page it goes to, when the href resolves to one. */
+  targetRouteId: z.string().optional(),
+  /** What makes it happen. A link is `event` `onClick` on the link element. */
+  trigger: TriggerSchema,
+  /**
+   * Set when it only happens after a request: `success` in a `try` block, `onSuccess`, `.then`,
+   * or an `if` on the response; `error` in `catch`, `onError`, `.catch` or the `else` branch.
+   */
+  outcome: z.enum(['success', 'error']).optional(),
+  /** Only rendered or reached on some paths. */
+  conditional: z.boolean().optional(),
+  loc: SourceLocSchema,
+  /** From the origin down to the navigation call. */
+  callStack: z.array(CallFrameSchema),
+})
+export type Navigation = z.infer<typeof NavigationSchema>
+
+export const FlowStepSchema = z.discriminatedUnion('kind', [
+  /** The user does something on a page: the first step, or a later one on another page. */
+  z.object({
+    kind: z.literal('interaction'),
+    routeId: z.string().optional(),
+    componentId: z.string(),
+    /** Event prop, e.g. `onSubmit`. */
+    event: z.string(),
+    loc: SourceLocSchema,
+  }),
+  /** A request the previous interaction (or the page) sends. */
+  z.object({
+    kind: z.literal('request'),
+    siteId: z.string(),
+    /** Sent when the page loads, not by the interaction. */
+    onLoad: z.boolean().optional(),
+  }),
+  /** The app moves to another page. */
+  z.object({
+    kind: z.literal('navigate'),
+    navigationId: z.string(),
+    routeId: z.string().optional(),
+  }),
+])
+export type FlowStep = z.infer<typeof FlowStepSchema>
+
+export const FlowBranchSchema = z.object({
+  /** Index in `steps` of the request whose failure leads here. */
+  after: z.number().int().nonnegative(),
+  outcome: z.literal('error'),
+  steps: z.array(FlowStepSchema),
+})
+export type FlowBranch = z.infer<typeof FlowBranchSchema>
+
+export const FlowSchema = z.object({
+  id: z.string(),
+  /** From the starting component and event, e.g. `LoginForm submit`. Rename in the dashboard. */
+  name: z.string(),
+  /** Where it starts. */
+  routeId: z.string().optional(),
+  componentId: z.string(),
+  /** The success path, in order. */
+  steps: z.array(FlowStepSchema),
+  /** Error paths that go somewhere else (navigate or send other requests). */
+  branches: z.array(FlowBranchSchema),
+  /** Routes it passes through, in order. */
+  routeIds: z.array(z.string()),
+})
+export type Flow = z.infer<typeof FlowSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -436,5 +523,9 @@ export const AppModelSchema = z.object({
   types: z.array(NamedTypeSchema),
   /** Request sites, sorted by where they start. Defaults to empty for models written before M2. */
   requests: z.array(RequestSiteSchema).default([]),
+  /** Navigation between pages (M7). */
+  navigations: z.array(NavigationSchema).default([]),
+  /** User flows inferred from the code (M7). Recording confirms them at runtime. */
+  flows: z.array(FlowSchema).default([]),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

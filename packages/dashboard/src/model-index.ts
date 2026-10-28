@@ -3,7 +3,9 @@ import {
   type AppModel,
   type Component,
   type ComponentRef,
+  type Flow,
   type NamedType,
+  type Navigation,
   type RequestSite,
   type Route,
   type TypeShape,
@@ -60,6 +62,12 @@ export interface ModelIndex {
   /** Type id → where it is used. */
   typeUsage: Map<string, TypeUsage>
   notes: ScanNote[]
+  navigations: Map<string, Navigation>
+  flows: Map<string, Flow>
+  /** Route id -> flows that pass through it. */
+  flowsByRoute: Map<string, Flow[]>
+  /** Page-to-page navigation edges (from the page whose own tree has the link or call). */
+  navEdges: { source: string; target: string; kinds: Navigation['kind'][] }[]
 }
 
 export function buildIndex(model: AppModel): ModelIndex {
@@ -114,6 +122,52 @@ export function buildIndex(model: AppModel): ModelIndex {
     }
   }
 
+  const flowsByRoute = new Map<string, Flow[]>()
+  for (const flow of model.flows) for (const id of new Set(flow.routeIds)) push(flowsByRoute, id, flow)
+
+  // Navigation edges. A navigation in a page's own component tree starts from that page. One
+  // only found in a layout starts from the shallowest page that uses the layout (not from every
+  // page below it). Server action redirects start from the pages that call the action.
+  const pages = model.routes.filter((r) => r.kind === 'page')
+  const pageTree = new Map<string, Set<string>>()
+  for (const route of pages) {
+    const seen = new Set<string>()
+    if (route.componentId) walkComponents(route.componentId, components, seen)
+    pageTree.set(route.id, seen)
+  }
+  const sourcesOf = (componentId: string): string[] => {
+    const direct = pages.filter((r) => pageTree.get(r.id)?.has(componentId)).map((r) => r.id)
+    if (direct.length > 0) return direct
+    const withLayout = pages
+      .filter((r) =>
+        r.layoutChain.some((l) => l.componentId && walkHas(l.componentId, componentId, components)),
+      )
+      .sort((x, y) => x.path.split('/').length - y.path.split('/').length)
+    return withLayout[0] ? [withLayout[0].id] : []
+  }
+  const edges = new Map<string, { source: string; target: string; kinds: Navigation['kind'][] }>()
+  const addEdge = (source: string, target: string, kind: Navigation['kind']) => {
+    if (source === target) return
+    const key = `${source}->${target}`
+    const edge = edges.get(key) ?? { source, target, kinds: [] }
+    if (!edge.kinds.includes(kind)) edge.kinds.push(kind)
+    edges.set(key, edge)
+  }
+  for (const nav of model.navigations) {
+    const target = nav.targetRouteId
+    if (!target) continue
+    if (nav.componentId) {
+      for (const source of sourcesOf(nav.componentId)) addEdge(source, target, nav.kind)
+    } else if (nav.serverAction) {
+      const name = nav.serverAction.name
+      for (const site of model.requests) {
+        if (site.transport !== 'server-action' || site.serverAction?.name !== name || !site.componentId)
+          continue
+        for (const source of sourcesOf(site.componentId)) addEdge(source, target, nav.kind)
+      }
+    }
+  }
+
   return {
     model,
     routes,
@@ -127,7 +181,17 @@ export function buildIndex(model: AppModel): ModelIndex {
     routesOf,
     typeUsage,
     notes: scanNotes(model),
+    navigations: new Map(model.navigations.map((n) => [n.id, n])),
+    flows: new Map(model.flows.map((f) => [f.id, f])),
+    flowsByRoute,
+    navEdges: [...edges.values()],
   }
+}
+
+function walkHas(rootId: string, target: string, components: Map<string, Component>): boolean {
+  const seen = new Set<string>()
+  walkComponents(rootId, components, seen)
+  return seen.has(target)
 }
 
 /** Ids of the named types a shape refers to, in order, without repeats. */

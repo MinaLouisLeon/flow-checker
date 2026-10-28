@@ -5,6 +5,7 @@ import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { ComponentPanel } from './screens/ComponentPanel'
+import { FlowsScreen } from './screens/FlowsScreen'
 import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
@@ -15,6 +16,7 @@ import { Empty } from './ui'
 const NAV: { label: string; screen: Screen; match: Screen['name'][]; needsCapture?: boolean }[] = [
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page', 'component'] },
+  { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
 ]
@@ -48,7 +50,7 @@ export function App() {
         </nav>
         <span className="spacer" />
         {meta.data?.scannedAt && (
-          <span className="muted" title={meta.data.scannedAt}>
+          <span className="muted topbar-meta" title={meta.data.scannedAt}>
             Scanned {new Date(meta.data.scannedAt).toLocaleTimeString()}
           </span>
         )}
@@ -62,7 +64,7 @@ export function App() {
             {rescan.isPending ? 'Scanning…' : 'Re-scan'}
           </button>
         )}
-        {meta.data?.version && <span className="muted">v{meta.data.version}</span>}
+        {meta.data?.version && <span className="muted topbar-meta">v{meta.data.version}</span>}
       </header>
 
       {rescan.error && <div className="banner banner-error">Re-scan failed: {rescan.error.message}</div>}
@@ -102,6 +104,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       )
     case 'types':
       return <TypesScreen typeId={screen.typeId} q={screen.q} />
+    case 'flows':
+      return <FlowsScreen flowId={screen.flowId} q={screen.q} />
     case 'live':
       return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
     case 'not-found':

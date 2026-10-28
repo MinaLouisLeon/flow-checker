@@ -16,6 +16,7 @@ import {
   HTTP_METHODS,
   type HttpMethod,
   makeId,
+  type Navigation,
   type RequestSite,
   type RequestUrl,
   type Route,
@@ -30,6 +31,8 @@ import {
   type FunctionDeclaration,
   type FunctionExpression,
   type JsxAttribute,
+  type JsxOpeningElement,
+  type JsxSelfClosingElement,
   type MethodDeclaration,
   Node as N,
   type Node,
@@ -39,7 +42,8 @@ import {
   type TypeNode,
   ts,
 } from 'ts-morph'
-import { directives, importModuleOf, unalias } from './components'
+import { directives, importModuleOf, isConditional, unalias } from './components'
+import { linkApi, type NavApi, type NavKind, navigationCall, outcomeOf } from './navigation'
 import { compare, relativeTo } from './paths'
 import type { TypeResolver } from './types'
 
@@ -162,6 +166,14 @@ interface Frame {
   trigger?: Trigger
   /** Set for a data-fetching hook frame. */
   hook?: { def: HookDef; key?: string; typeArg?: TypeNode }
+  /** Set when entering a mutation's `onSuccess` / `onError` callback. */
+  outcome?: 'success' | 'error'
+}
+
+interface NavFound {
+  kind: NavKind
+  api: NavApi
+  href: RequestUrl
 }
 
 interface Walk {
@@ -184,6 +196,7 @@ export class RequestScanner {
   readonly #root: string
   readonly #types: TypeResolver
   readonly #sites = new Map<string, RequestSite>()
+  readonly #navs = new Map<string, Navigation>()
   readonly #reaches = new Map<Node, boolean>()
   readonly #actionsExplored = new Set<Node>()
   readonly #fileDirectives = new Map<SourceFile, string[]>()
@@ -253,11 +266,40 @@ export class RequestScanner {
     return sites.sort(bySite)
   }
 
+  /** Every navigation, sorted by where it is, with the page it goes to when that resolves. */
+  navigations(routes: Route[]): Navigation[] {
+    const pages = routes
+      .filter((r) => r.kind === 'page' && !r.slot && !r.intercepting)
+      .map((r) => ({ route: r, re: routeRegex(r.path), dynamic: (r.path.match(/\[/g) ?? []).length }))
+      // Static segments win: `/products/new` before `/products/[id]`.
+      .sort((a, b) => a.dynamic - b.dynamic)
+    const navs = [...this.#navs.values()]
+    for (const nav of navs) {
+      const path = nav.href.path
+      if (!path?.startsWith('/') || nav.href.base) continue
+      const sample = path.replace(/:[^/]+/g, 'x')
+      const direct = () => pages.find((p) => p.re.test(sample))
+      // next-intl (and other locale-prefix setups) leave the `[locale]` segment out of hrefs.
+      const prefixed = () =>
+        pages.find((p) => {
+          const first = p.route.segments.find((s) => s.kind !== 'group')
+          if (first?.kind !== 'dynamic') return false
+          if (nav.api !== 'next-intl' && !/^(locale|lang|lng)$/.test(first.name)) return false
+          return p.re.test(`/x${sample === '/' ? '' : sample}`)
+        })
+      // With next-intl, `/login` is `/[locale]/login`, not the `[locale]` page itself.
+      const target = nav.api === 'next-intl' ? (prefixed() ?? direct()) : (direct() ?? prefixed())
+      if (target) nav.targetRouteId = target.route.id
+    }
+    return navs.sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
   // --- Walking -------------------------------------------------------------------------------
 
   /** Visits every call in `node`, which is inside the function `scope`. */
   #walk(node: Node, scope: Node, env: Env, w: Walk) {
     node.forEachDescendant((d, traversal) => {
+      if (N.isJsxOpeningElement(d) || N.isJsxSelfClosingElement(d)) this.#link(d, scope, env, w)
       if (N.isJsxAttribute(d)) {
         this.#jsxAttribute(d, scope, env, w)
         return
@@ -273,6 +315,12 @@ export class RequestScanner {
 
   /** Handles one call. Returns true when its arguments were handled too and should be skipped. */
   #call(call: CallExpression, scope: Node, env: Env, w: Walk): boolean {
+    const nav = navigationCall(call)
+    if (nav) {
+      const href = this.#href(call.getArguments()[0], env)
+      this.#emitNav(w, this.#frame(call, scope), { ...nav, href }, call)
+      return true
+    }
     if (this.#isFetch(call)) {
       this.#emit(w, this.#frame(call, scope), this.#fetchSite(call, env))
       return true
@@ -336,6 +384,51 @@ export class RequestScanner {
     }
   }
 
+  /** `<Link href={...}>`: a navigation the user starts by clicking. */
+  #link(element: JsxOpeningElement | JsxSelfClosingElement, scope: Node, env: Env, w: Walk) {
+    const api = linkApi(element.getTagNameNode())
+    if (!api) return
+    const attr = element.getAttribute('href')
+    if (!attr || !N.isJsxAttribute(attr)) return
+    const init = attr.getInitializer()
+    const expr = init && N.isJsxExpression(init) ? init.getExpression() : init
+    const loc = this.#loc(element)
+    const frame: Frame = {
+      node: element,
+      callee: `<${element.getTagNameNode().getText()}>`,
+      scope,
+      trigger: { kind: 'event', event: 'onClick', loc },
+    }
+    const node = N.isJsxOpeningElement(element) ? (element.getParent() ?? element) : element
+    this.#emitNav(
+      w,
+      frame,
+      { kind: 'link', api, href: this.#href(expr, env) },
+      node,
+      isConditional(node, scope),
+    )
+  }
+
+  /** A navigation target: a string, or next-intl's `{ href }` / `{ pathname }` objects. */
+  #href(arg: Node | undefined, env: Env): RequestUrl {
+    if (!arg) return { text: '', confidence: 'unknown' }
+    const text = oneLine(arg.getText())
+    const r = this.#resolve(arg, env)
+    const node = r.node ? skipWrappers(r.node) : undefined
+    if (node && N.isObjectLiteralExpression(node)) {
+      for (const key of ['href', 'pathname']) {
+        const prop = this.#prop(node, r.env, key)
+        if (prop === 'absent' || prop === 'unknown' || !prop.node) continue
+        const url = toUrl(this.#str(prop.node, prop.env), text)
+        // `pathname: '/users/[id]'` with `params`: the same placeholders as other patterns.
+        if (url.path) url.path = url.path.replace(/\[\[?(?:\.\.\.)?([^\]]+)\]\]?/g, ':$1')
+        return url
+      }
+      return { text, confidence: 'unknown' }
+    }
+    return toUrl(this.#str(arg, env), text)
+  }
+
   #enter(fn: Node, env: Env, frame: Frame, w: Walk) {
     w.frames.push(frame)
     w.active.add(fn)
@@ -348,8 +441,9 @@ export class RequestScanner {
   #hook(call: CallExpression, def: HookDef, scope: Node, env: Env, w: Walk) {
     let fnExpr: Node | undefined
     let keyExpr: Node | undefined
+    let options: Node | undefined
     if (def.fnProp) {
-      const options = this.#queryOptions(call.getArguments()[0], env)
+      options = this.#queryOptions(call.getArguments()[0], env)
       fnExpr = propValue(this.#prop(options, env, def.fnProp))
       keyExpr = propValue(this.#prop(options, env, def.keyProp ?? ''))
     } else {
@@ -376,6 +470,17 @@ export class RequestScanner {
         ? bindParams(fn, [{ expr: keyExpr, env }])
         : EMPTY_ENV
     this.#enter(fn, fnEnv, frame, w)
+
+    // What runs after the mutation: navigation (and requests) in its callbacks.
+    if (def.kind === 'mutation' && options) {
+      const { hook: _, ...plain } = frame
+      for (const name of ['onSuccess', 'onError', 'onSettled']) {
+        const callback = this.#functionValue(propValue(this.#prop(options, env, name)), env)
+        if (!callback || w.active.has(callback)) continue
+        const outcome = name === 'onSuccess' ? 'success' : name === 'onError' ? 'error' : undefined
+        this.#enter(callback, EMPTY_ENV, outcome ? { ...plain, outcome } : plain, w)
+      }
+    }
   }
 
   /** `useQuery(options)`, `useQuery(todoQuery)` or `useQuery(queryOptions({...}))`. */
@@ -529,7 +634,7 @@ export class RequestScanner {
     return fileDirectives.includes('use server')
   }
 
-  /** True when the function (or anything it calls in the project) sends a request. */
+  /** True when the function (or anything it calls in the project) sends a request or navigates. */
   #reachesNetwork(fn: Node): boolean {
     const known = this.#reaches.get(fn)
     if (known !== undefined) return known
@@ -541,7 +646,13 @@ export class RequestScanner {
         return
       }
       if (!N.isCallExpression(d)) return
-      if (this.#isFetch(d) || this.#axiosSite(d, EMPTY_ENV) || hookOf(d) || isActionStateHook(d)) {
+      if (
+        this.#isFetch(d) ||
+        this.#axiosSite(d, EMPTY_ENV) ||
+        hookOf(d) ||
+        isActionStateHook(d) ||
+        navigationCall(d)
+      ) {
         found = true
         return
       }
@@ -602,6 +713,30 @@ export class RequestScanner {
     }
     site.flags = flagsOf(site)
     this.#sites.set(id, site)
+  }
+
+  #emitNav(w: Walk, last: Frame, found: NavFound, node: Node, conditional = false) {
+    // Route handlers answer with NextResponse.redirect(); not a page navigation.
+    if (w.origin.kind === 'route-handler') return
+    const frames = [...w.frames, last]
+    const callStack: CallFrame[] = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
+    const id = makeId('nav', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#navs.has(id)) return
+    const outcome = found.kind === 'link' ? undefined : navOutcome(frames)
+    this.#navs.set(id, {
+      id,
+      origin: w.origin.kind === 'server-action' ? 'server-action' : 'component',
+      ...(w.origin.componentId ? { componentId: w.origin.componentId } : {}),
+      ...(w.origin.serverAction ? { serverAction: w.origin.serverAction } : {}),
+      kind: found.kind,
+      api: found.api,
+      href: found.href,
+      trigger: this.#trigger(frames, w.origin),
+      ...(outcome ? { outcome } : {}),
+      ...(conditional ? { conditional } : {}),
+      loc: this.#loc(node),
+      callStack,
+    })
   }
 
   // --- Triggers ------------------------------------------------------------------------------
@@ -1157,6 +1292,20 @@ function bySite(a: RequestSite, b: RequestSite): number {
     if (c !== 0) return c
   }
   return compare(a.id, b.id)
+}
+
+function compareLoc(a: SourceLoc, b: SourceLoc): number {
+  return compare(a.file, b.file) || a.line - b.line || a.column - b.column
+}
+
+/** Success or error path, from the innermost frame that tells: a callback, `catch`, `if (res.ok)`. */
+function navOutcome(frames: Frame[]): Navigation['outcome'] {
+  for (let i = frames.length - 1; i >= 0; i--) {
+    const frame = frames[i] as Frame
+    const found = outcomeOf(frame.node, frame.scope) ?? frame.outcome
+    if (found) return found
+  }
+  return undefined
 }
 
 // --- AST helpers -----------------------------------------------------------------------------

@@ -711,5 +711,188 @@
       "status": "inferred",
       "flags": []
     }
+  ],
+  "navigations": [
+    {
+      "id": "nav_1pbocv2fxma",
+      "origin": "component",
+      "componentId": "cmp_0r1iugj2rde",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 28,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/AddTodoForm.tsx",
+        "line": 18,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 14,
+          "column": 18,
+          "callee": "useMutation"
+        },
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 18,
+          "column": 7,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    },
+    {
+      "id": "nav_20o5kkfum58",
+      "origin": "component",
+      "componentId": "cmp_1gqfw2iamk9",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 23,
+          "column": 7
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/TodoDetail.tsx",
+        "line": 23,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 23,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_13eamnryn06",
+      "origin": "component",
+      "componentId": "cmp_0l3kw3n479w",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 26,
+          "column": 11
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/TodoList.tsx",
+        "line": 26,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 26,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_2e0zjxz2zwz",
+      "name": "AddTodoForm submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_0r1iugj2rde",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_0r1iugj2rde",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 28,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_21j0fo1p54x"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_1pbocv2fxma",
+          "routeId": "rt_0rsc27vk284"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0euad6xi67r",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf",
+        "rt_0rsc27vk284"
+      ]
+    },
+    {
+      "id": "flw_1do37llzb4t",
+      "name": "TodoList change",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_0l3kw3n479w",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_0l3kw3n479w",
+          "event": "onChange",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 25,
+            "column": 54
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0edpknxxbhl"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ]
+    }
   ]
 }

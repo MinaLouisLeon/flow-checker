@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { ScanError, scanProject } from '@flow-checker/scanner'
-import { type AppModel, formatModel, formatRequests, formatTypes } from '@flow-checker/shared'
+import { type AppModel, formatFlows, formatModel, formatRequests, formatTypes } from '@flow-checker/shared'
 import type { CliIO } from './run'
 
 export interface ScanCommandOptions {
@@ -10,6 +10,7 @@ export interface ScanCommandOptions {
   tree?: boolean
   types?: boolean
   requests?: boolean
+  flows?: boolean
 }
 
 /** `flow-checker scan`: scans the project and writes `.flow-checker/model.json`. */
@@ -33,6 +34,7 @@ export function scanCommand(options: ScanCommandOptions, io: CliIO): number {
   if (options.tree) io.out(formatModel(model))
   if (options.types) io.out(formatTypes(model))
   if (options.requests) io.out(formatRequests(model))
+  if (options.flows) io.out(formatFlows(model))
 
   io.out(summary(model, performance.now() - started))
   io.out(`Wrote ${relative(process.cwd(), outFile) || outFile}`)
@@ -54,8 +56,9 @@ export function summary(model: AppModel, elapsedMs: number): string {
   const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
   return (
     `Scanned ${plural(pages, 'page')}, ${plural(handlers, 'route handler')}, ` +
-    `${plural(model.components.length, 'component')}, ${plural(model.types.length, 'type')} ` +
-    `and ${plural(model.requests.length, 'request')} ` +
+    `${plural(model.components.length, 'component')}, ${plural(model.types.length, 'type')}, ` +
+    `${plural(model.requests.length, 'request')} ` +
+    `and ${plural(model.flows.length, 'flow')} ` +
     `in ${Math.round(elapsedMs)} ms.`
   )
 }

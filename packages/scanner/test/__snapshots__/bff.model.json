@@ -769,5 +769,153 @@
         "req_0pmni454dyo"
       ]
     }
+  ],
+  "navigations": [
+    {
+      "id": "nav_1a6joyr2qdh",
+      "origin": "component",
+      "componentId": "cmp_0w4ykuez903",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 22,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/app/products/[id]/page.tsx",
+        "line": 22,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 22,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_0crjmabfgaa",
+      "origin": "component",
+      "componentId": "cmp_014pegw9zf7",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "`/products/${product.id}`",
+        "confidence": "pattern",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 36,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/CreateProductForm.tsx",
+        "line": 29,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 29,
+          "column": 7,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_1kdazzrvrkg"
+    },
+    {
+      "id": "nav_1tes8ciw0b9",
+      "origin": "component",
+      "componentId": "cmp_04zm0jsozsm",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/products/${p.id}`",
+        "confidence": "pattern",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 23,
+          "column": 15
+        }
+      },
+      "loc": {
+        "file": "src/components/ProductsTable.tsx",
+        "line": 23,
+        "column": 15
+      },
+      "callStack": [
+        {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 23,
+          "column": 15,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1kdazzrvrkg"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_0fhg9qnt2e5",
+      "name": "CreateProductForm submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_014pegw9zf7",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_014pegw9zf7",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2ckm3fl20ym"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_0crjmabfgaa",
+          "routeId": "rt_1kdazzrvrkg"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2c3yq1l5klb",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf",
+        "rt_1kdazzrvrkg"
+      ]
+    }
   ]
 }

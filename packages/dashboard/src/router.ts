@@ -8,6 +8,8 @@ export type Screen =
   | { name: 'component'; componentId: string }
   | { name: 'types'; typeId?: string; q: string }
   | { name: 'live'; captureId?: string; q: string; filter?: MatchFilter }
+  /** `flowId` is an inferred flow id, or a recorded flow id (`rec_...`, `var_...`). */
+  | { name: 'flows'; flowId?: string; q: string }
   | { name: 'not-found' }
 
 /** Live screen: show only captures with this match status. */
@@ -33,6 +35,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'component', componentId: parts[1] }
     case 'types':
       return { name: 'types', typeId: parts[1], q: params.get('q') ?? '' }
+    case 'flows':
+      return { name: 'flows', flowId: parts[1], q: params.get('q') ?? '' }
     case 'live':
       return {
         name: 'live',
@@ -69,6 +73,10 @@ export function href(screen: Screen): string {
       return withQuery(screen.captureId ? `/live/${encodeURIComponent(screen.captureId)}` : '/live', {
         q: screen.q,
         match: screen.filter,
+      })
+    case 'flows':
+      return withQuery(screen.flowId ? `/flows/${encodeURIComponent(screen.flowId)}` : '/flows', {
+        q: screen.q,
       })
     case 'not-found':
       return '#/'

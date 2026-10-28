@@ -4,6 +4,7 @@ import {
   Controls,
   type Edge,
   Handle,
+  MarkerType,
   MiniMap,
   type Node,
   type NodeProps,
@@ -95,12 +96,28 @@ function RouteGraphView({ q }: { q: string }) {
         dimmed: false,
       },
     }))
-    const edges: Edge[] = graph.edges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      className: 'edge-hierarchy',
-    }))
+    const positions = new Map(graph.nodes.map((n) => [n.route.id, { x: n.x, y: n.y }]))
+    const edges: Edge[] = [
+      ...graph.edges.map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        sourceHandle: 'out',
+        targetHandle: 'in',
+        className: 'edge-hierarchy',
+      })),
+      // Links, router calls and redirects between pages (M7).
+      ...index.navEdges.map((e) => ({
+        id: `nav:${e.source}->${e.target}`,
+        source: e.source,
+        target: e.target,
+        type: 'smoothstep',
+        ...navHandles(positions.get(e.source), positions.get(e.target)),
+        className: `edge-nav${e.kinds.some((k) => k !== 'link') ? ' edge-nav-code' : ''}`,
+        markerEnd: { type: MarkerType.ArrowClosed },
+        label: e.kinds.filter((k) => k !== 'link').join(', ') || undefined,
+      })),
+    ]
     return { nodes, edges }
   }, [index])
 
@@ -148,9 +165,28 @@ function RouteGraphView({ q }: { q: string }) {
         <span className="legend-item">
           <i className="line line-hierarchy" /> nested route
         </span>
+        <span className="legend-item">
+          <i className="line line-nav" /> link
+        </span>
+        <span className="legend-item">
+          <i className="line line-nav-code" /> push / redirect
+        </span>
       </div>
     </div>
   )
+}
+
+/** Forward edges go left to right. Within a column or backwards they use the top and bottom. */
+function navHandles(
+  source: { x: number; y: number } | undefined,
+  target: { x: number; y: number } | undefined,
+): { sourceHandle: string; targetHandle: string } {
+  if (!source || !target || target.x > source.x) return { sourceHandle: 'out', targetHandle: 'in' }
+  // Back to a page on the left: a U underneath both.
+  if (target.x < source.x) return { sourceHandle: 'bottom-out', targetHandle: 'bottom-in' }
+  return target.y >= source.y
+    ? { sourceHandle: 'bottom-out', targetHandle: 'top-in' }
+    : { sourceHandle: 'top-out', targetHandle: 'bottom-in' }
 }
 
 function isVerified(entry: { total: number; verified: number } | undefined): boolean {
@@ -165,7 +201,12 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
       className={`route-node ${verified ? 'status-verified' : 'status-inferred'}${handler ? ' route-node-handler' : ''}${dimmed ? ' dimmed' : ''}`}
       title={route.file}
     >
-      <Handle type="target" position={Position.Left} isConnectable={false} />
+      <Handle type="target" id="in" position={Position.Left} isConnectable={false} />
+      {/* Navigation between pages in the same column goes over the top or bottom edge. */}
+      <Handle type="target" id="top-in" position={Position.Top} isConnectable={false} />
+      <Handle type="target" id="bottom-in" position={Position.Bottom} isConnectable={false} />
+      <Handle type="source" id="top-out" position={Position.Top} isConnectable={false} />
+      <Handle type="source" id="bottom-out" position={Position.Bottom} isConnectable={false} />
       <div className="route-node-path">{route.path}</div>
       <div className="route-node-meta">
         {handler ? (
@@ -179,7 +220,7 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
         {route.intercepting && <span>intercepts</span>}
         {noteCount > 0 && <span className="warn">⚠ {noteCount}</span>}
       </div>
-      <Handle type="source" position={Position.Right} isConnectable={false} />
+      <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>
   )
 }

@@ -6,6 +6,8 @@ import { type AppModel, IngestBatchSchema, summarizeCapture } from '@flow-checke
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
+import { FlowTracker } from './flows'
+import { OverridesFile } from './overrides'
 import type { CaptureStore } from './store'
 import { Verifier } from './verify'
 
@@ -68,11 +70,21 @@ export function createApp(options: AppOptions): Hono {
   let model = options.model
   let scannedAt = new Date().toISOString()
   let scanning: Promise<AppModel> | undefined
-  const verifier = options.capture
-    ? new Verifier({ root: options.root, model, store: options.capture.store })
-    : undefined
-  // With capture on, sites matched by a capture are served as `verified`.
-  const served = () => verifier?.servedModel() ?? model
+  const overrides = options.capture ? new OverridesFile(options.root) : undefined
+  const verifier =
+    options.capture && overrides
+      ? new Verifier({ root: options.root, model, store: options.capture.store, overrides })
+      : undefined
+  const flows =
+    options.capture && overrides
+      ? new FlowTracker({ model, store: options.capture.store, overrides })
+      : undefined
+  // With capture on, sites matched by a capture are served as `verified`, and flows carry the
+  // names you gave them.
+  const served = () => {
+    const current = verifier?.servedModel() ?? model
+    return flows ? flows.withNames(current) : current
+  }
 
   const app = new Hono()
 
@@ -109,13 +121,14 @@ export function createApp(options: AppOptions): Hono {
       model = await scanning
       scannedAt = new Date().toISOString()
       verifier?.setModel(model)
+      flows?.setModel(model)
       return c.json(served())
     } catch (error) {
       return c.json({ error: (error as Error).message }, 500)
     }
   })
 
-  if (options.capture && verifier) mountCapture(app, options.capture, verifier)
+  if (options.capture && verifier && flows) mountCapture(app, options.capture, verifier, flows)
 
   app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
 
@@ -138,7 +151,7 @@ export function createApp(options: AppOptions): Hono {
 }
 
 /** `/ingest` for the runtime, and the capture API for the dashboard. */
-function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier) {
+function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, flows: FlowTracker) {
   const { store, token } = capture
   const rules = compileRules(capture.options.redact)
 
@@ -179,6 +192,7 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier) {
 
   app.delete('/api/captures', (c) => {
     verifier.clear()
+    flows.changed()
     return c.body(null, 204)
   })
 
@@ -214,6 +228,33 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier) {
 
   app.get('/api/verification', (c) => c.json(verifier.summary()))
 
+  // Flows (M7): which inferred flows were walked, recorded variants and named recordings.
+  app.get('/api/flows', (c) => c.json(flows.summary()))
+
+  app.put('/api/flows/:id/name', async (c) => {
+    const body = (await c.req.json().catch(() => undefined)) as { name?: unknown } | undefined
+    if (typeof body?.name !== 'string') return c.json({ error: 'Expected { "name": string }' }, 400)
+    if (!flows.rename(c.req.param('id'), body.name)) return c.json({ error: 'Flow not found' }, 404)
+    return c.body(null, 204)
+  })
+
+  // Named recording: start, then stop to save everything that happened in between.
+  app.post('/api/recordings', async (c) => {
+    const body = (await c.req.json().catch(() => ({}))) as { name?: unknown }
+    return c.json(flows.start(typeof body.name === 'string' ? body.name : ''), 201)
+  })
+
+  app.post('/api/recordings/stop', (c) => {
+    const saved = flows.stop()
+    return saved ? c.json(saved) : c.json({ error: 'Nothing is being recorded' }, 409)
+  })
+
+  app.delete('/api/recordings/:id', (c) =>
+    flows.deleteRecording(c.req.param('id'))
+      ? c.body(null, 204)
+      : c.json({ error: 'Recording not found' }, 404),
+  )
+
   app.get('/api/sites/:id/captures', (c) => {
     const id = c.req.param('id')
     const list = store
@@ -229,8 +270,8 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier) {
     return session ? c.json(session) : c.json({ error: 'Session not found' }, 404)
   })
 
-  // Live feed for the dashboard: a `capture` event per new or re-matched capture, and a
-  // `verification` event when site statuses may have changed.
+  // Live feed for the dashboard: a `capture` event per new or re-matched capture, a
+  // `verification` event when site statuses may have changed, and `flows` for flow results.
   app.get('/api/live', (c) =>
     streamSSE(c, async (stream) => {
       let timer: ReturnType<typeof setTimeout> | undefined
@@ -245,10 +286,19 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier) {
           }
         }, VERIFICATION_EVENT_MS)
       })
+      let flowsTimer: ReturnType<typeof setTimeout> | undefined
+      const stopFlows = flows.subscribe(() => {
+        flowsTimer ??= setTimeout(() => {
+          flowsTimer = undefined
+          if (!stream.aborted) void stream.writeSSE({ event: 'flows', data: JSON.stringify(flows.summary()) })
+        }, VERIFICATION_EVENT_MS)
+      })
       const unsubscribe = () => {
         stopCaptures()
         stopVerification()
+        stopFlows()
         if (timer) clearTimeout(timer)
+        if (flowsTimer) clearTimeout(flowsTimer)
       }
       stream.onAbort(unsubscribe)
       await stream.writeSSE({ event: 'ready', data: '{}' })

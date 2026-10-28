@@ -1,0 +1,22 @@
+# Navigation
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+push /todos/:id -> /todos/[id]  event onSubmit  success
+
+## TodoDetail  src/components/TodoDetail.tsx
+link / -> /  event onClick  conditional
+
+## TodoList  src/components/TodoList.tsx
+link /todos/:id -> /todos/[id]  event onClick  conditional
+
+# Flows
+
+## AddTodoForm submit  (/ -> /todos/[id])
+1. AddTodoForm onSubmit on /
+2. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+3. push -> /todos/[id]
+4. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+
+## TodoList change  (/)
+1. TodoList onChange on /
+2. PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id

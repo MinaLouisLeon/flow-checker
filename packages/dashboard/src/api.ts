@@ -1,4 +1,11 @@
-import type { AppModel, Capture, CaptureSummary, VerificationSummary } from '@flow-checker/shared'
+import type {
+  AppModel,
+  Capture,
+  CaptureSummary,
+  FlowsSummary,
+  RecordedFlow,
+  VerificationSummary,
+} from '@flow-checker/shared'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
@@ -73,6 +80,7 @@ export function useRescan() {
 
 const CAPTURES_KEY = ['captures']
 const VERIFICATION_KEY = ['verification']
+const FLOWS_KEY = ['flows']
 /** Keep the newest captures in the list. */
 const MAX_LIST = 1000
 
@@ -172,6 +180,63 @@ export function useAssignMatch() {
   })
 }
 
+// --- Flows ---------------------------------------------------------------------------------
+
+/** Which inferred flows were walked, recorded variants, and the named recording in progress. */
+export function useFlows(enabled: boolean) {
+  return useQuery({
+    queryKey: FLOWS_KEY,
+    queryFn: () => getJson<FlowsSummary>('api/flows'),
+    enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+  })
+}
+
+export function useRenameFlow() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ flowId, name }: { flowId: string; name: string }) => {
+      const res = await fetch(`api/flows/${encodeURIComponent(flowId)}/name`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+    },
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ['model'] })
+      void client.invalidateQueries({ queryKey: FLOWS_KEY })
+    },
+  })
+}
+
+/** Start (`name`) or stop (`undefined`) recording a named flow. */
+export function useRecording() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: (name: string | undefined) =>
+      name === undefined
+        ? getJson<RecordedFlow>('api/recordings/stop', { method: 'POST' })
+        : getJson<{ id: string }>('api/recordings', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ name }),
+          }),
+    onSuccess: () => void client.invalidateQueries({ queryKey: FLOWS_KEY }),
+  })
+}
+
+export function useDeleteRecording() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`api/recordings/${encodeURIComponent(id)}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+    },
+    onSuccess: () => void client.invalidateQueries({ queryKey: FLOWS_KEY }),
+  })
+}
+
 export type LiveStatus = 'connecting' | 'live' | 'offline'
 
 /**
@@ -189,6 +254,10 @@ export function useLiveFeed(enabled: boolean): LiveStatus {
       // Catch up on anything that arrived while disconnected.
       void client.invalidateQueries({ queryKey: CAPTURES_KEY })
       void client.invalidateQueries({ queryKey: VERIFICATION_KEY })
+      void client.invalidateQueries({ queryKey: FLOWS_KEY })
+    })
+    source.addEventListener('flows', (event) => {
+      client.setQueryData(FLOWS_KEY, JSON.parse((event as MessageEvent<string>).data) as FlowsSummary)
     })
     source.addEventListener('capture', (event) => {
       const summary = JSON.parse((event as MessageEvent<string>).data) as CaptureSummary

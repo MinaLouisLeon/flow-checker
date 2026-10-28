@@ -38,6 +38,7 @@ Options:
   --tree                  scan: also print the route and component trees
   --types                 scan: also print the resolved types
   --requests              scan: also print the request sites
+  --flows                 scan: also print navigation and inferred flows
   -h, --help              Show help
   -v, --version           Show version
 `
@@ -100,6 +101,7 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
         tree: values.tree,
         types: values.types,
         requests: values.requests,
+        flows: values.flows,
       },
       io,
     )
@@ -146,6 +148,7 @@ function parse(argv: string[]) {
       tree: { type: 'boolean' },
       types: { type: 'boolean' },
       requests: { type: 'boolean' },
+      flows: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },
       config: { type: 'string' },

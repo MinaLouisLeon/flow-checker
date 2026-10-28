@@ -368,7 +368,7 @@ export function importModuleOf(node: Node): string | undefined {
  * For `const X = pkgFactory(...)` or `const { X } = pkgFactory(...)`, the package that
  * `pkgFactory` was imported from. These are package components created in project code.
  */
-function packageFactoryOf(node: Node): string | undefined {
+export function packageFactoryOf(node: Node): string | undefined {
   const variable = N.isVariableDeclaration(node)
     ? node
     : node.getFirstAncestorByKind(ts.SyntaxKind.VariableDeclaration)
@@ -392,7 +392,7 @@ function packageFromPath(path: string): string | undefined {
  * True when `element` is only rendered on some paths inside `root`: the branch of a
  * ternary, the right side of `&&`/`||`/`??`, inside an `if`/`switch`, or after an early return.
  */
-function isConditional(element: Node, root: Node): boolean {
+export function isConditional(element: Node, root: Node): boolean {
   let child: Node = element
   for (let node = element.getParent(); node && node !== root; node = node.getParent()) {
     if (N.isConditionalExpression(node) && child !== node.getCondition()) return true

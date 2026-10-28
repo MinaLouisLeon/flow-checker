@@ -100,6 +100,23 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
           </Section>
         )}
 
+        {(index.flowsByRoute.get(routeId) ?? []).length > 0 && (
+          <Section
+            title="Flows"
+            aside={<span className="count">{index.flowsByRoute.get(routeId)?.length}</span>}
+          >
+            <ul className="list">
+              {(index.flowsByRoute.get(routeId) ?? []).map((flow) => (
+                <li key={flow.id}>
+                  <a href={href({ name: 'flows', flowId: flow.id, q: '' })}>{flow.name}</a>
+                  <span className="spacer" />
+                  <span className="muted">{flow.routeId === routeId ? 'starts here' : 'passes through'}</span>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
         <Section title="Component tree">
           {route.componentId ? (
             <ul className="tree component-tree">

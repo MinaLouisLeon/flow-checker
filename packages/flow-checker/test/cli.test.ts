@@ -69,7 +69,7 @@ describe('cli scan', () => {
     const { io, out } = capture()
     expect(await runCli(['scan', '--root', root, '--tree', '--types', '--requests'], io)).toBe(0)
     const output = out.join('\n')
-    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components, 1 type and 1 request')
+    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components, 1 type, 1 request and 0 flows')
     expect(output).toContain('GET https://api.test/items  fetch  server-render')
     expect(output).toContain('# Types')
     expect(output).toContain('Props  interface  app/page.tsx:1')

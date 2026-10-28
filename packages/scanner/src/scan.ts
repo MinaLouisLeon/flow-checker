@@ -10,6 +10,7 @@ import {
 import { type FileSystemHost, Project, type SourceFile } from 'ts-morph'
 import { ComponentGraph } from './components'
 import { discoverProject } from './discovery'
+import { inferFlows } from './flows'
 import { relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { RequestScanner } from './requests'
@@ -83,6 +84,10 @@ export function scanProject(options: ScanOptions): AppModel {
     if (file) requests.addRouteHandler(route, file)
   }
 
+  const sites = requests.sites(routes)
+  const navigations = requests.navigations(routes)
+  const flows = inferFlows({ routes, components, requests: sites, navigations })
+
   return {
     version: MODEL_VERSION,
     project: {
@@ -95,7 +100,9 @@ export function scanProject(options: ScanOptions): AppModel {
     routes,
     components,
     types: types.types(),
-    requests: requests.sites(routes),
+    requests: sites,
+    navigations,
+    flows,
   }
 }
 
