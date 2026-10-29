@@ -2,7 +2,7 @@
 // entries, after showing the changes and asking for confirmation.
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
-import { PACKAGE_NAME } from '@flow-checker/shared'
+import { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, PACKAGE_NAME } from '@flow-checker/shared'
 import { findConfigFile } from './config'
 import {
   detectPackageManager,
@@ -49,6 +49,16 @@ ${REGISTER_BODY}
 const CONFIG_SNIPPET = `import { defineConfig } from '${PACKAGE_NAME}/config'
 
 export default defineConfig({
+  // Project root, relative to this file.
+  root: '.',
+  // Files the scan reads and skips: globs relative to the root.
+  include: ${JSON.stringify(DEFAULT_INCLUDE).replaceAll('"', "'")},
+  exclude: [
+${DEFAULT_EXCLUDE.map((glob) => `    '${glob}',`).join('\n')}
+  ],
+  // Modules whose calls are requests (HTTP libraries or API clients the scan can't follow), e.g.
+  // { module: 'ky', methods: ['default', 'get', 'post'] } or { module: '@acme/api', methods: ['listOrders'] }
+  apiClients: [],
   capture: {
     // Sensitive values (passwords, tokens, auth headers...) are masked before they are saved.
     // Set to true only for local debugging.
@@ -56,6 +66,18 @@ export default defineConfig({
   },
 })
 `
+
+const WRAPPER_SNIPPET = `  import { withFlowChecker } from '${PACKAGE_NAME}/next'
+  export default withFlowChecker(nextConfig)
+`
+
+const NEXT_CONFIGS = [
+  'next.config.ts',
+  'next.config.mts',
+  'next.config.js',
+  'next.config.mjs',
+  'next.config.cjs',
+]
 
 const REGISTER_EXPORT =
   /export\s+(?:async\s+)?function\s+register\b|export\s+(?:const|let|var)\s+register\b|export\s*\{[^}]*\bregister\b/
@@ -118,9 +140,15 @@ export async function initCommand(options: InitCommandOptions, io: CliIO): Promi
 
   const version = nextVersion(root)
   if (version && (version.major < 15 || (version.major === 15 && version.minor < 3))) {
-    manual.push(
-      `Next.js ${version.text} has no instrumentation-client file (added in 15.3). Browser capture needs Next.js 15.3 or later for now; server capture works from 13.4 (enable experimental.instrumentationHook before 15).`,
-    )
+    const nextConfig = NEXT_CONFIGS.map((f) => join(root, f)).find((f) => existsSync(f))
+    if (!nextConfig || !readFileSync(nextConfig, 'utf8').includes('withFlowChecker')) {
+      manual.push(
+        `Next.js ${version.text} has no instrumentation-client file (added in 15.3)${version.major < 15 ? ' and runs instrumentation.ts only with experimental.instrumentationHook' : ''}. Wrap your config in ${nextConfig ? rel(nextConfig) : 'next.config.mjs'} so both hooks run:
+
+${WRAPPER_SNIPPET}
+It does nothing unless the app was started by flow-checker. Browser capture needs webpack on these versions (next dev without --turbo).`,
+      )
+    }
   }
 
   if (changes.length === 0 && ignore.length === 0) {

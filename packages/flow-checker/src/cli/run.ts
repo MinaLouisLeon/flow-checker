@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util'
 import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { devCommand } from './dev'
+import { doctorCommand } from './doctor'
 import { exportCommand } from './export'
 import { initCommand } from './init'
 import { scanCommand } from './scan'
@@ -105,6 +106,7 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
       {
         root: values.root,
         appDir: values['app-dir'],
+        config: values.config,
         tree: values.tree,
         types: values.types,
         requests: values.requests,
@@ -153,8 +155,13 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
     )
   }
 
-  io.err(`"${command}" is not implemented yet.`)
-  return 1
+  const port = toPort(values.port, '--port', io)
+  const appPort = toPort(values['app-port'], '--app-port', io)
+  if (port === null || appPort === null) return 1
+  return doctorCommand(
+    { root: values.root, appDir: values['app-dir'], config: values.config, port, appPort },
+    io,
+  )
 }
 
 function parse(argv: string[]) {

@@ -50,7 +50,8 @@ export function formatRequests(model: AppModel): string {
 
 function siteLine(site: RequestSite): string {
   const hook = site.hook ? ` ${site.hook.name}${site.hook.key ? `(${site.hook.key})` : ''}` : ''
-  return `${requestText(site)}  ${site.transport}${hook}  ${triggerText(site.trigger)}`
+  const client = site.client ? ` ${site.client.module}#${site.client.name}` : ''
+  return `${requestText(site)}  ${site.transport}${client}${hook}  ${triggerText(site.trigger)}`
 }
 
 function requestText(site: RequestSite): string {

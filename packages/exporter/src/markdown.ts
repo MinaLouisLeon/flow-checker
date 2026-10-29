@@ -513,7 +513,10 @@ function requestSection(
       ['Status', statusText(ctx, site)],
       ['From', `${ownerText(ctx, site, from)}${first ? ` · ${code(`${first.file}:${first.line}`)}` : ''}`],
       ['Trigger', triggerText(site.trigger)],
-      ['Transport', `${site.transport}${hook}`],
+      [
+        'Transport',
+        `${site.transport}${site.client ? ` (${code(`${site.client.module}#${site.client.name}`)})` : ''}${hook}`,
+      ],
       ['URL', url],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
       [

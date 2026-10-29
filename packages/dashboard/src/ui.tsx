@@ -54,6 +54,11 @@ export function RefBadges({ site: r }: { site: ComponentRef }) {
           lazy
         </Badge>
       )}
+      {r.resolution === 'excluded' && (
+        <Badge tone="muted" title="In a file the config's include/exclude leaves out">
+          excluded
+        </Badge>
+      )}
       {r.resolution === 'unresolved' && (
         <Badge tone="warn" title="The scanner could not find this component">
           ⚠ unresolved

@@ -5,6 +5,7 @@
     "paths": {
       "@flow-checker/runtime/client": ["../runtime/src/client.ts"],
       "@flow-checker/runtime/server": ["../runtime/src/server.ts"],
+      "@flow-checker/runtime/next": ["../runtime/src/next.ts"],
       "@flow-checker/*": ["../*/src/index.ts"]
     }
   },

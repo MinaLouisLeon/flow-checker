@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { FlowCheckerConfig } from '@flow-checker/shared'
 
@@ -19,16 +19,27 @@ export function findConfigFile(root: string): string | undefined {
   return CONFIG_FILES.map((name) => join(root, name)).find((file) => existsSync(file))
 }
 
+/** The parts of the config every scan uses. */
+export function scanSettings(config: FlowCheckerConfig) {
+  return {
+    types: config.types,
+    include: config.include,
+    exclude: config.exclude,
+    apiClients: config.apiClients,
+  }
+}
+
 /**
- * Loads the config file (default export). `.ts` files load through Node's built-in type
+ * Loads the config file (default export). `root` is the project root: the config's `root`
+ * resolved from the config file's folder, or the given root. `.ts` files load through Node's built-in type
  * stripping (Node 22.18+). Returns an empty config when there is no file.
  */
 export async function loadConfig(
   root: string,
   file?: string,
-): Promise<{ config: FlowCheckerConfig; file?: string }> {
+): Promise<{ config: FlowCheckerConfig; file?: string; root: string }> {
   const path = file ? resolve(root, file) : findConfigFile(root)
-  if (!path) return { config: {} }
+  if (!path) return { config: {}, root }
   if (!existsSync(path)) throw new ConfigError(`Config file not found: ${path}`)
   let mod: { default?: unknown }
   // Most Next.js projects have no `"type": "module"`, so Node warns that it re-parses the
@@ -57,5 +68,9 @@ export async function loadConfig(
       `${path} must export a config object as default (export default defineConfig({ ... })).`,
     )
   }
-  return { config: config as FlowCheckerConfig, file: path }
+  const loaded = config as FlowCheckerConfig
+  if (loaded.root !== undefined && typeof loaded.root !== 'string') {
+    throw new ConfigError(`${path}: "root" must be a path (relative to the config file).`)
+  }
+  return { config: loaded, file: path, root: loaded.root ? resolve(dirname(path), loaded.root) : root }
 }
