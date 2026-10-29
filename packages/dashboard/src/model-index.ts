@@ -29,7 +29,12 @@ export interface TypeUsage {
   requests: string[]
 }
 
-export type NoteKind = 'unresolved-component' | 'unresolved-type' | 'missing-page-component' | 'request'
+export type NoteKind =
+  | 'type-mismatch'
+  | 'unresolved-component'
+  | 'unresolved-type'
+  | 'missing-page-component'
+  | 'request'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -295,7 +300,7 @@ function scanNotes(model: AppModel): ScanNote[] {
     const first = site.callStack[0]
     for (const flag of site.flags) {
       notes.push({
-        kind: 'request',
+        kind: flag.kind === 'type-mismatch' ? 'type-mismatch' : 'request',
         message: `${requestLabel(site)}: ${flag.message}`,
         file: first?.file ?? '',
         ...(first ? { line: first.line, column: first.column } : {}),

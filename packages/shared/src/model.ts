@@ -367,7 +367,8 @@ export const TriggerSchema = z.object({
 export type Trigger = z.infer<typeof TriggerSchema>
 
 export const FlagSchema = z.object({
-  kind: z.enum(['dynamic-url', 'unknown-method', 'unknown-response', 'unknown-trigger']),
+  /** `type-mismatch` is added by the tool server when captured data doesn't fit the declared types (M8). */
+  kind: z.enum(['dynamic-url', 'unknown-method', 'unknown-response', 'unknown-trigger', 'type-mismatch']),
   message: z.string(),
 })
 export type Flag = z.infer<typeof FlagSchema>
@@ -411,7 +412,7 @@ export const RequestSiteSchema = z.object({
   targetRouteId: z.string().optional(),
   /** Requests this one leads to on the server: route handler (BFF) hops or fetches in the server action. */
   chain: z.array(z.string()).optional(),
-  /** `inferred` until live capture confirms it (M6). */
+  /** `inferred` until live capture confirms it (M6). `mismatch`: confirmed, but the data doesn't fit the types (M8). */
   status: z.enum(['inferred', 'verified', 'needs-recheck', 'mismatch']),
   flags: z.array(FlagSchema),
 })

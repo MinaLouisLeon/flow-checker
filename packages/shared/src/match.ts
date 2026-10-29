@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { RecordedFlowSchema } from './flow-runs'
 import type { RequestUrl } from './model'
+import type { SiteTypeCheck } from './verification'
 
 /** Evidence that links a capture to a request site. */
 export const MATCH_SIGNALS = [
@@ -91,6 +92,8 @@ export interface SiteVerification {
   captures: number
   lastCaptureId?: string
   lastAt?: string
+  /** Type comparison of those captures (M8). Absent when the site declares no types. */
+  typeCheck?: SiteTypeCheck
 }
 
 /** `GET /api/verification`. */

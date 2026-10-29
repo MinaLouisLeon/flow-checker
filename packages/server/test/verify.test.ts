@@ -265,3 +265,75 @@ describe('verification', () => {
     })
   })
 })
+
+describe('type comparison', () => {
+  const userType = (idType: 'number' | 'string') => ({
+    text: 'User[]',
+    shape: {
+      kind: 'array' as const,
+      element: {
+        kind: 'object' as const,
+        properties: [
+          { name: 'id', type: { kind: 'primitive' as const, name: idType } },
+          { name: 'name', type: { kind: 'primitive' as const, name: 'string' as const } },
+        ],
+      },
+    },
+  })
+  const typed = (idType: 'number' | 'string') => [
+    site('req_table', 'cmp_table', 'src/UsersTable.tsx', { responseType: userType(idType) }),
+  ]
+  const users = capture('cap_users', {
+    response: { status: 200, headers: {}, body: { kind: 'json', value: [{ id: '1', name: 'Ada' }] } },
+  })
+
+  it('flags a site whose captured response does not fit its type, and clears it after a fix', async () => {
+    const { call, json, ingest, setModel } = setup(typed('number'))
+    await ingest(users)
+
+    const [summary] = await json<CaptureSummary[]>('/api/captures')
+    expect(summary).toMatchObject({ match: { status: 'matched' }, typeCheck: 'mismatch' })
+    const { capture: stored } = await json<{ capture: Capture }>('/api/captures/cap_users')
+    expect(stored.typeCheck?.parts).toEqual([
+      {
+        part: 'response',
+        type: 'User[]',
+        status: 'mismatch',
+        mismatches: [
+          { kind: 'wrong-type', path: 'response.body[].id', expected: 'number', actual: 'string "1"' },
+        ],
+      },
+    ])
+    // The runtime can't send its own result.
+    expect(stored.typeCheck?.siteId).toBe('req_table')
+
+    const served = await json<AppModel>('/api/model')
+    expect(served.requests[0]).toMatchObject({
+      status: 'mismatch',
+      flags: [
+        { kind: 'type-mismatch', message: expect.stringContaining('[].id is string "1" (expected number)') },
+      ],
+    })
+    const verification = await json<VerificationSummary>('/api/verification')
+    expect(verification.sites.req_table?.typeCheck).toMatchObject({ checked: 1, mismatched: 1 })
+
+    // The type is fixed in the code: a re-scan checks the stored capture again.
+    setModel(model(typed('string')))
+    const rescanned = await json<AppModel>('/api/scan', { method: 'POST' })
+    expect(rescanned.requests[0]).toMatchObject({ status: 'verified', flags: [] })
+    expect((await json<CaptureSummary[]>('/api/captures'))[0]?.typeCheck).toBe('ok')
+    await call('/api/captures', { method: 'DELETE' })
+  })
+
+  it('ignores a type check sent by the runtime', async () => {
+    const { json, ingest } = setup(typed('string'))
+    await ingest({
+      ...users,
+      typeCheck: {
+        siteId: 'req_table',
+        parts: [{ part: 'response', type: 'x', status: 'mismatch', mismatches: [] }],
+      },
+    })
+    expect((await json<CaptureSummary[]>('/api/captures'))[0]?.typeCheck).toBe('ok')
+  })
+})

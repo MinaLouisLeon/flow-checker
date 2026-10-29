@@ -1,4 +1,4 @@
-// Records real captures from every fixture app, for the matcher tests (M6).
+// Records real captures from every fixture app, for the matcher (M6) and type comparison (M8) tests.
 // For each fixture: starts the mock API and `flow-checker dev` (built CLI), drives the app in
 // Chromium, then saves the captures the tool server stored to
 // packages/server/test/recordings/<fixture>.json. Local paths are replaced with `<repo>`.
@@ -81,6 +81,14 @@ const scripts = {
     await page.click('button[type=submit]')
     await page.waitForURL(/\/dashboard/)
     await settle(page, 2500)
+  },
+  mismatch: async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[name=title]', 'Check types')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('li:has-text("Check types")')
+    await settle(page)
   },
 }
 

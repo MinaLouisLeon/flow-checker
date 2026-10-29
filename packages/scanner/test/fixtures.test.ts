@@ -10,7 +10,7 @@ import {
 import { describe, expect, it } from 'vitest'
 import { scanProject } from '../src'
 
-const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl'] as const
+const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl', 'mismatch'] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
 const models = new Map<string, AppModel>()

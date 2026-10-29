@@ -12,6 +12,7 @@ import {
 import { useData } from '../context'
 import { siteHref, siteLabel, siteOwner } from '../RequestView'
 import { href, type MatchFilter, replaceScreen } from '../router'
+import { CaptureTypeCheck, TypeCheckBadge } from '../TypeCheckView'
 import { Badge, Empty, matches, SearchBox, Section } from '../ui'
 
 const FILTERS: { value: MatchFilter | undefined; label: string }[] = [
@@ -19,6 +20,7 @@ const FILTERS: { value: MatchFilter | undefined; label: string }[] = [
   { value: 'matched', label: 'Matched' },
   { value: 'ambiguous', label: 'Ambiguous' },
   { value: 'unmatched', label: 'Unmatched' },
+  { value: 'mismatch', label: 'Type mismatch' },
 ]
 
 const SIGNAL_LABEL: Record<MatchSignal, string> = {
@@ -33,8 +35,9 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   manual: 'manual',
 }
 
-function matchStatus(c: CaptureSummary): MatchFilter {
-  return c.match?.status ?? 'unmatched'
+function fitsFilter(c: CaptureSummary, filter: MatchFilter): boolean {
+  if (filter === 'mismatch') return c.typeCheck === 'mismatch'
+  return (c.match?.status ?? 'unmatched') === filter
 }
 
 const STATUS_TEXT: Record<LiveStatus, string> = {
@@ -67,10 +70,13 @@ export function LiveScreen({
   }
 
   const all = captures.data ?? []
-  const counts = { matched: 0, ambiguous: 0, unmatched: 0 }
-  for (const c of all) counts[matchStatus(c)]++
+  const counts: Record<MatchFilter, number> = { matched: 0, ambiguous: 0, unmatched: 0, mismatch: 0 }
+  for (const c of all) {
+    counts[c.match?.status ?? 'unmatched']++
+    if (c.typeCheck === 'mismatch') counts.mismatch++
+  }
   const list = all.filter((c) => {
-    if (filter && matchStatus(c) !== filter) return false
+    if (filter && !fitsFilter(c, filter)) return false
     const site = c.match?.siteId ? index.requests.get(c.match.siteId) : undefined
     return matches(
       q,
@@ -188,6 +194,7 @@ function CaptureRow({
       <span className="spacer" />
       {c.component && <span className="muted capture-component">{c.component}</span>}
       <MatchBadge match={c.match} />
+      <TypeCheckBadge status={c.typeCheck} quiet />
       <StatusBadge status={c.status} error={c.error} />
       <span className="muted capture-duration">{c.durationMs} ms</span>
     </li>
@@ -294,6 +301,12 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
       <Section title="Request site">
         <MatchPanel capture={c} />
       </Section>
+
+      {c.typeCheck && (
+        <Section title="Type check">
+          <CaptureTypeCheck check={c.typeCheck} />
+        </Section>
+      )}
 
       {children.length > 0 && (
         <Section title="Server requests it caused">

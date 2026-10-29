@@ -1,0 +1,13 @@
+HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  [mismatch]
+  type-mismatch: Response doesn't match Account[]: [].id is number 1 (expected string); [].avatarUrl is missing (expected string); [].role is not in the type (2 of 2 captures).
+  - response wrong-type response.body[].id: expected string, got number 1
+  - response missing-field response.body[].avatarUrl: expected string, got missing
+  - response extra-field response.body[].role: expected not declared, got string "admin"
+SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  [mismatch]
+  type-mismatch: Response doesn't match Settings: digest is null (expected { frequency: "daily" | "weekly" }) (2 of 2 captures).
+  - response null response.body.digest: expected { frequency: "daily" | "weekly" }, got null
+TodoPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  [verified]
+TodoPanel · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  [mismatch]
+  type-mismatch: Response doesn't match Todo: userId is string "1" (expected number). Request body doesn't match NewTodo: userId is string "1" (expected number) (1 of 1 capture).
+  - request wrong-type request.body.userId: expected number, got string "1"
+  - response wrong-type response.body.userId: expected number, got string "1"

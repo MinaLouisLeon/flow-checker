@@ -13,8 +13,9 @@ export type Screen =
   | { name: 'not-found' }
 
 /** Live screen: show only captures with this match status. */
-export type MatchFilter = 'matched' | 'ambiguous' | 'unmatched'
-const MATCH_FILTERS: MatchFilter[] = ['matched', 'ambiguous', 'unmatched']
+/** Match status, or `mismatch`: matched captures whose data doesn't fit the site's types. */
+export type MatchFilter = 'matched' | 'ambiguous' | 'unmatched' | 'mismatch'
+const MATCH_FILTERS: MatchFilter[] = ['matched', 'ambiguous', 'unmatched', 'mismatch']
 
 export function parseHash(hash: string): Screen {
   const raw = hash.replace(/^#/, '') || '/'
