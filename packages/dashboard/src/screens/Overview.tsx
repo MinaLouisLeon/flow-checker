@@ -6,6 +6,7 @@ import { href } from '../router'
 import { Empty, Section, SourceLink } from '../ui'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
+  'needs-recheck': 'Requests whose code changed since they were captured',
   'type-mismatch': "Requests whose data doesn't match the types",
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',

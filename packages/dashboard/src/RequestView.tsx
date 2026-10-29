@@ -1,11 +1,11 @@
 // One request site: method + URL, how and when it is sent, body and response types,
 // the server hops it leads to, and the call stack from the component down to the network call.
-import { isVerified, type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
+import { hasCaptures, type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import type { ModelIndex } from './model-index'
 import { href } from './router'
-import { SiteStatusBadge, SiteTypeCheckView, TypeCheckBadge } from './TypeCheckView'
+import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
 import { Badge, Empty, SourceLink } from './ui'
 
@@ -229,7 +229,7 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         )}
 
         {site.status === 'mismatch' && <SiteMismatches site={site} />}
-        {isVerified(site) && <SiteCaptures site={site} />}
+        {hasCaptures(site) && <SiteCaptures site={site} />}
 
         <div className="request-stack">
           <h4>Call path</h4>
@@ -286,7 +286,7 @@ function SiteCaptures({ site }: { site: RequestSite }) {
               </code>
             </a>
             <span className="spacer" />
-            <TypeCheckBadge status={c.typeCheck} quiet />{' '}
+            <TypeCheckBadge status={c.typeCheck} quiet /> <StaleBadge stale={c.stale} />{' '}
             <span className={c.status !== undefined && c.status < 400 ? 'muted' : 'warn'}>
               {c.status ?? 'failed'}
             </span>

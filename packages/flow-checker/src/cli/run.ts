@@ -34,6 +34,7 @@ Options:
   --dev-command <cmd>     dev: command that starts your app (default: the "dev" script)
   --no-app                dev: don't start your app (start it yourself with the printed env)
   --no-open               dev: don't open the browser
+  --no-watch              dev: don't re-scan when files change
   -y, --yes               init: apply the changes without asking
   --tree                  scan: also print the route and component trees
   --types                 scan: also print the resolved types
@@ -121,6 +122,7 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
         open: values.open,
         app: values.app,
         devCommand: values['dev-command'],
+        watch: values.watch,
       },
       io,
     )
@@ -155,6 +157,7 @@ function parse(argv: string[]) {
       'dev-command': { type: 'string' },
       app: { type: 'boolean', default: true },
       open: { type: 'boolean', default: true },
+      watch: { type: 'boolean', default: true },
       yes: { type: 'boolean', short: 'y' },
     },
   })

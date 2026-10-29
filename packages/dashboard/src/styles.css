@@ -252,7 +252,8 @@ h3 {
   padding: 10px 14px;
   border-radius: var(--radius);
 }
-.banner-error {
+.banner-error,
+.banner-warn {
   background: var(--warn-soft);
   color: var(--warn);
 }

@@ -91,14 +91,29 @@ function typeMismatchFlag(site: RequestSite, check: SiteTypeCheck): Flag {
   return { kind: 'type-mismatch', message: `${parts.join('. ')} (${of}).` }
 }
 
-/** Status from captures: `verified` when one matched, `mismatch` when its data didn't fit the types. */
-export function siteStatus(
-  site: RequestSite,
-  verification: SiteVerification | undefined,
-): RequestSite['status'] {
-  if (site.status === 'needs-recheck') return site.status
-  if (!verification) return 'inferred'
+/** Every matched capture was taken before the site's code last changed. */
+export function needsRecheck(verification: SiteVerification | undefined): boolean {
+  return !!verification && verification.captures > 0 && (verification.stale ?? 0) >= verification.captures
+}
+
+/**
+ * Status from captures: `verified` when one matched, `mismatch` when its data didn't fit the
+ * types, `needs-recheck` when the code changed after every capture.
+ */
+export function siteStatus(verification: SiteVerification | undefined): RequestSite['status'] {
+  if (!verification || verification.captures === 0) return 'inferred'
+  if (needsRecheck(verification)) return 'needs-recheck'
   return verification.typeCheck?.mismatched ? 'mismatch' : 'verified'
+}
+
+function staleFlag(verification: SiteVerification): Flag {
+  const n = verification.captures
+  return {
+    kind: 'stale',
+    message:
+      `The code changed after the last capture (${n} capture${n === 1 ? '' : 's'} from before the change). ` +
+      'Use the app again to re-check it.',
+  }
 }
 
 /**
@@ -110,10 +125,11 @@ export function applyVerification(model: AppModel, summary: Pick<VerificationSum
   let changed = false
   const requests = model.requests.map((site) => {
     const verification = summary.sites[site.id]
-    const status = siteStatus(site, verification)
-    const flags = site.flags.filter((f) => f.kind !== 'type-mismatch')
+    const status = siteStatus(verification)
+    const flags = site.flags.filter((f) => f.kind !== 'type-mismatch' && f.kind !== 'stale')
     const check = verification?.typeCheck
     if (status === 'mismatch' && check) flags.push(typeMismatchFlag(site, check))
+    if (status === 'needs-recheck' && verification) flags.push(staleFlag(verification))
     if (status === site.status && JSON.stringify(flags) === JSON.stringify(site.flags)) return site
     changed = true
     return { ...site, status, flags }
@@ -124,4 +140,9 @@ export function applyVerification(model: AppModel, summary: Pick<VerificationSum
 /** Matched by live capture (with or without a type mismatch). */
 export function isVerified(site: Pick<RequestSite, 'status'>): boolean {
   return site.status === 'verified' || site.status === 'mismatch'
+}
+
+/** Has matched captures, current or from before a code change. */
+export function hasCaptures(site: Pick<RequestSite, 'status'>): boolean {
+  return isVerified(site) || site.status === 'needs-recheck'
 }

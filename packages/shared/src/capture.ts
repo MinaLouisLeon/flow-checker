@@ -174,6 +174,8 @@ export interface CaptureSummary {
   match?: Pick<CaptureMatch, 'status' | 'by' | 'siteId' | 'score'>
   /** Result of comparing the bodies with the matched site's types. */
   typeCheck?: TypeCheckStatus
+  /** Taken before the matched site's code last changed (M9). Set by the tool server. */
+  stale?: boolean
 }
 
 export function summarizeCapture(c: Capture): CaptureSummary {

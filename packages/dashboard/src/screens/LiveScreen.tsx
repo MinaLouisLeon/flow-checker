@@ -12,7 +12,7 @@ import {
 import { useData } from '../context'
 import { siteHref, siteLabel, siteOwner } from '../RequestView'
 import { href, type MatchFilter, replaceScreen } from '../router'
-import { CaptureTypeCheck, TypeCheckBadge } from '../TypeCheckView'
+import { CaptureTypeCheck, StaleBadge, TypeCheckBadge } from '../TypeCheckView'
 import { Badge, Empty, matches, SearchBox, Section } from '../ui'
 
 const FILTERS: { value: MatchFilter | undefined; label: string }[] = [
@@ -195,6 +195,7 @@ function CaptureRow({
       {c.component && <span className="muted capture-component">{c.component}</span>}
       <MatchBadge match={c.match} />
       <TypeCheckBadge status={c.typeCheck} quiet />
+      <StaleBadge stale={c.stale} />
       <StatusBadge status={c.status} error={c.error} />
       <span className="muted capture-duration">{c.durationMs} ms</span>
     </li>
