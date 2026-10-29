@@ -104,10 +104,10 @@ try {
     result.rescanMs = { median: rescans[2], max: rescans[4], all: rescans }
     result.slowestApiMs = Math.round(slowestApiMs)
   } finally {
-    stop(dev)
+    await stop(dev)
   }
 } finally {
-  rmSync(dir, { recursive: true, force: true })
+  removeDir(dir)
 }
 
 if (json) console.log(JSON.stringify(result, null, 2))
@@ -133,12 +133,37 @@ for (const [env, value, what] of budgets) {
   }
 }
 
-function stop(child) {
-  if (child.exitCode !== null) return
+/**
+ * Stops `flow-checker dev` and waits for it to exit. On SIGTERM it stops the app's process tree
+ * first, so nothing writes into the temporary folder afterwards. Force-kills after 15 s.
+ */
+async function stop(child) {
+  if (child.exitCode !== null || child.signalCode !== null) return
+  const exited = new Promise((done) => child.once('exit', done))
+  const signal = (sig) => {
+    try {
+      if (isWin) spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
+      else process.kill(-child.pid, sig)
+    } catch {}
+  }
+  signal('SIGTERM')
+  const timedOut = await Promise.race([
+    exited.then(() => false),
+    new Promise((r) => setTimeout(() => r(true), 15_000)),
+  ])
+  if (timedOut) {
+    signal('SIGKILL')
+    await exited
+  }
+}
+
+/** Removes a temporary folder. A file still held open by a stopped process only warns. */
+function removeDir(dir) {
   try {
-    if (isWin) spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
-    else process.kill(-child.pid, 'SIGTERM')
-  } catch {}
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 })
+  } catch (error) {
+    console.warn(`Could not remove ${dir}: ${error.message}`)
+  }
 }
 
 function sleep(ms) {

@@ -3,14 +3,24 @@
 // option to a non-default value, and checks each one's effect through the installed CLI.
 // Run after `pnpm build`: node scripts/verify-config.mjs
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 
 const repo = resolve(import.meta.dirname, '..')
 const pkgDir = join(repo, 'packages', 'flow-checker')
-const work = mkdtempSync(join(tmpdir(), 'flow-checker-config-'))
+// Real path: on macOS tmpdir() is a symlink (/var -> /private/var), and the CLI reports real paths.
+const work = realpathSync(mkdtempSync(join(tmpdir(), 'flow-checker-config-')))
 const isWin = process.platform === 'win32'
 const results = []
 
@@ -248,12 +258,12 @@ try {
     )
     check('capture.redact.headers: x-session is masked', saved?.request?.headers?.['x-session'] !== 'abc')
   } finally {
-    stopTree(dev)
+    await stopTree(dev)
   }
 } catch (error) {
   check('run', false, error.stderr || error.stdout || error.message)
 } finally {
-  rmSync(work, { recursive: true, force: true })
+  removeDir(work)
 }
 
 for (const r of results)
@@ -261,12 +271,37 @@ for (const r of results)
 if (results.some((r) => !r.ok)) process.exitCode = 1
 else console.log(`\nEvery config option is used by the published package (${results.length} checks).`)
 
-function stopTree(child) {
-  if (child.exitCode !== null) return
+/**
+ * Stops `flow-checker dev` and waits for it to exit. On SIGTERM it stops the app's process tree
+ * first, so nothing writes into the temporary folder afterwards. Force-kills after 15 s.
+ */
+async function stopTree(child) {
+  if (child.exitCode !== null || child.signalCode !== null) return
+  const exited = new Promise((done) => child.once('exit', done))
+  const signal = (sig) => {
+    try {
+      if (isWin) spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
+      else process.kill(-child.pid, sig)
+    } catch {}
+  }
+  signal('SIGTERM')
+  const timedOut = await Promise.race([
+    exited.then(() => false),
+    new Promise((r) => setTimeout(() => r(true), 15_000)),
+  ])
+  if (timedOut) {
+    signal('SIGKILL')
+    await exited
+  }
+}
+
+/** Removes a temporary folder. A file still held open by a stopped process only warns. */
+function removeDir(dir) {
   try {
-    if (isWin) spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
-    else process.kill(-child.pid, 'SIGTERM')
-  } catch {}
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 })
+  } catch (error) {
+    console.warn(`Could not remove ${dir}: ${error.message}`)
+  }
 }
 
 async function waitFor(fn, timeoutMs = 60_000) {
