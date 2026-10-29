@@ -1,6 +1,6 @@
 {
-  "name": "@integr8/flow-checker",
-  "version": "0.0.0",
+  "name": "@integr8-media/flow-checker",
+  "version": "0.1.0",
   "description": "Map a Next.js App Router project: pages, components, requests, types and flows, verified against live traffic and exported as documentation.",
   "keywords": [
     "nextjs",
@@ -8,9 +8,23 @@
     "documentation",
     "api",
     "flows",
-    "devtools"
+    "devtools",
+    "next",
+    "instrumentation",
+    "api-docs",
+    "type-checking"
   ],
   "license": "MIT",
+  "author": "Mina Louis Leon",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MinaLouisLeon/flow-checker.git",
+    "directory": "packages/flow-checker"
+  },
+  "homepage": "https://github.com/MinaLouisLeon/flow-checker#readme",
+  "bugs": {
+    "url": "https://github.com/MinaLouisLeon/flow-checker/issues"
+  },
   "type": "module",
   "bin": {
     "flow-checker": "./dist/cli.js"
@@ -32,11 +46,23 @@
       "types": "./dist/runtime-server.d.ts",
       "default": "./dist/runtime-server.js"
     },
+    "./next": {
+      "import": {
+        "types": "./dist/next.d.ts",
+        "default": "./dist/next.js"
+      },
+      "require": {
+        "types": "./dist/next.d.cts",
+        "default": "./dist/next.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=22.12.0"
@@ -68,6 +94,8 @@
   },
   "dependencies": {
     "@hono/node-server": "catalog:",
+    "@jridgewell/trace-mapping": "catalog:",
+    "chokidar": "catalog:",
     "hono": "catalog:",
     "ts-morph": "catalog:",
     "zod": "catalog:"

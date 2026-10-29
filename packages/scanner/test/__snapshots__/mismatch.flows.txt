@@ -1,0 +1,9 @@
+# Navigation
+
+(none)
+
+# Flows
+
+## TodoPanel submit  (/)
+1. TodoPanel onSubmit on /
+2. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos

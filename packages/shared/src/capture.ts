@@ -1,0 +1,206 @@
+// Live capture data (M5, docs/PLAN.md 7): requests recorded by the runtime injected into the
+// user's app, and the session timeline used later to record flows.
+// The runtime only imports these as types, so zod never ends up in the user's bundle.
+import { z } from 'zod'
+import { type CaptureMatch, CaptureMatchSchema } from './match'
+import { SourceLocSchema } from './model'
+import { TypeCheckSchema, type TypeCheckStatus, typeCheckStatus } from './type-check'
+
+/** A request or response body, cut to `maxBodyBytes`. */
+export const CapturedBodySchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('none') }),
+  /** Parsed JSON. */
+  z.object({ kind: z.literal('json'), value: z.unknown(), size: z.number().optional() }),
+  /** Text that is not JSON, or JSON that was cut short (`truncated`). */
+  z.object({
+    kind: z.literal('text'),
+    value: z.string(),
+    size: z.number().optional(),
+    truncated: z.boolean().optional(),
+  }),
+  /** `FormData` or `application/x-www-form-urlencoded`. Files are described, not stored. */
+  z.object({
+    kind: z.literal('form'),
+    value: z.record(z.string(), z.union([z.string(), z.array(z.string())])),
+  }),
+  /** Binary or streamed content: only its type and size are kept. */
+  z.object({
+    kind: z.literal('binary'),
+    contentType: z.string().optional(),
+    size: z.number().optional(),
+  }),
+])
+export type CapturedBody = z.infer<typeof CapturedBodySchema>
+
+export const CapturedRequestSchema = z.object({
+  method: z.string(),
+  /** Absolute URL. */
+  url: z.string(),
+  /** Lower-case header names. */
+  headers: z.record(z.string(), z.string()),
+  body: CapturedBodySchema,
+})
+export type CapturedRequest = z.infer<typeof CapturedRequestSchema>
+
+export const CapturedResponseSchema = z.object({
+  status: z.number().int(),
+  statusText: z.string().optional(),
+  headers: z.record(z.string(), z.string()),
+  body: CapturedBodySchema,
+})
+export type CapturedResponse = z.infer<typeof CapturedResponseSchema>
+
+/** The user interaction that most likely started a browser request. */
+export const InteractionSchema = z.object({
+  /** DOM event type: `click`, `submit`, `change`, `keydown`. */
+  type: z.string(),
+  /** Short description of the target element, e.g. `button "Delete user"`. */
+  target: z.string(),
+  /** React component names from the target element up, nearest first (from the React fiber). */
+  componentChain: z.array(z.string()),
+  /** ISO time of the interaction. */
+  at: z.string(),
+})
+export type Interaction = z.infer<typeof InteractionSchema>
+
+/** For server captures: the incoming request the outgoing call was made for. */
+export const CaptureParentSchema = z.object({
+  method: z.string(),
+  /** Path and query of the incoming request. */
+  url: z.string(),
+  /** The browser capture that sent the incoming request, when it could be linked. */
+  captureId: z.string().optional(),
+  /** Set when the incoming request called a server action. */
+  serverActionId: z.string().optional(),
+})
+export type CaptureParent = z.infer<typeof CaptureParentSchema>
+
+export const CaptureSchema = z.object({
+  id: z.string(),
+  /** Browser tab session. Server captures inherit it from the browser request they serve. */
+  sessionId: z.string(),
+  /** Where the request was sent from. */
+  origin: z.enum(['browser', 'server']),
+  /** `http` is Node's http/https module (axios on the server). */
+  transport: z.enum(['fetch', 'xhr', 'http']),
+  /** ISO time the request started. */
+  timestamp: z.string(),
+  durationMs: z.number(),
+  /** Browser: the page URL. Server: absent (see `parent`). */
+  pageUrl: z.string().optional(),
+  request: CapturedRequestSchema,
+  /** Absent when the request failed before a response arrived (see `error`). */
+  response: CapturedResponseSchema.optional(),
+  error: z.string().optional(),
+  /** Server action called by this request (from the `Next-Action` header). */
+  serverAction: z.object({ id: z.string() }).optional(),
+  interaction: InteractionSchema.optional(),
+  parent: CaptureParentSchema.optional(),
+  /** Stack frames where the request was sent, innermost first. */
+  stack: z.array(z.string()),
+  /** Sensitive values were masked (see `redactedPaths`). False only with `capture.storeRaw`. */
+  redacted: z.boolean(),
+  /** What was masked, e.g. `request.headers.authorization`, `request.body.password`. */
+  redactedPaths: z.array(z.string()),
+  /**
+   * Project frames of `stack`, resolved through the dev build's source maps by the tool server
+   * when the capture arrives (chunks change on rebuild, so this is done once). Innermost first.
+   */
+  sourceStack: z.array(SourceLocSchema.extend({ fn: z.string().optional() })).optional(),
+  /** Which request site this is, set by the tool server (M6). Absent until matched. */
+  match: CaptureMatchSchema.optional(),
+  /** The bodies compared with the matched site's declared types, set by the tool server (M8). */
+  typeCheck: TypeCheckSchema.optional(),
+})
+export type Capture = z.infer<typeof CaptureSchema>
+
+export const SessionEventSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('navigation'),
+    at: z.string(),
+    /** `load` is the first page of the tab, or a full reload. */
+    how: z.enum(['load', 'push', 'replace', 'pop']),
+    url: z.string(),
+  }),
+  z.object({
+    kind: z.literal('interaction'),
+    at: z.string(),
+    type: z.string(),
+    target: z.string(),
+    componentChain: z.array(z.string()),
+    url: z.string(),
+  }),
+  z.object({ kind: z.literal('capture'), at: z.string(), captureId: z.string() }),
+])
+export type SessionEvent = z.infer<typeof SessionEventSchema>
+
+export const SessionSchema = z.object({
+  version: z.literal(1),
+  id: z.string(),
+  startedAt: z.string(),
+  updatedAt: z.string(),
+  events: z.array(SessionEventSchema),
+})
+export type Session = z.infer<typeof SessionSchema>
+
+/** What the runtime posts to the tool server's `/ingest` endpoint. */
+export const IngestBatchSchema = z.object({
+  /** Per-run secret, so other local pages can't write captures. */
+  token: z.string(),
+  sessionId: z.string().optional(),
+  captures: z.array(CaptureSchema).default([]),
+  events: z.array(SessionEventSchema).default([]),
+})
+export type IngestBatch = z.infer<typeof IngestBatchSchema>
+
+/** A capture without its bodies and headers: what lists show. */
+export interface CaptureSummary {
+  id: string
+  sessionId: string
+  origin: Capture['origin']
+  transport: Capture['transport']
+  timestamp: string
+  durationMs: number
+  method: string
+  url: string
+  status?: number
+  error?: string
+  pageUrl?: string
+  serverActionId?: string
+  parentCaptureId?: string
+  /** Nearest component from the interaction, if any. */
+  component?: string
+  redacted: boolean
+  match?: Pick<CaptureMatch, 'status' | 'by' | 'siteId' | 'score'>
+  /** Result of comparing the bodies with the matched site's types. */
+  typeCheck?: TypeCheckStatus
+  /** Taken before the matched site's code last changed (M9). Set by the tool server. */
+  stale?: boolean
+}
+
+export function summarizeCapture(c: Capture): CaptureSummary {
+  return {
+    id: c.id,
+    sessionId: c.sessionId,
+    origin: c.origin,
+    transport: c.transport,
+    timestamp: c.timestamp,
+    durationMs: c.durationMs,
+    method: c.request.method,
+    url: c.request.url,
+    status: c.response?.status,
+    error: c.error,
+    pageUrl: c.pageUrl,
+    serverActionId: c.serverAction?.id,
+    parentCaptureId: c.parent?.captureId,
+    component: c.interaction?.componentChain[0],
+    redacted: c.redacted,
+    match: c.match && {
+      status: c.match.status,
+      by: c.match.by,
+      siteId: c.match.siteId,
+      score: c.match.score,
+    },
+    typeCheck: c.typeCheck && typeCheckStatus(c.typeCheck),
+  }
+}

@@ -1,0 +1,630 @@
+{
+  "fixture": "react-query",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvs01iod2mwenmmj",
+      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:26.318Z",
+      "durationMs": 13,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
+        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:231:24)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at #executeFetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1sj869w7n8_pj._.js:480:42)",
+        "at QueryObserver.onSubscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1sj869w7n8_pj._.js:276:89)",
+        "at QueryObserver.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2917:14)",
+        "at useBaseQuery.useSyncExternalStore.useCallback (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1sj869w7n8_pj._.js:1041:60)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "fetchTodos",
+          "file": "src/services/todos.ts",
+          "line": 20,
+          "column": 33
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs01kke660fx99e",
+      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:28.766Z",
+      "durationMs": 8,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:4010/todos/2",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "done": true
+          },
+          "size": 13
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "userId": 2,
+            "title": "Break Enigma",
+            "done": true
+          },
+          "size": 54
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "input[type=checkbox]",
+        "componentChain": [
+          "TodoList",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-28T10:56:28.763Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
+        "at updateTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:237:33)",
+        "at TodoList.useMutation[toggle] [as mutationFn] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:122:225)",
+        "at Object.fn (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:458:37)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Mutation.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:497:40)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "updateTodo",
+          "file": "src/services/todos.ts",
+          "line": 28,
+          "column": 3
+        },
+        {
+          "fn": "TodoList.useMutation[toggle] [as mutationFn]",
+          "file": "src/components/TodoList.tsx",
+          "line": 14,
+          "column": 43
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs01kkobctmxzst",
+      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:28.776Z",
+      "durationMs": 5,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": true
+            }
+          ],
+          "size": 122
+        }
+      },
+      "interaction": {
+        "type": "change",
+        "target": "input[type=checkbox]",
+        "componentChain": [
+          "TodoList",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-28T10:56:28.767Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
+        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:231:24)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2310:37",
+        "at Array.map (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2309:398",
+        "at Object.batch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:912:26)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "fetchTodos",
+          "file": "src/services/todos.ts",
+          "line": 20,
+          "column": 33
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs01lsk4qczq26p",
+      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:30.356Z",
+      "durationMs": 10,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Record captures"
+          },
+          "size": 27
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          },
+          "size": 58
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-28T10:56:30.355Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
+        "at Object.createTodo [as mutationFn] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:233:29)",
+        "at Object.fn (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:458:37)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Mutation.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:497:40)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "Object.createTodo [as mutationFn]",
+          "file": "src/services/todos.ts",
+          "line": 25,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs01lswj5s1v8pz",
+      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:30.368Z",
+      "durationMs": 10,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": true
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Record captures"
+            }
+          ],
+          "size": 181
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-28T10:56:30.355Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
+        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:231:24)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2310:37",
+        "at Array.map (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2309:398",
+        "at Object.batch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:912:26)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "fetchTodos",
+          "file": "src/services/todos.ts",
+          "line": 20,
+          "column": 33
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs01njzw18gsqu6",
+      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:32.639Z",
+      "durationMs": 16,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          },
+          "size": 58
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-28T10:56:30.355Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
+        "at fetchTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:232:25)",
+        "at TodoDetail.useSWR (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0su-qqec0edwi._.js:25:205)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1nu4pi8s3ayk1._.js:953:271",
+        "at useSWRHandler.useCallback[revalidate] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1nu4pi8s3ayk1._.js:2141:63)",
+        "at useSWRHandler.useIsomorphicLayoutEffect (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1nu4pi8s3ayk1._.js:2380:25)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookLayoutEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7101:60)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "fetchTodo",
+          "file": "src/services/todos.ts",
+          "line": 22,
+          "column": 42
+        },
+        {
+          "fn": "TodoDetail.useSWR",
+          "file": "src/components/TodoDetail.tsx",
+          "line": 14,
+          "column": 80
+        }
+      ]
+    }
+  ]
+}

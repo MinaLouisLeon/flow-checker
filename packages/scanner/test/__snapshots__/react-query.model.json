@@ -406,6 +406,497 @@
           }
         ]
       }
+    },
+    {
+      "id": "typ_1llbjxbqwwk",
+      "name": "NewTodo",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/types/todo.ts",
+        "line": 8,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1omtz7j8kgo",
+      "name": "TodoPatch",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/types/todo.ts",
+        "line": 10,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            },
+            "optional": true
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            },
+            "optional": true
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_21j0fo1p54x",
+      "origin": "component",
+      "componentId": "cmp_0r1iugj2rde",
+      "transport": "fetch",
+      "hook": {
+        "name": "useMutation",
+        "module": "@tanstack/react-query"
+      },
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 28,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "NewTodo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1llbjxbqwwk",
+          "name": "NewTodo"
+        }
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0fc96ucq8sd",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 14,
+          "column": 18,
+          "callee": "useMutation"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 25,
+          "column": 3,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1xum50ixbb2"
+    },
+    {
+      "id": "req_0euad6xi67r",
+      "origin": "component",
+      "componentId": "cmp_1gqfw2iamk9",
+      "transport": "fetch",
+      "hook": {
+        "name": "useSWR",
+        "module": "swr",
+        "key": "['todo', id]"
+      },
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0fc96ucq8sd",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 14,
+          "column": 38,
+          "callee": "useSWR"
+        },
+        {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 14,
+          "column": 71,
+          "callee": "fetchTodo"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 22,
+          "column": 42,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0nshmzdtsfo"
+    },
+    {
+      "id": "req_0s4qt6a0r0d",
+      "origin": "component",
+      "componentId": "cmp_0l3kw3n479w",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "todoKeys.all"
+      },
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 11,
+          "column": 38,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 20,
+          "column": 33,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0yym8egbxwt"
+    },
+    {
+      "id": "req_0edpknxxbhl",
+      "origin": "component",
+      "componentId": "cmp_0l3kw3n479w",
+      "transport": "fetch",
+      "hook": {
+        "name": "useMutation",
+        "module": "@tanstack/react-query"
+      },
+      "method": "PATCH",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onChange",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 25,
+          "column": 54
+        }
+      },
+      "bodyType": {
+        "text": "TodoPatch",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1omtz7j8kgo",
+          "name": "TodoPatch"
+        }
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0fc96ucq8sd",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 13,
+          "column": 18,
+          "callee": "useMutation"
+        },
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 14,
+          "column": 33,
+          "callee": "updateTodo"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 28,
+          "column": 3,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0p3wr8878d3"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_1pbocv2fxma",
+      "origin": "component",
+      "componentId": "cmp_0r1iugj2rde",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 28,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/AddTodoForm.tsx",
+        "line": 18,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 14,
+          "column": 18,
+          "callee": "useMutation"
+        },
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 18,
+          "column": 7,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    },
+    {
+      "id": "nav_20o5kkfum58",
+      "origin": "component",
+      "componentId": "cmp_1gqfw2iamk9",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 23,
+          "column": 7
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/TodoDetail.tsx",
+        "line": 23,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 23,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_13eamnryn06",
+      "origin": "component",
+      "componentId": "cmp_0l3kw3n479w",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 26,
+          "column": 11
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/TodoList.tsx",
+        "line": 26,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 26,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_2e0zjxz2zwz",
+      "name": "AddTodoForm submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_0r1iugj2rde",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_0r1iugj2rde",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 28,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_21j0fo1p54x"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_1pbocv2fxma",
+          "routeId": "rt_0rsc27vk284"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0euad6xi67r",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf",
+        "rt_0rsc27vk284"
+      ]
+    },
+    {
+      "id": "flw_1do37llzb4t",
+      "name": "TodoList change",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_0l3kw3n479w",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_0l3kw3n479w",
+          "event": "onChange",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 25,
+            "column": 54
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0edpknxxbhl"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ]
     }
   ]
 }

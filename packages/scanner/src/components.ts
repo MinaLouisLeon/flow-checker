@@ -39,9 +39,16 @@ export class ComponentGraph {
   readonly #directiveCache = new Map<SourceFile, boolean>()
   readonly #types: TypeResolver
 
-  constructor(root: string, types: TypeResolver = new TypeResolver(root)) {
+  readonly #scanned: (file: string) => boolean
+
+  constructor(
+    root: string,
+    types: TypeResolver = new TypeResolver(root),
+    scanned: (file: string) => boolean = () => true,
+  ) {
     this.#root = root
     this.#types = types
+    this.#scanned = scanned
   }
 
   /** Adds the default-export component of a page/layout file. Returns its id. */
@@ -50,6 +57,11 @@ export class ComponentGraph {
     if (!symbol) return undefined
     const decl = declarationOf(unalias(symbol))
     return decl ? this.#visit(decl.body, decl) : undefined
+  }
+
+  /** Component id -> the node holding its body (function, arrow, class). */
+  bodies(): Map<string, Node> {
+    return new Map([...this.#byNode].map(([node, id]) => [id, node]))
   }
 
   /** Final component list, with `kind` computed from the given render roots. */
@@ -154,6 +166,7 @@ export class ComponentGraph {
     if (file.isInNodeModules() || file.isDeclarationFile()) {
       return { resolution: 'external', module: module ?? packageFromPath(file.getFilePath()) }
     }
+    if (!this.#scanned(file.getFilePath())) return { resolution: 'excluded', module }
 
     // `const X = dynamic(() => import('./X'))` / `lazy(...)`
     const loader = N.isVariableDeclaration(node) ? node.getInitializer() : undefined
@@ -252,7 +265,7 @@ export function directives(file: SourceFile): string[] {
   return out
 }
 
-function unalias(symbol: TsSymbol): TsSymbol {
+export function unalias(symbol: TsSymbol): TsSymbol {
   return symbol.isAlias() ? (symbol.getAliasedSymbol() ?? symbol) : symbol
 }
 
@@ -348,7 +361,7 @@ function isIntrinsic(tag: JsxTagNameExpression): boolean {
 }
 
 /** Module specifier of the import that brought the leftmost identifier of `node` into scope. */
-function importModuleOf(node: Node): string | undefined {
+export function importModuleOf(node: Node): string | undefined {
   let left: Node = node
   while (N.isPropertyAccessExpression(left)) left = left.getExpression()
   if (!N.isIdentifier(left)) return undefined
@@ -363,7 +376,7 @@ function importModuleOf(node: Node): string | undefined {
  * For `const X = pkgFactory(...)` or `const { X } = pkgFactory(...)`, the package that
  * `pkgFactory` was imported from. These are package components created in project code.
  */
-function packageFactoryOf(node: Node): string | undefined {
+export function packageFactoryOf(node: Node): string | undefined {
   const variable = N.isVariableDeclaration(node)
     ? node
     : node.getFirstAncestorByKind(ts.SyntaxKind.VariableDeclaration)
@@ -374,7 +387,7 @@ function packageFactoryOf(node: Node): string | undefined {
 }
 
 /** Bare package specifiers (`next/link`, `@scope/pkg/x`), not relative paths or `@/` aliases. */
-function isPackage(specifier: string): boolean {
+export function isPackage(specifier: string): boolean {
   return /^(@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*(\/.*)?$/i.test(specifier)
 }
 
@@ -387,7 +400,7 @@ function packageFromPath(path: string): string | undefined {
  * True when `element` is only rendered on some paths inside `root`: the branch of a
  * ternary, the right side of `&&`/`||`/`??`, inside an `if`/`switch`, or after an early return.
  */
-function isConditional(element: Node, root: Node): boolean {
+export function isConditional(element: Node, root: Node): boolean {
   let child: Node = element
   for (let node = element.getParent(); node && node !== root; node = node.getParent()) {
     if (N.isConditionalExpression(node) && child !== node.getCondition()) return true

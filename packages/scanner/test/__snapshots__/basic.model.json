@@ -545,5 +545,375 @@
         ]
       }
     }
+  ],
+  "requests": [
+    {
+      "id": "req_23wds4ry0if",
+      "origin": "component",
+      "componentId": "cmp_0ku4o3jpe9o",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/users`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0857a9l1j3p",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 23,
+          "callee": "getUsers"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "02dz0jr9jyy"
+    },
+    {
+      "id": "req_21o1or0unbb",
+      "origin": "component",
+      "componentId": "cmp_0vmo84pmvzo",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/users/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users/:id"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0857a9l1j3p",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/users/[id]/page.tsx",
+          "line": 10,
+          "column": 22,
+          "callee": "getUser"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 20,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1ev2l0nsayb"
+    },
+    {
+      "id": "req_0l0l4hns6qh",
+      "origin": "component",
+      "componentId": "cmp_0yr9r67zb7l",
+      "transport": "axios",
+      "method": "DELETE",
+      "url": {
+        "text": "`/users/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 27,
+          "column": 29
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 18,
+          "column": 13,
+          "callee": "deleteUser"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 9,
+          "column": 10,
+          "callee": "api.delete"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1o678ausr0t"
+    },
+    {
+      "id": "req_0h7xmjn6pcm",
+      "origin": "component",
+      "componentId": "cmp_256fhhuhol5",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/todos?userId=${userId}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos",
+        "query": "userId=:userId"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "components/ProfileCard.tsx",
+          "line": 15,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1tfsxfuhjes",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/ProfileCard.tsx",
+          "line": 16,
+          "column": 5,
+          "callee": "getTodos"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 26,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1n8dsq6vhag"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_23ohd71fojm",
+      "origin": "component",
+      "componentId": "cmp_2dznycb4aq7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "app/layout.tsx",
+        "line": 11,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_12v7saiyoj2"
+    },
+    {
+      "id": "nav_1r9wayox0ec",
+      "origin": "component",
+      "componentId": "cmp_2dznycb4aq7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/about\"",
+        "confidence": "exact",
+        "path": "/about"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 41
+        }
+      },
+      "loc": {
+        "file": "app/layout.tsx",
+        "line": 11,
+        "column": 41
+      },
+      "callStack": [
+        {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 41,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_20chr3ve23a"
+    },
+    {
+      "id": "nav_1gk5rdkvs5s",
+      "origin": "component",
+      "componentId": "cmp_0yr9r67zb7l",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "'/'",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 27,
+          "column": 29
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "components/DeleteUserButton.tsx",
+        "line": 19,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 19,
+          "column": 7,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_12v7saiyoj2"
+    },
+    {
+      "id": "nav_1n7on8z0jek",
+      "origin": "component",
+      "componentId": "cmp_1i8zxr0i8pg",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/users/${user.id}`",
+        "confidence": "pattern",
+        "path": "/users/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/UserList.tsx",
+          "line": 14,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "components/UserList.tsx",
+        "line": 14,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "components/UserList.tsx",
+          "line": 14,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_2656kti2wza"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_2bpz63n90mo",
+      "name": "DeleteUserButton click",
+      "routeId": "rt_2656kti2wza",
+      "componentId": "cmp_0yr9r67zb7l",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_2656kti2wza",
+          "componentId": "cmp_0yr9r67zb7l",
+          "event": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 27,
+            "column": 29
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0l0l4hns6qh"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_1gk5rdkvs5s",
+          "routeId": "rt_12v7saiyoj2"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_23wds4ry0if",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_2656kti2wza",
+        "rt_12v7saiyoj2"
+      ]
+    }
   ]
 }

@@ -7,7 +7,16 @@ export type Screen =
   | { name: 'page'; routeId: string; componentId?: string }
   | { name: 'component'; componentId: string }
   | { name: 'types'; typeId?: string; q: string }
+  | { name: 'live'; captureId?: string; q: string; filter?: MatchFilter }
+  /** `flowId` is an inferred flow id, or a recorded flow id (`rec_...`, `var_...`). */
+  | { name: 'flows'; flowId?: string; q: string }
+  | { name: 'export' }
   | { name: 'not-found' }
+
+/** Live screen: show only captures with this match status. */
+/** Match status, or `mismatch`: matched captures whose data doesn't fit the site's types. */
+export type MatchFilter = 'matched' | 'ambiguous' | 'unmatched' | 'mismatch'
+const MATCH_FILTERS: MatchFilter[] = ['matched', 'ambiguous', 'unmatched', 'mismatch']
 
 export function parseHash(hash: string): Screen {
   const raw = hash.replace(/^#/, '') || '/'
@@ -28,6 +37,17 @@ export function parseHash(hash: string): Screen {
       return { name: 'component', componentId: parts[1] }
     case 'types':
       return { name: 'types', typeId: parts[1], q: params.get('q') ?? '' }
+    case 'flows':
+      return { name: 'flows', flowId: parts[1], q: params.get('q') ?? '' }
+    case 'export':
+      return { name: 'export' }
+    case 'live':
+      return {
+        name: 'live',
+        captureId: parts[1],
+        q: params.get('q') ?? '',
+        filter: MATCH_FILTERS.find((f) => f === params.get('match')),
+      }
   }
   return { name: 'not-found' }
 }
@@ -51,6 +71,17 @@ export function href(screen: Screen): string {
       return `#/component/${encodeURIComponent(screen.componentId)}`
     case 'types':
       return withQuery(screen.typeId ? `/types/${encodeURIComponent(screen.typeId)}` : '/types', {
+        q: screen.q,
+      })
+    case 'export':
+      return '#/export'
+    case 'live':
+      return withQuery(screen.captureId ? `/live/${encodeURIComponent(screen.captureId)}` : '/live', {
+        q: screen.q,
+        match: screen.filter,
+      })
+    case 'flows':
+      return withQuery(screen.flowId ? `/flows/${encodeURIComponent(screen.flowId)}` : '/flows', {
         q: screen.q,
       })
     case 'not-found':

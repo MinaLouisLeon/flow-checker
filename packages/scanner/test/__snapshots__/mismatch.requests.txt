@@ -1,0 +1,20 @@
+# Requests
+
+## HomePage  app/page.tsx:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch  server-render
+  response: Account[]
+  via: getAccounts app/page.tsx:9 > fetch lib/api.ts:5
+
+## SettingsPanel  components/SettingsPanel.tsx:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  fetch  effect
+  response: Settings
+  via: getSettings components/SettingsPanel.tsx:12 > fetch lib/api.ts:10
+
+## TodoPanel  components/TodoPanel.tsx:9
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch  effect
+  response: Todo[]
+  via: getTodos components/TodoPanel.tsx:13 > fetch lib/api.ts:15
+POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch  event onSubmit
+  body: NewTodo
+  response: Todo
+  via: createTodo components/TodoPanel.tsx:19 > fetch lib/api.ts:20

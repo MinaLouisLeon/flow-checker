@@ -19,6 +19,8 @@ const db = {
     { id: 1, name: 'Keyboard', price: 49.9, stock: 12 },
     { id: 2, name: 'Mouse', price: 19.5, stock: 0 },
   ],
+  // `digest` is null until the user picks a frequency (the mismatch fixture declares it non-null).
+  settings: { theme: 'dark', locale: 'en', digest: null },
   challenges: new Map(), // challengeId -> userId
   tokens: new Map(), // token -> userId
 }
@@ -49,6 +51,8 @@ const routes = [
     },
   ],
   ['PATCH', /^\/todos\/(\d+)$/, ({ params, body }) => update(db.todos, params[0], body)],
+
+  ['GET', /^\/settings$/, () => db.settings],
 
   ['GET', /^\/products$/, () => db.products],
   ['GET', /^\/products\/(\d+)$/, ({ params }) => findOr404(db.products, params[0])],

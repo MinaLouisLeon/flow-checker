@@ -27,11 +27,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm typecheck:fixtures
       - run: pnpm test
       - run: pnpm build
+      # Fixtures import the built @integr8-media/flow-checker (their capture hooks).
+      - run: pnpm typecheck:fixtures
       - name: Verify published package (pack, install, run, typecheck)
         run: pnpm verify:package
+      - name: Verify every config option in the published package
+        run: pnpm verify:config
 
   fixtures:
     name: Build fixture apps
@@ -44,6 +47,80 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - name: Start mock API
         run: node fixtures/mock-api/server.js &
       - run: pnpm --filter "./fixtures/**" --filter "!@fixtures/mock-api" build
+
+  e2e:
+    name: End-to-end capture (Playwright, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-${{ matrix.os }}
+          path: playwright-report/
+          retention-days: 7
+
+  next-matrix:
+    name: Next.js ${{ matrix.next }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        next: ["13.4", "14.2", "15.2", "15.5", "16"]
+        os: [ubuntu-latest]
+        include:
+          # The oldest and newest supported versions also run on Windows and macOS.
+          - { next: "13.4", os: windows-latest }
+          - { next: "16", os: windows-latest }
+          - { next: "13.4", os: macos-latest }
+          - { next: "16", os: macos-latest }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      # Installs that Next.js version in a fresh app with the packed package, then checks
+      # init, doctor, scan and live capture (scripts/next-matrix.mjs).
+      - run: node scripts/next-matrix.mjs ${{ matrix.next }}
+
+  performance:
+    name: Large repo performance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      # A synthetic app with 200 features (~1,800 files, 400 pages, 1,000 requests).
+      # Budgets are about twice the measured times, to catch regressions, not noise.
+      - run: node scripts/perf/bench.mjs 200
+        env:
+          FLOW_CHECKER_BUDGET_SCAN_MS: "25000"
+          FLOW_CHECKER_BUDGET_RESCAN_MS: "8000"
+          FLOW_CHECKER_BUDGET_API_MS: "1000"

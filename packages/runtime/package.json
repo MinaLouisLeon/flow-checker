@@ -7,7 +7,10 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
-    "./server": "./src/server.ts"
+    "./server": "./src/server.ts",
+    "./options": "./src/options.ts",
+    "./redact": "./src/redact.ts",
+    "./next": "./src/next.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

@@ -1,0 +1,19 @@
+# Types
+
+Account  interface  types/index.ts:5
+  { id: string; name: string; email: string; avatarUrl: string }
+Settings  interface  types/index.ts:15
+  { theme: "light" | "dark"; locale: string; digest: { frequency: "daily" | "weekly" } }
+Todo  interface  types/index.ts:23
+  { id: number; userId: number; title: string; done: boolean }
+NewTodo  interface  types/index.ts:30
+  { title: string; userId: number }
+
+# Component types
+
+RootLayout  app/layout.tsx:5
+  props: { children: ReactNode }
+SettingsPanel  components/SettingsPanel.tsx:8
+  uses: Settings
+TodoPanel  components/TodoPanel.tsx:9
+  uses: Todo

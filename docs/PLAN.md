@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: planning only, no code yet. Date: 2026-10-27.
+> Status: M0–M10 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export). M11 (public release) is built; v0.1.0 is ready to tag and publish. Updated: 2026-10-29.
 
 ## 1. Goal
 
@@ -44,7 +44,7 @@ It maps how the whole project works: pages, components, requests, types and user
         │                     │   sessions/*.json  │
         ▼                     └─────────▲──────────┘
  ┌──────────────────────────┐           │
- │ Tool server (Hono + WS)  │───────────┘
+ │ Tool server (Hono + SSE) │───────────┘
  │  - serves dashboard :4400│◀──── capture events ────┐
  │  - ingest endpoint       │                         │
  │  - matcher + verifier    │                         │
@@ -92,7 +92,7 @@ flow-checker/
 | Concern       | Choice                                                                           | Why                                                                                            |
 | ------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | AST + types   | **ts-morph** (TypeScript compiler API)                                           | Required for fully resolved types (generics, `Pick`, `z.infer`). SWC and Babel don't do types. |
-| Server        | **Hono** on Node, with `ws`                                                      | Small and fast. Serves the API, WebSocket and static dashboard.                                |
+| Server        | **Hono** on Node, with server-sent events                                        | Small and fast. Serves the API, live feed and static dashboard. SSE needs no extra dependency. |
 | Dashboard     | **React + Vite + @xyflow/react** (graph) + TanStack Query                        | React Flow is the standard for interactive node graphs.                                        |
 | File watching | **chokidar**                                                                     | Reliable across platforms, including Windows.                                                  |
 | Validation    | **zod** for internal files. A custom checker compares captured data to TS types. |                                                                                                |
@@ -113,13 +113,16 @@ RequestSite    { id, componentId, routeId, trigger: page-load|event(onSubmit|onC
                  transport: fetch|axios|client-wrapper|react-query|swr|server-action|route-handler,
                  method, urlPattern: "/api/users/:id", urlConfidence: exact|pattern|unknown,
                  bodyType?: TypeRef, responseType?: TypeRef, chain?: RequestSiteId[],  // BFF hop
-                 callStack: SourceLoc[], status: inferred|verified|needs-recheck|mismatch, flags: Flag[] }
+                 callStack: SourceLoc[], hash, status: inferred|verified|needs-recheck|mismatch, flags: Flag[] }
 TypeRef        { name, definedAt: SourceLoc, resolved: TypeShape }   // TypeShape = JSON-like IR
-Flow           { id, name, steps: FlowStep[], source: inferred|recorded|both, status }
-FlowStep       { order, routeId, componentId, action, requestSiteId?, onSuccess?: next, onError?: next }
+Navigation     { id, origin: component|server-action, kind: link|push|replace|redirect|permanent-redirect,
+                 api: next|next-intl, href: RequestUrl, targetRouteId?, trigger, outcome?: success|error, loc }
+Flow           { id, name, routeId?, componentId, steps: FlowStep[], branches: { after, outcome: error, steps }[],
+                 routeIds[] }        // source + status (inferred|both, confirmed|partial) come from recording
+FlowStep       interaction{ routeId, componentId, event } | request{ siteId, onLoad? } | navigate{ navigationId, routeId? }
 Capture        { id, sessionId, timestamp, routeUrl, request{method,url,headers,body},
                  response{status,headers,body,durationMs}, origin: browser|server,
-                 attribution{ stack[], componentChain[], interaction? }, matchedSiteId?, matchScore,
+                 attribution{ stack[], componentChain[], interaction? }, sourceStack?, match?{status,siteId,score,candidates},
                  redacted: boolean, typeCheck?: Mismatch[] }
 Session        { id, startedAt, events: (navigation|interaction|capture)[] }   // used to record flows
 Flag           { kind: unknown-response|dynamic-url|unconfirmed-flow|type-mismatch|unmatched-capture|stale, message }
@@ -175,22 +178,45 @@ Detect each call, then **trace it back up the call graph** to the component and 
   Branches (`onError`, `if (res.ok)`) become alternative paths.
 - Flows are named from the starting component and route (e.g. "LoginForm submit"), and you can rename them in the UI.
 
+**Built in M7** (`packages/scanner`: `navigation.ts`, `flows.ts`):
+
+- Navigation is found on the request walk, so it gets the same origin, trigger and string resolution (`` `/verify?challenge=${id}` `` → `/verify?challenge=:id`). Supported: `next/link`, `next/navigation` (`useRouter().push/replace`, `redirect`, `permanentRedirect`) and next-intl `createNavigation()` wrappers, including renamed exports and `{ href }` / `{ pathname, params }` targets. Hrefs resolve to routes, static segments first. For next-intl the `[locale]` prefix is added.
+- **Outcome:** a navigation is on the `success` path in a `try` block, `onSuccess`, `.then`, or an `if` that checks a response (`res.ok`, `status`); on the `error` path in `catch`, `onError`, `.catch` or the failing side of that `if`. Mutation `onSuccess`/`onError`/`onSettled` callbacks are now walked too.
+- **Flows:** start at each event handler that sends a request. Steps: interaction → its requests (server action redirects included) → success navigation → the next page's load requests (its own component tree, not layouts) → the next page's handler that sends a request and moves on (forms first), and so on, until a page repeats. Error navigations become branches. A handler that only continues another flow is not listed separately (the OTP form is part of "LoginForm submit").
+- Middleware redirects are not scanned yet.
+- `flow-checker scan --flows` prints navigation and flows; snapshot `<fixture>.flows.txt`.
+
 ### 6.7 Incremental re-scan
 
 - Keep a reverse dependency map (file → entities that depend on it).
 - On a chokidar change: refresh that file in ts-morph, re-run the stages for the affected entities, compare old and new entities, and push the changes over WebSocket.
 - If a request site's hash changed, set its status to `needs-recheck` and keep the old captures, marked stale.
 
+**Built in M9** (`packages/scanner`: `scan.ts` `createScanSession`, `code-hash.ts`; `packages/server`: `watch.ts`, `history.ts`, `scan-feed.ts`; `packages/shared`: `diff.ts`):
+
+- **Warm session instead of a dependency map.** `createScanSession()` keeps the ts-morph project. `update({ changed, added, removed })` re-reads only those files, then runs every stage again on the warm project. The compiler reuses everything else, so this takes about 75–300 ms on the fixtures (a cold scan takes 0.8–2.5 s). That is fast enough without tracking which entities depend on which file. Imports are only resolved again when a file was added or a changed file's imports changed (it's the slowest step). Changes to `tsconfig.json`, `jsconfig.json`, `package.json` or `next.config.*` start a fresh project.
+- **Warm-up.** The first program rebuild after any change costs about a second, later ones much less. `session.warm()` pays for it right after start, so the first edit is fast too.
+- **Watcher.** chokidar watches the project root, skipping `node_modules`, `.next`, `.git`, `.flow-checker` and build output, and only reports source files and project config files. Events are batched (40 ms). Each batch is re-scanned, written to `model.json` and published to the server. A failed re-scan is printed and the next change starts over. `--no-watch` turns it off.
+- **Code hash.** Each request site has a `hash` of the code that sends it: the transport, method, URL, trigger and hook, plus the code along its call path. In the origin (component, route handler or action) only the part around the call counts: the JSX attribute, the nearest function inside it (handler, effect), or the statement. The functions the path enters (handlers, wrappers) count in full. The code is hashed as AST tokens, so whitespace, comments and line numbers don't count. Types don't count either: they don't change what is sent, and M8 re-checks old captures against new types anyway.
+- **Stale captures.** `.flow-checker/cache/code-hashes.json` remembers when each hash was first seen. A capture taken before its site's current hash appeared is **stale**. A site with only stale captures is `needs-recheck`, with a `stale` flag. A new capture makes it `verified` again. The type check uses captures of the current code while there are some. The first run ever sets a baseline (existing captures count as current). Code edited while the tool was off is noticed on the next start. Hashes no longer in the code are forgotten, so undoing an edit also asks for a re-check.
+- **Ids that moved.** Site ids include line numbers, so adding a line above a request gives it a new id. After a re-scan, removed and added sites are paired by hash (only moved), then by call path without line numbers (moved and changed). Only unambiguous pairs. A paired site keeps its automatic matches (instead of scoring again with outdated lines), and manual matches in `overrides.json` move to the new id.
+- **Live update.** The server applies the new model, matches every capture again and sends a `scan` event on `/api/live` (server-sent events, which the dashboard already uses, rather than a WebSocket): files, entity counts added/removed/changed, sites whose code changed, and sites that now need a re-check. `/api/live` is on whenever files are watched, even without capture. Capture summaries carry `stale`.
+- Dashboard: refetches the model on `scan`, `↻ needs re-check` badge, `stale` badge on captures (Live screen and request panel), a "code changed" banner and the changed file next to the scan time, and a "Requests whose code changed since they were captured" group on the overview.
+- **Check:** `watch.test.ts` (CLI) runs `dev` on a copy of the basic fixture with its recorded captures. Moving lines keeps every site verified. Editing `getUsers` makes only that site `needs-recheck`, with the `scan` event and the model update arriving in under 1 s (about 170 ms). A new capture verifies it again. An edit made while the tool was off is noticed on start. `incremental.test.ts` checks that every session update equals a fresh scan, and the hash rules. `e2e/watch.spec.ts` edits `LoginForm.tsx` in the running next-intl fixture: the dashboard shows `↻ needs re-check` within 1 s (about 480 ms), then a new login shows `✓ verified` again.
+- **M11:** the warm session runs in a worker thread (`dist/scan-worker.js`), so the server keeps answering during large re-scans. Scans are queued one at a time. From source (tests) it runs in-process. Middleware is still not scanned.
+
 ## 7. Runtime capture (`packages/runtime`)
 
 ### 7.1 Injection with no manual setup
 
-The tool runs the dev command with `FLOW_CHECKER=1` and `FLOW_CHECKER_INGEST=http://localhost:4400/ingest`.
+The tool runs the dev command with `FLOW_CHECKER=1`, `PORT=<app port>`, and the runtime settings as JSON (ingest URL, a per-project ingest token, resolved capture options) in `FLOW_CHECKER_RUNTIME` (server) and `NEXT_PUBLIC_FLOW_CHECKER` (browser, inlined by Next).
 
 - **Next 15.3+:** use `instrumentation-client.ts` (browser) and `instrumentation.ts` (server).
 - **Next 13.4–15.2:** `instrumentation.ts` for the server (with `experimental.instrumentationHook` where needed). The browser runtime comes from a small `withFlowChecker()` wrapper in `next.config` that prepends the client entry.
 - `flow-checker init` makes these one-line additions, with your confirmation. Every hook is a **no-op unless `FLOW_CHECKER=1`**, and the runtime is excluded from production builds.
 - `flow-checker doctor` checks the setup.
+- **Built in M5:** the 15.3+ path. `dev` warns when a hook is missing.
+- **Built in M11:** `withFlowChecker()` (`@integr8-media/flow-checker/next`, ESM and CommonJS). Before 15.3 it prepends the project's own `instrumentation-client.*` to the webpack `main-app` client entry in dev, so the same hook files work on every version; before 15.0 it also sets `experimental.instrumentationHook`. It returns the config untouched without `FLOW_CHECKER=1` or on 15.3+, and accepts config functions. Turbopack ignores webpack config, so browser capture before 15.3 needs `next dev` without `--turbo` (`doctor` warns). `init` prints the wrapper snippet when it is needed.
 
 ### 7.2 Browser side
 
@@ -202,13 +228,16 @@ The tool runs the dev command with `FLOW_CHECKER=1` and `FLOW_CHECKER_INGEST=htt
   - the **last user interaction**: event type and target element. From the element's React fiber (`__reactFiber$…`), it walks up to the component names. This works for event-driven requests even when the stack loses async frames.
   - the current URL
 - It also records **navigation** events (history patch + `popstate`) and **interaction** events into a session timeline, which is used to record flows.
-- Events are sent in batches over `navigator.sendBeacon` / `fetch` to the ingest endpoint, which is excluded from capture.
+- Events are sent in batches over `navigator.sendBeacon` / `fetch` to the ingest endpoint, which is excluded from capture. Batches are `text/plain` with `mode: 'no-cors'` (a CORS simple request, no preflight) and carry the ingest token.
+- Next's own RSC requests (`RSC: 1` header, `_rsc` param) are skipped. Same-origin requests get an `x-flow-checker-link: <sessionId>.<captureId>` header so server captures can point back to them.
 
 ### 7.3 Server side (`instrumentation.ts`)
 
-- Wrap `globalThis.fetch` after Next's own patch, and add an undici/http hook for axios on Node.
-- Use `AsyncLocalStorage` (with Next's request context) to link each outgoing call to the incoming request (route handler, server action, or RSC render of route X). This is how the **BFF two-hop chain** and server component fetches get linked.
-- **Server Actions:** map the action ID to its file and export using `.next/server/server-reference-manifest.json`.
+- `globalThis.fetch` is wrapped through a property accessor. Next's dev server puts the native fetch back on hot reload (`resetFetch` in `router-server`), so a plain wrapper would silently disappear; the accessor wraps whatever gets assigned, except Next's patched fetch (which already calls ours).
+- Node's `http`/`https` (axios on Node) are captured through the `http.client.request.start` / `http.client.response.finish` diagnostics channels. Request bodies are tapped on `ClientRequest.prototype.write/end`, response bodies by tapping `emit('data')` (no extra listener, so streams keep their mode).
+- `http.server.request.start` puts the incoming request into an `AsyncLocalStorage`, so each outgoing call records its `parent` (method, URL, `Next-Action` id, and the browser capture from `x-flow-checker-link`). This is how the **BFF two-hop chain** and server component fetches get linked.
+- **Server Actions:** the runtime records the action ID. The tool server maps it to its file and export with `server-reference-manifest.json` (`.next/dev/server/` on Next 16, `.next/server/` before), re-read when it changes.
+- Next's own RSC requests (`RSC: 1`, e.g. the page Next fetches from itself after a server action redirects) are skipped, as in the browser.
 - Edge runtime: best effort (`fetch` patch only). This is documented as a limit.
 
 ### 7.4 Redaction (default ON)
@@ -230,7 +259,9 @@ The tool runs the dev command with `FLOW_CHECKER=1` and `FLOW_CHECKER_INGEST=htt
   }
   ```
 - If `storeRaw: true`, the CLI prints a warning at startup, and `export` still redacts unless you pass `--raw`.
-- `.flow-checker/captures/` and `sessions/` are added to `.gitignore` on first run.
+- `.flow-checker/captures/`, `sessions/` and `cache/` are added to `.gitignore` on first run, unless a `.gitignore` up to the repo root already covers them.
+- The tool server redacts every capture again on arrival (unless `storeRaw`), as a safety net. Redaction is idempotent.
+- Masked numbers become `0` and booleans `false`. Each capture lists what was masked in `redactedPaths`. Sensitive query parameters in URLs are masked too.
 
 ## 8. Matching and verification (`packages/server`)
 
@@ -248,12 +279,40 @@ Captures are matched to scanned request sites with a score:
 - Two sites with similar scores → "ambiguous" flag, and you pick the right one in the UI. Your choice is remembered.
 - No match → `unmatched-capture` flag. This usually means the scanner missed something, so it's reported as a scanner gap.
 
+**Built in M6** (`packages/server`: `matcher.ts`, `verify.ts`, `stack.ts`, `actions.ts`):
+
+- **Hard filters first.** A site is only a candidate if it fits: same side (browser or server, from the trigger), same method, URL matches the pattern (a base from an env variable is not enforced), a browser Server Action call only matches server-action sites (and the right action when the manifest resolves it), a hop inside a route handler only matches sites of that handler and method.
+- **Points** (`MATCH_THRESHOLD` 40, `MATCH_MARGIN` 15): action id → manifest 100 (60 for fetches inside the action), source-mapped stack frames on the site's call path 25 each (max 75), URL 35–40 (+5 same fixed base, +3 per query key), interaction component 15–30, parent request matched to a site whose `chain` leads here 40, route handler 40, route 15 (25 for server render), stack function names 5–20, trigger fit −10…+10.
+- **Source maps:** the server resolves frames through the dev build's `.map` files (Turbopack index maps and webpack `webpack-internal://` frames) **when the capture arrives**, and stores them as `sourceStack`, because chunks change on rebuild.
+- **Ambiguous** when the best two are closer than the margin. **Unmatched** when nothing reaches the threshold. Both stay in `captures/_unmatched/`. Matched captures are filed under `captures/<siteId>/`.
+- **Manual assignment** (`PUT/DELETE /api/captures/:id/match`) is saved in `overrides.json` by fingerprint (side, method, URL shape, action, incoming request, nearest component), so it applies to similar captures later.
+- **Status:** `/api/model` serves sites with a matched capture as `verified`. Captures are matched again after each re-scan, and server hops again once their browser request is matched. The live feed sends `verification` events, and the dashboard shows match badges, evidence, an assign control, verified badges and route colors.
+- **Check:** `scripts/record-captures.mjs` records real captures from every fixture (`packages/server/test/recordings/`). `matching.test.ts` requires ≥95% auto-matched (currently all of them, each to the right site per the snapshot), and ≥90% even without source maps or the manifest.
+
 **Type check:** the captured response and body are validated against the site's `TypeShape`. The results are `ok`, `missing field`, `extra field`, `wrong type`, or `null where non-null`. Any mismatch flags the site, and the UI shows the difference.
+
+**Built in M8** (`packages/shared`: `type-check.ts`, `verification.ts`; `packages/server/src/verify.ts`):
+
+- `checkCapture()` compares a matched capture's request body (`bodyType`) and response (`responseType`) with the site's types. Each part is `ok`, `mismatch` or `skipped` with a reason. Skipped: error responses (non-2xx, the type describes success), server action calls (React-encoded, not JSON; the action's own fetches are checked), form data, binary, truncated bodies, failed requests. An empty body is fine for `void`/`undefined`.
+- Mismatch kinds: `missing-field`, `extra-field`, `wrong-type`, `null`. Paths use the `redactedPaths` form (`response.body.user.email`). Array items share one path (`response.body[].id`) with a count. Tuple positions keep their index.
+- Rules: optional and `| undefined` properties may be missing; index signatures check unknown keys; `{}` accepts any object; unions report against the closest member (same JSON kind, matching literal discriminant, then fewest mismatches), or as a whole for scalar unions; object intersections are merged; branded primitives check only the primitive; `Date` accepts a string; `Promise<T>`/`Array<T>` unwrap; package types, type parameters and unresolved shapes are not checked. Masked values (`[REDACTED:string]`, `0`, `false`) only need the right JSON type.
+- The verifier runs it on every matched capture (on arrival and after each re-scan, so fixing a type clears the flag) and stores it as `Capture.typeCheck`. A `typeCheck` sent by the runtime is dropped.
+- `applyVerification()` (shared by server and dashboard) sets site status `mismatch` and adds a `type-mismatch` flag listing what didn't fit and in how many captures. `/api/verification` has per-site `typeCheck` (`checked`, `mismatched`, distinct mismatches). Capture summaries carry `typeCheck: ok|mismatch|skipped`.
+- Dashboard: `✗ type mismatch` badge, a type-check table on each request (field, problem, expected, captured, captures), a "Type check" section and `✗ types` badge on captures in Live, a "Type mismatch" filter, and a group on the overview to-do list.
+- **Check:** the `mismatch` fixture (types that disagree with `mock-api` on purpose; `GET /settings` added to the mock) is recorded like the others. `type-check.test.ts` requires the expected flags there (wrong type, missing and extra field, null, request body), `verified` with no flag for its correct site, and **no** mismatches in the five correctly typed fixtures.
 
 **Flow recording:** a session timeline is split into flows at the starting interaction (e.g. a submit). The ordered steps are matched to inferred flows:
 - If they match, the flow becomes `both` (confirmed).
 - If you took an unexpected path, it's added as a new `recorded` variant.
 - Inferred branches that were never exercised stay flagged as `unconfirmed`.
+
+**Built in M7** (`packages/server/src/flows.ts`):
+
+- Each session timeline (interactions, navigation, browser captures with their matched site) is checked against every inferred flow. A flow is split into segments, one per interaction. A segment's requests and navigation must show up after its interaction and before the next segment's interaction (any order, within 60 s; the next interaction within 10 min). Server-render requests aren't linked to a browser session, so they don't block confirmation.
+- Results (`GET /api/flows`, live `flows` event): `confirmed` (walked end to end, source `both`), `partial` (started, stopped early), `unconfirmed`. Error branches are marked seen when a session takes them.
+- A walk that navigates to a page the flow doesn't predict becomes a `variant` recorded flow.
+- **Named recording:** start/stop in the Live screen (`POST /api/recordings`, `POST /api/recordings/stop`). Everything in between is saved in `overrides.json`, linked to the inferred flow it walks. Flow renames are saved there too (`PUT /api/flows/:id/name`).
+- Dashboard: Flows screen (step list with done marks, branches, rename, recorded variants), flows per page, navigation edges on the map, flow count on the overview.
 
 ## 9. Dashboard (`packages/dashboard`)
 
@@ -268,7 +327,7 @@ Captures are matched to scanned request sites with a score:
 | **Types**           | Searchable index of all types, showing where each is defined and which components and requests use it.                                                                                                                                                                               |
 | **Export**          | Buttons for Markdown and HTML, with a redaction toggle.                                                                                                                                                                                                                              |
 
-Live updates over WebSocket. "Open in editor" links use `vscode://file/...`.
+Live updates over server-sent events (`/api/live`). "Open in editor" links use `vscode://file/...`.
 
 ## 10. Export (`packages/exporter`)
 
@@ -286,6 +345,17 @@ issues.md            open flags, type mismatches, unmatched captures
 
 Both formats redact by default.
 
+**Built in M10** (`packages/exporter`; `packages/server/src/snapshot.ts`; `flow-checker export`; dashboard Export screen):
+
+- **Snapshot first.** `collectSnapshot()` scans fresh, reads `.flow-checker/` (captures, sessions, overrides) **without changing it** (read-only store, in-memory code history) and runs the same verifier and flow tracker as `dev`. `buildSnapshot()` does the same from a running server (`POST /api/export`). The result is one `ExportData` object (`packages/shared/src/export.ts`): the served model (statuses, flags, flow names), verification, flow results and captures.
+- **Captures:** redacted again with the config's rules unless `--raw` (which only matters with `capture.storeRaw`), absolute project paths removed from stack frames, the newest 10 per site and 100 unmatched kept, plus every capture the verification points at.
+- **Markdown** is a pure function of the snapshot, so fixtures have golden files (`packages/exporter/test/golden/<fixture>/md`, recorded captures from `packages/server/test/recordings`). File names: `pages/users.[id].md`, `components/<Name>.md` (`<Name>.<file>` when names repeat), `flows/<slug>.md`, `flows/recorded.md` when there are recordings. Requests are documented with their types, type-check table and the newest successful and failed captured examples; BFF and server action hops are nested under the request that leads to them. Flow sequence diagrams show the user, each page, the app server, route handlers and external APIs.
+- **Static HTML:** the dashboard build plus `data.js` (`window.__FLOW_CHECKER__`). The dashboard reads everything from it, hides what needs a server (re-scan, live feed, assign, record, rename, export) and labels Live as Captures. The bundle has no imports, so it is loaded as a classic script and `index.html` also works from `file://`. The embedded data is golden-tested too (`golden/<fixture>/html/data.json`).
+- **Writing:** each export folder gets `.flow-checker-export.json` listing its files. The next export replaces those (and removes pages that are gone) and nothing else. A folder with other files and no manifest is refused unless `--force`.
+- **CLI:** `flow-checker export --md <dir> --html <dir> [--raw] [--force]`. With neither flag, both go to `export.md` / `export.html` from the config, default `docs/flow` and `.flow-checker/site`.
+- **Dashboard:** an Export screen with a button per format and the redaction toggle (only changeable with `capture.storeRaw`), writing to the config folders.
+- **Check:** `markdown.test.ts` and `html.test.ts` compare every fixture with its golden files; `snapshot.test.ts` covers redaction, path removal, trimming and the read-only guarantee; `e2e/export.spec.ts` opens an exported site from disk and uses the Export screen.
+
 ## 11. CLI
 
 ```
@@ -296,11 +366,20 @@ flow-checker export     # --md <dir> | --html <dir> [--raw]
 flow-checker doctor     # check Next version, hooks, ports, tsconfig
 ```
 
-Options: `--port`, `--app-port`, `--dev-command "pnpm dev"`, `--no-open`, `--config`.
+Options: `--port`, `--app-port`, `--dev-command "pnpm dev"`, `--no-open`, `--no-watch`, `--config`.
 
 Package manager (npm, pnpm, yarn or bun) is detected from the lockfile.
 
+**Built in M11:** `doctor` checks Node (22.12+, 22.18+ for a `.ts` config), the config file, the App Router directory (warns about `pages/`), the Next version (13.4+), `tsconfig`/`jsconfig` (parse errors, path aliases), that the package is installed, both hooks, `withFlowChecker()` before 15.3, Turbopack before 15.3, both ports and `.gitignore`. Each problem comes with a fix; exit code 1 on a failed check. `scan` now loads the config too. `--no-app` prints the environment to start the app with. Not done: `scan --fail-on`.
+
 ## 12. Config file (`flow-checker.config.ts`)
+
+**Built in M11** (documented in [config.md](config.md); `init` writes the defaults into the new file):
+
+- `root`: resolved from the config file's folder (default `.`); `.flow-checker/` and the dev command use it. `doctor` loads the config first, so every check uses it.
+- `include` / `exclude`: globs from the root (`packages/shared/src/glob.ts`). Defaults `['**']` and tests/specs/stories/`__tests__`/`__mocks__`; a user list replaces the default. Excluded pages and route handlers are dropped, components declared in excluded files appear as `resolution: 'excluded'` and are not walked, and the request walk doesn't enter excluded functions.
+- `apiClients`: `{ module, methods }[]`, default `[]`. A call becomes a site with transport `api-client` and `client: { module, name }` when its callee is a listed name imported from the module (as written, or resolving to the same project file, also through barrels), a method on such an import, or on an instance created from it (`ky.create()`, also when imported from another file). `default` = calling the import or instance. Method from a verb name, else the `method` option, else GET; URL from the first argument (or `url`), with `prefixUrl`/`baseURL` from the instance; body from `json`/`body`/`data` or the second argument of `post`/`put`/`patch`; response from a type argument. A configured project module is the request itself (not entered). `doctor` warns when a listed package isn't installed.
+- `types.maxDepth` is passed to the type resolver.
 
 ```ts
 import { defineConfig } from 'flow-checker/config'
@@ -331,29 +410,37 @@ export default defineConfig({
 .flow-checker/
 ├─ model.json          # scan result (safe to commit)
 ├─ overrides.json      # user decisions: renamed flows, manual matches (safe to commit)
-├─ captures/<siteId>/<captureId>.json   # gitignored by default
+├─ captures/<siteId>/<captureId>.json   # gitignored by default (`_unmatched/` until matched to a site)
 ├─ sessions/<sessionId>.json            # gitignored by default
-└─ cache/              # scan cache keyed by file hash (gitignored)
+└─ cache/              # gitignored: ingest token, code-hashes.json (when each request's code was first seen, M9)
 ```
 
 Every file is checked against a zod schema with a `version` field, so the format can change safely later.
 
 ## 14. Milestones
 
-| #   | Milestone                                                                                                                                                   | Done when                                                                         |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| M0  | **Setup:** monorepo, tsup/Vite builds, Vitest, fixtures (basic, react-query, server-actions, bff, next-intl)                                                | CI green on an empty pipeline                                                     |
-| M1  | **Routes + components** scan                                                                                                                                | Snapshot tests: route tree and component trees for all fixtures                   |
-| M2  | **Request sites:** fetch/axios/wrappers, React Query/SWR, server actions, route handlers + chain, triggers, URL patterns                                    | Every fixture request detected with the right component and trigger               |
-| M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      |
-| M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              |
-| M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard |
-| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             |
-| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                |
-| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        |
-| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      |
-| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   |
-| M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     |
+| #   | Milestone                                                                                                                                                   | Done when                                                                         | Status               |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------- |
+| M0  | **Setup:** monorepo, tsup/Vite builds, Vitest, fixtures (basic, react-query, server-actions, bff, next-intl)                                                | CI green on an empty pipeline                                                     | ✅ Done              |
+| M1  | **Routes + components** scan                                                                                                                                | Snapshot tests: route tree and component trees for all fixtures                   | ✅ Done              |
+| M2  | **Request sites:** fetch/axios/wrappers, React Query/SWR, server actions, route handlers + chain, triggers, URL patterns                                    | Every fixture request detected with the right component and trigger               | ✅ Done              |
+| M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      | ✅ Done              |
+| M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done              |
+| M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done              |
+| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done              |
+| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done              |
+| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done              |
+| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done              |
+| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | ✅ Done              |
+| M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | Built, not published |
+
+### M11 notes
+
+- **Docs:** user README in `packages/flow-checker/README.md` (shown on npm), `docs/config.md`, `CHANGELOG.md`, MIT `LICENSE`.
+- **Next.js matrix:** `scripts/next-matrix.mjs` creates a small app per version (13.4.19, 14.2.35, 15.2.9, 15.5.28, 16.4.3), installs the packed package, runs `init` (+ `withFlowChecker()` before 15.3), `doctor`, `scan`, then `dev` with Chromium: a page-load server fetch, a click-triggered browser fetch and the route handler's upstream fetch must be captured, matched, and linked as a two-hop chain. CI runs every version on Linux, and 13.4 and 16 also on Windows and macOS. Next 13.4–13.5 dev-server IPC to its render workers (`/?key=…&method=…`) is ignored by default.
+- **OS:** lint/typecheck/test/build/package checks and the Playwright e2e suite run on Linux, Windows and macOS in CI.
+- **Performance:** `scripts/perf/generate-app.mjs` writes a synthetic app; `scripts/perf/bench.mjs` measures it. At 200 features (1,808 files, 401 pages, 804 components, 1,000 requests): cold scan ~9–10 s, re-scan after an edit ~3.4 s, and the slowest dashboard API answer during re-scans fell from ~4,000 ms (main thread) to ~170 ms (worker). CI fails above 25 s / 8 s / 1 s. Profiling shows the time spread over import resolution (~4 s cold) and symbol/type lookups, with no single hot spot; per-file caching and lazy type resolution remain options for later.
+- **Release:** `.github/workflows/release.yml` publishes on a `v*` tag that matches the package version, after every check, with `pnpm publish --provenance` (needs `NPM_TOKEN` or npm trusted publishing, and an `npm` environment). `verify:package` also checks `./next` from ESM, CommonJS and TypeScript.
 
 Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11.
 

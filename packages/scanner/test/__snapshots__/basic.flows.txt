@@ -1,0 +1,19 @@
+# Navigation
+
+## RootLayout  app/layout.tsx
+link / -> /  event onClick
+link /about -> /about  event onClick
+
+## DeleteUserButton  components/DeleteUserButton.tsx
+push / -> /  event onClick  success
+
+## UserList  components/UserList.tsx
+link /users/:id -> /users/[id]  event onClick
+
+# Flows
+
+## DeleteUserButton click  (/users/[id] -> /)
+1. DeleteUserButton onClick on /users/[id]
+2. DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+3. push -> /
+4. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users

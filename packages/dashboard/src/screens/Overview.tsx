@@ -1,20 +1,38 @@
+import { isVerified } from '@flow-checker/shared'
+import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import type { NoteKind, ScanNote } from '../model-index'
 import { href } from '../router'
 import { Empty, Section, SourceLink } from '../ui'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
+  'needs-recheck': 'Requests whose code changed since they were captured',
+  'type-mismatch': "Requests whose data doesn't match the types",
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
+  request: 'Requests the scan could not fully resolve',
 }
 
 export function Overview() {
-  const { index } = useData()
+  const { index, meta } = useData()
+  const verification = useVerification(Boolean(meta.capture))
+  const flowRuns = useFlows(Boolean(meta.capture)).data
+  const confirmedFlows = index.model.flows.filter((f) => flowRuns?.flows[f.id]?.status === 'confirmed').length
+  const counts = verification.data?.counts
   const { model } = index
   const pages = model.routes.filter((r) => r.kind === 'page')
   const handlers = model.routes.filter((r) => r.kind === 'route-handler')
   const byKind = (kind: string) => model.components.filter((c) => c.kind === kind).length
+  const clientRequests = model.requests.filter((s) => s.origin === 'component')
+  const onLoad = clientRequests.filter((s) =>
+    ['server-render', 'page-load', 'effect'].includes(s.trigger.kind),
+  ).length
+  const onEvent = clientRequests.filter((s) => s.trigger.kind === 'event').length
+  const serverHops = model.requests.length - clientRequests.length
+  const verified = model.requests.filter(isVerified).length
+  const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
+  const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
     <div className="screen">
@@ -31,23 +49,81 @@ export function Overview() {
           detail={`${byKind('server')} server · ${byKind('client')} client · ${byKind('shared')} shared`}
         />
         <Stat label="Types" value={model.types.length} link={href({ name: 'types', q: '' })} />
-        <Stat label="Requests" value="—" detail="Not scanned yet" />
-        <Stat label="Flows" value="—" detail="Not scanned yet" />
+        <Stat
+          label="Requests"
+          value={model.requests.length}
+          detail={`${onLoad} on load · ${onEvent} on events · ${serverHops} server-side`}
+        />
+        <Stat
+          label="Flows"
+          value={model.flows.length}
+          detail={
+            meta.capture ? `${confirmedFlows} confirmed` : `${model.navigations.length} navigation links`
+          }
+          link={href({ name: 'flows', q: '' })}
+        />
       </div>
 
       <Section title="Verification">
-        <div className="progress" role="progressbar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100}>
-          <div className="progress-bar" style={{ width: '0%' }} />
+        <div
+          className="progress"
+          role="progressbar"
+          aria-valuenow={percent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <div className="progress-bar" style={{ width: `${percent}%` }} />
         </div>
         <p className="muted">
-          Everything on this map comes from the code scan. Requests become verified once live capture records
-          them while you use the app.
+          {verified} of {model.requests.length} requests verified. Everything on this map comes from the code
+          scan. Requests become verified once live capture records them while you use the app.
         </p>
+        {counts && counts.matched + counts.ambiguous + counts.unmatched > 0 && (
+          <ul className="list">
+            <li>
+              <a href={href({ name: 'live', q: '', filter: 'matched' })}>
+                {counts.matched} captured requests matched to a request site
+              </a>
+              {counts.manual > 0 && <span className="muted"> ({counts.manual} assigned by you)</span>}
+            </li>
+            {counts.ambiguous > 0 && (
+              <li>
+                <span className="warn-icon" aria-hidden>
+                  ⚠
+                </span>
+                <a href={href({ name: 'live', q: '', filter: 'ambiguous' })}>
+                  {counts.ambiguous} could be more than one request site. Pick the right one.
+                </a>
+              </li>
+            )}
+            {mismatched > 0 && (
+              <li>
+                <span className="warn-icon" aria-hidden>
+                  ⚠
+                </span>
+                <a href={href({ name: 'live', q: '', filter: 'mismatch' })}>
+                  {mismatched} request{mismatched === 1 ? '' : 's'} sent or received data that doesn't match
+                  the types in the code.
+                </a>
+              </li>
+            )}
+            {counts.unmatched > 0 && (
+              <li>
+                <span className="warn-icon" aria-hidden>
+                  ⚠
+                </span>
+                <a href={href({ name: 'live', q: '', filter: 'unmatched' })}>
+                  {counts.unmatched} match no request site. The scanner probably missed them.
+                </a>
+              </li>
+            )}
+          </ul>
+        )}
       </Section>
 
       <Section title="To check" aside={<span className="count">{index.notes.length}</span>}>
         {index.notes.length === 0 ? (
-          <Empty>The scan resolved every page, component and type.</Empty>
+          <Empty>The scan resolved every page, component, type and request.</Empty>
         ) : (
           <NoteGroups notes={index.notes} />
         )}

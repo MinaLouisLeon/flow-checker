@@ -1,9 +1,16 @@
 import { resolve } from 'node:path'
-import { type AppModel, AppModelSchema, formatModel, formatTypes } from '@flow-checker/shared'
+import {
+  type AppModel,
+  AppModelSchema,
+  formatFlows,
+  formatModel,
+  formatRequests,
+  formatTypes,
+} from '@flow-checker/shared'
 import { describe, expect, it } from 'vitest'
 import { scanProject } from '../src'
 
-const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl'] as const
+const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl', 'mismatch'] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
 const models = new Map<string, AppModel>()
@@ -27,6 +34,14 @@ describe.each(FIXTURES)('fixture %s', (fixture) => {
 
   it('matches the resolved types snapshot', async () => {
     await expect(formatTypes(scan(fixture))).toMatchFileSnapshot(`__snapshots__/${fixture}.types.txt`)
+  })
+
+  it('matches the request sites snapshot', async () => {
+    await expect(formatRequests(scan(fixture))).toMatchFileSnapshot(`__snapshots__/${fixture}.requests.txt`)
+  })
+
+  it('matches the navigation and flows snapshot', async () => {
+    await expect(formatFlows(scan(fixture))).toMatchFileSnapshot(`__snapshots__/${fixture}.flows.txt`)
   })
 
   it('matches the model snapshot', async () => {

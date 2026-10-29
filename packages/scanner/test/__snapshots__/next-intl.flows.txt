@@ -1,0 +1,26 @@
+# Navigation
+
+## HomePage  src/app/[locale]/page.tsx
+link /login -> /[locale]/login  event onClick  next-intl
+
+## DashboardProfile  src/components/DashboardProfile.tsx
+push /login -> /[locale]/login  event onClick  next-intl
+link /login -> /[locale]/login  event onClick  next-intl conditional
+
+## LoginForm  src/components/LoginForm.tsx
+push /verify?challenge=:challengeId -> /[locale]/verify  event onSubmit  next-intl success
+
+## VerifyOtpForm  src/components/VerifyOtpForm.tsx
+link /login -> /[locale]/login  event onClick  next-intl conditional
+replace /dashboard -> /[locale]/dashboard  event onSubmit  next-intl success
+
+# Flows
+
+## LoginForm submit  (/[locale]/login -> /[locale]/verify -> /[locale]/dashboard)
+1. LoginForm onSubmit on /[locale]/login
+2. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/auth/login
+3. push -> /[locale]/verify
+4. VerifyOtpForm onSubmit on /[locale]/verify
+5. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/auth/verify-otp
+6. replace -> /[locale]/dashboard
+7. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/me

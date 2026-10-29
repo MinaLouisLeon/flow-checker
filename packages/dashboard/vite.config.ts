@@ -14,6 +14,6 @@ export default defineConfig({
   server: {
     port: 4401,
     // `pnpm dev` here talks to a tool server started with `flow-checker dev --no-open`.
-    proxy: { '/api': 'http://localhost:4400' },
+    proxy: { '/api': 'http://127.0.0.1:4400' },
   },
 })

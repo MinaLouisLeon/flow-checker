@@ -11,8 +11,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@flow-checker/runtime": "workspace:*",
     "@flow-checker/shared": "workspace:*",
-    "hono": "catalog:",
-    "@hono/node-server": "catalog:"
+    "@hono/node-server": "catalog:",
+    "@jridgewell/trace-mapping": "catalog:",
+    "chokidar": "catalog:",
+    "hono": "catalog:"
+  },
+  "devDependencies": {
+    "@flow-checker/scanner": "workspace:*"
   }
 }

@@ -1,14 +1,18 @@
+import { createInterface } from 'node:readline/promises'
 import { parseArgs } from 'node:util'
 import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { devCommand } from './dev'
+import { doctorCommand } from './doctor'
+import { exportCommand } from './export'
+import { initCommand } from './init'
 import { scanCommand } from './scan'
 
 const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
   scan: 'Scan only and write .flow-checker/model.json',
   init: 'Add instrumentation hooks, config file and .gitignore entries',
-  export: 'Export documentation (--md <dir> | --html <dir>)',
+  export: 'Export Markdown docs and a static HTML site (--md <dir>, --html <dir>)',
   doctor: 'Check Next.js version, hooks, ports and tsconfig',
 } as const
 
@@ -24,25 +28,49 @@ ${Object.entries(COMMANDS)
   .join('\n')}
 
 Options:
-  --root <dir>      Project root (default: current directory)
-  --app-dir <dir>   App Router directory, relative to the root (default: src/app or app)
-  --port <n>        dev: dashboard port (default: 4400)
-  --app-port <n>    dev: port your Next.js app runs on (default: 3000)
-  --no-open         dev: don't open the browser
-  --tree            scan: also print the route and component trees
-  --types           scan: also print the resolved types
-  -h, --help        Show help
-  -v, --version     Show version
+  --root <dir>            Project root (default: current directory)
+  --app-dir <dir>         App Router directory, relative to the root (default: src/app or app)
+  --config <file>         Config file (default: flow-checker.config.* in the root)
+  --port <n>              dev: dashboard port (default: 4400)
+  --app-port <n>          dev: port your Next.js app runs on (default: 3000)
+  --dev-command <cmd>     dev: command that starts your app (default: the "dev" script)
+  --no-app                dev: don't start your app (start it yourself with the printed env)
+  --no-open               dev: don't open the browser
+  --no-watch              dev: don't re-scan when files change
+  -y, --yes               init: apply the changes without asking
+  --tree                  scan: also print the route and component trees
+  --types                 scan: also print the resolved types
+  --requests              scan: also print the request sites
+  --flows                 scan: also print navigation and inferred flows
+  --md <dir>              export: write Markdown docs to this folder
+  --html <dir>            export: write the static HTML site to this folder
+                          (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
+  --raw                   export: keep captures as saved, without redacting them again
+  --force                 export: write into a folder that has other files
+  -h, --help              Show help
+  -v, --version           Show version
 `
 
 export interface CliIO {
   out: (text: string) => void
   err: (text: string) => void
+  /** Asks a yes/no question. Absent when there is no terminal to ask in. */
+  confirm?: (question: string) => Promise<boolean>
 }
 
 const defaultIO: CliIO = {
   out: (text) => process.stdout.write(`${text}\n`),
   err: (text) => process.stderr.write(`${text}\n`),
+  confirm: process.stdin.isTTY
+    ? async (question) => {
+        const rl = createInterface({ input: process.stdin, output: process.stdout })
+        try {
+          return /^y(es)?$/i.test((await rl.question(`${question} [y/N] `)).trim())
+        } finally {
+          rl.close()
+        }
+      }
+    : undefined,
 }
 
 /** Runs the CLI and returns the exit code. */
@@ -75,7 +103,15 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
 
   if (command === 'scan') {
     return scanCommand(
-      { root: values.root, appDir: values['app-dir'], tree: values.tree, types: values.types },
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        tree: values.tree,
+        types: values.types,
+        requests: values.requests,
+        flows: values.flows,
+      },
       io,
     )
   }
@@ -84,11 +120,48 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
     const port = toPort(values.port, '--port', io)
     const appPort = toPort(values['app-port'], '--app-port', io)
     if (port === null || appPort === null) return 1
-    return devCommand({ root: values.root, appDir: values['app-dir'], port, appPort, open: values.open }, io)
+    return devCommand(
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        port,
+        appPort,
+        open: values.open,
+        app: values.app,
+        devCommand: values['dev-command'],
+        watch: values.watch,
+      },
+      io,
+    )
   }
 
-  io.err(`"${command}" is not implemented yet.`)
-  return 1
+  if (command === 'init') {
+    return initCommand({ root: values.root, appDir: values['app-dir'], yes: values.yes }, io)
+  }
+
+  if (command === 'export') {
+    return exportCommand(
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        md: values.md,
+        html: values.html,
+        raw: values.raw,
+        force: values.force,
+      },
+      io,
+    )
+  }
+
+  const port = toPort(values.port, '--port', io)
+  const appPort = toPort(values['app-port'], '--app-port', io)
+  if (port === null || appPort === null) return 1
+  return doctorCommand(
+    { root: values.root, appDir: values['app-dir'], config: values.config, port, appPort },
+    io,
+  )
 }
 
 function parse(argv: string[]) {
@@ -104,9 +177,20 @@ function parse(argv: string[]) {
       'app-dir': { type: 'string' },
       tree: { type: 'boolean' },
       types: { type: 'boolean' },
+      requests: { type: 'boolean' },
+      flows: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },
+      config: { type: 'string' },
+      'dev-command': { type: 'string' },
+      app: { type: 'boolean', default: true },
       open: { type: 'boolean', default: true },
+      watch: { type: 'boolean', default: true },
+      yes: { type: 'boolean', short: 'y' },
+      md: { type: 'string' },
+      html: { type: 'string' },
+      raw: { type: 'boolean' },
+      force: { type: 'boolean' },
     },
   })
 }

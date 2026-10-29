@@ -1,4 +1,4 @@
-// Packs @integr8/flow-checker, installs the tarball into an empty project, and checks
+// Packs @integr8-media/flow-checker, installs the tarball into an empty project, and checks
 // that it works the way a user would get it: no private @flow-checker/* references,
 // the bin runs, and the public entry points import and typecheck.
 // Run after `pnpm build`: node scripts/verify-package.mjs
@@ -54,7 +54,7 @@ try {
   run('npm', ['install', '--no-audit', '--no-fund', join(work, tarball), `typescript@${tsVersion()}`], app)
 
   const manifest = JSON.parse(
-    readFileSync(join(app, 'node_modules', '@integr8', 'flow-checker', 'package.json'), 'utf8'),
+    readFileSync(join(app, 'node_modules', '@integr8-media', 'flow-checker', 'package.json'), 'utf8'),
   )
   if (
     manifest.dependencies &&
@@ -71,12 +71,14 @@ try {
   writeFileSync(
     join(app, 'flow-checker.config.ts'),
     [
-      "import { defineConfig } from '@integr8/flow-checker/config'",
-      "import { installClientRuntime } from '@integr8/flow-checker/runtime/client'",
-      "import { registerServerRuntime } from '@integr8/flow-checker/runtime/server'",
+      "import { defineConfig } from '@integr8-media/flow-checker/config'",
+      "import { installClientRuntime } from '@integr8-media/flow-checker/runtime/client'",
+      "import { registerServerRuntime } from '@integr8-media/flow-checker/runtime/server'",
+      "import { withFlowChecker } from '@integr8-media/flow-checker/next'",
+      'export const nextConfig = withFlowChecker({ reactStrictMode: true })',
       'installClientRuntime()',
       'registerServerRuntime()',
-      'export default defineConfig({ capture: { storeRaw: false }, ports: { app: 3000 } })',
+      "export default defineConfig({ root: '.', include: ['**'], exclude: ['**/*.test.*'], apiClients: [{ module: 'ky', methods: ['get'] }], capture: { storeRaw: false }, ports: { app: 3000 } })",
       '',
     ].join('\n'),
   )
@@ -99,7 +101,16 @@ try {
     [
       '--input-type=module',
       '-e',
-      "await import('@integr8/flow-checker'); await import('@integr8/flow-checker/config')",
+      "await import('@integr8-media/flow-checker'); await import('@integr8-media/flow-checker/config'); const { withFlowChecker } = await import('@integr8-media/flow-checker/next'); if (typeof withFlowChecker !== 'function') throw new Error('withFlowChecker missing')",
+    ],
+    app,
+  )
+  // next.config.js of older Next.js versions is CommonJS.
+  run(
+    process.execPath,
+    [
+      '-e',
+      "const { withFlowChecker } = require('@integr8-media/flow-checker/next'); const c = { a: 1 }; if (withFlowChecker(c) !== c) throw new Error('withFlowChecker changed the config without FLOW_CHECKER=1')",
     ],
     app,
   )

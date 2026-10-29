@@ -1,0 +1,862 @@
+{
+  "fixture": "bff",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvs02skashzt4bdn",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:25.786Z",
+      "durationMs": 544,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductsTable.useEffect (http://localhost:3077/_next/static/chunks/_0z8xqh1rg4cvd._.js:148:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductsTable.useEffect",
+          "file": "src/components/ProductsTable.tsx",
+          "line": 12,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02sy3g7dmytfa",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:26.283Z",
+      "durationMs": 23,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products",
+        "captureId": "cap_mvs02skashzt4bdn"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:19:177)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/route.ts",
+          "line": 7,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02skgxxea2wk9",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:25.792Z",
+      "durationMs": 576,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductsTable.useEffect (http://localhost:3077/_next/static/chunks/_0z8xqh1rg4cvd._.js:148:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductsTable.useEffect",
+          "file": "src/components/ProductsTable.tsx",
+          "line": 12,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02t02kmby9003",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:26.354Z",
+      "durationMs": 4,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products",
+        "captureId": "cap_mvs02skgxxea2wk9"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:19:177)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/route.ts",
+          "line": 7,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02v34234dnear",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:29.056Z",
+      "durationMs": 41,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "name": "Cable",
+            "price": 9.5,
+            "stock": 3
+          },
+          "size": 38
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:29 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-28T10:57:29.055Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at handleSubmit (http://localhost:3077/_next/static/chunks/_0z8xqh1rg4cvd._.js:30:27)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "handleSubmit",
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 21,
+          "column": 23
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02v3wcx68i3do",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:29.084Z",
+      "durationMs": 8,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "name": "Cable",
+            "price": 9.5,
+            "stock": 3
+          },
+          "size": 38
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:29 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/api/products",
+        "captureId": "cap_mvs02v34234dnear"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at POST (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:37:177)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\1ghd_next_043567m2smjkx._.js:793:50)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "POST",
+          "file": "src/app/api/products/route.ts",
+          "line": 23,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02w72gxwrj3t3",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:30.494Z",
+      "durationMs": 1453,
+      "pageUrl": "http://localhost:3077/products/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products/3",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-28T10:57:29.055Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductPage.useEffect (http://localhost:3077/_next/static/chunks/_12g2k6bkanec3._.js:23:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8571:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductPage.useEffect",
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 13,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02xay0u7ct5y0",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:31.930Z",
+      "durationMs": 5,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products/3",
+        "captureId": "cap_mvs02w72gxwrj3t3"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__08stmq-gne0uu._.js:87:177)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\1ghd_next_18g3wn70xkx7r._.js:793:50)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/[id]/route.ts",
+          "line": 8,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02w779bfsaxnc",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:30.499Z",
+      "durationMs": 1499,
+      "pageUrl": "http://localhost:3077/products/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products/3",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-28T10:57:29.055Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductPage.useEffect (http://localhost:3077/_next/static/chunks/_12g2k6bkanec3._.js:23:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8661:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductPage.useEffect",
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 13,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs02xcm88r4amvq",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:31.990Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products/3",
+        "captureId": "cap_mvs02w779bfsaxnc"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__08stmq-gne0uu._.js:87:177)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\1ghd_next_18g3wn70xkx7r._.js:793:50)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/[id]/route.ts",
+          "line": 8,
+          "column": 28
+        }
+      ]
+    }
+  ]
+}

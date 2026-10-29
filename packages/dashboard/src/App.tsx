@@ -1,20 +1,32 @@
 import { CLI_NAME } from '@flow-checker/shared'
 import { useMemo } from 'react'
-import { useMeta, useModel, useRescan } from './api'
+import { useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { ComponentPanel } from './screens/ComponentPanel'
+import { ExportScreen } from './screens/ExportScreen'
+import { FlowsScreen } from './screens/FlowsScreen'
+import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
 import { TypesScreen } from './screens/TypesScreen'
 import { Empty } from './ui'
 
-const NAV: { label: string; screen: Screen; match: Screen['name'][] }[] = [
+const NAV: {
+  label: string
+  screen: Screen
+  match: Screen['name'][]
+  needsCapture?: boolean
+  needsExport?: boolean
+}[] = [
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page', 'component'] },
+  { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
+  { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
+  { label: 'Export', screen: { name: 'export' }, match: ['export'], needsExport: true },
 ]
 
 export function App() {
@@ -22,6 +34,10 @@ export function App() {
   const meta = useMeta()
   const rescan = useRescan()
   const screen = useScreen()
+  const captureOn = Boolean(meta.data?.capture)
+  const exported = meta.data?.exported
+  const live = useLiveFeed(captureOn || Boolean(meta.data?.watching))
+  const lastScan = useLastScan()
   const index = useMemo(() => (model.data ? buildIndex(model.data) : undefined), [model.data])
 
   const error = model.error ?? meta.error
@@ -32,20 +48,41 @@ export function App() {
           {CLI_NAME}
         </a>
         <nav className="nav">
-          {NAV.map((item) => (
+          {NAV.filter(
+            (item) => (!item.needsCapture || meta.data?.capture) && (!item.needsExport || meta.data?.export),
+          ).map((item) => (
             <a
               key={item.label}
               href={href(item.screen)}
               aria-current={item.match.includes(screen.name) ? 'page' : undefined}
             >
-              {item.label}
+              {/* An export has no live feed: the same screen lists the exported captures. */}
+              {item.screen.name === 'live' && exported ? 'Captures' : item.label}
             </a>
           ))}
         </nav>
         <span className="spacer" />
-        {meta.data?.scannedAt && (
-          <span className="muted" title={meta.data.scannedAt}>
+        {exported && (
+          <span className="muted topbar-meta" title={exported.generatedAt}>
+            {exported.projectName} · exported {new Date(exported.generatedAt).toLocaleString()}
+          </span>
+        )}
+        {!exported && meta.data?.scannedAt && (
+          <span
+            className="muted topbar-meta"
+            title={
+              lastScan?.files.length
+                ? `Re-scanned after a change to ${lastScan.files.join(', ')}`
+                : meta.data.scannedAt
+            }
+          >
+            {meta.data.watching && (
+              <span className={`live-status live-${live}`} title={`Watching files (${live})`}>
+                <span className="dot" />{' '}
+              </span>
+            )}
             Scanned {new Date(meta.data.scannedAt).toLocaleTimeString()}
+            {lastScan?.files.length ? ` · ${shortFiles(lastScan.files)}` : ''}
           </span>
         )}
         {meta.data?.canRescan && (
@@ -58,10 +95,22 @@ export function App() {
             {rescan.isPending ? 'Scanning…' : 'Re-scan'}
           </button>
         )}
-        {meta.data?.version && <span className="muted">v{meta.data.version}</span>}
+        {meta.data?.version && <span className="muted topbar-meta">v{meta.data.version}</span>}
       </header>
 
+      {exported && !exported.redacted && (
+        <div className="banner banner-error">
+          Raw export: captured requests are not redacted. Do not share this site.
+        </div>
+      )}
       {rescan.error && <div className="banner banner-error">Re-scan failed: {rescan.error.message}</div>}
+      {lastScan && lastScan.needsRecheck.length > 0 && (
+        <div className="banner banner-warn">
+          The code of {lastScan.needsRecheck.length} captured request
+          {lastScan.needsRecheck.length === 1 ? '' : 's'} changed. Use the app again to re-check{' '}
+          {lastScan.needsRecheck.length === 1 ? 'it' : 'them'}.
+        </div>
+      )}
 
       <main className="content">
         {error ? (
@@ -69,7 +118,7 @@ export function App() {
             <div className="banner banner-error">Could not load the scan: {error.message}</div>
           </div>
         ) : index && meta.data ? (
-          <DataContext.Provider value={{ index, meta: meta.data }}>
+          <DataContext.Provider value={{ index, meta: meta.data, live: captureOn ? live : undefined }}>
             <ScreenView screen={screen} />
           </DataContext.Provider>
         ) : (
@@ -80,6 +129,12 @@ export function App() {
       </main>
     </div>
   )
+}
+
+/** `page.tsx changed`, `page.tsx and 2 more changed`. */
+function shortFiles(files: string[]): string {
+  const name = (files[0] ?? '').split('/').pop()
+  return files.length === 1 ? `${name} changed` : `${name} and ${files.length - 1} more changed`
 }
 
 function ScreenView({ screen }: { screen: Screen }) {
@@ -98,6 +153,12 @@ function ScreenView({ screen }: { screen: Screen }) {
       )
     case 'types':
       return <TypesScreen typeId={screen.typeId} q={screen.q} />
+    case 'flows':
+      return <FlowsScreen flowId={screen.flowId} q={screen.q} />
+    case 'live':
+      return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
+    case 'export':
+      return <ExportScreen />
     case 'not-found':
       return (
         <div className="screen">

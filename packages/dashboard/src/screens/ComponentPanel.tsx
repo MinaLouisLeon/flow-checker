@@ -1,4 +1,5 @@
 import { useData } from '../context'
+import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
 import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
@@ -6,7 +7,13 @@ import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 export function ComponentPanel({ componentId, routeId }: { componentId: string; routeId?: string }) {
   const { index } = useData()
   const component = index.components.get(componentId)
-  if (!component) return <Empty>This component is not in the current scan.</Empty>
+  if (!component) {
+    return (
+      <Empty>
+        This component is not in the current scan. <a href={href({ name: 'overview' })}>Back to overview</a>
+      </Empty>
+    )
+  }
 
   const parents = index.renderedBy.get(component.id) ?? []
   const routeIds = index.routesOf.get(component.id) ?? []
@@ -59,7 +66,7 @@ export function ComponentPanel({ componentId, routeId }: { componentId: string; 
       </Section>
 
       <Section title="Requests">
-        <Empty>Request detection is not part of the scan yet.</Empty>
+        <RequestList sites={index.requestsByComponent.get(component.id) ?? []} empty="Sends no requests." />
       </Section>
 
       <Section title="Renders">

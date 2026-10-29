@@ -352,5 +352,688 @@
       }
     }
   ],
-  "types": []
+  "types": [
+    {
+      "id": "typ_0c608pp860k",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/product.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1ft4f009hfw",
+      "name": "CreateProductInput",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/types/product.ts",
+        "line": 8,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1a49e9mbomv",
+      "name": "FormState",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/product.ts",
+        "line": 10,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "error",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            },
+            "optional": true
+          },
+          {
+            "name": "fieldErrors",
+            "type": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "name",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  },
+                  "optional": true
+                },
+                {
+                  "name": "price",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  },
+                  "optional": true
+                },
+                {
+                  "name": "stock",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  },
+                  "optional": true
+                }
+              ]
+            },
+            "optional": true
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_0h59cmicyii",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "createProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 9,
+          "column": 23
+        }
+      },
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}/products`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "bodyType": {
+        "text": "CreateProductInput",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1ft4f009hfw",
+          "name": "CreateProductInput"
+        }
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0c608pp860k",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/actions/products.ts",
+          "line": 21,
+          "column": 17,
+          "callee": "insertProduct"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 17,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "2em44kwxz3s"
+    },
+    {
+      "id": "req_11sozx68f2s",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "deleteProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 30,
+          "column": 23
+        }
+      },
+      "transport": "fetch",
+      "method": "DELETE",
+      "url": {
+        "text": "`${API_URL}/products/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/actions/products.ts",
+          "line": 31,
+          "column": 9,
+          "callee": "removeProduct"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 27,
+          "column": 9,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1pc9v9a94c7"
+    },
+    {
+      "id": "req_25a1hdpohd6",
+      "origin": "component",
+      "componentId": "cmp_0w4ykuez903",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product | null",
+        "shape": {
+          "kind": "union",
+          "types": [
+            {
+              "kind": "ref",
+              "typeId": "typ_0c608pp860k",
+              "name": "Product"
+            },
+            {
+              "kind": "primitive",
+              "name": "null"
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 9,
+          "column": 25,
+          "callee": "getProduct"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 12,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1mpr2wqbiqr"
+    },
+    {
+      "id": "req_1u9qpywsqwd",
+      "origin": "component",
+      "componentId": "cmp_115a9noj763",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0c608pp860k",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/page.tsx",
+          "line": 8,
+          "column": 26,
+          "callee": "listProducts"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1qc80czzl2u"
+    },
+    {
+      "id": "req_07o63rveyo8",
+      "origin": "component",
+      "componentId": "cmp_014pegw9zf7",
+      "serverAction": {
+        "name": "createProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 9,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 14,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "FormState",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1a49e9mbomv",
+          "name": "FormState"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 11,
+          "column": 40,
+          "callee": "useActionState"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0phm3ffg3zr",
+      "chain": [
+        "req_0h59cmicyii"
+      ]
+    },
+    {
+      "id": "req_0b08g87h2vb",
+      "origin": "component",
+      "componentId": "cmp_0jz34mtqlno",
+      "serverAction": {
+        "name": "deleteProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 30,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/DeleteProductButton.tsx",
+          "line": 11,
+          "column": 46
+        }
+      },
+      "bodyType": {
+        "text": "number",
+        "shape": {
+          "kind": "primitive",
+          "name": "number"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/DeleteProductButton.tsx",
+          "line": 11,
+          "column": 83,
+          "callee": "deleteProduct"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0zbsnchu1q9",
+      "chain": [
+        "req_11sozx68f2s"
+      ]
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_08wa7nfuh00",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "createProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 9,
+          "column": 23
+        }
+      },
+      "kind": "redirect",
+      "api": "next",
+      "href": {
+        "text": "`/products/${id}`",
+        "confidence": "pattern",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "loc": {
+        "file": "src/actions/products.ts",
+        "line": 26,
+        "column": 3
+      },
+      "callStack": [
+        {
+          "file": "src/actions/products.ts",
+          "line": 26,
+          "column": 3,
+          "callee": "redirect"
+        }
+      ],
+      "targetRouteId": "rt_1kdazzrvrkg"
+    },
+    {
+      "id": "nav_2ex7ab0yjle",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "kind": "redirect",
+      "api": "next",
+      "href": {
+        "text": "'/products'",
+        "confidence": "exact",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 4,
+        "column": 3
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 4,
+          "column": 3,
+          "callee": "redirect"
+        }
+      ],
+      "targetRouteId": "rt_0te2vdgan2u"
+    },
+    {
+      "id": "nav_0x0xxwncewy",
+      "origin": "component",
+      "componentId": "cmp_0w4ykuez903",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/products\"",
+        "confidence": "exact",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 18,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/app/products/[id]/page.tsx",
+        "line": 18,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 18,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0te2vdgan2u"
+    },
+    {
+      "id": "nav_0fky1wmngk4",
+      "origin": "component",
+      "componentId": "cmp_115a9noj763",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/products/new\"",
+        "confidence": "exact",
+        "path": "/products/new"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/products/page.tsx",
+          "line": 12,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 12,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/page.tsx",
+          "line": 12,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0pq5p0nm2h4"
+    },
+    {
+      "id": "nav_13ok85ungyw",
+      "origin": "component",
+      "componentId": "cmp_115a9noj763",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/products/${product.id}`",
+        "confidence": "pattern",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/products/page.tsx",
+          "line": 16,
+          "column": 13
+        }
+      },
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 16,
+        "column": 13
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/page.tsx",
+          "line": 16,
+          "column": 13,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1kdazzrvrkg"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_14lgyscxig3",
+      "name": "CreateProductForm submit",
+      "routeId": "rt_0pq5p0nm2h4",
+      "componentId": "cmp_014pegw9zf7",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0pq5p0nm2h4",
+          "componentId": "cmp_014pegw9zf7",
+          "event": "action",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 14,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_07o63rveyo8"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_08wa7nfuh00",
+          "routeId": "rt_1kdazzrvrkg"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_25a1hdpohd6",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0pq5p0nm2h4",
+        "rt_1kdazzrvrkg"
+      ]
+    },
+    {
+      "id": "flw_0vf3cfh7187",
+      "name": "DeleteProductButton click",
+      "routeId": "rt_0te2vdgan2u",
+      "componentId": "cmp_0jz34mtqlno",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0te2vdgan2u",
+          "componentId": "cmp_0jz34mtqlno",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/DeleteProductButton.tsx",
+            "line": 11,
+            "column": 46
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0b08g87h2vb"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0te2vdgan2u"
+      ]
+    }
+  ]
 }

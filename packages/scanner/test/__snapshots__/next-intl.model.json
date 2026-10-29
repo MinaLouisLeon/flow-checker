@@ -556,6 +556,583 @@
           }
         ]
       }
+    },
+    {
+      "id": "typ_0soatqi8re7",
+      "name": "LoginRequest",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "password",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1ywasj4ylf5",
+      "name": "LoginResponse",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 13,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "otpRequired",
+            "type": {
+              "kind": "literal",
+              "value": true
+            }
+          },
+          {
+            "name": "challengeId",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0picqcg78cw",
+      "name": "VerifyOtpRequest",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 18,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "challengeId",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "code",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1pi4a892sek",
+      "name": "VerifyOtpResponse",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/auth.ts",
+        "line": 23,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "token",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "user",
+            "type": {
+              "kind": "ref",
+              "typeId": "typ_1tpxqokvkch",
+              "name": "User"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1ostg0bhzmk",
+      "origin": "component",
+      "componentId": "cmp_0bpwse6tsg4",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/me`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/me"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 15,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "User | null",
+        "shape": {
+          "kind": "union",
+          "types": [
+            {
+              "kind": "ref",
+              "typeId": "typ_1tpxqokvkch",
+              "name": "User"
+            },
+            {
+              "kind": "primitive",
+              "name": "null"
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 16,
+          "column": 5,
+          "callee": "getMe"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 25,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1hvf877plw1"
+    },
+    {
+      "id": "req_0ldgejuv5rs",
+      "origin": "component",
+      "componentId": "cmp_0skl5lm1a9a",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/auth/login"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/LoginForm.tsx",
+          "line": 29,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "LoginRequest",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0soatqi8re7",
+          "name": "LoginRequest"
+        }
+      },
+      "responseType": {
+        "text": "LoginResponse",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1ywasj4ylf5",
+          "name": "LoginResponse"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/LoginForm.tsx",
+          "line": 18,
+          "column": 37,
+          "callee": "login"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 17,
+          "column": 47,
+          "callee": "post"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0e8ff5tnkzd"
+    },
+    {
+      "id": "req_0ivpze9dolu",
+      "origin": "component",
+      "componentId": "cmp_1hlwjtaw6e6",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/auth/verify-otp"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 36,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "VerifyOtpRequest",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0picqcg78cw",
+          "name": "VerifyOtpRequest"
+        }
+      },
+      "responseType": {
+        "text": "VerifyOtpResponse",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1pi4a892sek",
+          "name": "VerifyOtpResponse"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 27,
+          "column": 31,
+          "callee": "verifyOtp"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 20,
+          "column": 3,
+          "callee": "post"
+        },
+        {
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0skdmbnza9l"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_15nvkgumvy5",
+      "origin": "component",
+      "componentId": "cmp_0nwenv6i3tq",
+      "kind": "link",
+      "api": "next-intl",
+      "href": {
+        "text": "\"/login\"",
+        "confidence": "exact",
+        "path": "/login"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/[locale]/page.tsx",
+          "line": 12,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/app/[locale]/page.tsx",
+        "line": 12,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/app/[locale]/page.tsx",
+          "line": 12,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1cprhxt7jgk"
+    },
+    {
+      "id": "nav_1zfhub5393t",
+      "origin": "component",
+      "componentId": "cmp_0bpwse6tsg4",
+      "kind": "push",
+      "api": "next-intl",
+      "href": {
+        "text": "'/login'",
+        "confidence": "exact",
+        "path": "/login"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 31,
+          "column": 29
+        }
+      },
+      "loc": {
+        "file": "src/components/DashboardProfile.tsx",
+        "line": 21,
+        "column": 5
+      },
+      "callStack": [
+        {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 21,
+          "column": 5,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_1cprhxt7jgk"
+    },
+    {
+      "id": "nav_1jxvbqpyff7",
+      "origin": "component",
+      "componentId": "cmp_0bpwse6tsg4",
+      "kind": "link",
+      "api": "next-intl",
+      "href": {
+        "text": "\"/login\"",
+        "confidence": "exact",
+        "path": "/login"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 25,
+          "column": 29
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/DashboardProfile.tsx",
+        "line": 25,
+        "column": 29
+      },
+      "callStack": [
+        {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 25,
+          "column": 29,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1cprhxt7jgk"
+    },
+    {
+      "id": "nav_0i71joksxg5",
+      "origin": "component",
+      "componentId": "cmp_0skl5lm1a9a",
+      "kind": "push",
+      "api": "next-intl",
+      "href": {
+        "text": "`/verify?challenge=${challengeId}`",
+        "confidence": "pattern",
+        "path": "/verify",
+        "query": "challenge=:challengeId"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/LoginForm.tsx",
+          "line": 29,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/LoginForm.tsx",
+        "line": 22,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/LoginForm.tsx",
+          "line": 22,
+          "column": 7,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_0s0435jzyyw"
+    },
+    {
+      "id": "nav_271y09boqq4",
+      "origin": "component",
+      "componentId": "cmp_1hlwjtaw6e6",
+      "kind": "link",
+      "api": "next-intl",
+      "href": {
+        "text": "\"/login\"",
+        "confidence": "exact",
+        "path": "/login"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 19,
+          "column": 12
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/VerifyOtpForm.tsx",
+        "line": 19,
+        "column": 12
+      },
+      "callStack": [
+        {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 19,
+          "column": 12,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1cprhxt7jgk"
+    },
+    {
+      "id": "nav_12qmtlo0oqp",
+      "origin": "component",
+      "componentId": "cmp_1hlwjtaw6e6",
+      "kind": "replace",
+      "api": "next-intl",
+      "href": {
+        "text": "'/dashboard'",
+        "confidence": "exact",
+        "path": "/dashboard"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 36,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/VerifyOtpForm.tsx",
+        "line": 29,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 29,
+          "column": 7,
+          "callee": "router.replace"
+        }
+      ],
+      "targetRouteId": "rt_0nr7aw4u4g0"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_1my9reuz10k",
+      "name": "LoginForm submit",
+      "routeId": "rt_1cprhxt7jgk",
+      "componentId": "cmp_0skl5lm1a9a",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1cprhxt7jgk",
+          "componentId": "cmp_0skl5lm1a9a",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0ldgejuv5rs"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_0i71joksxg5",
+          "routeId": "rt_0s0435jzyyw"
+        },
+        {
+          "kind": "interaction",
+          "routeId": "rt_0s0435jzyyw",
+          "componentId": "cmp_1hlwjtaw6e6",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0ivpze9dolu"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_12qmtlo0oqp",
+          "routeId": "rt_0nr7aw4u4g0"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1ostg0bhzmk",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1cprhxt7jgk",
+        "rt_0s0435jzyyw",
+        "rt_0nr7aw4u4g0"
+      ]
     }
   ]
 }

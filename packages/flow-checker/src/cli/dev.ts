@@ -1,43 +1,103 @@
 import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { ScanError, scanProject } from '@flow-checker/scanner'
-import { type RunningServer, startServer } from '@flow-checker/server'
-import { DEFAULT_PORTS } from '@flow-checker/shared'
+import { randomBytes } from 'node:crypto'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { isAbsolute, join, relative, resolve } from 'node:path'
+import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/runtime/options'
+import { ScanError } from '@flow-checker/scanner'
+import {
+  CaptureStore,
+  type ProjectWatcher,
+  ScanFeed,
+  startServer,
+  type WatchBatch,
+  watchProject,
+} from '@flow-checker/server'
+import { type AppModel, DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
+import { type AppProcess, startApp } from './app-process'
+import { ConfigError, loadConfig, scanSettings } from './config'
+import { configExportDirs, writeFormat } from './export'
+import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
 import type { CliIO } from './run'
-import { summary, writeModel } from './scan'
+import { summary } from './scan'
+import { createScanRunner } from './scan-runner'
 
 export interface DevCommandOptions {
   root?: string
   appDir?: string
+  /** Config file, relative to the root. Default: `flow-checker.config.*` in the root. */
+  config?: string
   /** Dashboard port. */
   port?: number
-  /** Port of the user's Next.js app, for "open in app" links. */
+  /** Port of the user's Next.js app. */
   appPort?: number
   /** Open the dashboard in the browser. Default: true. */
   open?: boolean
+  /** Start the user's app with capture on. Default: false here, true from the CLI. */
+  app?: boolean
+  /** Command that starts the app. Default: the `dev` script, or `next dev`. */
+  devCommand?: string
+  /** Re-scan when source files change. Default: true. */
+  watch?: boolean
+  /** Called after each re-scan triggered by a file change (tests). */
+  onRescan?: (model: AppModel, files: string[]) => void
+}
+
+export interface DevSession {
+  url: string
+  port: number
+  /** Ingest endpoint the runtime posts to. */
+  ingestUrl: string
+  /** Env the app runs with (also handy to start it yourself). */
+  appEnv: Record<string, string>
+  close: () => Promise<void>
 }
 
 /**
- * `flow-checker dev`: scans, writes the model, serves the dashboard and opens it.
- * Running the app with capture comes with M5. Returns the server, or an exit code on failure.
+ * `flow-checker dev`: scans, serves the dashboard and the ingest endpoint, and starts the app
+ * with capture on. Returns the running session, or an exit code on failure.
  */
-export async function startDev(options: DevCommandOptions, io: CliIO): Promise<RunningServer | number> {
-  const root = resolve(options.root ?? process.cwd())
-  const scan = () => {
-    const started = performance.now()
-    const model = scanProject({ root, appDir: options.appDir })
-    writeModel(root, model)
-    io.out(summary(model, performance.now() - started))
-    return model
+export async function startDev(options: DevCommandOptions, io: CliIO): Promise<DevSession | number> {
+  let root = resolve(options.root ?? process.cwd())
+
+  let config: FlowCheckerConfig
+  try {
+    const loaded = await loadConfig(root, options.config)
+    config = loaded.config
+    if (loaded.file) io.out(`Config: ${loaded.file}`)
+    if (loaded.root !== root) io.out(`Project root: ${loaded.root}`)
+    root = loaded.root
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      io.err(error.message)
+      return 1
+    }
+    throw error
   }
 
-  let model: ReturnType<typeof scanProject>
+  const appDir = options.appDir ?? config.appDir
+  // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7). From the
+  // build it runs in a worker thread, so the server keeps answering during large re-scans.
+  const scanner = createScanRunner({ root, appDir, ...scanSettings(config) })
+  // One scan at a time: a change that arrives during a scan waits for it.
+  let queue: Promise<unknown> = Promise.resolve()
+  const serial = <T>(task: () => Promise<T>): Promise<T> => {
+    const next = queue.then(task, task)
+    queue = next.catch(() => {})
+    return next
+  }
+  const scan = () =>
+    serial(async () => {
+      const { model, durationMs } = await scanner.scan()
+      io.out(summary(model, durationMs))
+      return model
+    })
+
+  let model: AppModel
   try {
-    model = scan()
+    model = await scan()
   } catch (error) {
+    await scanner.close()
     if (error instanceof ScanError) {
       io.err(error.message)
       return 1
@@ -45,28 +105,151 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<R
     throw error
   }
 
+  const captureOptions = resolveCaptureOptions(config.capture)
+  if (captureOptions.storeRaw) {
+    io.err(
+      'Warning: capture.storeRaw is on. Captured requests are saved WITHOUT masking passwords and tokens.',
+    )
+  }
+  const added = ensureGitignore(root)
+  if (added.length > 0) io.out(`Added ${added.join(', ')} to .gitignore`)
+
+  const store = new CaptureStore({ root }).load()
+  const token = ingestToken(root)
+  const appPort = options.appPort ?? config.ports?.app ?? DEFAULT_PORTS.app
+
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')
 
+  const exportDirs = configExportDirs(root, config)
+  const watching = options.watch !== false
+  const scans = watching ? new ScanFeed() : undefined
   const server = await startServer({
     root,
     model,
     rescan: scan,
+    scans,
     dashboardDir,
-    appPort: options.appPort ?? DEFAULT_PORTS.app,
+    appPort,
     version,
-    port: options.port ?? DEFAULT_PORTS.dashboard,
+    port: options.port ?? config.ports?.dashboard ?? DEFAULT_PORTS.dashboard,
+    capture: { store, token, options: captureOptions },
+    exporter: {
+      dirs: { md: shownPath(root, exportDirs.md), html: shownPath(root, exportDirs.html) },
+      write: (format, data, { force }) => {
+        const files = writeFormat(format, data, exportDirs[format], { force, dashboardDir })
+        io.out(
+          `Exported ${format === 'md' ? 'Markdown docs' : 'the static site'} to ${shownPath(root, exportDirs[format])}.`,
+        )
+        return { dir: shownPath(root, exportDirs[format]), files: files.length }
+      },
+    },
   })
   io.out(`Dashboard: ${server.url}`)
+
+  let watcher: ProjectWatcher | undefined
+  let warmTimer: ReturnType<typeof setTimeout> | undefined
+  if (scans) {
+    const onChange = (batch: WatchBatch) => {
+      const files = [...batch.changed, ...batch.added, ...batch.removed].map((f) =>
+        relative(root, f).replaceAll('\\', '/'),
+      )
+      return serial(async () => {
+        try {
+          const { model: next, durationMs } = await scanner.update(batch)
+          scans.publish({ model: next, durationMs, files })
+          io.out(`Re-scanned in ${Math.round(durationMs)} ms (${describeFiles(files)} changed).`)
+          options.onRescan?.(next, files)
+        } catch (error) {
+          io.err(`Re-scan failed after ${describeFiles(files)} changed: ${(error as Error).message}`)
+        }
+      })
+    }
+    try {
+      watcher = await watchProject({ root, onChange })
+      io.out('Watching for file changes.')
+      // The first re-scan is the slow one: pay for it now, after startup, not on the first edit.
+      warmTimer = setTimeout(() => {
+        void serial(() => scanner.warm()).catch(() => {})
+      }, 0)
+    } catch (error) {
+      io.err(`Could not watch files, so changes need a manual re-scan: ${(error as Error).message}`)
+    }
+  }
+
+  const ingestUrl = `${server.url}/ingest`
+  const runtimeConfig: RuntimeConfig = { ingest: ingestUrl, token, capture: captureOptions }
+  const json = JSON.stringify(runtimeConfig)
+  const appEnv: Record<string, string> = {
+    [ENV.enabled]: '1',
+    [ENV.server]: json,
+    [ENV.client]: json,
+    PORT: String(appPort),
+  }
+
+  let app: AppProcess | undefined
+  if (options.app) {
+    const hooks = hookStatus(root, model.project.appDir ? resolve(root, model.project.appDir) : root)
+    if (!hooks.client || !hooks.server) {
+      const missing = [!hooks.client && 'browser', !hooks.server && 'server'].filter(Boolean).join(' and ')
+      io.err(
+        `The ${missing} capture hook is missing, so those requests won't be captured. Run "flow-checker init".`,
+      )
+    }
+    const command = options.devCommand ?? config.devCommand ?? defaultDevCommand(root)
+    io.out(`Starting your app: ${command} (port ${appPort})`)
+    app = startApp({
+      command,
+      cwd: root,
+      env: appEnv,
+      onLine: (line, stream) => (stream === 'err' ? io.err : io.out)(`[app] ${line}`),
+      onExit: (code) => {
+        if (code !== null && code !== 0) io.err(`[app] exited with code ${code}`)
+      },
+    })
+  } else {
+    // Without --app the user starts it (Docker, a task runner...) and needs this env.
+    io.out('Start your app with capture on using this environment:')
+    for (const [name, value] of Object.entries(appEnv)) io.out(`  ${name}=${shellQuote(value)}`)
+  }
+
   if (options.open !== false) openBrowser(server.url)
-  return server
+
+  return {
+    url: server.url,
+    port: server.port,
+    ingestUrl,
+    appEnv,
+    close: async () => {
+      clearTimeout(warmTimer)
+      await watcher?.close()
+      await app?.stop()
+      store.writeSessions()
+      await server.close()
+      await scanner.close()
+    },
+  }
 }
 
-/** CLI entry: starts the dashboard and keeps running until Ctrl+C. */
+/** A folder relative to the project root (forward slashes), or absolute when outside it. */
+function shownPath(root: string, dir: string): string {
+  const rel = relative(root, dir)
+  return rel && !rel.startsWith('..') && !isAbsolute(rel) ? rel.split('\\').join('/') : dir
+}
+
+function describeFiles(files: string[]): string {
+  if (files.length === 1) return files[0] ?? ''
+  return `${files[0]} and ${files.length - 1} more`
+}
+
+/** CLI entry: runs until Ctrl+C. */
 export async function devCommand(options: DevCommandOptions, io: CliIO): Promise<number> {
-  const result = await startDev(options, io)
+  const result = await startDev({ app: true, ...options }, io)
   if (typeof result === 'number') return result
+  let closing = false
   const stop = () => {
+    if (closing) return
+    closing = true
     void result.close().finally(() => process.exit(0))
   }
   process.once('SIGINT', stop)
@@ -75,14 +258,20 @@ export async function devCommand(options: DevCommandOptions, io: CliIO): Promise
   return 0
 }
 
-/** The built dashboard: next to the bundled CLI, or in the workspace when run from source. */
-function findDashboardDir(): string | undefined {
-  const here = fileURLToPath(new URL('.', import.meta.url))
-  const candidates = [
-    join(here, 'dashboard'), // dist/cli.js → dist/dashboard
-    join(here, '..', '..', '..', 'dashboard', 'dist'), // src/cli/dev.ts → packages/dashboard/dist
-  ]
-  return candidates.find((dir) => existsSync(join(dir, 'index.html')))
+/**
+ * Secret the runtime sends with each batch, so other local pages can't write captures.
+ * Kept per project (gitignored), so Next's compile cache stays valid across runs.
+ */
+function ingestToken(root: string): string {
+  const file = join(root, '.flow-checker', 'cache', 'ingest-token')
+  try {
+    const existing = readFileSync(file, 'utf8').trim()
+    if (/^[a-f0-9]{32}$/.test(existing)) return existing
+  } catch {}
+  const token = randomBytes(16).toString('hex')
+  mkdirSync(join(root, '.flow-checker', 'cache'), { recursive: true })
+  writeFileSync(file, token)
+  return token
 }
 
 function openBrowser(url: string) {
@@ -99,4 +288,9 @@ function openBrowser(url: string) {
   } catch {
     // No browser available (CI, SSH). The URL is printed above.
   }
+}
+
+/** Single-quoted for POSIX shells when the value has characters a shell would interpret. */
+function shellQuote(value: string): string {
+  return /^[\w./:-]*$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`
 }

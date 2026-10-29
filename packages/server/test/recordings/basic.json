@@ -1,0 +1,522 @@
+{
+  "fixture": "basic",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvs00uayl8gel13d",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:55:54.730Z",
+      "durationMs": 366,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:55:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:110:17)",
+        "at async HomePage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 17
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs00uu7k30wlli8",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:55:55.423Z",
+      "durationMs": 35,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:55:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:110:17)",
+        "at async HomePage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 17
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs010ajhof7c8yd",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:02.491Z",
+      "durationMs": 45,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:02 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUser (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:117:17)",
+        "at async UserPage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__18q83gzg20yjy._.js:23:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUser",
+          "file": "lib/api.ts",
+          "line": 20,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "app/users/[id]/page.tsx",
+          "line": 10,
+          "column": 16
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs010m20uvw20uo",
+      "sessionId": "ses_mvs00v2t7vf18tai",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:02.906Z",
+      "durationMs": 12,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 57
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:763:195)",
+        "at getTodos (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:189:23)",
+        "at ProfileCard.useEffect (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:89:160)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodos",
+          "file": "lib/api.ts",
+          "line": 26,
+          "column": 21
+        },
+        {
+          "fn": "ProfileCard.useEffect",
+          "file": "components/ProfileCard.tsx",
+          "line": 16,
+          "column": 13
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs010m9ywalowpm",
+      "sessionId": "ses_mvs00v2t7vf18tai",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:02.913Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 57
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:763:195)",
+        "at getTodos (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:189:23)",
+        "at ProfileCard.useEffect (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:89:160)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodos",
+          "file": "lib/api.ts",
+          "line": 26,
+          "column": 21
+        },
+        {
+          "fn": "ProfileCard.useEffect",
+          "file": "components/ProfileCard.tsx",
+          "line": 16,
+          "column": 13
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs012l4glsqdt24",
+      "sessionId": "ses_mvs00v2t7vf18tai",
+      "origin": "browser",
+      "transport": "xhr",
+      "timestamp": "2026-10-28T10:56:05.464Z",
+      "durationMs": 21,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:4010/users/2",
+        "headers": {
+          "accept": "application/json, text/plain, */*"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 204,
+        "statusText": "No Content",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete user\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-28T10:56:05.456Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:763:195)",
+        "at dispatchXhrRequest (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:808:17)",
+        "at new Promise (<anonymous>)",
+        "at xhr (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:623:12)",
+        "at Axios.dispatchRequest (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:2134:12)",
+        "at Axios._request (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:1258:265)",
+        "at Axios.request (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:1113:31)",
+        "at Axios.<computed> [as delete] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:1284:21)",
+        "at wrap [as delete] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:2741:19)",
+        "at deleteUser (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:172:22)",
+        "at handleClick (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:25:168)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "deleteUser",
+          "file": "lib/api.ts",
+          "line": 9,
+          "column": 20
+        },
+        {
+          "fn": "handleClick",
+          "file": "components/DeleteUserButton.tsx",
+          "line": 18,
+          "column": 23
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs012o8q31a4xfd",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:05.576Z",
+      "durationMs": 16,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            }
+          ],
+          "size": 73
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/?_rsc=UNYZX3PacoQ5wtLo"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:110:17)",
+        "at async HomePage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 17
+        }
+      ]
+    }
+  ]
+}

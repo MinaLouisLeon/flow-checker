@@ -1,0 +1,26 @@
+# Navigation
+
+## server action createProduct  src/actions/products.ts
+redirect /products/:id -> /products/[id]  server-action
+
+## Home  src/app/page.tsx
+redirect /products -> /products  server-render
+
+## ProductPage  src/app/products/[id]/page.tsx
+link /products -> /products  event onClick
+
+## ProductsPage  src/app/products/page.tsx
+link /products/new -> /products/new  event onClick
+link /products/:id -> /products/[id]  event onClick
+
+# Flows
+
+## CreateProductForm submit  (/products/new -> /products/[id])
+1. CreateProductForm action on /products/new
+2. POST server action createProduct
+3. redirect -> /products/[id]
+4. load GET {API_URL ?? http://localhost:4010}/products/:id
+
+## DeleteProductButton click  (/products)
+1. DeleteProductButton onClick on /products
+2. POST server action deleteProduct

@@ -62,14 +62,15 @@ describe('cli scan', () => {
       'app/layout.tsx': 'export default function Root({ children }) { return <html>{children}</html> }',
       'app/page.tsx': [
         'interface Props { params: Promise<{ id: string }> }',
-        'export default function Home(_: Props) { return <main /> }',
+        'export default async function Home(_: Props) { await fetch("https://api.test/items"); return <main /> }',
       ].join('\n'),
       'app/api/ping/route.ts': 'export function GET() { return new Response() }',
     })
     const { io, out } = capture()
-    expect(await runCli(['scan', '--root', root, '--tree', '--types'], io)).toBe(0)
+    expect(await runCli(['scan', '--root', root, '--tree', '--types', '--requests'], io)).toBe(0)
     const output = out.join('\n')
-    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components and 1 type')
+    expect(output).toContain('Scanned 1 page, 1 route handler, 2 components, 1 type, 1 request and 0 flows')
+    expect(output).toContain('GET https://api.test/items  fetch  server-render')
     expect(output).toContain('# Types')
     expect(output).toContain('Props  interface  app/page.tsx:1')
     expect(output).toContain('# Route tree')
@@ -104,7 +105,7 @@ describe('cli dev', () => {
     const server = await startDev({ root, port: 0, open: false }, io)
     if (typeof server === 'number') throw new Error(`startDev failed with ${server}`)
     try {
-      expect(out.join('\n')).toContain('Dashboard: http://localhost:')
+      expect(out.join('\n')).toContain('Dashboard: http://127.0.0.1:')
       expect(existsSync(join(root, '.flow-checker', 'model.json'))).toBe(true)
 
       const model = (await (await fetch(`${server.url}/api/model`)).json()) as AppModel

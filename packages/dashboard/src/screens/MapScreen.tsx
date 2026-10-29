@@ -4,6 +4,7 @@ import {
   Controls,
   type Edge,
   Handle,
+  MarkerType,
   MiniMap,
   type Node,
   type NodeProps,
@@ -11,6 +12,7 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { isVerified as isSiteVerified } from '@flow-checker/shared'
 import { useMemo } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
@@ -21,6 +23,8 @@ interface RouteNodeData extends Record<string, unknown> {
   route: Route
   componentCount: number
   noteCount: number
+  /** Every request on the route was captured. */
+  verified: boolean
   dimmed: boolean
 }
 type RouteNode = Node<RouteNodeData, 'route'>
@@ -66,6 +70,19 @@ function RouteGraphView({ q }: { q: string }) {
     for (const [, routeIds] of index.routesOf) {
       for (const id of routeIds) componentCount.set(id, (componentCount.get(id) ?? 0) + 1)
     }
+    // Requests per route: from its components, or sent by its route handler.
+    const routeRequests = new Map<string, { total: number; verified: number }>()
+    const count = (routeId: string, verified: boolean) => {
+      const entry = routeRequests.get(routeId) ?? { total: 0, verified: 0 }
+      entry.total++
+      if (verified) entry.verified++
+      routeRequests.set(routeId, entry)
+    }
+    for (const site of index.model.requests) {
+      const verified = isSiteVerified(site)
+      if (site.componentId) for (const id of index.routesOf.get(site.componentId) ?? []) count(id, verified)
+      else if (site.origin === 'route-handler' && site.routeId) count(site.routeId, verified)
+    }
     const nodes: RouteNode[] = graph.nodes.map((n) => ({
       id: n.route.id,
       type: 'route',
@@ -76,15 +93,32 @@ function RouteGraphView({ q }: { q: string }) {
         route: n.route,
         componentCount: componentCount.get(n.route.id) ?? 0,
         noteCount: notesByRoute.get(n.route.id) ?? 0,
+        verified: isVerified(routeRequests.get(n.route.id)),
         dimmed: false,
       },
     }))
-    const edges: Edge[] = graph.edges.map((e) => ({
-      id: e.id,
-      source: e.source,
-      target: e.target,
-      className: 'edge-hierarchy',
-    }))
+    const positions = new Map(graph.nodes.map((n) => [n.route.id, { x: n.x, y: n.y }]))
+    const edges: Edge[] = [
+      ...graph.edges.map((e) => ({
+        id: e.id,
+        source: e.source,
+        target: e.target,
+        sourceHandle: 'out',
+        targetHandle: 'in',
+        className: 'edge-hierarchy',
+      })),
+      // Links, router calls and redirects between pages (M7).
+      ...index.navEdges.map((e) => ({
+        id: `nav:${e.source}->${e.target}`,
+        source: e.source,
+        target: e.target,
+        type: 'smoothstep',
+        ...navHandles(positions.get(e.source), positions.get(e.target)),
+        className: `edge-nav${e.kinds.some((k) => k !== 'link') ? ' edge-nav-code' : ''}`,
+        markerEnd: { type: MarkerType.ArrowClosed },
+        label: e.kinds.filter((k) => k !== 'link').join(', ') || undefined,
+      })),
+    ]
     return { nodes, edges }
   }, [index])
 
@@ -112,10 +146,9 @@ function RouteGraphView({ q }: { q: string }) {
           fitView
           fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
           minZoom={0.2}
-          proOptions={{ hideAttribution: true }}
           onNodeClick={(_, node) => {
             const route = (node as RouteNode).data.route
-            if (route.kind === 'page') window.location.hash = href({ name: 'page', routeId: route.id })
+            window.location.hash = href({ name: 'page', routeId: route.id })
           }}
         >
           <Background gap={24} />
@@ -133,20 +166,48 @@ function RouteGraphView({ q }: { q: string }) {
         <span className="legend-item">
           <i className="line line-hierarchy" /> nested route
         </span>
+        <span className="legend-item">
+          <i className="line line-nav" /> link
+        </span>
+        <span className="legend-item">
+          <i className="line line-nav-code" /> push / redirect
+        </span>
       </div>
     </div>
   )
 }
 
+/** Forward edges go left to right. Within a column or backwards they use the top and bottom. */
+function navHandles(
+  source: { x: number; y: number } | undefined,
+  target: { x: number; y: number } | undefined,
+): { sourceHandle: string; targetHandle: string } {
+  if (!source || !target || target.x > source.x) return { sourceHandle: 'out', targetHandle: 'in' }
+  // Back to a page on the left: a U underneath both.
+  if (target.x < source.x) return { sourceHandle: 'bottom-out', targetHandle: 'bottom-in' }
+  return target.y >= source.y
+    ? { sourceHandle: 'bottom-out', targetHandle: 'top-in' }
+    : { sourceHandle: 'top-out', targetHandle: 'bottom-in' }
+}
+
+function isVerified(entry: { total: number; verified: number } | undefined): boolean {
+  return Boolean(entry && entry.total > 0 && entry.verified === entry.total)
+}
+
 function RouteNodeView({ data }: NodeProps<RouteNode>) {
-  const { route, componentCount, noteCount, dimmed } = data
+  const { route, componentCount, noteCount, verified, dimmed } = data
   const handler = route.kind === 'route-handler'
   return (
     <div
-      className={`route-node status-inferred${handler ? ' route-node-handler' : ''}${dimmed ? ' dimmed' : ''}`}
+      className={`route-node ${verified ? 'status-verified' : 'status-inferred'}${handler ? ' route-node-handler' : ''}${dimmed ? ' dimmed' : ''}`}
       title={route.file}
     >
-      <Handle type="target" position={Position.Left} isConnectable={false} />
+      <Handle type="target" id="in" position={Position.Left} isConnectable={false} />
+      {/* Navigation between pages in the same column goes over the top or bottom edge. */}
+      <Handle type="target" id="top-in" position={Position.Top} isConnectable={false} />
+      <Handle type="target" id="bottom-in" position={Position.Bottom} isConnectable={false} />
+      <Handle type="source" id="top-out" position={Position.Top} isConnectable={false} />
+      <Handle type="source" id="bottom-out" position={Position.Bottom} isConnectable={false} />
       <div className="route-node-path">{route.path}</div>
       <div className="route-node-meta">
         {handler ? (
@@ -160,7 +221,7 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
         {route.intercepting && <span>intercepts</span>}
         {noteCount > 0 && <span className="warn">⚠ {noteCount}</span>}
       </div>
-      <Handle type="source" position={Position.Right} isConnectable={false} />
+      <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>
   )
 }
@@ -213,21 +274,22 @@ function TreeNode({
         <span className="files">
           {files.map(([kind, file]) => {
             const route = routeByFile.get(file)
-            if (route?.kind === 'page') {
+            if (route) {
               return (
                 <a
                   key={kind}
-                  className="file-chip file-chip-page"
+                  className={`file-chip ${route.kind === 'page' ? 'file-chip-page' : 'file-chip-route'}`}
                   href={href({ name: 'page', routeId: route.id })}
+                  title={route.file}
                 >
                   {kind}
+                  {route.methods?.length ? ` ${route.methods.join(' ')}` : ''}
                 </a>
               )
             }
             return (
-              <span key={kind} className={`file-chip${route ? ' file-chip-route' : ''}`} title={file}>
+              <span key={kind} className="file-chip" title={file}>
                 {kind}
-                {route?.methods?.length ? ` ${route.methods.join(' ')}` : ''}
               </span>
             )
           })}

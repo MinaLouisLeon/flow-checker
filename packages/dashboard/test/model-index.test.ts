@@ -26,6 +26,25 @@ const route = (path: string, extra: Partial<Route> = {}): Route => ({
 })
 
 describe('buildIndex on fixtures', () => {
+  it('draws navigation edges from the page that navigates (basic, server-actions)', () => {
+    const edges = (name: string) => {
+      const index = buildIndex(fixture(name))
+      const path = (id: string) => index.routes.get(id)?.path
+      return index.navEdges.map((e) => `${path(e.source)} -> ${path(e.target)} ${e.kinds.join(',')}`).sort()
+    }
+    // Root layout links start from `/` only, not from every page below the layout.
+    expect(edges('basic')).toEqual(['/ -> /about link', '/ -> /users/[id] link', '/users/[id] -> / push'])
+    // The create form's server action redirects to the new product.
+    expect(edges('server-actions')).toContain('/products/new -> /products/[id] redirect')
+
+    const flows = buildIndex(fixture('next-intl')).flowsByRoute
+    expect([...flows.values()].map((list) => list.map((f) => f.name))).toEqual([
+      ['LoginForm submit'],
+      ['LoginForm submit'],
+      ['LoginForm submit'],
+    ])
+  })
+
   it('links components to the pages that render them (bff)', () => {
     const index = buildIndex(fixture('bff'))
     const home = index.model.routes.find((r) => r.path === '/')
@@ -50,6 +69,21 @@ describe('buildIndex on fixtures', () => {
     expect(index.typeUsage.get(byName('Todo'))?.usedBy.map(name)).toEqual(
       expect.arrayContaining(['TodoDetail', 'TodoList']),
     )
+  })
+
+  it('indexes requests by component, route handler and type (bff)', () => {
+    const index = buildIndex(fixture('bff'))
+    const table = index.model.components.find((c) => c.name === 'ProductsTable')
+    const handler = index.model.routes.find((r) => r.path === '/api/products')
+    const product = index.model.types.find((t) => t.name === 'Product')
+    const own = index.requestsByComponent.get(table?.id ?? '') ?? []
+    expect(own.map((s) => s.url?.path)).toEqual(['/api/products'])
+    expect((index.handlerRequests.get(handler?.id ?? '') ?? []).map((s) => s.handlerMethod)).toEqual([
+      'GET',
+      'POST',
+    ])
+    expect(index.handlerCallers.get(handler?.id ?? '')).toHaveLength(2)
+    expect(index.typeUsage.get(product?.id ?? '')?.requests).toContain(own[0]?.id)
   })
 
   it('has no scan notes for the clean fixtures', () => {
@@ -80,13 +114,34 @@ describe('scan notes', () => {
       routes: [route('/', { componentId: 'cmp_page' }), route('/empty')],
       components: [page],
       types: [],
+      requests: [
+        {
+          id: 'req_1',
+          origin: 'component',
+          componentId: 'cmp_page',
+          transport: 'fetch',
+          url: { text: 'url', confidence: 'unknown' },
+          trigger: { kind: 'server-render' },
+          callStack: [{ ...loc, callee: 'fetch' }],
+          status: 'inferred',
+          flags: [{ kind: 'dynamic-url', message: 'The URL could not be resolved: url' }],
+        },
+      ],
+      navigations: [],
+      flows: [],
     })
     expect(index.notes.map((n) => n.kind)).toEqual([
       'missing-page-component',
       'unresolved-component',
       'unresolved-type',
+      'request',
     ])
     expect(index.notes[1]?.message).toContain('<Mystery>')
+    expect(index.notes[3]).toMatchObject({
+      message: '? ? url: The URL could not be resolved: url',
+      componentId: 'cmp_page',
+      requestId: 'req_1',
+    })
   })
 })
 

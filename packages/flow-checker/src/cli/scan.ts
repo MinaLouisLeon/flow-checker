@@ -1,24 +1,49 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { ScanError, scanProject } from '@flow-checker/scanner'
-import { type AppModel, formatModel, formatTypes } from '@flow-checker/shared'
+import {
+  type AppModel,
+  type FlowCheckerConfig,
+  formatFlows,
+  formatModel,
+  formatRequests,
+  formatTypes,
+} from '@flow-checker/shared'
+import { ConfigError, loadConfig, scanSettings } from './config'
 import type { CliIO } from './run'
 
 export interface ScanCommandOptions {
   root?: string
   appDir?: string
+  /** Config file, relative to the root. Default: `flow-checker.config.*` in the root. */
+  config?: string
   tree?: boolean
   types?: boolean
+  requests?: boolean
+  flows?: boolean
 }
 
 /** `flow-checker scan`: scans the project and writes `.flow-checker/model.json`. */
-export function scanCommand(options: ScanCommandOptions, io: CliIO): number {
-  const root = resolve(options.root ?? process.cwd())
-  const started = performance.now()
+export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promise<number> {
+  let root = resolve(options.root ?? process.cwd())
 
+  let config: FlowCheckerConfig
+  try {
+    const loaded = await loadConfig(root, options.config)
+    config = loaded.config
+    root = loaded.root
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      io.err(error.message)
+      return 1
+    }
+    throw error
+  }
+
+  const started = performance.now()
   let model: AppModel
   try {
-    model = scanProject({ root, appDir: options.appDir })
+    model = scanProject({ root, appDir: options.appDir ?? config.appDir, ...scanSettings(config) })
   } catch (error) {
     if (error instanceof ScanError) {
       io.err(error.message)
@@ -31,6 +56,8 @@ export function scanCommand(options: ScanCommandOptions, io: CliIO): number {
 
   if (options.tree) io.out(formatModel(model))
   if (options.types) io.out(formatTypes(model))
+  if (options.requests) io.out(formatRequests(model))
+  if (options.flows) io.out(formatFlows(model))
 
   io.out(summary(model, performance.now() - started))
   io.out(`Wrote ${relative(process.cwd(), outFile) || outFile}`)
@@ -52,7 +79,9 @@ export function summary(model: AppModel, elapsedMs: number): string {
   const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
   return (
     `Scanned ${plural(pages, 'page')}, ${plural(handlers, 'route handler')}, ` +
-    `${plural(model.components.length, 'component')} and ${plural(model.types.length, 'type')} ` +
+    `${plural(model.components.length, 'component')}, ${plural(model.types.length, 'type')}, ` +
+    `${plural(model.requests.length, 'request')} ` +
+    `and ${plural(model.flows.length, 'flow')} ` +
     `in ${Math.round(elapsedMs)} ms.`
   )
 }

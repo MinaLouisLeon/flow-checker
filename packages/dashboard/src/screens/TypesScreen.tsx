@@ -1,4 +1,5 @@
 import { useData } from '../context'
+import { RequestList } from '../RequestView'
 import { href, replaceScreen } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
 import { Badge, Empty, matches, SearchBox, Section, SourceLink } from '../ui'
@@ -61,7 +62,7 @@ function TypeDetail({ typeId }: { typeId: string }) {
   const { index } = useData()
   const type = index.types.get(typeId)
   if (!type) return null
-  const usage = index.typeUsage.get(typeId) ?? { props: [], usedBy: [], inTypes: [] }
+  const usage = index.typeUsage.get(typeId) ?? { props: [], usedBy: [], inTypes: [], requests: [] }
   const componentLinks = (ids: string[]) => (
     <ul className="chips">
       {ids.map((id) => (
@@ -109,7 +110,11 @@ function TypeDetail({ typeId }: { typeId: string }) {
         )}
       </Section>
       <Section title="Requests">
-        <Empty>Request detection is not part of the scan yet.</Empty>
+        <RequestList
+          sites={usage.requests.map((id) => index.requests.get(id)).filter((s) => s !== undefined)}
+          empty="No request body or response uses it."
+          open={false}
+        />
       </Section>
     </div>
   )

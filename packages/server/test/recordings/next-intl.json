@@ -1,0 +1,450 @@
+{
+  "fixture": "next-intl",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvs03jjp9jifcbw5",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:00.757Z",
+      "durationMs": 12,
+      "pageUrl": "http://localhost:3077/en/login",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/auth/login",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "email": "ada@example.com",
+            "password": "[REDACTED:string]"
+          },
+          "size": 49
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "otpRequired": true,
+            "challengeId": "515708eb-7e2d-462b-b51a-de5c05e6f6f7"
+          },
+          "size": 73
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Sign inContinue\"",
+        "componentChain": [
+          "LoginForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:00.755Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at post (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:167:23)",
+        "at login (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:178:24)",
+        "at handleSubmit (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:31:209)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.body.password"
+      ],
+      "sourceStack": [
+        {
+          "fn": "post",
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "login",
+          "file": "src/lib/auth-api.ts",
+          "line": 17,
+          "column": 47
+        },
+        {
+          "fn": "handleSubmit",
+          "file": "src/components/LoginForm.tsx",
+          "line": 18,
+          "column": 42
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs03m38qj1vxekc",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:04.052Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/en/verify?challenge=515708eb-7e2d-462b-b51a-de5c05e6f6f7",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/auth/verify-otp",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "challengeId": "515708eb-7e2d-462b-b51a-de5c05e6f6f7",
+            "code": "[REDACTED:string]"
+          },
+          "size": 70
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "token": "[REDACTED:string]",
+            "user": {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            }
+          },
+          "size": 127
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Enter your codeVerify\"",
+        "componentChain": [
+          "VerifyOtpForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:04.052Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at post (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:167:23)",
+        "at verifyOtp (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:179:28)",
+        "at handleSubmit (http://localhost:3077/_next/static/chunks/_16isr7klsg8uo._.js:42:207)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.body.code",
+        "response.body.token"
+      ],
+      "sourceStack": [
+        {
+          "fn": "post",
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "verifyOtp",
+          "file": "src/lib/auth-api.ts",
+          "line": 20,
+          "column": 3
+        },
+        {
+          "fn": "handleSubmit",
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 27,
+          "column": 40
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs03ohrtukrhxrt",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:07.167Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/en/dashboard",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Enter your codeVerify\"",
+        "componentChain": [
+          "VerifyOtpForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:04.052Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at getMe (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:183:23)",
+        "at DashboardProfile.useEffect (http://localhost:3077/_next/static/chunks/_0gat20k9u9v_r._.js:29:179)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getMe",
+          "file": "src/lib/auth-api.ts",
+          "line": 25,
+          "column": 21
+        },
+        {
+          "fn": "DashboardProfile.useEffect",
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 16,
+          "column": 10
+        }
+      ]
+    },
+    {
+      "id": "cap_mvs03ohyl778o85f",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:07.174Z",
+      "durationMs": 55,
+      "pageUrl": "http://localhost:3077/en/dashboard",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Enter your codeVerify\"",
+        "componentChain": [
+          "VerifyOtpForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:04.052Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at getMe (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:183:23)",
+        "at DashboardProfile.useEffect (http://localhost:3077/_next/static/chunks/_0gat20k9u9v_r._.js:29:179)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getMe",
+          "file": "src/lib/auth-api.ts",
+          "line": 25,
+          "column": 21
+        },
+        {
+          "fn": "DashboardProfile.useEffect",
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 16,
+          "column": 10
+        }
+      ]
+    }
+  ]
+}

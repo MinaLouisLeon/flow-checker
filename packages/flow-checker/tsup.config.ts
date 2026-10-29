@@ -37,8 +37,19 @@ export default defineConfig([
     noExternal: internal,
     dts: { resolve: internal },
   },
+  // next.config files of older Next.js versions are often CommonJS (`require`), so this one
+  // entry ships both formats. It has no dependencies.
   {
-    entry: { cli: 'src/cli.ts' },
+    entry: { next: 'src/next.ts' },
+    format: ['esm', 'cjs'],
+    target: 'node18',
+    platform: 'node',
+    noExternal: internal,
+    dts: { resolve: internal },
+  },
+  {
+    // The dev scan session runs in a worker thread: dist/scan-worker.js, next to the CLI.
+    entry: { cli: 'src/cli.ts', 'scan-worker': 'src/cli/scan-worker.ts' },
     format: 'esm',
     target: 'node22',
     platform: 'node',

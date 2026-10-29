@@ -471,5 +471,457 @@
         ]
       }
     }
+  ],
+  "requests": [
+    {
+      "id": "req_1t6ibh8o0so",
+      "origin": "route-handler",
+      "routeId": "rt_0g0grflp887",
+      "handlerMethod": "GET",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${BACKEND_URL}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "BACKEND_URL",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1rwhmsgdwtz",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/products/[id]/route.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "backend"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1fo1arxc0gy"
+    },
+    {
+      "id": "req_0pmni454dyo",
+      "origin": "route-handler",
+      "routeId": "rt_1kkymdue03z",
+      "handlerMethod": "GET",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${BACKEND_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "BACKEND_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1rwhmsgdwtz",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/products/route.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "backend"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1cc8kojvliw"
+    },
+    {
+      "id": "req_02nrpzzew80",
+      "origin": "route-handler",
+      "routeId": "rt_1kkymdue03z",
+      "handlerMethod": "POST",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${BACKEND_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "BACKEND_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "bodyType": {
+        "text": "{ name: string; price: number; stock: number; }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "price",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "stock",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1rwhmsgdwtz",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/products/route.ts",
+          "line": 23,
+          "column": 21,
+          "callee": "backend"
+        },
+        {
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0cglnfd7ijn"
+    },
+    {
+      "id": "req_2c3yq1l5klb",
+      "origin": "component",
+      "componentId": "cmp_0w4ykuez903",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`/api/products/${id}`",
+        "confidence": "pattern",
+        "path": "/api/products/:id"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 12,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1rwhmsgdwtz",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 13,
+          "column": 5,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "2gkje0i3e9p",
+      "targetRouteId": "rt_0g0grflp887",
+      "chain": [
+        "req_1t6ibh8o0so"
+      ]
+    },
+    {
+      "id": "req_2ckm3fl20ym",
+      "origin": "component",
+      "componentId": "cmp_014pegw9zf7",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "'/api/products'",
+        "confidence": "exact",
+        "path": "/api/products"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 36,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "CreateProductInput",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_2g53pdr4pws",
+          "name": "CreateProductInput"
+        }
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1rwhmsgdwtz",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 21,
+          "column": 23,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0dhnh45ebpk",
+      "targetRouteId": "rt_1kkymdue03z",
+      "chain": [
+        "req_02nrpzzew80"
+      ]
+    },
+    {
+      "id": "req_1vj2qrt6hdx",
+      "origin": "component",
+      "componentId": "cmp_04zm0jsozsm",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "'/api/products'",
+        "confidence": "exact",
+        "path": "/api/products"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 11,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1rwhmsgdwtz",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 12,
+          "column": 5,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1alsu0dzg61",
+      "targetRouteId": "rt_1kkymdue03z",
+      "chain": [
+        "req_0pmni454dyo"
+      ]
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_1a6joyr2qdh",
+      "origin": "component",
+      "componentId": "cmp_0w4ykuez903",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 22,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/app/products/[id]/page.tsx",
+        "line": 22,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 22,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_0crjmabfgaa",
+      "origin": "component",
+      "componentId": "cmp_014pegw9zf7",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "`/products/${product.id}`",
+        "confidence": "pattern",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 36,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/CreateProductForm.tsx",
+        "line": 29,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 29,
+          "column": 7,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_1kdazzrvrkg"
+    },
+    {
+      "id": "nav_1tes8ciw0b9",
+      "origin": "component",
+      "componentId": "cmp_04zm0jsozsm",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/products/${p.id}`",
+        "confidence": "pattern",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 23,
+          "column": 15
+        }
+      },
+      "loc": {
+        "file": "src/components/ProductsTable.tsx",
+        "line": 23,
+        "column": 15
+      },
+      "callStack": [
+        {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 23,
+          "column": 15,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1kdazzrvrkg"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_0fhg9qnt2e5",
+      "name": "CreateProductForm submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_014pegw9zf7",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_014pegw9zf7",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2ckm3fl20ym"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_0crjmabfgaa",
+          "routeId": "rt_1kdazzrvrkg"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2c3yq1l5klb",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf",
+        "rt_1kdazzrvrkg"
+      ]
+    }
   ]
 }

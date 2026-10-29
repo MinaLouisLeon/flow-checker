@@ -2,7 +2,7 @@
 export const MODEL_VERSION = 1
 
 /** Name of the published npm package. */
-export const PACKAGE_NAME = '@integr8/flow-checker'
+export const PACKAGE_NAME = '@integr8-media/flow-checker'
 
 /** Name of the command users run. */
 export const CLI_NAME = 'flow-checker'
