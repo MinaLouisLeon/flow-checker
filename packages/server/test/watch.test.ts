@@ -31,7 +31,7 @@ describe('isWatched', () => {
 })
 
 describe('watchProject', () => {
-  it('reports added, changed and removed source files in one batch', async () => {
+  it('reports added, changed and removed source files', async () => {
     const root = mkdtempSync(join(tmpdir(), 'flow-checker-watcher-'))
     dirs.push(root)
     mkdirSync(join(root, 'app'))
@@ -48,24 +48,34 @@ describe('watchProject', () => {
         notify()
       },
     })
+    const all = { changed: new Set<string>(), added: new Set<string>(), removed: new Set<string>() }
+    const collect = () => {
+      for (const batch of batches.splice(0)) {
+        for (const kind of ['changed', 'added', 'removed'] as const) {
+          for (const path of batch[kind]) all[kind].add(path.replaceAll('\\', '/').slice(root.length + 1))
+        }
+      }
+      return all.changed.size + all.added.size + all.removed.size
+    }
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
     try {
-      const next = () => new Promise<void>((resolve) => (notify = resolve))
-      const got = next()
       writeFileSync(join(root, 'app', 'page.tsx'), 'export default function Page() { return <main /> }\n')
       writeFileSync(join(root, 'app', 'new.ts'), 'export const fresh = 1\n')
       unlinkSync(join(root, 'app', 'old.ts'))
       writeFileSync(join(root, 'node_modules', 'pkg', 'index.js'), 'module.exports = 1\n')
       writeFileSync(join(root, 'notes.md'), '# not code\n')
-      await got
-      // Late events from the same burst may arrive in a second batch.
-      await new Promise((resolve) => setTimeout(resolve, 200))
-
-      const all = { changed: new Set<string>(), added: new Set<string>(), removed: new Set<string>() }
-      for (const batch of batches) {
-        for (const kind of ['changed', 'added', 'removed'] as const) {
-          for (const path of batch[kind]) all[kind].add(path.replaceAll('\\', '/').slice(root.length + 1))
-        }
+      // Events can be slow on a busy machine: wait for the three expected ones, then a little
+      // longer to catch anything that should have been ignored.
+      const deadline = Date.now() + 5000
+      while (collect() < 3 && Date.now() < deadline) {
+        await new Promise<void>((resolve) => {
+          notify = resolve
+          setTimeout(resolve, 100)
+        })
       }
+      await sleep(300)
+      collect()
+
       expect([...all.changed]).toEqual(['app/page.tsx'])
       expect([...all.added]).toEqual(['app/new.ts'])
       expect([...all.removed]).toEqual(['app/old.ts'])

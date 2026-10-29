@@ -4,13 +4,12 @@ import {
   cpSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
-  symlinkSync,
   unlinkSync,
   writeFileSync,
 } from 'node:fs'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { AppModel, RequestSite } from '@flow-checker/shared'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -22,18 +21,18 @@ let root: string
 let session: ScanSession
 
 function copyFixture(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'flow-checker-incremental-'))
-  cpSync(fixture, dir, {
-    recursive: true,
-    filter: (src) => !/[\\/](node_modules|\.next|\.flow-checker)([\\/]|$)/.test(src),
-  })
-  // Linked, not copied: package types (axios, next) decide what counts as a request.
-  symlinkSync(join(fixture, 'node_modules'), join(dir, 'node_modules'), 'junction')
+  // Inside the fixture (gitignored), so its packages resolve as usual: package types (axios,
+  // next) decide what counts as a request. A link to node_modules from the system temp folder
+  // does not resolve on every OS (Windows CI has the repo and temp on different drives).
+  const dir = mkdtempSync(join(fixture, '.test-copy-'))
+  for (const entry of readdirSync(fixture)) {
+    if (/^(node_modules|\.next|\.flow-checker|\.test-copy-.*)$/.test(entry)) continue
+    cpSync(join(fixture, entry), join(dir, entry), { recursive: true })
+  }
   return dir
 }
 
 function removeCopy(dir: string) {
-  unlinkSync(join(dir, 'node_modules'))
   rmSync(dir, { recursive: true, force: true })
 }
 
@@ -58,7 +57,7 @@ describe('scan session', () => {
     root = copyFixture()
     session = createScanSession({ root })
   })
-  afterAll(() => removeCopy(root))
+  afterAll(() => root && removeCopy(root))
 
   it('starts with the same model as a fresh scan', () => {
     expectFresh(session.model)

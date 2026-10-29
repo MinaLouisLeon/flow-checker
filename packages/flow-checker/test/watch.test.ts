@@ -1,16 +1,6 @@
 // M9 "done when": editing a fixture file updates the dashboard in under a second, and the request
 // sites whose code changed go to `needs-recheck`. Uses the basic fixture's recorded captures.
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  symlinkSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs'
-import { tmpdir } from 'node:os'
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ENV, type RuntimeConfig } from '@flow-checker/runtime/options'
 import type { AppModel, Capture, CaptureSummary, RequestSite, ScanEvent } from '@flow-checker/shared'
@@ -107,12 +97,14 @@ const statuses = (model: AppModel) =>
 
 describe('watch + incremental re-scan', () => {
   beforeAll(async () => {
-    root = mkdtempSync(join(tmpdir(), 'flow-checker-watch-'))
-    cpSync(fixture, root, {
-      recursive: true,
-      filter: (src) => !/[\\/](node_modules|\.next|\.flow-checker)([\\/]|$)/.test(src),
-    })
-    symlinkSync(join(fixture, 'node_modules'), join(root, 'node_modules'), 'junction')
+    // Inside the fixture (gitignored), so its packages resolve as usual. The config file is left
+    // out: it imports the built package, which doesn't exist before `pnpm build`.
+    root = mkdtempSync(join(fixture, '.test-copy-'))
+    for (const entry of readdirSync(fixture)) {
+      if (/^(node_modules|\.next|\.flow-checker|\.test-copy-.*|flow-checker\.config\.ts)$/.test(entry))
+        continue
+      cpSync(join(fixture, entry), join(root, entry), { recursive: true })
+    }
     // Captures from an earlier run: matched on start.
     const unmatched = join(root, '.flow-checker', 'captures', '_unmatched')
     mkdirSync(unmatched, { recursive: true })
@@ -131,8 +123,7 @@ describe('watch + incremental re-scan', () => {
   afterAll(async () => {
     live?.close()
     await server?.close()
-    unlinkSync(join(root, 'node_modules'))
-    rmSync(root, { recursive: true, force: true })
+    if (root) rmSync(root, { recursive: true, force: true })
   })
 
   it('starts with the recorded captures verifying their sites', async () => {
