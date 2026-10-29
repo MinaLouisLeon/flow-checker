@@ -1,6 +1,7 @@
 // Watches the project's source files for the incremental re-scan (M9, docs/PLAN.md 6.7).
 // Bursts of events (a save that writes several files, a branch switch) arrive as one batch.
-import { existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, readFileSync } from 'node:fs'
 import { relative } from 'node:path'
 import { watch } from 'chokidar'
 
@@ -57,15 +58,26 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
   const { root } = options
   const debounceMs = options.debounceMs ?? 40
   const pending = new Map<string, 'add' | 'change' | 'unlink'>()
+  // Content hash of each file as last reported. Some file systems (macOS FSEvents) send a second
+  // `change` for a file that was just added or saved, after its batch went out; a change whose
+  // content is the same as last reported can't change the scan, so it is dropped.
+  const reported = new Map<string, string>()
   let timer: ReturnType<typeof setTimeout> | undefined
 
   const flush = () => {
     timer = undefined
     const batch: WatchBatch = { changed: [], added: [], removed: [] }
     for (const [path, kind] of pending) {
-      const exists = existsSync(path)
-      if (!exists) batch.removed.push(path)
-      else if (kind === 'add') batch.added.push(path)
+      if (!existsSync(path)) {
+        reported.delete(path)
+        batch.removed.push(path)
+        continue
+      }
+      const hash = contentHash(path)
+      if (kind === 'change' && hash !== undefined && reported.get(path) === hash) continue
+      if (hash === undefined) reported.delete(path)
+      else reported.set(path, hash)
+      if (kind === 'add') batch.added.push(path)
       else batch.changed.push(path)
     }
     pending.clear()
@@ -96,9 +108,19 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
         close: async () => {
           if (timer) clearTimeout(timer)
           pending.clear()
+          reported.clear()
           await watcher.close()
         },
       }),
     )
   })
+}
+
+/** SHA-1 of a file's content, or undefined when it can't be read (a directory, a race). */
+function contentHash(path: string): string | undefined {
+  try {
+    return createHash('sha1').update(readFileSync(path)).digest('hex')
+  } catch {
+    return undefined
+  }
 }
