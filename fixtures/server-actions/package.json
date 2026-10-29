@@ -16,7 +16,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
-    "@integr8/flow-checker": "workspace:*",
+    "@integr8-media/flow-checker": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

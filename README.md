@@ -3,14 +3,14 @@
 Maps a Next.js App Router project: its pages, components, requests, types and user flows. It verifies that map against real traffic while you use the app, and exports it as documentation.
 
 ```bash
-npm install -D @integr8/flow-checker
+npm install -D @integr8-media/flow-checker
 npx flow-checker init     # adds the capture hooks and a config file
 npx flow-checker          # scans, opens the dashboard and starts your app with capture on
 ```
 
 **User docs:** [package README](packages/flow-checker/README.md) (setup, commands, Next.js 13.4–15.2, redaction, limits) and [docs/config.md](docs/config.md) (every config option). The design and milestones are in [docs/PLAN.md](docs/PLAN.md), and releases in the [changelog](packages/flow-checker/CHANGELOG.md).
 
-Published as [`@integr8/flow-checker`](https://www.npmjs.com/package/@integr8/flow-checker). The command is `flow-checker`.
+Published as [`@integr8-media/flow-checker`](https://www.npmjs.com/package/@integr8-media/flow-checker). The command is `flow-checker`.
 
 ## Repository layout
 
@@ -25,7 +25,7 @@ Published as [`@integr8/flow-checker`](https://www.npmjs.com/package/@integr8/fl
 | `packages/exporter`     | Markdown and static HTML export                                                            |
 | `fixtures/*`            | Small Next.js 16 apps used as test inputs, one per pattern ([details](fixtures/README.md)) |
 
-Internal packages (`@flow-checker/*`) are private and source-only. Other packages import their TypeScript directly, and `tsup` bundles them into `@integr8/flow-checker` at build time.
+Internal packages (`@flow-checker/*`) are private and source-only. Other packages import their TypeScript directly, and `tsup` bundles them into `@integr8-media/flow-checker` at build time.
 
 ## Development
 

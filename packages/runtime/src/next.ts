@@ -40,7 +40,7 @@ type ConfigInput<C> = C | ((...args: any[]) => C | Promise<C>)
  *
  * ```js
  * // next.config.mjs
- * import { withFlowChecker } from '@integr8/flow-checker/next'
+ * import { withFlowChecker } from '@integr8-media/flow-checker/next'
  * export default withFlowChecker({ reactStrictMode: true })
  * ```
  */

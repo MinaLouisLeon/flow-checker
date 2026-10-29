@@ -1,4 +1,4 @@
-import { defineConfig } from '@integr8/flow-checker/config'
+import { defineConfig } from '@integr8-media/flow-checker/config'
 
 export default defineConfig({
   capture: {

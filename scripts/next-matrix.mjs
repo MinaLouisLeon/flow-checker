@@ -1,5 +1,5 @@
 // Next.js version matrix (docs/PLAN.md M11). For each version it creates a small App Router app,
-// installs that Next.js version with the packed @integr8/flow-checker, sets it up the way the
+// installs that Next.js version with the packed @integr8-media/flow-checker, sets it up the way the
 // docs say (`flow-checker init`, plus withFlowChecker() before 15.3), and checks:
 //
 //   doctor  → no failed check
@@ -116,7 +116,7 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     app,
   )
 
-  const cli = join(app, 'node_modules', '@integr8', 'flow-checker', 'dist', 'cli.js')
+  const cli = join(app, 'node_modules', '@integr8-media', 'flow-checker', 'dist', 'cli.js')
   const fc = (...a) => run(process.execPath, [cli, ...a], app)
 
   // Set up as a user would: init, then (before 15.3) the next.config wrapper init asks for.
@@ -127,7 +127,7 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   if (legacy) {
     writeFileSync(
       join(app, 'next.config.js'),
-      "const { withFlowChecker } = require('@integr8/flow-checker/next')\n\nmodule.exports = withFlowChecker({})\n",
+      "const { withFlowChecker } = require('@integr8-media/flow-checker/next')\n\nmodule.exports = withFlowChecker({})\n",
     )
   }
 

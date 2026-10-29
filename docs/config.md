@@ -3,7 +3,7 @@
 flow-checker works without a config file: the app directory, dev command, ports and package manager are detected. Add `flow-checker.config.ts` in the project root to change them (`flow-checker init` creates one).
 
 ```ts
-import { defineConfig } from '@integr8/flow-checker/config'
+import { defineConfig } from '@integr8-media/flow-checker/config'
 
 export default defineConfig({
   root: '.',
@@ -157,7 +157,7 @@ Each export folder gets a `.flow-checker-export.json` listing the files it wrote
 Only needed on Next.js 13.4–15.2 (see the [README](../packages/flow-checker/README.md#nextjs-before-153)).
 
 ```ts
-import { withFlowChecker } from '@integr8/flow-checker/next'
+import { withFlowChecker } from '@integr8-media/flow-checker/next'
 
 export default withFlowChecker(nextConfig, {
   // Both optional:

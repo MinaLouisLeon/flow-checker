@@ -3,7 +3,7 @@
 Maps a Next.js **App Router** project (its pages, components, requests, types and user flows), checks that map against real traffic while you use the app, and exports it as documentation.
 
 ```bash
-npm install -D @integr8/flow-checker
+npm install -D @integr8-media/flow-checker
 npx flow-checker init     # adds two capture hooks and a config file
 npx flow-checker          # scans, opens the dashboard and starts your app with capture on
 ```
@@ -33,7 +33,7 @@ Next.js 15.3 added the `instrumentation-client` file that loads the browser hook
 
 ```js
 // next.config.mjs
-import { withFlowChecker } from '@integr8/flow-checker/next'
+import { withFlowChecker } from '@integr8-media/flow-checker/next'
 
 export default withFlowChecker({
   // your config
@@ -42,7 +42,7 @@ export default withFlowChecker({
 
 ```js
 // next.config.js (CommonJS)
-const { withFlowChecker } = require('@integr8/flow-checker/next')
+const { withFlowChecker } = require('@integr8-media/flow-checker/next')
 
 module.exports = withFlowChecker({})
 ```
@@ -95,7 +95,7 @@ Optional. Everything is auto-detected. See [docs/config.md](https://github.com/M
 
 ```ts
 // flow-checker.config.ts
-import { defineConfig } from '@integr8/flow-checker/config'
+import { defineConfig } from '@integr8-media/flow-checker/config'
 
 export default defineConfig({
   root: '.', // project root, relative to this file

@@ -83,4 +83,42 @@ describe('watchProject', () => {
       await watcher.close()
     }
   })
+
+  it('drops a change that leaves the content as it was last reported', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'flow-checker-watcher-'))
+    dirs.push(root)
+    mkdirSync(join(root, 'app'))
+    const file = join(root, 'app', 'page.tsx')
+    writeFileSync(file, 'export default function Page() { return null }\n')
+
+    const batches: WatchBatch[] = []
+    const watcher = await watchProject({ root, onChange: (batch) => batches.push(batch) })
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+    const reportedPaths = () => batches.flatMap((b) => [...b.changed, ...b.added])
+    const waitForBatch = async () => {
+      const deadline = Date.now() + 5000
+      while (batches.length === 0 && Date.now() < deadline) await sleep(50)
+    }
+    try {
+      // A real edit is reported.
+      writeFileSync(file, 'export default function Page() { return <main /> }\n')
+      await waitForBatch()
+      expect(reportedPaths()).toHaveLength(1)
+
+      // Saving the same content again (or a late duplicate event, as macOS sends) is not.
+      batches.length = 0
+      writeFileSync(file, 'export default function Page() { return <main /> }\n')
+      await sleep(600)
+      expect(batches).toEqual([])
+
+      // The next real edit is reported again.
+      writeFileSync(file, 'export default function Page() { return <section /> }\n')
+      await waitForBatch()
+      expect(reportedPaths().map((p) => p.replaceAll('\\', '/').slice(root.length + 1))).toEqual([
+        'app/page.tsx',
+      ])
+    } finally {
+      await watcher.close()
+    }
+  })
 })

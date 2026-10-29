@@ -1,6 +1,6 @@
 # Fixtures
 
-Small Next.js 16 App Router apps used as scanner inputs (snapshot tests) and for end-to-end capture tests (`e2e/`). Each app has the capture hooks `flow-checker init` writes, importing the workspace build of `@integr8/flow-checker` (run `pnpm build` first). Each covers one group of patterns from docs/PLAN.md section 6.
+Small Next.js 16 App Router apps used as scanner inputs (snapshot tests) and for end-to-end capture tests (`e2e/`). Each app has the capture hooks `flow-checker init` writes, importing the workspace build of `@integr8-media/flow-checker` (run `pnpm build` first). Each covers one group of patterns from docs/PLAN.md section 6.
 
 | Fixture          | `app/` location     | Covers                                                                                                                                                                                                                     |
 | ---------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
