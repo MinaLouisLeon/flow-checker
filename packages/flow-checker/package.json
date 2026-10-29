@@ -1,5 +1,5 @@
 {
-  "name": "@integr8/flow-checker",
+  "name": "@integr8-media/flow-checker",
   "version": "0.1.0",
   "description": "Map a Next.js App Router project: pages, components, requests, types and flows, verified against live traffic and exported as documentation.",
   "keywords": [

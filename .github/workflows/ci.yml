@@ -29,7 +29,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      # Fixtures import the built @integr8/flow-checker (their capture hooks).
+      # Fixtures import the built @integr8-media/flow-checker (their capture hooks).
       - run: pnpm typecheck:fixtures
       - name: Verify published package (pack, install, run, typecheck)
         run: pnpm verify:package

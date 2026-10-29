@@ -49,13 +49,13 @@ describe('flow-checker init', () => {
     expect(await runCli(['init', '--root', root, '--yes'], cli)).toBe(0)
 
     expect(read(root, 'src/instrumentation-client.ts')).toContain(
-      "import { installClientRuntime } from '@integr8/flow-checker/runtime/client'",
+      "import { installClientRuntime } from '@integr8-media/flow-checker/runtime/client'",
     )
     expect(read(root, 'src/instrumentation.ts')).toContain("process.env.NEXT_RUNTIME === 'nodejs'")
     expect(read(root, 'flow-checker.config.ts')).toContain('storeRaw: false')
     expect(read(root, '.gitignore')).toContain('.flow-checker/captures/')
     expect(hookStatus(root, join(root, 'src', 'app'))).toEqual({ client: true, server: true })
-    expect(out.join('\n')).toContain('Add it to the project: npm install -D @integr8/flow-checker')
+    expect(out.join('\n')).toContain('Add it to the project: npm install -D @integr8-media/flow-checker')
 
     // Running it again changes nothing.
     const again = io()

@@ -13,8 +13,8 @@ afterEach(async () => {
   await Promise.all(servers.splice(0).map((s) => new Promise((r) => s.close(r))))
 })
 
-const CLIENT = "import { installClientRuntime } from '@integr8/flow-checker/runtime/client'\n"
-const SERVER = "await import('@integr8/flow-checker/runtime/server')\n"
+const CLIENT = "import { installClientRuntime } from '@integr8-media/flow-checker/runtime/client'\n"
+const SERVER = "await import('@integr8-media/flow-checker/runtime/server')\n"
 
 function project(files: Record<string, string>) {
   const dir = mkdtempSync(join(tmpdir(), 'flow-checker-doctor-'))
@@ -30,7 +30,7 @@ function project(files: Record<string, string>) {
 function installed(next: string) {
   return {
     'node_modules/next/package.json': JSON.stringify({ version: next }),
-    'node_modules/@integr8/flow-checker/package.json': '{}',
+    'node_modules/@integr8-media/flow-checker/package.json': '{}',
   }
 }
 
@@ -53,7 +53,7 @@ describe('flow-checker doctor', () => {
     const root = project({
       'package.json': JSON.stringify({
         scripts: { dev: 'next dev' },
-        devDependencies: { '@integr8/flow-checker': '0.1.0' },
+        devDependencies: { '@integr8-media/flow-checker': '0.1.0' },
       }),
       'package-lock.json': '{}',
       'tsconfig.json': '{ // comments are fine\n "compilerOptions": { "paths": { "@/*": ["./src/*"] } } }',
@@ -117,7 +117,7 @@ describe('flow-checker doctor', () => {
     let checks = byName(await runDoctor({ root: project(files), ...(await freePorts()) }))
     expect(checks['next.config']).toMatchObject({ status: 'fail' })
     expect(checks['next.config']?.hint).toContain(
-      "import { withFlowChecker } from '@integr8/flow-checker/next'",
+      "import { withFlowChecker } from '@integr8-media/flow-checker/next'",
     )
     expect(checks['Dev command']?.status).toBe('warn')
 
@@ -126,7 +126,7 @@ describe('flow-checker doctor', () => {
         root: project({
           ...files,
           'next.config.js':
-            "const { withFlowChecker } = require('@integr8/flow-checker/next')\nmodule.exports = withFlowChecker({})\n",
+            "const { withFlowChecker } = require('@integr8-media/flow-checker/next')\nmodule.exports = withFlowChecker({})\n",
         }),
         ...(await freePorts()),
       }),

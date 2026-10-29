@@ -1,5 +1,5 @@
 // Checks that the published package uses every config option (docs/config.md). Packs
-// @integr8/flow-checker, installs it into an empty project, writes a config that sets every
+// @integr8-media/flow-checker, installs it into an empty project, writes a config that sets every
 // option to a non-default value, and checks each one's effect through the installed CLI.
 // Run after `pnpm build`: node scripts/verify-config.mjs
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
@@ -65,7 +65,7 @@ try {
   const [dashboardPort, appPort] = [await freePort(), await freePort()]
   write(top, {
     'tools/flow-checker.config.ts': lines(
-      `import { defineConfig } from '@integr8/flow-checker/config'`,
+      `import { defineConfig } from '@integr8-media/flow-checker/config'`,
       `export default defineConfig({`,
       `  root: '../web',`,
       `  appDir: 'src/application',`,
@@ -116,7 +116,7 @@ try {
     'web/start-app.js': '',
   })
 
-  const cli = join(top, 'node_modules', '@integr8', 'flow-checker', 'dist', 'cli.js')
+  const cli = join(top, 'node_modules', '@integr8-media', 'flow-checker', 'dist', 'cli.js')
   const config = ['--config', 'tools/flow-checker.config.ts']
   const fc = (...a) => run(process.execPath, [cli, ...a, ...config], top)
 

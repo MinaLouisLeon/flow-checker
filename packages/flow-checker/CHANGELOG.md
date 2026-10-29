@@ -12,4 +12,4 @@ First public release.
 - **Export:** Markdown docs with Mermaid diagrams, and a static read-only copy of the dashboard.
 - **Config:** `root`, `appDir`, `devCommand`, `ports`, `include`/`exclude` (file globs; tests, stories and mocks skipped by default), `apiClients` (HTTP libraries and API client packages whose calls are requests), `capture`, `types.maxDepth` and `export`. `flow-checker init` writes the defaults into the new config file.
 - **`flow-checker doctor`** checks Node, Next.js, hooks, tsconfig, ports and `.gitignore`.
-- **`withFlowChecker()`** (`@integr8/flow-checker/next`) makes the capture hooks work on Next.js 13.4–15.2.
+- **`withFlowChecker()`** (`@integr8-media/flow-checker/next`) makes the capture hooks work on Next.js 13.4–15.2.

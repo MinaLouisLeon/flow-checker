@@ -216,7 +216,7 @@ The tool runs the dev command with `FLOW_CHECKER=1`, `PORT=<app port>`, and the 
 - `flow-checker init` makes these one-line additions, with your confirmation. Every hook is a **no-op unless `FLOW_CHECKER=1`**, and the runtime is excluded from production builds.
 - `flow-checker doctor` checks the setup.
 - **Built in M5:** the 15.3+ path. `dev` warns when a hook is missing.
-- **Built in M11:** `withFlowChecker()` (`@integr8/flow-checker/next`, ESM and CommonJS). Before 15.3 it prepends the project's own `instrumentation-client.*` to the webpack `main-app` client entry in dev, so the same hook files work on every version; before 15.0 it also sets `experimental.instrumentationHook`. It returns the config untouched without `FLOW_CHECKER=1` or on 15.3+, and accepts config functions. Turbopack ignores webpack config, so browser capture before 15.3 needs `next dev` without `--turbo` (`doctor` warns). `init` prints the wrapper snippet when it is needed.
+- **Built in M11:** `withFlowChecker()` (`@integr8-media/flow-checker/next`, ESM and CommonJS). Before 15.3 it prepends the project's own `instrumentation-client.*` to the webpack `main-app` client entry in dev, so the same hook files work on every version; before 15.0 it also sets `experimental.instrumentationHook`. It returns the config untouched without `FLOW_CHECKER=1` or on 15.3+, and accepts config functions. Turbopack ignores webpack config, so browser capture before 15.3 needs `next dev` without `--turbo` (`doctor` warns). `init` prints the wrapper snippet when it is needed.
 
 ### 7.2 Browser side
 
