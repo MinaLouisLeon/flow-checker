@@ -4,6 +4,7 @@
 import { z } from 'zod'
 import { type CaptureMatch, CaptureMatchSchema } from './match'
 import { SourceLocSchema } from './model'
+import { TypeCheckSchema, type TypeCheckStatus, typeCheckStatus } from './type-check'
 
 /** A request or response body, cut to `maxBodyBytes`. */
 export const CapturedBodySchema = z.discriminatedUnion('kind', [
@@ -108,6 +109,8 @@ export const CaptureSchema = z.object({
   sourceStack: z.array(SourceLocSchema.extend({ fn: z.string().optional() })).optional(),
   /** Which request site this is, set by the tool server (M6). Absent until matched. */
   match: CaptureMatchSchema.optional(),
+  /** The bodies compared with the matched site's declared types, set by the tool server (M8). */
+  typeCheck: TypeCheckSchema.optional(),
 })
 export type Capture = z.infer<typeof CaptureSchema>
 
@@ -169,6 +172,8 @@ export interface CaptureSummary {
   component?: string
   redacted: boolean
   match?: Pick<CaptureMatch, 'status' | 'by' | 'siteId' | 'score'>
+  /** Result of comparing the bodies with the matched site's types. */
+  typeCheck?: TypeCheckStatus
 }
 
 export function summarizeCapture(c: Capture): CaptureSummary {
@@ -194,5 +199,6 @@ export function summarizeCapture(c: Capture): CaptureSummary {
       siteId: c.match.siteId,
       score: c.match.score,
     },
+    typeCheck: c.typeCheck && typeCheckStatus(c.typeCheck),
   }
 }

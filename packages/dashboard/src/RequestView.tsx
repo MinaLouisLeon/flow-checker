@@ -1,10 +1,11 @@
 // One request site: method + URL, how and when it is sent, body and response types,
 // the server hops it leads to, and the call stack from the component down to the network call.
-import { type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
-import { useSiteCaptures } from './api'
+import { isVerified, type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
+import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import type { ModelIndex } from './model-index'
 import { href } from './router'
+import { SiteStatusBadge, SiteTypeCheckView, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
 import { Badge, Empty, SourceLink } from './ui'
 
@@ -124,11 +125,7 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
             ⚠ {site.flags.length}
           </Badge>
         )}
-        {site.status === 'verified' && (
-          <Badge tone="ok" title="Live capture recorded this request">
-            ✓ verified
-          </Badge>
-        )}
+        <SiteStatusBadge site={site} />
       </summary>
 
       <div className="request-body">
@@ -231,7 +228,8 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           </div>
         )}
 
-        {site.status === 'verified' && <SiteCaptures site={site} />}
+        {site.status === 'mismatch' && <SiteMismatches site={site} />}
+        {isVerified(site) && <SiteCaptures site={site} />}
 
         <div className="request-stack">
           <h4>Call path</h4>
@@ -247,6 +245,24 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         </div>
       </div>
     </details>
+  )
+}
+
+/** What didn't match the types, across the site's captures. */
+function SiteMismatches({ site }: { site: RequestSite }) {
+  const { meta } = useData()
+  const check = useVerification(Boolean(meta.capture)).data?.sites[site.id]?.typeCheck
+  if (!check) return null
+  return (
+    <div className="request-type-check">
+      <h4>
+        Type check{' '}
+        <span className="muted">
+          {check.mismatched} of {check.checked} capture{check.checked === 1 ? '' : 's'} didn't match
+        </span>
+      </h4>
+      <SiteTypeCheckView mismatches={check.mismatches} checked={check.checked} />
+    </div>
   )
 }
 
@@ -270,6 +286,7 @@ function SiteCaptures({ site }: { site: RequestSite }) {
               </code>
             </a>
             <span className="spacer" />
+            <TypeCheckBadge status={c.typeCheck} quiet />{' '}
             <span className={c.status !== undefined && c.status < 400 ? 'muted' : 'warn'}>
               {c.status ?? 'failed'}
             </span>

@@ -1,3 +1,4 @@
+import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import type { NoteKind, ScanNote } from '../model-index'
@@ -5,6 +6,7 @@ import { href } from '../router'
 import { Empty, Section, SourceLink } from '../ui'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
+  'type-mismatch': "Requests whose data doesn't match the types",
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
@@ -27,7 +29,8 @@ export function Overview() {
   ).length
   const onEvent = clientRequests.filter((s) => s.trigger.kind === 'event').length
   const serverHops = model.requests.length - clientRequests.length
-  const verified = model.requests.filter((s) => s.status === 'verified').length
+  const verified = model.requests.filter(isVerified).length
+  const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
@@ -89,6 +92,17 @@ export function Overview() {
                 </span>
                 <a href={href({ name: 'live', q: '', filter: 'ambiguous' })}>
                   {counts.ambiguous} could be more than one request site. Pick the right one.
+                </a>
+              </li>
+            )}
+            {mismatched > 0 && (
+              <li>
+                <span className="warn-icon" aria-hidden>
+                  ⚠
+                </span>
+                <a href={href({ name: 'live', q: '', filter: 'mismatch' })}>
+                  {mismatched} request{mismatched === 1 ? '' : 's'} sent or received data that doesn't match
+                  the types in the code.
                 </a>
               </li>
             )}

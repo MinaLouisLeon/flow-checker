@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M7 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows). M8 (type comparison) is next. Updated: 2026-10-28.
+> Status: M0–M8 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison). M9 (watch + incremental re-scan) is next. Updated: 2026-10-29.
 
 ## 1. Goal
 
@@ -277,6 +277,16 @@ Captures are matched to scanned request sites with a score:
 
 **Type check:** the captured response and body are validated against the site's `TypeShape`. The results are `ok`, `missing field`, `extra field`, `wrong type`, or `null where non-null`. Any mismatch flags the site, and the UI shows the difference.
 
+**Built in M8** (`packages/shared`: `type-check.ts`, `verification.ts`; `packages/server/src/verify.ts`):
+
+- `checkCapture()` compares a matched capture's request body (`bodyType`) and response (`responseType`) with the site's types. Each part is `ok`, `mismatch` or `skipped` with a reason. Skipped: error responses (non-2xx, the type describes success), server action calls (React-encoded, not JSON; the action's own fetches are checked), form data, binary, truncated bodies, failed requests. An empty body is fine for `void`/`undefined`.
+- Mismatch kinds: `missing-field`, `extra-field`, `wrong-type`, `null`. Paths use the `redactedPaths` form (`response.body.user.email`). Array items share one path (`response.body[].id`) with a count. Tuple positions keep their index.
+- Rules: optional and `| undefined` properties may be missing; index signatures check unknown keys; `{}` accepts any object; unions report against the closest member (same JSON kind, matching literal discriminant, then fewest mismatches), or as a whole for scalar unions; object intersections are merged; branded primitives check only the primitive; `Date` accepts a string; `Promise<T>`/`Array<T>` unwrap; package types, type parameters and unresolved shapes are not checked. Masked values (`[REDACTED:string]`, `0`, `false`) only need the right JSON type.
+- The verifier runs it on every matched capture (on arrival and after each re-scan, so fixing a type clears the flag) and stores it as `Capture.typeCheck`. A `typeCheck` sent by the runtime is dropped.
+- `applyVerification()` (shared by server and dashboard) sets site status `mismatch` and adds a `type-mismatch` flag listing what didn't fit and in how many captures. `/api/verification` has per-site `typeCheck` (`checked`, `mismatched`, distinct mismatches). Capture summaries carry `typeCheck: ok|mismatch|skipped`.
+- Dashboard: `✗ type mismatch` badge, a type-check table on each request (field, problem, expected, captured, captures), a "Type check" section and `✗ types` badge on captures in Live, a "Type mismatch" filter, and a group on the overview to-do list.
+- **Check:** the `mismatch` fixture (types that disagree with `mock-api` on purpose; `GET /settings` added to the mock) is recorded like the others. `type-check.test.ts` requires the expected flags there (wrong type, missing and extra field, null, request body), `verified` with no flag for its correct site, and **no** mismatches in the five correctly typed fixtures.
+
 **Flow recording:** a session timeline is split into flows at the starting interaction (e.g. a submit). The ordered steps are matched to inferred flows:
 - If they match, the flow becomes `both` (confirmed).
 - If you took an unexpected path, it's added as a new `recorded` variant.
@@ -385,7 +395,7 @@ Every file is checked against a zod schema with a `version` field, so the format
 | M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done |
 | M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done |
 | M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done |
-| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | To do   |
+| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done |
 | M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | To do   |
 | M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | To do   |
 | M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | To do   |

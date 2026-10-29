@@ -1,11 +1,19 @@
 // Runs the matcher on captures as they arrive and after each re-scan, keeps your manual
-// decisions in `.flow-checker/overrides.json`, and derives each request site's status.
-import type {
-  AppModel,
-  Capture,
-  CaptureMatch,
-  SiteVerification,
-  VerificationSummary,
+// decisions in `.flow-checker/overrides.json`, compares matched captures with the site's
+// declared types (M8), and derives each request site's status.
+import {
+  type AppModel,
+  applyVerification,
+  type Capture,
+  type CaptureMatch,
+  checkCapture,
+  type RequestSite,
+  type SiteVerification,
+  summarizeTypeChecks,
+  type TypeCheck,
+  type TypeTable,
+  typeTable,
+  type VerificationSummary,
 } from '@flow-checker/shared'
 import { ServerActionResolver } from './actions'
 import { fingerprint, Matcher } from './matcher'
@@ -25,6 +33,8 @@ export interface VerifierOptions {
 export class Verifier {
   private model: AppModel
   private matcher: Matcher
+  private sites: Map<string, RequestSite>
+  private types: TypeTable
   private readonly store: CaptureStore
   private readonly mapper: SourceMapper
   private readonly actions: ServerActionResolver
@@ -35,6 +45,8 @@ export class Verifier {
   constructor(options: VerifierOptions) {
     this.model = options.model
     this.matcher = new Matcher(options.model)
+    this.sites = new Map(options.model.requests.map((s) => [s.id, s]))
+    this.types = typeTable(options.model.types)
     this.store = options.store
     this.mapper = new SourceMapper(options.root)
     this.actions = new ServerActionResolver(options.root)
@@ -47,6 +59,8 @@ export class Verifier {
   setModel(model: AppModel): void {
     this.model = model
     this.matcher = new Matcher(model)
+    this.sites = new Map(model.requests.map((s) => [s.id, s]))
+    this.types = typeTable(model.types)
     this.rematch(this.store.all(), true)
   }
 
@@ -54,11 +68,11 @@ export class Verifier {
   ingest(captures: Capture[]): void {
     for (const incoming of captures) {
       // The runtime must not decide these.
-      const { match: _, sourceStack: __, ...rest } = incoming
-      const capture: Capture = { ...rest }
+      const { match: _, sourceStack: __, typeCheck: ___, ...rest } = incoming
+      let capture: Capture = { ...rest }
       const frames = this.mapper.resolve(capture.stack)
       if (frames.length > 0) capture.sourceStack = frames
-      capture.match = this.matchOne(capture)
+      capture = this.evaluate(capture)
       this.store.add(capture)
       // Server hops that arrived first can now use this capture's match.
       if (capture.origin === 'browser') this.rematch(this.store.children(capture.id))
@@ -90,16 +104,9 @@ export class Verifier {
     this.changed()
   }
 
-  /** The model with each site's status from its matched captures. */
+  /** The model with each site's status (and type-mismatch flag) from its matched captures. */
   servedModel(): AppModel {
-    if (this.served) return this.served
-    const sites = this.siteVerification()
-    this.served = {
-      ...this.model,
-      requests: this.model.requests.map((site) =>
-        site.status === 'inferred' && sites[site.id] ? { ...site, status: 'verified' } : site,
-      ),
-    }
+    this.served ??= applyVerification(this.model, { sites: this.siteVerification() })
     return this.served
   }
 
@@ -122,6 +129,7 @@ export class Verifier {
 
   private siteVerification(): Record<string, SiteVerification> {
     const sites: Record<string, SiteVerification> = {}
+    const checks = new Map<string, { captureId: string; check: TypeCheck }[]>()
     for (const capture of this.store.all()) {
       const match = capture.match
       if (match?.status !== 'matched' || !match.siteId) continue
@@ -132,8 +140,27 @@ export class Verifier {
         entry.lastAt = capture.timestamp
         entry.lastCaptureId = capture.id
       }
+      if (capture.typeCheck?.siteId === match.siteId) {
+        const list = checks.get(match.siteId) ?? []
+        checks.set(match.siteId, list)
+        list.push({ captureId: capture.id, check: capture.typeCheck })
+      }
+    }
+    for (const [siteId, list] of checks) {
+      const entry = sites[siteId]
+      const typeCheck = summarizeTypeChecks(list)
+      if (entry && typeCheck) entry.typeCheck = typeCheck
     }
     return sites
+  }
+
+  /** The capture with its match and, when matched, the type comparison against that site. */
+  private evaluate(capture: Capture): Capture {
+    const { typeCheck: _, ...rest } = capture
+    const match = this.matchOne(capture)
+    const site = match.status === 'matched' && match.siteId ? this.sites.get(match.siteId) : undefined
+    const typeCheck = site ? checkCapture(capture, site, this.types) : undefined
+    return typeCheck ? { ...rest, match, typeCheck } : { ...rest, match }
   }
 
   private matchOne(capture: Capture): CaptureMatch {
@@ -160,9 +187,14 @@ export class Verifier {
     const hops: Capture[] = []
     let changed = false
     for (const capture of ordered) {
-      const match = this.matchOne(capture)
-      if (JSON.stringify(match) === JSON.stringify(capture.match)) continue
-      this.store.add({ ...capture, match })
+      const next = this.evaluate(capture)
+      if (
+        JSON.stringify(next.match) === JSON.stringify(capture.match) &&
+        JSON.stringify(next.typeCheck) === JSON.stringify(capture.typeCheck)
+      ) {
+        continue
+      }
+      this.store.add(next)
       changed = true
       // Server hops of a re-matched browser capture use its site as evidence.
       if (capture.origin === 'browser') {

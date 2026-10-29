@@ -1,0 +1,19 @@
+# Route tree
+
+app [layout, page]
+
+# Routes
+
+/  page  app/page.tsx
+
+# Layouts
+
+RootLayout  server  app/layout.tsx:5
+
+# Pages
+
+## /  app/page.tsx
+layouts: app/layout.tsx
+HomePage  server  app/page.tsx:8
+├─ SettingsPanel  client (use client)  components/SettingsPanel.tsx:8
+└─ TodoPanel  client (use client)  components/TodoPanel.tsx:9

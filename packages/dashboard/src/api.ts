@@ -1,10 +1,11 @@
-import type {
-  AppModel,
-  Capture,
-  CaptureSummary,
-  FlowsSummary,
-  RecordedFlow,
-  VerificationSummary,
+import {
+  type AppModel,
+  applyVerification,
+  type Capture,
+  type CaptureSummary,
+  type FlowsSummary,
+  type RecordedFlow,
+  type VerificationSummary,
 } from '@flow-checker/shared'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
@@ -126,24 +127,6 @@ export function useSiteCaptures(siteId: string, enabled: boolean) {
     enabled,
     staleTime: Number.POSITIVE_INFINITY,
   })
-}
-
-/** Sets each site's status from the verification summary (the server does the same for /api/model). */
-function applyVerification(model: AppModel, summary: VerificationSummary): AppModel {
-  let changed = false
-  const requests = model.requests.map((site) => {
-    const verified = Boolean(summary.sites[site.id])
-    if (site.status === 'inferred' && verified) {
-      changed = true
-      return { ...site, status: 'verified' as const }
-    }
-    if (site.status === 'verified' && !verified) {
-      changed = true
-      return { ...site, status: 'inferred' as const }
-    }
-    return site
-  })
-  return changed ? { ...model, requests } : model
 }
 
 function upsertCapture(client: ReturnType<typeof useQueryClient>, summary: CaptureSummary) {

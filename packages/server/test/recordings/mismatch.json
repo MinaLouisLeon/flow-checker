@@ -1,0 +1,689 @@
+{
+  "fixture": "mismatch",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvtj507a3gmo6giz",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:47.878Z",
+      "durationMs": 294,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Thu, 29 Oct 2026 12:38:48 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getAccounts (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0qo_fdr0vdlul._.js:126:17)",
+        "at async HomePage (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0qo_fdr0vdlul._.js:22:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getAccounts",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_13cmzl2vi57",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Account[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].id",
+                "expected": "string",
+                "actual": "number 1",
+                "count": 2
+              },
+              {
+                "kind": "missing-field",
+                "path": "response.body[].avatarUrl",
+                "expected": "string",
+                "actual": "missing",
+                "count": 2
+              },
+              {
+                "kind": "extra-field",
+                "path": "response.body[].role",
+                "expected": "not declared",
+                "actual": "string \"admin\"",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvtj50qw60pavr4f",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:48.584Z",
+      "durationMs": 29,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Thu, 29 Oct 2026 12:38:48 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getAccounts (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0qo_fdr0vdlul._.js:126:17)",
+        "at async HomePage (<repo>\\fixtures\\mismatch\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0qo_fdr0vdlul._.js:22:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getAccounts",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_13cmzl2vi57",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Account[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].id",
+                "expected": "string",
+                "actual": "number 1",
+                "count": 2
+              },
+              {
+                "kind": "missing-field",
+                "path": "response.body[].avatarUrl",
+                "expected": "string",
+                "actual": "missing",
+                "count": 2
+              },
+              {
+                "kind": "extra-field",
+                "path": "response.body[].role",
+                "expected": "not declared",
+                "actual": "string \"admin\"",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvtj5165eg3pk26a",
+      "sessionId": "ses_mvtj50z2tpuapuyq",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:49.133Z",
+      "durationMs": 16,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:763:195)",
+        "at getSettings (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:196:23)",
+        "at SettingsPanel.useEffect (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:22:166)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getSettings",
+          "file": "lib/api.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "SettingsPanel.useEffect",
+          "file": "components/SettingsPanel.tsx",
+          "line": 12,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_23elzbn49tu",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Settings",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "null",
+                "path": "response.body.digest",
+                "expected": "{ frequency: \"daily\" | \"weekly\" }",
+                "actual": "null"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvtj5168xxk4tesi",
+      "sessionId": "ses_mvtj50z2tpuapuyq",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:49.136Z",
+      "durationMs": 14,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:763:195)",
+        "at getTodos (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:200:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:88:163)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodos",
+          "file": "lib/api.ts",
+          "line": 15,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 13,
+          "column": 13
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1a4xvnngrvj",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvtj516e4kphr21z",
+      "sessionId": "ses_mvtj50z2tpuapuyq",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:49.142Z",
+      "durationMs": 12,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:763:195)",
+        "at getSettings (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:196:23)",
+        "at SettingsPanel.useEffect (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:22:166)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getSettings",
+          "file": "lib/api.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "SettingsPanel.useEffect",
+          "file": "components/SettingsPanel.tsx",
+          "line": 12,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_23elzbn49tu",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Settings",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "null",
+                "path": "response.body.digest",
+                "expected": "{ frequency: \"daily\" | \"weekly\" }",
+                "actual": "null"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvtj516fatpy6xpt",
+      "sessionId": "ses_mvtj50z2tpuapuyq",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:49.143Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:763:195)",
+        "at getTodos (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:200:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:88:163)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodos",
+          "file": "lib/api.ts",
+          "line": 15,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 13,
+          "column": 13
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1a4xvnngrvj",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvtj53314evqnk74",
+      "sessionId": "ses_mvtj50z2tpuapuyq",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-29T12:38:51.613Z",
+      "durationMs": 10,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Check types",
+            "userId": "1"
+          },
+          "size": 36
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": "1",
+            "done": false,
+            "title": "Check types"
+          },
+          "size": 56
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "TodoPanel",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-29T12:38:51.612Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1op0abtwvuuig._.js:763:195)",
+        "at createTodo (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:204:23)",
+        "at onSubmit (http://localhost:3077/_next/static/chunks/_0him-4us7skif._.js:94:180)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "createTodo",
+          "file": "lib/api.ts",
+          "line": 20,
+          "column": 21
+        },
+        {
+          "fn": "onSubmit",
+          "file": "components/TodoPanel.tsx",
+          "line": 19,
+          "column": 34
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1m9d40sdmxx",
+        "parts": [
+          {
+            "part": "request",
+            "type": "NewTodo",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "request.body.userId",
+                "expected": "number",
+                "actual": "string \"1\""
+              }
+            ]
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body.userId",
+                "expected": "number",
+                "actual": "string \"1\""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -79,3 +79,19 @@ browser GET localhost:4010/me
   → matched DashboardProfile · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/me
 browser GET localhost:4010/me
   → matched DashboardProfile · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/me
+
+## mismatch
+server GET localhost:4010/users
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/settings
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/settings
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser POST localhost:4010/todos
+  → matched TodoPanel · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos

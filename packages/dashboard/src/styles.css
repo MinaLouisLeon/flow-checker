@@ -1132,3 +1132,35 @@ a.stat:hover {
     display: none;
   }
 }
+
+/* Type comparison (M8) */
+.type-check {
+  display: grid;
+  gap: 12px;
+}
+.type-check-part h4 {
+  margin: 0 0 6px;
+}
+.type-check-part > p {
+  margin: 0 0 6px;
+}
+.request-type-check {
+  margin-top: 12px;
+}
+.mismatch-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.mismatch-table th,
+.mismatch-table td {
+  text-align: left;
+  padding: 4px 8px 4px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.mismatch-table th {
+  font-weight: 500;
+  color: var(--muted);
+}

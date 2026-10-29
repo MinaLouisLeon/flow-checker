@@ -12,6 +12,7 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { isVerified as isSiteVerified } from '@flow-checker/shared'
 import { useMemo } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
@@ -78,7 +79,7 @@ function RouteGraphView({ q }: { q: string }) {
       routeRequests.set(routeId, entry)
     }
     for (const site of index.model.requests) {
-      const verified = site.status === 'verified'
+      const verified = isSiteVerified(site)
       if (site.componentId) for (const id of index.routesOf.get(site.componentId) ?? []) count(id, verified)
       else if (site.origin === 'route-handler' && site.routeId) count(site.routeId, verified)
     }

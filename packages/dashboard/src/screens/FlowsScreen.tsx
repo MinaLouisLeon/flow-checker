@@ -7,6 +7,7 @@ import { useData } from '../context'
 import type { ModelIndex } from '../model-index'
 import { siteHref } from '../RequestView'
 import { href, replaceScreen } from '../router'
+import { SiteStatusBadge } from '../TypeCheckView'
 import { Badge, Empty, matches, SearchBox, Section, SourceLink } from '../ui'
 
 export function FlowsScreen({ flowId, q }: { flowId?: string; q: string }) {
@@ -273,7 +274,7 @@ function StepView({ step }: { step: FlowStep }) {
           )}
           {step.onLoad && <span className="muted"> on load</span>}
           {site.responseType && <span className="muted"> → {site.responseType.text}</span>}{' '}
-          {site.status === 'verified' && <Badge tone="ok">✓ verified</Badge>}
+          <SiteStatusBadge site={site} />
         </span>
       )
     }
