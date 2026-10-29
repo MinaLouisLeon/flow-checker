@@ -322,6 +322,13 @@ importers:
       "@flow-checker/shared":
         specifier: workspace:*
         version: link:../shared
+    devDependencies:
+      "@flow-checker/scanner":
+        specifier: workspace:*
+        version: link:../scanner
+      "@flow-checker/server":
+        specifier: workspace:*
+        version: link:../server
 
   packages/flow-checker:
     dependencies:

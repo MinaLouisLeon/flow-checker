@@ -6,6 +6,7 @@ import {
   type AppModel,
   diffCounts,
   diffModels,
+  type ExportData,
   IngestBatchSchema,
   type ScanEvent,
 } from '@flow-checker/shared'
@@ -15,6 +16,7 @@ import { streamSSE } from 'hono/streaming'
 import { FlowTracker } from './flows'
 import { OverridesFile } from './overrides'
 import type { ScanFeed } from './scan-feed'
+import { buildSnapshot, collectSnapshot } from './snapshot'
 import type { CaptureStore } from './store'
 import { Verifier } from './verify'
 
@@ -49,6 +51,21 @@ export interface AppOptions {
   capture?: CaptureOptions
   /** Scan results from the file watcher (M9). Each one replaces the model and is announced live. */
   scans?: ScanFeed
+  /** Export from the dashboard (M10). Without it, `POST /api/export` is off. */
+  exporter?: ExporterOptions
+}
+
+export type ExportFormat = 'md' | 'html'
+
+export interface ExporterOptions {
+  /** Where each format goes, as shown in the dashboard (relative to the root when inside it). */
+  dirs: Record<ExportFormat, string>
+  /** Renders and writes the snapshot. Throws with a message for the dashboard when it can't. */
+  write: (
+    format: ExportFormat,
+    data: ExportData,
+    options: { force: boolean },
+  ) => { dir: string; files: number } | Promise<{ dir: string; files: number }>
 }
 
 /** What the dashboard needs besides the model. */
@@ -64,6 +81,8 @@ export interface ServerMeta {
   watching: boolean
   /** Present when live capture is on. */
   capture?: { storeRaw: boolean }
+  /** Present when the dashboard can export (M10): the target folder of each format. */
+  export?: Record<ExportFormat, string>
 }
 
 // The server only listens on loopback. Checking the Host header as well blocks DNS
@@ -150,8 +169,40 @@ export function createApp(options: AppOptions): Hono {
       canRescan: Boolean(options.rescan),
       watching: Boolean(options.scans),
       capture: options.capture ? { storeRaw: options.capture.options.storeRaw } : undefined,
+      export: options.exporter?.dirs,
     } satisfies ServerMeta),
   )
+
+  // Export (M10): `{ "format": "md" | "html", "raw"?: boolean, "force"?: boolean }`. Uses the
+  // live state: the served model, matches, flow results and the captures in memory.
+  const exporter = options.exporter
+  if (exporter) {
+    app.post('/api/export', async (c) => {
+      const body = (await c.req.json().catch(() => undefined)) as
+        | { format?: unknown; raw?: unknown; force?: unknown }
+        | undefined
+      const format = body?.format
+      if (format !== 'md' && format !== 'html') {
+        return c.json({ error: 'Expected { "format": "md" | "html" }' }, 400)
+      }
+      const snapshot = {
+        root: options.root,
+        toolVersion: options.version,
+        raw: body?.raw === true,
+        ...(options.capture ? { capture: options.capture.options } : {}),
+      }
+      const data =
+        options.capture && verifier && flows
+          ? buildSnapshot({ ...snapshot, store: options.capture.store, verifier, flows })
+          : collectSnapshot({ ...snapshot, model })
+      try {
+        const result = await exporter.write(format, data, { force: body?.force === true })
+        return c.json({ ...result, redacted: data.redacted, captures: data.captureCounts })
+      } catch (error) {
+        return c.json({ error: (error as Error).message }, 409)
+      }
+    })
+  }
 
   app.post('/api/scan', async (c) => {
     const rescan = options.rescan

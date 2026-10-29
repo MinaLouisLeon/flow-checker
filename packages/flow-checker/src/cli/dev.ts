@@ -1,8 +1,7 @@
 import { spawn } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { isAbsolute, join, relative, resolve } from 'node:path'
 import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/runtime/options'
 import { createScanSession, ScanError, type ScanSession } from '@flow-checker/scanner'
 import {
@@ -17,7 +16,8 @@ import { type AppModel, DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-chec
 import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
 import { ConfigError, loadConfig } from './config'
-import { defaultDevCommand, ensureGitignore, hookStatus } from './project'
+import { configExportDirs, writeFormat } from './export'
+import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
 import type { CliIO } from './run'
 import { summary, writeModel } from './scan'
 
@@ -110,6 +110,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')
 
+  const exportDirs = configExportDirs(root, config)
   const watching = options.watch !== false
   const scans = watching ? new ScanFeed() : undefined
   const server = await startServer({
@@ -122,6 +123,16 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     version,
     port: options.port ?? config.ports?.dashboard ?? DEFAULT_PORTS.dashboard,
     capture: { store, token, options: captureOptions },
+    exporter: {
+      dirs: { md: shownPath(root, exportDirs.md), html: shownPath(root, exportDirs.html) },
+      write: (format, data, { force }) => {
+        const files = writeFormat(format, data, exportDirs[format], { force, dashboardDir })
+        io.out(
+          `Exported ${format === 'md' ? 'Markdown docs' : 'the static site'} to ${shownPath(root, exportDirs[format])}.`,
+        )
+        return { dir: shownPath(root, exportDirs[format]), files: files.length }
+      },
+    },
   })
   io.out(`Dashboard: ${server.url}`)
 
@@ -209,6 +220,12 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 }
 
+/** A folder relative to the project root (forward slashes), or absolute when outside it. */
+function shownPath(root: string, dir: string): string {
+  const rel = relative(root, dir)
+  return rel && !rel.startsWith('..') && !isAbsolute(rel) ? rel.split('\\').join('/') : dir
+}
+
 function describeFiles(files: string[]): string {
   if (files.length === 1) return files[0] ?? ''
   return `${files[0]} and ${files.length - 1} more`
@@ -244,16 +261,6 @@ function ingestToken(root: string): string {
   mkdirSync(join(root, '.flow-checker', 'cache'), { recursive: true })
   writeFileSync(file, token)
   return token
-}
-
-/** The built dashboard: next to the bundled CLI, or in the workspace when run from source. */
-function findDashboardDir(): string | undefined {
-  const here = fileURLToPath(new URL('.', import.meta.url))
-  const candidates = [
-    join(here, 'dashboard'), // dist/cli.js → dist/dashboard
-    join(here, '..', '..', '..', 'dashboard', 'dist'), // src/cli/dev.ts → packages/dashboard/dist
-  ]
-  return candidates.find((dir) => existsSync(join(dir, 'index.html')))
 }
 
 function openBrowser(url: string) {

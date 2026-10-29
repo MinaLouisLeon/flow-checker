@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/__snapshots__", "!**/test/recordings"]
+    "includes": ["**", "!**/__snapshots__", "!**/test/recordings", "!**/test/golden"]
   },
   "formatter": {
     "enabled": true,

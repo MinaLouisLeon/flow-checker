@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util'
 import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { devCommand } from './dev'
+import { exportCommand } from './export'
 import { initCommand } from './init'
 import { scanCommand } from './scan'
 
@@ -10,7 +11,7 @@ const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
   scan: 'Scan only and write .flow-checker/model.json',
   init: 'Add instrumentation hooks, config file and .gitignore entries',
-  export: 'Export documentation (--md <dir> | --html <dir>)',
+  export: 'Export Markdown docs and a static HTML site (--md <dir>, --html <dir>)',
   doctor: 'Check Next.js version, hooks, ports and tsconfig',
 } as const
 
@@ -40,6 +41,11 @@ Options:
   --types                 scan: also print the resolved types
   --requests              scan: also print the request sites
   --flows                 scan: also print navigation and inferred flows
+  --md <dir>              export: write Markdown docs to this folder
+  --html <dir>            export: write the static HTML site to this folder
+                          (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
+  --raw                   export: keep captures as saved, without redacting them again
+  --force                 export: write into a folder that has other files
   -h, --help              Show help
   -v, --version           Show version
 `
@@ -132,6 +138,21 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
     return initCommand({ root: values.root, appDir: values['app-dir'], yes: values.yes }, io)
   }
 
+  if (command === 'export') {
+    return exportCommand(
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        md: values.md,
+        html: values.html,
+        raw: values.raw,
+        force: values.force,
+      },
+      io,
+    )
+  }
+
   io.err(`"${command}" is not implemented yet.`)
   return 1
 }
@@ -159,6 +180,10 @@ function parse(argv: string[]) {
       open: { type: 'boolean', default: true },
       watch: { type: 'boolean', default: true },
       yes: { type: 'boolean', short: 'y' },
+      md: { type: 'string' },
+      html: { type: 'string' },
+      raw: { type: 'boolean' },
+      force: { type: 'boolean' },
     },
   })
 }

@@ -1165,3 +1165,14 @@ a.stat:hover {
   font-weight: 500;
   color: var(--muted);
 }
+
+/* Export screen (M10) */
+.banner-ok {
+  background: var(--client-soft);
+  color: var(--ok);
+}
+.export-redact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

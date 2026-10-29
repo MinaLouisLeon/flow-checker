@@ -1,0 +1,1914 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "basic",
+  "model": {
+    "version": 1,
+    "project": {
+      "appDir": "app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "app",
+      "files": {
+        "layout": "app/layout.tsx",
+        "page": "app/page.tsx"
+      },
+      "children": [
+        {
+          "segment": {
+            "raw": "(marketing)",
+            "kind": "group",
+            "name": "marketing"
+          },
+          "dir": "app/(marketing)",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "about",
+                "kind": "static",
+                "name": "about"
+              },
+              "dir": "app/(marketing)/about",
+              "files": {
+                "page": "app/(marketing)/about/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "segment": {
+            "raw": "users",
+            "kind": "static",
+            "name": "users"
+          },
+          "dir": "app/users",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "[id]",
+                "kind": "dynamic",
+                "name": "id"
+              },
+              "dir": "app/users/[id]",
+              "files": {
+                "page": "app/users/[id]/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_12v7saiyoj2",
+        "path": "/",
+        "kind": "page",
+        "file": "app/page.tsx",
+        "segments": [],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_0ku4o3jpe9o"
+      },
+      {
+        "id": "rt_20chr3ve23a",
+        "path": "/about",
+        "kind": "page",
+        "file": "app/(marketing)/about/page.tsx",
+        "segments": [
+          {
+            "raw": "(marketing)",
+            "kind": "group",
+            "name": "marketing"
+          },
+          {
+            "raw": "about",
+            "kind": "static",
+            "name": "about"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_1x4w21saxh9"
+      },
+      {
+        "id": "rt_2656kti2wza",
+        "path": "/users/[id]",
+        "kind": "page",
+        "file": "app/users/[id]/page.tsx",
+        "segments": [
+          {
+            "raw": "users",
+            "kind": "static",
+            "name": "users"
+          },
+          {
+            "raw": "[id]",
+            "kind": "dynamic",
+            "name": "id"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_0vmo84pmvzo"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_1x4w21saxh9",
+        "name": "AboutPage",
+        "file": "app/(marketing)/about/page.tsx",
+        "loc": {
+          "file": "app/(marketing)/about/page.tsx",
+          "line": 2,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_2dznycb4aq7",
+        "name": "RootLayout",
+        "file": "app/layout.tsx",
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 6,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 11,
+              "column": 11
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0ku4o3jpe9o",
+        "name": "HomePage",
+        "file": "app/page.tsx",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 7,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "UserList",
+            "resolution": "project",
+            "componentId": "cmp_1i8zxr0i8pg",
+            "module": "@/components/UserList",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 12,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0vmo84pmvzo",
+        "name": "UserPage",
+        "file": "app/users/[id]/page.tsx",
+        "loc": {
+          "file": "app/users/[id]/page.tsx",
+          "line": 8,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "ProfileCard",
+            "resolution": "project",
+            "componentId": "cmp_256fhhuhol5",
+            "module": "@/components/ProfileCard",
+            "loc": {
+              "file": "app/users/[id]/page.tsx",
+              "line": 13,
+              "column": 7
+            }
+          },
+          {
+            "name": "DeleteUserButton",
+            "resolution": "project",
+            "componentId": "cmp_0yr9r67zb7l",
+            "module": "@/components/DeleteUserButton",
+            "loc": {
+              "file": "app/users/[id]/page.tsx",
+              "line": 14,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ params: Promise<{ id: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "id",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0yr9r67zb7l",
+        "name": "DeleteUserButton",
+        "file": "components/DeleteUserButton.tsx",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 12,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [],
+        "propsType": {
+          "text": "DeleteUserButtonProps",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0ywmxvblq29",
+            "name": "DeleteUserButtonProps"
+          }
+        }
+      },
+      {
+        "id": "cmp_256fhhuhol5",
+        "name": "ProfileCard",
+        "file": "components/ProfileCard.tsx",
+        "loc": {
+          "file": "components/ProfileCard.tsx",
+          "line": 12,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_1tfsxfuhjes"
+        ],
+        "propsType": {
+          "text": "ProfileCardProps",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_12vhl9gsqi3",
+            "name": "ProfileCardProps"
+          }
+        }
+      },
+      {
+        "id": "cmp_1i8zxr0i8pg",
+        "name": "UserList",
+        "file": "components/UserList.tsx",
+        "loc": {
+          "file": "components/UserList.tsx",
+          "line": 9,
+          "column": 17
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "components/UserList.tsx",
+              "line": 14,
+              "column": 11
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "UserListProps",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1biwb76ctp8",
+            "name": "UserListProps"
+          }
+        }
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_0ywmxvblq29",
+        "name": "DeleteUserButtonProps",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 7,
+          "column": 11
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "userId",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_12vhl9gsqi3",
+        "name": "ProfileCardProps",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "components/ProfileCard.tsx",
+          "line": 7,
+          "column": 11
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "user",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_0857a9l1j3p",
+                "name": "User"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1biwb76ctp8",
+        "name": "UserListProps",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "components/UserList.tsx",
+          "line": 4,
+          "column": 11
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "users",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "ref",
+                  "typeId": "typ_0857a9l1j3p",
+                  "name": "User"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_243k6cp1cea",
+        "name": "Role",
+        "declarationKind": "type-alias",
+        "definedAt": {
+          "file": "types/user.ts",
+          "line": 1,
+          "column": 13
+        },
+        "shape": {
+          "kind": "union",
+          "types": [
+            {
+              "kind": "literal",
+              "value": "admin"
+            },
+            {
+              "kind": "literal",
+              "value": "member"
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_0857a9l1j3p",
+        "name": "User",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/user.ts",
+          "line": 3,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "role",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_243k6cp1cea",
+                "name": "Role"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1tfsxfuhjes",
+        "name": "Todo",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/user.ts",
+          "line": 10,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "userId",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_23wds4ry0if",
+        "origin": "component",
+        "componentId": "cmp_0ku4o3jpe9o",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/users`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/users"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "responseType": {
+          "text": "User[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_0857a9l1j3p",
+              "name": "User"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/page.tsx",
+            "line": 8,
+            "column": 23,
+            "callee": "getUsers"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 14,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "02dz0jr9jyy"
+      },
+      {
+        "id": "req_21o1or0unbb",
+        "origin": "component",
+        "componentId": "cmp_0vmo84pmvzo",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/users/${id}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/users/:id"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "responseType": {
+          "text": "User",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0857a9l1j3p",
+            "name": "User"
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/users/[id]/page.tsx",
+            "line": 10,
+            "column": 22,
+            "callee": "getUser"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 20,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1ev2l0nsayb"
+      },
+      {
+        "id": "req_0l0l4hns6qh",
+        "origin": "component",
+        "componentId": "cmp_0yr9r67zb7l",
+        "transport": "axios",
+        "method": "DELETE",
+        "url": {
+          "text": "`/users/${id}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/users/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 27,
+            "column": 29
+          }
+        },
+        "responseType": {
+          "text": "void",
+          "shape": {
+            "kind": "primitive",
+            "name": "void"
+          }
+        },
+        "callStack": [
+          {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 18,
+            "column": 13,
+            "callee": "deleteUser"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 9,
+            "column": 10,
+            "callee": "api.delete"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1o678ausr0t"
+      },
+      {
+        "id": "req_0h7xmjn6pcm",
+        "origin": "component",
+        "componentId": "cmp_256fhhuhol5",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/todos?userId=${userId}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/todos",
+          "query": "userId=:userId"
+        },
+        "trigger": {
+          "kind": "effect",
+          "loc": {
+            "file": "components/ProfileCard.tsx",
+            "line": 15,
+            "column": 3
+          }
+        },
+        "responseType": {
+          "text": "Todo[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_1tfsxfuhjes",
+              "name": "Todo"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "components/ProfileCard.tsx",
+            "line": 16,
+            "column": 5,
+            "callee": "getTodos"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 26,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1n8dsq6vhag"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_23ohd71fojm",
+        "origin": "component",
+        "componentId": "cmp_2dznycb4aq7",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/\"",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 11
+          }
+        },
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 11,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_12v7saiyoj2"
+      },
+      {
+        "id": "nav_1r9wayox0ec",
+        "origin": "component",
+        "componentId": "cmp_2dznycb4aq7",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/about\"",
+          "confidence": "exact",
+          "path": "/about"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 41
+          }
+        },
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 41
+        },
+        "callStack": [
+          {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 41,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_20chr3ve23a"
+      },
+      {
+        "id": "nav_1gk5rdkvs5s",
+        "origin": "component",
+        "componentId": "cmp_0yr9r67zb7l",
+        "kind": "push",
+        "api": "next",
+        "href": {
+          "text": "'/'",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 27,
+            "column": 29
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 19,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 19,
+            "column": 7,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_12v7saiyoj2"
+      },
+      {
+        "id": "nav_1n7on8z0jek",
+        "origin": "component",
+        "componentId": "cmp_1i8zxr0i8pg",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "`/users/${user.id}`",
+          "confidence": "pattern",
+          "path": "/users/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "components/UserList.tsx",
+            "line": 14,
+            "column": 11
+          }
+        },
+        "loc": {
+          "file": "components/UserList.tsx",
+          "line": 14,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "components/UserList.tsx",
+            "line": 14,
+            "column": 11,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_2656kti2wza"
+      }
+    ],
+    "flows": [
+      {
+        "id": "flw_2bpz63n90mo",
+        "name": "DeleteUserButton click",
+        "routeId": "rt_2656kti2wza",
+        "componentId": "cmp_0yr9r67zb7l",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_2656kti2wza",
+            "componentId": "cmp_0yr9r67zb7l",
+            "event": "onClick",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 27,
+              "column": 29
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0l0l4hns6qh"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_1gk5rdkvs5s",
+            "routeId": "rt_12v7saiyoj2"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_23wds4ry0if",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_2656kti2wza",
+          "rt_12v7saiyoj2"
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "sites": {
+      "req_0h7xmjn6pcm": {
+        "captures": 2,
+        "lastAt": "2026-10-28T10:56:02.913Z",
+        "lastCaptureId": "cap_mvs010m9ywalowpm",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0l0l4hns6qh": {
+        "captures": 1,
+        "lastAt": "2026-10-28T10:56:05.464Z",
+        "lastCaptureId": "cap_mvs012l4glsqdt24",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_23wds4ry0if": {
+        "captures": 3,
+        "lastAt": "2026-10-28T10:56:05.576Z",
+        "lastCaptureId": "cap_mvs012o8q31a4xfd",
+        "typeCheck": {
+          "checked": 3,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_21o1or0unbb": {
+        "captures": 1,
+        "lastAt": "2026-10-28T10:56:02.491Z",
+        "lastCaptureId": "cap_mvs010ajhof7c8yd",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 7,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {
+      "flw_2bpz63n90mo": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      }
+    },
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvs010m20uvw20uo",
+      "sessionId": "ses_mvs00v2t7vf18tai",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:02.906Z",
+      "durationMs": 12,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 57
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:763:195)",
+        "at getTodos (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:189:23)",
+        "at ProfileCard.useEffect (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:89:160)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodos",
+          "file": "lib/api.ts",
+          "line": 26,
+          "column": 21
+        },
+        {
+          "fn": "ProfileCard.useEffect",
+          "file": "components/ProfileCard.tsx",
+          "line": 16,
+          "column": 13
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0h7xmjn6pcm",
+        "score": 138,
+        "candidates": [
+          {
+            "siteId": "req_0h7xmjn6pcm",
+            "score": 138,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "url",
+                "points": 3,
+                "detail": "query keys"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProfileCard.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getTodos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/users/2"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0h7xmjn6pcm",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs010m9ywalowpm",
+      "sessionId": "ses_mvs00v2t7vf18tai",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:02.913Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 57
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:763:195)",
+        "at getTodos (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:189:23)",
+        "at ProfileCard.useEffect (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:89:160)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodos",
+          "file": "lib/api.ts",
+          "line": 26,
+          "column": 21
+        },
+        {
+          "fn": "ProfileCard.useEffect",
+          "file": "components/ProfileCard.tsx",
+          "line": 16,
+          "column": 13
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0h7xmjn6pcm",
+        "score": 138,
+        "candidates": [
+          {
+            "siteId": "req_0h7xmjn6pcm",
+            "score": 138,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "url",
+                "points": 3,
+                "detail": "query keys"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProfileCard.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getTodos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/users/2"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0h7xmjn6pcm",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs012l4glsqdt24",
+      "sessionId": "ses_mvs00v2t7vf18tai",
+      "origin": "browser",
+      "transport": "xhr",
+      "timestamp": "2026-10-28T10:56:05.464Z",
+      "durationMs": 21,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:4010/users/2",
+        "headers": {
+          "accept": "application/json, text/plain, */*"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 204,
+        "statusText": "No Content",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete user\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-28T10:56:05.456Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1ialwcisa1tjv._.js:763:195)",
+        "at dispatchXhrRequest (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:808:17)",
+        "at new Promise (<anonymous>)",
+        "at xhr (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:623:12)",
+        "at Axios.dispatchRequest (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:2134:12)",
+        "at Axios._request (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:1258:265)",
+        "at Axios.request (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:1113:31)",
+        "at Axios.<computed> [as delete] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:1284:21)",
+        "at wrap [as delete] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0pgm46db-jviz._.js:2741:19)",
+        "at deleteUser (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:172:22)",
+        "at handleClick (http://localhost:3077/_next/static/chunks/fixtures_basic_1ibl_ncvno9b-._.js:25:168)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "deleteUser",
+          "file": "lib/api.ts",
+          "line": 9,
+          "column": 20
+        },
+        {
+          "fn": "handleClick",
+          "file": "components/DeleteUserButton.tsx",
+          "line": 18,
+          "column": 23
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0l0l4hns6qh",
+        "score": 150,
+        "candidates": [
+          {
+            "siteId": "req_0l0l4hns6qh",
+            "score": 150,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "DELETE /users/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "deleteUser"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "DeleteUserButton"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/users/2"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "click event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0l0l4hns6qh",
+        "parts": [
+          {
+            "part": "response",
+            "type": "void",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs00uayl8gel13d",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:55:54.730Z",
+      "durationMs": 366,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:55:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:110:17)",
+        "at async HomePage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_23wds4ry0if",
+        "score": 120,
+        "candidates": [
+          {
+            "siteId": "req_23wds4ry0if",
+            "score": 120,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "HomePage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_23wds4ry0if",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs00uu7k30wlli8",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:55:55.423Z",
+      "durationMs": 35,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:55:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:110:17)",
+        "at async HomePage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_23wds4ry0if",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_23wds4ry0if",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "HomePage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_23wds4ry0if",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs010ajhof7c8yd",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:02.491Z",
+      "durationMs": 45,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:02 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUser (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:117:17)",
+        "at async UserPage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__18q83gzg20yjy._.js:23:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUser",
+          "file": "lib/api.ts",
+          "line": 20,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "app/users/[id]/page.tsx",
+          "line": 10,
+          "column": 16
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_21o1or0unbb",
+        "score": 140,
+        "candidates": [
+          {
+            "siteId": "req_21o1or0unbb",
+            "score": 140,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /users/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "UserPage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUser"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/users/2"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_21o1or0unbb",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs012o8q31a4xfd",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:56:05.576Z",
+      "durationMs": 16,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:56:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            }
+          ],
+          "size": 73
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/?_rsc=UNYZX3PacoQ5wtLo"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:110:17)",
+        "at async HomePage (<repo>\\fixtures\\basic\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0ebizgxberdme._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 14,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 8,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_23wds4ry0if",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_23wds4ry0if",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "HomePage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_23wds4ry0if",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 7,
+    "included": 7
+  },
+  "redacted": true
+}

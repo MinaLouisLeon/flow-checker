@@ -1,0 +1,2404 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "bff",
+  "model": {
+    "version": 1,
+    "project": {
+      "appDir": "src/app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "src/app",
+      "files": {
+        "layout": "src/app/layout.tsx",
+        "page": "src/app/page.tsx"
+      },
+      "children": [
+        {
+          "segment": {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          "dir": "src/app/api",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "products",
+                "kind": "static",
+                "name": "products"
+              },
+              "dir": "src/app/api/products",
+              "files": {
+                "route": "src/app/api/products/route.ts"
+              },
+              "children": [
+                {
+                  "segment": {
+                    "raw": "[id]",
+                    "kind": "dynamic",
+                    "name": "id"
+                  },
+                  "dir": "src/app/api/products/[id]",
+                  "files": {
+                    "route": "src/app/api/products/[id]/route.ts"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "segment": {
+            "raw": "products",
+            "kind": "static",
+            "name": "products"
+          },
+          "dir": "src/app/products",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "[id]",
+                "kind": "dynamic",
+                "name": "id"
+              },
+              "dir": "src/app/products/[id]",
+              "files": {
+                "page": "src/app/products/[id]/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_0h4e5x5madf",
+        "path": "/",
+        "kind": "page",
+        "file": "src/app/page.tsx",
+        "segments": [],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_2flvqsq9ypc"
+      },
+      {
+        "id": "rt_1kkymdue03z",
+        "path": "/api/products",
+        "kind": "route-handler",
+        "file": "src/app/api/products/route.ts",
+        "segments": [
+          {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          {
+            "raw": "products",
+            "kind": "static",
+            "name": "products"
+          }
+        ],
+        "layoutChain": [],
+        "methods": [
+          "GET",
+          "POST"
+        ]
+      },
+      {
+        "id": "rt_0g0grflp887",
+        "path": "/api/products/[id]",
+        "kind": "route-handler",
+        "file": "src/app/api/products/[id]/route.ts",
+        "segments": [
+          {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          {
+            "raw": "products",
+            "kind": "static",
+            "name": "products"
+          },
+          {
+            "raw": "[id]",
+            "kind": "dynamic",
+            "name": "id"
+          }
+        ],
+        "layoutChain": [],
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "id": "rt_1kdazzrvrkg",
+        "path": "/products/[id]",
+        "kind": "page",
+        "file": "src/app/products/[id]/page.tsx",
+        "segments": [
+          {
+            "raw": "products",
+            "kind": "static",
+            "name": "products"
+          },
+          {
+            "raw": "[id]",
+            "kind": "dynamic",
+            "name": "id"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_0w4ykuez903"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_17dqv782ua7",
+        "name": "RootLayout",
+        "file": "src/app/layout.tsx",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 5,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_2flvqsq9ypc",
+        "name": "HomePage",
+        "file": "src/app/page.tsx",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 4,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "CreateProductForm",
+            "resolution": "project",
+            "componentId": "cmp_014pegw9zf7",
+            "module": "@/components/CreateProductForm",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 8,
+              "column": 7
+            }
+          },
+          {
+            "name": "ProductsTable",
+            "resolution": "project",
+            "componentId": "cmp_04zm0jsozsm",
+            "module": "@/components/ProductsTable",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0w4ykuez903",
+        "name": "ProductPage",
+        "file": "src/app/products/[id]/page.tsx",
+        "loc": {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 8,
+          "column": 25
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "src/app/products/[id]/page.tsx",
+              "line": 22,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": [
+          "typ_1rwhmsgdwtz"
+        ],
+        "propsType": {
+          "text": "{ params: Promise<{ id: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "id",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_014pegw9zf7",
+        "name": "CreateProductForm",
+        "file": "src/components/CreateProductForm.tsx",
+        "loc": {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_2bhrdzxr8wt",
+          "typ_2g53pdr4pws",
+          "typ_1rwhmsgdwtz"
+        ]
+      },
+      {
+        "id": "cmp_04zm0jsozsm",
+        "name": "ProductsTable",
+        "file": "src/components/ProductsTable.tsx",
+        "loc": {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "src/components/ProductsTable.tsx",
+              "line": 23,
+              "column": 15
+            }
+          }
+        ],
+        "usedTypes": [
+          "typ_1rwhmsgdwtz"
+        ]
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_1rwhmsgdwtz",
+        "name": "Product",
+        "declarationKind": "type-alias",
+        "definedAt": {
+          "file": "src/lib/schemas.ts",
+          "line": 15,
+          "column": 13
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "price",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "stock",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_2g53pdr4pws",
+        "name": "CreateProductInput",
+        "declarationKind": "type-alias",
+        "definedAt": {
+          "file": "src/lib/schemas.ts",
+          "line": 16,
+          "column": 13
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "price",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "stock",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              },
+              "optional": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_2bhrdzxr8wt",
+        "name": "ApiError",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/lib/schemas.ts",
+          "line": 18,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "error",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "issues",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "path",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "message",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    }
+                  ]
+                }
+              },
+              "optional": true
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_1t6ibh8o0so",
+        "origin": "route-handler",
+        "routeId": "rt_0g0grflp887",
+        "handlerMethod": "GET",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${BACKEND_URL}${path}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "BACKEND_URL",
+          "path": "/products/:id"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "responseType": {
+          "text": "Product",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1rwhmsgdwtz",
+            "name": "Product"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/api/products/[id]/route.ts",
+            "line": 8,
+            "column": 21,
+            "callee": "backend"
+          },
+          {
+            "file": "src/lib/backend.ts",
+            "line": 5,
+            "column": 10,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1fo1arxc0gy"
+      },
+      {
+        "id": "req_0pmni454dyo",
+        "origin": "route-handler",
+        "routeId": "rt_1kkymdue03z",
+        "handlerMethod": "GET",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${BACKEND_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "BACKEND_URL",
+          "path": "/products"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "responseType": {
+          "text": "Product[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_1rwhmsgdwtz",
+              "name": "Product"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/api/products/route.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "backend"
+          },
+          {
+            "file": "src/lib/backend.ts",
+            "line": 5,
+            "column": 10,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1cc8kojvliw"
+      },
+      {
+        "id": "req_02nrpzzew80",
+        "origin": "route-handler",
+        "routeId": "rt_1kkymdue03z",
+        "handlerMethod": "POST",
+        "transport": "fetch",
+        "method": "POST",
+        "url": {
+          "text": "`${BACKEND_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "BACKEND_URL",
+          "path": "/products"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "bodyType": {
+          "text": "{ name: string; price: number; stock: number; }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "name",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              },
+              {
+                "name": "price",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "stock",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Product",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1rwhmsgdwtz",
+            "name": "Product"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/api/products/route.ts",
+            "line": 23,
+            "column": 21,
+            "callee": "backend"
+          },
+          {
+            "file": "src/lib/backend.ts",
+            "line": 5,
+            "column": 10,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0cglnfd7ijn"
+      },
+      {
+        "id": "req_2c3yq1l5klb",
+        "origin": "component",
+        "componentId": "cmp_0w4ykuez903",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`/api/products/${id}`",
+          "confidence": "pattern",
+          "path": "/api/products/:id"
+        },
+        "trigger": {
+          "kind": "effect",
+          "loc": {
+            "file": "src/app/products/[id]/page.tsx",
+            "line": 12,
+            "column": 3
+          }
+        },
+        "responseType": {
+          "text": "Product",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1rwhmsgdwtz",
+            "name": "Product"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/products/[id]/page.tsx",
+            "line": 13,
+            "column": 5,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "2gkje0i3e9p",
+        "targetRouteId": "rt_0g0grflp887",
+        "chain": [
+          "req_1t6ibh8o0so"
+        ]
+      },
+      {
+        "id": "req_2ckm3fl20ym",
+        "origin": "component",
+        "componentId": "cmp_014pegw9zf7",
+        "transport": "fetch",
+        "method": "POST",
+        "url": {
+          "text": "'/api/products'",
+          "confidence": "exact",
+          "path": "/api/products"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        "bodyType": {
+          "text": "CreateProductInput",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_2g53pdr4pws",
+            "name": "CreateProductInput"
+          }
+        },
+        "responseType": {
+          "text": "Product",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1rwhmsgdwtz",
+            "name": "Product"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 21,
+            "column": 23,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0dhnh45ebpk",
+        "targetRouteId": "rt_1kkymdue03z",
+        "chain": [
+          "req_02nrpzzew80"
+        ]
+      },
+      {
+        "id": "req_1vj2qrt6hdx",
+        "origin": "component",
+        "componentId": "cmp_04zm0jsozsm",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "'/api/products'",
+          "confidence": "exact",
+          "path": "/api/products"
+        },
+        "trigger": {
+          "kind": "effect",
+          "loc": {
+            "file": "src/components/ProductsTable.tsx",
+            "line": 11,
+            "column": 3
+          }
+        },
+        "responseType": {
+          "text": "Product[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_1rwhmsgdwtz",
+              "name": "Product"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/ProductsTable.tsx",
+            "line": 12,
+            "column": 5,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1alsu0dzg61",
+        "targetRouteId": "rt_1kkymdue03z",
+        "chain": [
+          "req_0pmni454dyo"
+        ]
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_1a6joyr2qdh",
+        "origin": "component",
+        "componentId": "cmp_0w4ykuez903",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/\"",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/app/products/[id]/page.tsx",
+            "line": 22,
+            "column": 7
+          }
+        },
+        "loc": {
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 22,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/app/products/[id]/page.tsx",
+            "line": 22,
+            "column": 7,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_0h4e5x5madf"
+      },
+      {
+        "id": "nav_0crjmabfgaa",
+        "origin": "component",
+        "componentId": "cmp_014pegw9zf7",
+        "kind": "push",
+        "api": "next",
+        "href": {
+          "text": "`/products/${product.id}`",
+          "confidence": "pattern",
+          "path": "/products/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 29,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 29,
+            "column": 7,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_1kdazzrvrkg"
+      },
+      {
+        "id": "nav_1tes8ciw0b9",
+        "origin": "component",
+        "componentId": "cmp_04zm0jsozsm",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "`/products/${p.id}`",
+          "confidence": "pattern",
+          "path": "/products/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/ProductsTable.tsx",
+            "line": 23,
+            "column": 15
+          }
+        },
+        "loc": {
+          "file": "src/components/ProductsTable.tsx",
+          "line": 23,
+          "column": 15
+        },
+        "callStack": [
+          {
+            "file": "src/components/ProductsTable.tsx",
+            "line": 23,
+            "column": 15,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_1kdazzrvrkg"
+      }
+    ],
+    "flows": [
+      {
+        "id": "flw_0fhg9qnt2e5",
+        "name": "CreateProductForm submit",
+        "routeId": "rt_0h4e5x5madf",
+        "componentId": "cmp_014pegw9zf7",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_0h4e5x5madf",
+            "componentId": "cmp_014pegw9zf7",
+            "event": "onSubmit",
+            "loc": {
+              "file": "src/components/CreateProductForm.tsx",
+              "line": 36,
+              "column": 11
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_2ckm3fl20ym"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_0crjmabfgaa",
+            "routeId": "rt_1kdazzrvrkg"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_2c3yq1l5klb",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_0h4e5x5madf",
+          "rt_1kdazzrvrkg"
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "sites": {
+      "req_1vj2qrt6hdx": {
+        "captures": 2,
+        "lastAt": "2026-10-28T10:57:25.792Z",
+        "lastCaptureId": "cap_mvs02skgxxea2wk9",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_2ckm3fl20ym": {
+        "captures": 1,
+        "lastAt": "2026-10-28T10:57:29.056Z",
+        "lastCaptureId": "cap_mvs02v34234dnear",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_2c3yq1l5klb": {
+        "captures": 2,
+        "lastAt": "2026-10-28T10:57:30.499Z",
+        "lastCaptureId": "cap_mvs02w779bfsaxnc",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0pmni454dyo": {
+        "captures": 2,
+        "lastAt": "2026-10-28T10:57:26.354Z",
+        "lastCaptureId": "cap_mvs02t02kmby9003",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_02nrpzzew80": {
+        "captures": 1,
+        "lastAt": "2026-10-28T10:57:29.084Z",
+        "lastCaptureId": "cap_mvs02v3wcx68i3do",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1t6ibh8o0so": {
+        "captures": 2,
+        "lastAt": "2026-10-28T10:57:31.990Z",
+        "lastCaptureId": "cap_mvs02xcm88r4amvq",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 10,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {
+      "flw_0fhg9qnt2e5": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      }
+    },
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvs02skashzt4bdn",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:25.786Z",
+      "durationMs": 544,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductsTable.useEffect (http://localhost:3077/_next/static/chunks/_0z8xqh1rg4cvd._.js:148:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductsTable.useEffect",
+          "file": "src/components/ProductsTable.tsx",
+          "line": 12,
+          "column": 5
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1vj2qrt6hdx",
+        "score": 105,
+        "candidates": [
+          {
+            "siteId": "req_1vj2qrt6hdx",
+            "score": 105,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/products"
+              },
+              {
+                "signal": "stack-source",
+                "points": 25,
+                "detail": "1 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductsTable.useEffect"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1vj2qrt6hdx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02skgxxea2wk9",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:25.792Z",
+      "durationMs": 576,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductsTable.useEffect (http://localhost:3077/_next/static/chunks/_0z8xqh1rg4cvd._.js:148:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductsTable.useEffect",
+          "file": "src/components/ProductsTable.tsx",
+          "line": 12,
+          "column": 5
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1vj2qrt6hdx",
+        "score": 105,
+        "candidates": [
+          {
+            "siteId": "req_1vj2qrt6hdx",
+            "score": 105,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/products"
+              },
+              {
+                "signal": "stack-source",
+                "points": 25,
+                "detail": "1 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductsTable.useEffect"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1vj2qrt6hdx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02v34234dnear",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:29.056Z",
+      "durationMs": 41,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "name": "Cable",
+            "price": 9.5,
+            "stock": 3
+          },
+          "size": 38
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:29 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-28T10:57:29.055Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at handleSubmit (http://localhost:3077/_next/static/chunks/_0z8xqh1rg4cvd._.js:30:27)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "handleSubmit",
+          "file": "src/components/CreateProductForm.tsx",
+          "line": 21,
+          "column": 23
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_2ckm3fl20ym",
+        "score": 120,
+        "candidates": [
+          {
+            "siteId": "req_2ckm3fl20ym",
+            "score": 120,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/products"
+              },
+              {
+                "signal": "stack-source",
+                "points": 25,
+                "detail": "1 frame(s) on the call path"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "CreateProductForm"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_2ckm3fl20ym",
+        "parts": [
+          {
+            "part": "request",
+            "type": "CreateProductInput",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02w72gxwrj3t3",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:30.494Z",
+      "durationMs": 1453,
+      "pageUrl": "http://localhost:3077/products/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products/3",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-28T10:57:29.055Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductPage.useEffect (http://localhost:3077/_next/static/chunks/_12g2k6bkanec3._.js:23:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8571:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductPage.useEffect",
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 13,
+          "column": 5
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_2c3yq1l5klb",
+        "score": 95,
+        "candidates": [
+          {
+            "siteId": "req_2c3yq1l5klb",
+            "score": 95,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /api/products/:id"
+              },
+              {
+                "signal": "stack-source",
+                "points": 25,
+                "detail": "1 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductPage.useEffect"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/products/3"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_2c3yq1l5klb",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02w779bfsaxnc",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:30.499Z",
+      "durationMs": 1499,
+      "pageUrl": "http://localhost:3077/products/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/products/3",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Create\"",
+        "componentChain": [
+          "CreateProductForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-28T10:57:29.055Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1mxa0kueqerw4._.js:763:195)",
+        "at ProductPage.useEffect (http://localhost:3077/_next/static/chunks/_12g2k6bkanec3._.js:23:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8661:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductPage.useEffect",
+          "file": "src/app/products/[id]/page.tsx",
+          "line": 13,
+          "column": 5
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_2c3yq1l5klb",
+        "score": 95,
+        "candidates": [
+          {
+            "siteId": "req_2c3yq1l5klb",
+            "score": 95,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /api/products/:id"
+              },
+              {
+                "signal": "stack-source",
+                "points": 25,
+                "detail": "1 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductPage.useEffect"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/products/3"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_2c3yq1l5klb",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02sy3g7dmytfa",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:26.283Z",
+      "durationMs": 23,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products",
+        "captureId": "cap_mvs02skashzt4bdn"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:19:177)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/route.ts",
+          "line": 7,
+          "column": 28
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0pmni454dyo",
+        "score": 180,
+        "candidates": [
+          {
+            "siteId": "req_0pmni454dyo",
+            "score": 180,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/products"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "backend"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0pmni454dyo",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02t02kmby9003",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:26.354Z",
+      "durationMs": 4,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products",
+        "captureId": "cap_mvs02skgxxea2wk9"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:19:177)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/route.ts",
+          "line": 7,
+          "column": 28
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0pmni454dyo",
+        "score": 180,
+        "candidates": [
+          {
+            "siteId": "req_0pmni454dyo",
+            "score": 180,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/products"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "backend"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0pmni454dyo",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02v3wcx68i3do",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:29.084Z",
+      "durationMs": 8,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/products",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "name": "Cable",
+            "price": 9.5,
+            "stock": 3
+          },
+          "size": 38
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:29 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/api/products",
+        "captureId": "cap_mvs02v34234dnear"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at POST (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:37:177)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\1ghd_next_043567m2smjkx._.js:793:50)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "POST",
+          "file": "src/app/api/products/route.ts",
+          "line": 23,
+          "column": 28
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_02nrpzzew80",
+        "score": 180,
+        "candidates": [
+          {
+            "siteId": "req_02nrpzzew80",
+            "score": 180,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in POST /api/products"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "backend"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_02nrpzzew80",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ name: string; price: number; stock: number; }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02xay0u7ct5y0",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:31.930Z",
+      "durationMs": 5,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products/3",
+        "captureId": "cap_mvs02w72gxwrj3t3"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__08stmq-gne0uu._.js:87:177)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\1ghd_next_18g3wn70xkx7r._.js:793:50)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/[id]/route.ts",
+          "line": 8,
+          "column": 28
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1t6ibh8o0so",
+        "score": 175,
+        "candidates": [
+          {
+            "siteId": "req_1t6ibh8o0so",
+            "score": 175,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /products/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/products/3"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "backend"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1t6ibh8o0so",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs02xcm88r4amvq",
+      "sessionId": "ses_mvs02sdzyvaqii4e",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:57:31.990Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 28 Oct 2026 10:57:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "stock": 3,
+            "name": "Cable",
+            "price": 9.5
+          },
+          "size": 45
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/products/3",
+        "captureId": "cap_mvs02w779bfsaxnc"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__1694t0gmvvkn2._.js:663:197)",
+        "at dedupeFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at backend (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__18cpi57wta5mm._.js:57:12)",
+        "at GET (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\[root-of-the-server]__08stmq-gne0uu._.js:87:177)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@playwright+tes_e8eec4a489bcf8c57698457e34201021\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\bff\\.next\\dev\\server\\chunks\\1ghd_next_18g3wn70xkx7r._.js:793:50)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "backend",
+          "file": "src/lib/backend.ts",
+          "line": 5,
+          "column": 10
+        },
+        {
+          "fn": "GET",
+          "file": "src/app/api/products/[id]/route.ts",
+          "line": 8,
+          "column": 28
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1t6ibh8o0so",
+        "score": 175,
+        "candidates": [
+          {
+            "siteId": "req_1t6ibh8o0so",
+            "score": 175,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /products/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/products/3"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "backend"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1t6ibh8o0so",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 10,
+    "included": 10
+  },
+  "redacted": true
+}

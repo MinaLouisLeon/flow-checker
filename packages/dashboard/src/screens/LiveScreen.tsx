@@ -57,6 +57,7 @@ export function LiveScreen({
 }) {
   const { meta, index, live } = useData()
   const enabled = Boolean(meta.capture)
+  const exported = meta.exported
   const captures = useCaptures(enabled)
   const status = live ?? 'connecting'
   const clear = useClearCaptures()
@@ -112,22 +113,35 @@ export function LiveScreen({
               </button>
             ))}
           </fieldset>
-          <span className={`live-status live-${status}`} title="Live feed from the capture runtime">
-            <span className="dot" /> {STATUS_TEXT[status]}
-          </span>
+          {!exported && (
+            <span className={`live-status live-${status}`} title="Live feed from the capture runtime">
+              <span className="dot" /> {STATUS_TEXT[status]}
+            </span>
+          )}
           <span className="muted">
             {list.length} of {all.length}
           </span>
           <span className="spacer" />
-          <RecordControl />
-          <button
-            type="button"
-            className="button"
-            disabled={all.length === 0 || clear.isPending}
-            onClick={() => clear.mutate()}
-          >
-            Clear
-          </button>
+          {exported ? (
+            exported.captureCounts.included < exported.captureCounts.total && (
+              <span className="muted">
+                The newest {exported.captureCounts.included} of {exported.captureCounts.total} captures are in
+                this export.
+              </span>
+            )
+          ) : (
+            <>
+              <RecordControl />
+              <button
+                type="button"
+                className="button"
+                disabled={all.length === 0 || clear.isPending}
+                onClick={() => clear.mutate()}
+              >
+                Clear
+              </button>
+            </>
+          )}
         </div>
         {captures.error && <div className="banner banner-error">{captures.error.message}</div>}
         {all.length === 0 ? (
@@ -428,7 +442,9 @@ function MatchBadge({ match }: { match: CaptureSummary['match'] }) {
 
 /** Which request site the capture is, why, and manual assignment. */
 function MatchPanel({ capture }: { capture: Capture }) {
-  const { index } = useData()
+  const { index, meta } = useData()
+  // An export can't change matches.
+  const canAssign = !meta.exported
   const assign = useAssignMatch()
   const [picked, setPicked] = useState('')
   const match = capture.match
@@ -477,7 +493,7 @@ function MatchPanel({ capture }: { capture: Capture }) {
                   <SiteLink site={site} />
                   <span className="spacer" />
                   <span className="muted">{candidate.score}</span>
-                  {!chosen && (
+                  {!chosen && canAssign && (
                     <button
                       type="button"
                       className="button"
@@ -505,45 +521,54 @@ function MatchPanel({ capture }: { capture: Capture }) {
         </ul>
       )}
 
-      <div className="match-assign">
-        <select
-          aria-label="Assign to a request site"
-          value={picked}
-          onChange={(event) => setPicked(event.target.value)}
-        >
-          <option value="">Assign to another request site…</option>
-          {options.map((site) => (
-            <option key={site.id} value={site.id}>
-              {siteLabel(site, index)}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className="button"
-          disabled={!picked || assign.isPending}
-          onClick={() => {
-            set(picked)
-            setPicked('')
-          }}
-        >
-          Assign
-        </button>
-        {!(match?.by === 'manual' && match.status === 'unmatched') && (
-          <button type="button" className="button" disabled={assign.isPending} onClick={() => set(null)}>
-            No site
+      {canAssign && (
+        <div className="match-assign">
+          <select
+            aria-label="Assign to a request site"
+            value={picked}
+            onChange={(event) => setPicked(event.target.value)}
+          >
+            <option value="">Assign to another request site…</option>
+            {options.map((site) => (
+              <option key={site.id} value={site.id}>
+                {siteLabel(site, index)}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="button"
+            disabled={!picked || assign.isPending}
+            onClick={() => {
+              set(picked)
+              setPicked('')
+            }}
+          >
+            Assign
           </button>
-        )}
-        {match?.by === 'manual' && (
-          <button type="button" className="button" disabled={assign.isPending} onClick={() => set(undefined)}>
-            Back to automatic
-          </button>
-        )}
-      </div>
-      <p className="muted match-note">
-        Your choice is saved in <code>.flow-checker/overrides.json</code> and applies to requests like this
-        one.
-      </p>
+          {!(match?.by === 'manual' && match.status === 'unmatched') && (
+            <button type="button" className="button" disabled={assign.isPending} onClick={() => set(null)}>
+              No site
+            </button>
+          )}
+          {match?.by === 'manual' && (
+            <button
+              type="button"
+              className="button"
+              disabled={assign.isPending}
+              onClick={() => set(undefined)}
+            >
+              Back to automatic
+            </button>
+          )}
+        </div>
+      )}
+      {canAssign && (
+        <p className="muted match-note">
+          Your choice is saved in <code>.flow-checker/overrides.json</code> and applies to requests like this
+          one.
+        </p>
+      )}
       {assign.error && <div className="banner banner-error">{assign.error.message}</div>}
     </div>
   )

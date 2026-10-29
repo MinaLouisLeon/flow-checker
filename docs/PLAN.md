@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M9 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan). M10 (export) is next. Updated: 2026-10-29.
+> Status: M0–M10 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export). M11 (public release) is next. Updated: 2026-10-29.
 
 ## 1. Goal
 
@@ -344,6 +344,17 @@ issues.md            open flags, type mismatches, unmatched captures
 
 Both formats redact by default.
 
+**Built in M10** (`packages/exporter`; `packages/server/src/snapshot.ts`; `flow-checker export`; dashboard Export screen):
+
+- **Snapshot first.** `collectSnapshot()` scans fresh, reads `.flow-checker/` (captures, sessions, overrides) **without changing it** (read-only store, in-memory code history) and runs the same verifier and flow tracker as `dev`. `buildSnapshot()` does the same from a running server (`POST /api/export`). The result is one `ExportData` object (`packages/shared/src/export.ts`): the served model (statuses, flags, flow names), verification, flow results and captures.
+- **Captures:** redacted again with the config's rules unless `--raw` (which only matters with `capture.storeRaw`), absolute project paths removed from stack frames, the newest 10 per site and 100 unmatched kept, plus every capture the verification points at.
+- **Markdown** is a pure function of the snapshot, so fixtures have golden files (`packages/exporter/test/golden/<fixture>/md`, recorded captures from `packages/server/test/recordings`). File names: `pages/users.[id].md`, `components/<Name>.md` (`<Name>.<file>` when names repeat), `flows/<slug>.md`, `flows/recorded.md` when there are recordings. Requests are documented with their types, type-check table and the newest successful and failed captured examples; BFF and server action hops are nested under the request that leads to them. Flow sequence diagrams show the user, each page, the app server, route handlers and external APIs.
+- **Static HTML:** the dashboard build plus `data.js` (`window.__FLOW_CHECKER__`). The dashboard reads everything from it, hides what needs a server (re-scan, live feed, assign, record, rename, export) and labels Live as Captures. The bundle has no imports, so it is loaded as a classic script and `index.html` also works from `file://`. The embedded data is golden-tested too (`golden/<fixture>/html/data.json`).
+- **Writing:** each export folder gets `.flow-checker-export.json` listing its files. The next export replaces those (and removes pages that are gone) and nothing else. A folder with other files and no manifest is refused unless `--force`.
+- **CLI:** `flow-checker export --md <dir> --html <dir> [--raw] [--force]`. With neither flag, both go to `export.md` / `export.html` from the config, default `docs/flow` and `.flow-checker/site`.
+- **Dashboard:** an Export screen with a button per format and the redaction toggle (only changeable with `capture.storeRaw`), writing to the config folders.
+- **Check:** `markdown.test.ts` and `html.test.ts` compare every fixture with its golden files; `snapshot.test.ts` covers redaction, path removal, trimming and the read-only guarantee; `e2e/export.spec.ts` opens an exported site from disk and uses the Export screen.
+
 ## 11. CLI
 
 ```
@@ -410,7 +421,7 @@ Every file is checked against a zod schema with a `version` field, so the format
 | M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done |
 | M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done |
 | M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done |
-| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | To do   |
+| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | ✅ Done |
 | M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | To do   |
 
 Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11.
