@@ -146,6 +146,9 @@ describe('options', () => {
     expect(ignored(new URL('https://telemetry.nextjs.org/api/v1/record'))).toBe(true)
     expect(ignored(new URL('http://api.test/health'))).toBe(true)
     expect(ignored(new URL('http://api.test/users'))).toBe(false)
+    // Next 13.4 dev server IPC to its render workers.
+    expect(ignored(new URL('http://[::1]:55669/?key=abc&method=ensurePage&args=%5B%5D'))).toBe(true)
+    expect(ignored(new URL('http://api.test/search?key=abc'))).toBe(false)
   })
 
   it('parses the runtime config from env JSON', () => {

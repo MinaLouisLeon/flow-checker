@@ -12,7 +12,7 @@ import { ScanError, scanProject } from '@flow-checker/scanner'
 import { collectSnapshot, type ExportFormat } from '@flow-checker/server'
 import type { AppModel, ExportData, FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
-import { ConfigError, loadConfig } from './config'
+import { ConfigError, loadConfig, scanSettings } from './config'
 import { findDashboardDir } from './project'
 import type { CliIO } from './run'
 
@@ -43,11 +43,13 @@ export interface ExportCommandOptions {
  * are written to the folders in the config (`export.md`, `export.html`) or the defaults.
  */
 export async function exportCommand(options: ExportCommandOptions, io: CliIO): Promise<number> {
-  const root = resolve(options.root ?? process.cwd())
+  let root = resolve(options.root ?? process.cwd())
 
   let config: FlowCheckerConfig
   try {
-    config = (await loadConfig(root, options.config)).config
+    const loaded = await loadConfig(root, options.config)
+    config = loaded.config
+    root = loaded.root
   } catch (error) {
     if (error instanceof ConfigError) {
       io.err(error.message)
@@ -60,7 +62,7 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
 
   let model: AppModel
   try {
-    model = scanProject({ root, appDir: options.appDir ?? config.appDir })
+    model = scanProject({ root, appDir: options.appDir ?? config.appDir, ...scanSettings(config) })
   } catch (error) {
     if (error instanceof ScanError) {
       io.err(error.message)

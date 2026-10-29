@@ -15,8 +15,9 @@
     "test:e2e": "playwright test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm typecheck:fixtures && pnpm verify:package",
-    "verify:package": "node scripts/verify-package.mjs"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm typecheck:fixtures && pnpm verify:package && pnpm verify:config",
+    "verify:package": "node scripts/verify-package.mjs",
+    "verify:config": "node scripts/verify-config.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

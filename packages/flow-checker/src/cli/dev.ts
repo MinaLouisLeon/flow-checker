@@ -3,7 +3,7 @@ import { randomBytes } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { isAbsolute, join, relative, resolve } from 'node:path'
 import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/runtime/options'
-import { createScanSession, ScanError, type ScanSession } from '@flow-checker/scanner'
+import { ScanError } from '@flow-checker/scanner'
 import {
   CaptureStore,
   type ProjectWatcher,
@@ -15,11 +15,12 @@ import {
 import { type AppModel, DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
-import { ConfigError, loadConfig } from './config'
+import { ConfigError, loadConfig, scanSettings } from './config'
 import { configExportDirs, writeFormat } from './export'
 import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
 import type { CliIO } from './run'
-import { summary, writeModel } from './scan'
+import { summary } from './scan'
+import { createScanRunner } from './scan-runner'
 
 export interface DevCommandOptions {
   root?: string
@@ -57,13 +58,15 @@ export interface DevSession {
  * with capture on. Returns the running session, or an exit code on failure.
  */
 export async function startDev(options: DevCommandOptions, io: CliIO): Promise<DevSession | number> {
-  const root = resolve(options.root ?? process.cwd())
+  let root = resolve(options.root ?? process.cwd())
 
   let config: FlowCheckerConfig
   try {
     const loaded = await loadConfig(root, options.config)
     config = loaded.config
     if (loaded.file) io.out(`Config: ${loaded.file}`)
+    if (loaded.root !== root) io.out(`Project root: ${loaded.root}`)
+    root = loaded.root
   } catch (error) {
     if (error instanceof ConfigError) {
       io.err(error.message)
@@ -73,20 +76,28 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 
   const appDir = options.appDir ?? config.appDir
-  // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7).
-  let session: ScanSession | undefined
-  const scan = () => {
-    const started = performance.now()
-    session = createScanSession({ root, appDir })
-    writeModel(root, session.model)
-    io.out(summary(session.model, performance.now() - started))
-    return session.model
+  // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7). From the
+  // build it runs in a worker thread, so the server keeps answering during large re-scans.
+  const scanner = createScanRunner({ root, appDir, ...scanSettings(config) })
+  // One scan at a time: a change that arrives during a scan waits for it.
+  let queue: Promise<unknown> = Promise.resolve()
+  const serial = <T>(task: () => Promise<T>): Promise<T> => {
+    const next = queue.then(task, task)
+    queue = next.catch(() => {})
+    return next
   }
+  const scan = () =>
+    serial(async () => {
+      const { model, durationMs } = await scanner.scan()
+      io.out(summary(model, durationMs))
+      return model
+    })
 
   let model: AppModel
   try {
-    model = scan()
+    model = await scan()
   } catch (error) {
+    await scanner.close()
     if (error instanceof ScanError) {
       io.err(error.message)
       return 1
@@ -143,28 +154,23 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
       const files = [...batch.changed, ...batch.added, ...batch.removed].map((f) =>
         relative(root, f).replaceAll('\\', '/'),
       )
-      const started = performance.now()
-      try {
-        // A failed scan leaves no session: start over.
-        const next = session ? session.update(batch) : scan()
-        const durationMs = performance.now() - started
-        writeModel(root, next)
-        scans.publish({ model: next, durationMs, files })
-        io.out(`Re-scanned in ${Math.round(durationMs)} ms (${describeFiles(files)} changed).`)
-        options.onRescan?.(next, files)
-      } catch (error) {
-        session = undefined
-        io.err(`Re-scan failed after ${describeFiles(files)} changed: ${(error as Error).message}`)
-      }
+      return serial(async () => {
+        try {
+          const { model: next, durationMs } = await scanner.update(batch)
+          scans.publish({ model: next, durationMs, files })
+          io.out(`Re-scanned in ${Math.round(durationMs)} ms (${describeFiles(files)} changed).`)
+          options.onRescan?.(next, files)
+        } catch (error) {
+          io.err(`Re-scan failed after ${describeFiles(files)} changed: ${(error as Error).message}`)
+        }
+      })
     }
     try {
       watcher = await watchProject({ root, onChange })
       io.out('Watching for file changes.')
       // The first re-scan is the slow one: pay for it now, after startup, not on the first edit.
       warmTimer = setTimeout(() => {
-        try {
-          session?.warm()
-        } catch {}
+        void serial(() => scanner.warm()).catch(() => {})
       }, 0)
     } catch (error) {
       io.err(`Could not watch files, so changes need a manual re-scan: ${(error as Error).message}`)
@@ -201,6 +207,10 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
         if (code !== null && code !== 0) io.err(`[app] exited with code ${code}`)
       },
     })
+  } else {
+    // Without --app the user starts it (Docker, a task runner...) and needs this env.
+    io.out('Start your app with capture on using this environment:')
+    for (const [name, value] of Object.entries(appEnv)) io.out(`  ${name}=${shellQuote(value)}`)
   }
 
   if (options.open !== false) openBrowser(server.url)
@@ -216,6 +226,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
       await app?.stop()
       store.writeSessions()
       await server.close()
+      await scanner.close()
     },
   }
 }
@@ -277,4 +288,9 @@ function openBrowser(url: string) {
   } catch {
     // No browser available (CI, SSH). The URL is printed above.
   }
+}
+
+/** Single-quoted for POSIX shells when the value has characters a shell would interpret. */
+function shellQuote(value: string): string {
+  return /^[\w./:-]*$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`
 }

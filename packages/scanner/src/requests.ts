@@ -10,6 +10,7 @@
 // call sits on the way up: a JSX event prop, `useEffect`, a query hook at render, a mutation's
 // `.mutate()` call, or plain render.
 import {
+  type ApiClientConfig,
   type CallFrame,
   type Component,
   type Flag,
@@ -38,6 +39,7 @@ import {
   type Node,
   type ParameterDeclaration,
   type SourceFile,
+  type Symbol as TsSymbol,
   type Type,
   type TypeNode,
   ts,
@@ -191,7 +193,30 @@ interface Found {
   bodyType?: TypeRef
   responseType?: TypeRef
   serverAction?: ServerActionRef
+  client?: { module: string; name: string }
 }
+
+export interface RequestScannerOptions {
+  /** Whether a file (absolute, forward slashes) is scanned. Calls into other files aren't followed. */
+  scanned?: (file: string) => boolean
+  /** Modules whose calls are requests (config `apiClients`). */
+  apiClients?: readonly ApiClientConfig[]
+  /** The project file a module specifier points to, for `apiClients` given as project paths. */
+  resolveModule?: (specifier: string) => string | undefined
+}
+
+/** Where a call's callee comes from, when it is one of the configured API clients. */
+interface ClientRef {
+  client: ApiClientConfig
+  /** The imported name (`default` for a default import, `*` for a namespace import). */
+  imported: string
+  /** Set when the callee is an instance created by the client (`const api = ky.create(...)`). */
+  instance?: CallExpression
+}
+
+/** Option keys that mark an argument as an options object rather than the request body. */
+const CLIENT_OPTION_KEYS = ['json', 'body', 'data', 'headers', 'method', 'searchParams', 'query', 'params']
+const BODY_METHODS = new Set<HttpMethod>(['POST', 'PUT', 'PATCH'])
 
 export class RequestScanner {
   readonly #root: string
@@ -201,10 +226,17 @@ export class RequestScanner {
   readonly #reaches = new Map<Node, boolean>()
   readonly #actionsExplored = new Set<Node>()
   readonly #fileDirectives = new Map<SourceFile, string[]>()
+  readonly #scanned: (file: string) => boolean
+  readonly #clients: readonly ApiClientConfig[]
+  readonly #resolveModule: (specifier: string) => string | undefined
+  readonly #clientFiles = new Map<string, string | undefined>()
 
-  constructor(root: string, types: TypeResolver) {
+  constructor(root: string, types: TypeResolver, options: RequestScannerOptions = {}) {
     this.#root = root
     this.#types = types
+    this.#scanned = options.scanned ?? (() => true)
+    this.#clients = options.apiClients ?? []
+    this.#resolveModule = options.resolveModule ?? (() => undefined)
   }
 
   /** Requests sent while a component renders or handles events. */
@@ -331,6 +363,11 @@ export class RequestScanner {
       this.#emit(w, this.#frame(call, scope), axios)
       return true
     }
+    const client = this.#clientSite(call, env)
+    if (client) {
+      this.#emit(w, this.#frame(call, scope), client)
+      return true
+    }
     const hook = hookOf(call)
     if (hook) {
       this.#hook(call, hook, scope, env, w)
@@ -347,7 +384,7 @@ export class RequestScanner {
     }
 
     const fn = calleeFunction(call)
-    if (!fn || !isProject(fn) || w.active.has(fn)) return false
+    if (!fn || !isProject(fn) || w.active.has(fn) || !this.#isScanned(fn)) return false
     if (this.#isServerAction(fn) && w.origin.client) {
       this.#emit(w, this.#frame(call, scope), this.#actionSite(fn, false))
       return false
@@ -587,6 +624,138 @@ export class RequestScanner {
     }
   }
 
+  /**
+   * A call to a configured API client (config `apiClients`): `get(url)`, `api.post(url, body)`,
+   * `ky.post(url, { json })`, `ofetch(url, { method })`, or a method of an instance it created.
+   */
+  #clientSite(call: CallExpression, env: Env): Found | undefined {
+    if (this.#clients.length === 0) return undefined
+    const expr = call.getExpression()
+    let ref: ClientRef | undefined
+    let name: string
+    if (N.isIdentifier(expr)) {
+      ref = this.#clientOf(expr)
+      if (!ref) return undefined
+      // Calling an import or an instance directly: `get(url)`, `ofetch(url)`, `api(url)`.
+      name = ref.instance || ref.imported === '*' ? 'default' : ref.imported
+    } else if (N.isPropertyAccessExpression(expr) && N.isIdentifier(expr.getExpression())) {
+      ref = this.#clientOf(expr.getExpression())
+      if (!ref) return undefined
+      name = expr.getName()
+    } else {
+      return undefined
+    }
+    if (!ref.client.methods.includes(name)) return undefined
+
+    const args = call.getArguments()
+    let urlArg = args[0]
+    let options = args[1]
+    const first = this.#resolve(args[0], env).node
+    if (first && N.isObjectLiteralExpression(first)) {
+      options = args[0]
+      urlArg = propValue(this.#prop(options, env, 'url'))
+    }
+    const isOptions = (arg: Node | undefined) =>
+      !!arg && CLIENT_OPTION_KEYS.some((key) => this.#prop(arg, env, key) !== 'absent')
+
+    // The method from the name (`post`), else from the options, else GET.
+    const verb = HTTP_METHODS.find((m) => m === name.toUpperCase())
+    let method = verb
+    if (!method) {
+      const prop = this.#prop(isOptions(options) ? options : undefined, env, 'method')
+      method = prop === 'absent' ? 'GET' : this.#method(prop)
+    }
+
+    // The body: `{ json | body | data }` in the options, or the second argument itself for
+    // POST/PUT/PATCH helpers like `api.post(url, data)`.
+    let bodyNode: Node | undefined
+    if (isOptions(options)) {
+      for (const key of ['json', 'body', 'data']) {
+        bodyNode = propValue(this.#prop(options, env, key))
+        if (bodyNode) break
+      }
+    } else if (verb && BODY_METHODS.has(verb)) {
+      bodyNode = options
+    }
+
+    // A base URL from the instance's options: `ky.create({ prefixUrl })`, `{ baseURL }`.
+    let base: Str | undefined
+    if (ref.instance) {
+      const config = ref.instance.getArguments()[0]
+      for (const key of ['prefixUrl', 'baseURL', 'baseUrl']) {
+        base = this.#str(propValue(this.#prop(config, EMPTY_ENV, key)), EMPTY_ENV)
+        if (base) break
+      }
+    }
+    const path = this.#str(urlArg, env)
+    const body = this.#bodyOf(bodyNode, env)
+    const typeArg = call.getTypeArguments()[0]
+    const responseType =
+      typeArg && !typeArg.getType().isTypeParameter() ? this.#types.fromTypeNode(typeArg) : undefined
+    return {
+      transport: 'api-client',
+      client: { module: ref.client.module, name },
+      ...(method ? { method } : {}),
+      url: toUrl(base && path ? joinUrl(base, path) : path, urlArg ? oneLine(urlArg.getText()) : ''),
+      ...(body ? { bodyType: body } : {}),
+      ...(responseType ? { responseType } : {}),
+    }
+  }
+
+  /** The configured client an identifier comes from: imported from it, or created by it. */
+  #clientOf(identifier: Node, depth = 0): ClientRef | undefined {
+    const symbol = identifier.getSymbol()
+    if (!symbol) return undefined
+    // The import itself, then what it points to (an instance created in another file).
+    const target = unalias(symbol)
+    const decls = [...symbol.getDeclarations(), ...(target !== symbol ? target.getDeclarations() : [])]
+    for (const decl of decls) {
+      const importDecl = decl.getFirstAncestorByKind(ts.SyntaxKind.ImportDeclaration)
+      if (importDecl) {
+        const client = this.#clients.find((c) => this.#importMatches(importDecl, c, symbol))
+        if (!client) continue
+        const imported = N.isImportSpecifier(decl)
+          ? decl.getName()
+          : N.isImportClause(decl)
+            ? 'default'
+            : N.isNamespaceImport(decl)
+              ? '*'
+              : identifier.getText()
+        return { client, imported }
+      }
+      // `const api = ky.create({ ... })` or `const api = createClient()`.
+      if (depth === 0 && N.isVariableDeclaration(decl)) {
+        const init = skipParens(decl.getInitializer())
+        if (!init || !N.isCallExpression(init)) continue
+        let callee: Node = init.getExpression()
+        while (N.isPropertyAccessExpression(callee)) callee = callee.getExpression()
+        const ref = N.isIdentifier(callee) ? this.#clientOf(callee, depth + 1) : undefined
+        if (ref) return { ...ref, instance: init }
+      }
+    }
+    return undefined
+  }
+
+  /** The import names the client's module as written, or resolves to the same project file. */
+  #importMatches(importDecl: Node, client: ApiClientConfig, symbol: TsSymbol): boolean {
+    if (!N.isImportDeclaration(importDecl)) return false
+    if (importDecl.getModuleSpecifierValue() === client.module) return true
+    if (!this.#clientFiles.has(client.module)) {
+      this.#clientFiles.set(client.module, this.#resolveModule(client.module))
+    }
+    const target = this.#clientFiles.get(client.module)
+    if (!target) return false
+    if (importDecl.getModuleSpecifierSourceFile()?.getFilePath() === target) return true
+    // Imported through a barrel that re-exports it.
+    return unalias(symbol)
+      .getDeclarations()
+      .some((d) => d.getSourceFile().getFilePath() === target)
+  }
+
+  #isScanned(node: Node): boolean {
+    return this.#scanned(node.getSourceFile().getFilePath())
+  }
+
   /** A call to a server action. With `useActionState`, the first parameter is the previous state. */
   #actionSite(fn: Node, formState: boolean): Found {
     this.#exploreAction(fn)
@@ -650,6 +819,7 @@ export class RequestScanner {
       if (
         this.#isFetch(d) ||
         this.#axiosSite(d, EMPTY_ENV) ||
+        this.#clientSite(d, EMPTY_ENV) ||
         hookOf(d) ||
         isActionStateHook(d) ||
         navigationCall(d)
@@ -658,7 +828,7 @@ export class RequestScanner {
         return
       }
       const callee = calleeFunction(d)
-      if (callee && isProject(callee) && callee !== fn) {
+      if (callee && isProject(callee) && callee !== fn && this.#isScanned(callee)) {
         found = this.#isServerAction(callee) || this.#reachesNetwork(callee)
       }
     })
@@ -694,6 +864,7 @@ export class RequestScanner {
           ? { serverAction: w.origin.serverAction }
           : {}),
       transport: found.transport,
+      ...(found.client ? { client: found.client } : {}),
       ...(hookFrame?.hook
         ? {
             hook: {

@@ -139,7 +139,8 @@ describe('flow-checker dev capture', () => {
   it('serves ingest and passes the runtime config to the app env', async () => {
     const root = project({ 'app/page.tsx': 'export default function Home() { return <main /> }' })
     const { cli, out } = io()
-    const session = await startDev({ root, port: 0, open: false }, cli)
+    // No watcher: this test is about ingest and the app env.
+    const session = await startDev({ root, port: 0, open: false, watch: false }, cli)
     if (typeof session === 'number') throw new Error(`startDev failed with ${session}`)
     try {
       const runtime = JSON.parse(session.appEnv.NEXT_PUBLIC_FLOW_CHECKER ?? '{}')
@@ -157,5 +158,7 @@ describe('flow-checker dev capture', () => {
     } finally {
       await session.close()
     }
-  })
+    // A full dev start (scan + server) takes about a second alone, but several times that while
+    // the whole suite compiles TypeScript in parallel.
+  }, 20_000)
 })

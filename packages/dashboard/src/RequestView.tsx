@@ -111,7 +111,11 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         <RequestSummary site={site} />
         <span className="spacer" />
         <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
-          {site.transport === 'server-action' ? 'server action' : site.transport}
+          {site.transport === 'server-action'
+            ? 'server action'
+            : site.client
+              ? `${site.client.module} · ${site.client.name}`
+              : site.transport}
           {site.hook ? ` · ${site.hook.name}` : ''}
         </Badge>
         <Badge

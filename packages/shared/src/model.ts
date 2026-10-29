@@ -271,8 +271,9 @@ export const ComponentRefSchema = z.object({
    * `project`: a component in the scanned source (see `componentId`).
    * `external`: from a package (see `module`).
    * `unresolved`: the scanner could not find a component declaration.
+   * `excluded`: declared in a file the config's `include`/`exclude` leaves out.
    */
-  resolution: z.enum(['project', 'external', 'unresolved']),
+  resolution: z.enum(['project', 'external', 'unresolved', 'excluded']),
   componentId: z.string().optional(),
   /** Import specifier the tag came from, when it was imported. */
   module: z.string().optional(),
@@ -400,7 +401,10 @@ export const RequestSiteSchema = z.object({
   handlerMethod: HttpMethodSchema.optional(),
   /** Transport `server-action`: the action called. Origin `server-action`: the action it runs in. */
   serverAction: ServerActionRefSchema.optional(),
-  transport: z.enum(['fetch', 'axios', 'server-action']),
+  /** `api-client`: a call to a function listed in the config's `apiClients` (see `client`). */
+  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action']),
+  /** Transport `api-client`: the configured module and the function or method called. */
+  client: z.object({ module: z.string(), name: z.string() }).optional(),
   /** Set when a data-fetching hook runs the request. `key` is the query/SWR key as written. */
   hook: z
     .object({

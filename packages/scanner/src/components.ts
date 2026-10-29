@@ -39,9 +39,16 @@ export class ComponentGraph {
   readonly #directiveCache = new Map<SourceFile, boolean>()
   readonly #types: TypeResolver
 
-  constructor(root: string, types: TypeResolver = new TypeResolver(root)) {
+  readonly #scanned: (file: string) => boolean
+
+  constructor(
+    root: string,
+    types: TypeResolver = new TypeResolver(root),
+    scanned: (file: string) => boolean = () => true,
+  ) {
     this.#root = root
     this.#types = types
+    this.#scanned = scanned
   }
 
   /** Adds the default-export component of a page/layout file. Returns its id. */
@@ -159,6 +166,7 @@ export class ComponentGraph {
     if (file.isInNodeModules() || file.isDeclarationFile()) {
       return { resolution: 'external', module: module ?? packageFromPath(file.getFilePath()) }
     }
+    if (!this.#scanned(file.getFilePath())) return { resolution: 'excluded', module }
 
     // `const X = dynamic(() => import('./X'))` / `lazy(...)`
     const loader = N.isVariableDeclaration(node) ? node.getInitializer() : undefined

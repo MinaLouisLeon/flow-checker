@@ -1,0 +1,58 @@
+name: Release
+
+# Publishes @integr8/flow-checker to npm with provenance when a version tag is pushed:
+#   git tag v0.1.0 && git push origin v0.1.0
+# The tag must match packages/flow-checker/package.json.
+#
+# Needs the NPM_TOKEN repository secret (an npm automation or granular token with publish
+# access to @integr8), or npm trusted publishing set up for this workflow.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Check and publish
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      # Signs the provenance statement through GitHub's OIDC token.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Tag matches the package version
+        run: |
+          version=$(node -p "require('./packages/flow-checker/package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package version $version" >&2
+            exit 1
+          fi
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm typecheck:fixtures
+      - run: pnpm verify:package
+      - run: pnpm verify:config
+
+      # pnpm turns workspace:* into real versions in the published package.json.
+      - name: Publish
+        working-directory: packages/flow-checker
+        run: pnpm publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"

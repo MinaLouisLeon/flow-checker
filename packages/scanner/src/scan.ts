@@ -1,13 +1,17 @@
 import { resolve } from 'node:path'
 import {
+  type ApiClientConfig,
   type AppModel,
+  createPathFilter,
+  DEFAULT_EXCLUDE,
+  DEFAULT_INCLUDE,
   HTTP_METHODS,
   type HttpMethod,
   MODEL_VERSION,
   makeId,
   type Route,
 } from '@flow-checker/shared'
-import { type FileSystemHost, Project, type SourceFile } from 'ts-morph'
+import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
@@ -15,7 +19,7 @@ import { relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { RequestScanner } from './requests'
 import { walkRoutes } from './routes'
-import { TypeResolver } from './types'
+import { TypeResolver, type TypeResolverOptions } from './types'
 
 export interface ScanOptions {
   /** Project root (the directory with package.json / next.config). */
@@ -24,6 +28,22 @@ export interface ScanOptions {
   appDir?: string
   /** Alternative file system, e.g. ts-morph's `InMemoryFileSystemHost` in tests. */
   fileSystem?: FileSystemHost
+  /** Limits for type resolution (config `types`). */
+  types?: TypeResolverOptions
+  /** Globs of files to scan, relative to the root (config `include`). Default: everything. */
+  include?: readonly string[]
+  /** Globs of files to skip (config `exclude`). Default: tests, stories and mocks. */
+  exclude?: readonly string[]
+  /** Modules whose calls are requests (config `apiClients`). */
+  apiClients?: readonly ApiClientConfig[]
+}
+
+/** Settings every stage gets. */
+export interface ScanSettings {
+  types?: TypeResolverOptions
+  /** Whether a file (absolute, forward slashes) is scanned. */
+  scanned: (file: string) => boolean
+  apiClients: readonly ApiClientConfig[]
 }
 
 /** Scans a Next.js App Router project into the model written to `.flow-checker/model.json`. */
@@ -66,9 +86,16 @@ export function createScanSession(options: ScanOptions): ScanSession {
   const root = options.fileSystem ? toPosix(options.root) : toPosix(resolve(options.root))
   const fs = options.fileSystem ?? new Project({ skipAddingFilesFromTsConfig: true }).getFileSystem()
 
+  const pathFilter = createPathFilter(options.include ?? DEFAULT_INCLUDE, options.exclude ?? DEFAULT_EXCLUDE)
+  const settings: ScanSettings = {
+    types: options.types,
+    scanned: (file) => pathFilter(relativeTo(root, file)),
+    apiClients: options.apiClients ?? [],
+  }
+
   let discovery = discoverProject(fs, root, options.appDir)
-  let project = createProject(discovery, fs)
-  let model = analyze(root, fs, discovery, project)
+  let project = createProject(discovery, fs, settings.scanned)
+  let model = analyze(root, fs, discovery, project, settings)
 
   return {
     get model() {
@@ -96,7 +123,7 @@ export function createScanSession(options: ScanOptions): ScanSession {
         removed.some((f) => f === discovery.appDir || discovery.appDir.startsWith(`${f}/`))
       if (restart) {
         discovery = discoverProject(fs, root, options.appDir)
-        project = createProject(discovery, fs)
+        project = createProject(discovery, fs, settings.scanned)
       } else {
         for (const file of removed) {
           // A removed directory removes every file below it.
@@ -124,12 +151,12 @@ export function createScanSession(options: ScanOptions): ScanSession {
           if (existing) existing.refreshFromFileSystemSync()
           // New files in the app directory are scanned. Elsewhere they are only pulled in once
           // something imports them, which re-resolving imports below takes care of.
-          else if (file.startsWith(`${discovery.appDir}/`) && isSource(file))
+          else if (file.startsWith(`${discovery.appDir}/`) && isSource(file) && settings.scanned(file))
             project.addSourceFileAtPathIfExists(file)
         }
         if (resolveImports) project.resolveSourceFileDependencies()
       }
-      model = analyze(root, fs, discovery, project)
+      model = analyze(root, fs, discovery, project, settings)
       return model
     },
   }
@@ -150,13 +177,23 @@ function importsOf(file: SourceFile): string {
 }
 
 /** Runs every stage on the project as it is now. */
-function analyze(root: string, fs: FileSystemHost, discovery: Discovery, project: Project): AppModel {
-  const { tree, routes: found } = walkRoutes(fs, root, discovery.appDir)
+function analyze(
+  root: string,
+  fs: FileSystemHost,
+  discovery: Discovery,
+  project: Project,
+  settings: ScanSettings,
+): AppModel {
+  const walked = walkRoutes(fs, root, discovery.appDir)
+  const tree = walked.tree
+  // Excluded pages and route handlers are left out (their folders stay in the route tree).
+  const found = walked.routes.filter((r) => settings.scanned(resolveFrom(root, r.file)))
 
-  const types = new TypeResolver(root)
-  const graph = new ComponentGraph(root, types)
+  const types = new TypeResolver(root, settings.types)
+  const graph = new ComponentGraph(root, types, settings.scanned)
   const fileComponents = new Map<string, string | undefined>()
   const componentOf = (relFile: string) => {
+    if (!settings.scanned(resolveFrom(root, relFile))) return undefined
     if (!fileComponents.has(relFile)) {
       const file = sourceFile(project, resolveFrom(root, relFile))
       fileComponents.set(relFile, file ? graph.addFileDefault(file) : undefined)
@@ -190,7 +227,11 @@ function analyze(root: string, fs: FileSystemHost, discovery: Discovery, project
 
   // Requests come after components (client/server kinds decide what a server action call is)
   // and before types are collected (request body and response types join the type table).
-  const requests = new RequestScanner(root, types)
+  const requests = new RequestScanner(root, types, {
+    scanned: settings.scanned,
+    apiClients: settings.apiClients,
+    resolveModule: (specifier) => resolveModule(project, root, specifier),
+  })
   const bodies = graph.bodies()
   for (const component of components) {
     const body = bodies.get(component.id)
@@ -222,6 +263,17 @@ function analyze(root: string, fs: FileSystemHost, discovery: Discovery, project
     navigations,
     flows,
   }
+}
+
+/** The project file a module specifier (e.g. `@/lib/api`) points to, as seen from the root. */
+function resolveModule(project: Project, root: string, specifier: string): string | undefined {
+  const resolved = ts.resolveModuleName(
+    specifier,
+    `${root}/index.ts`,
+    project.getCompilerOptions(),
+    project.getModuleResolutionHost(),
+  ).resolvedModule
+  return resolved && !resolved.isExternalLibraryImport ? toPosix(resolved.resolvedFileName) : undefined
 }
 
 function withId<T extends object>(value: T, componentId: string | undefined): T & { componentId?: string } {

@@ -8,7 +8,11 @@ const SOURCE_GLOB = '**/*.{ts,tsx,js,jsx,mts,cts,mjs,cjs}'
  * Creates the ts-morph project. Only `app/` files are added up front; everything they
  * import is pulled in by the compiler on demand, which keeps large repos fast.
  */
-export function createProject(discovery: Discovery, fileSystem?: FileSystemHost): Project {
+export function createProject(
+  discovery: Discovery,
+  fileSystem?: FileSystemHost,
+  scanned: (file: string) => boolean = () => true,
+): Project {
   const project = discovery.tsconfig
     ? new Project({
         tsConfigFilePath: discovery.tsconfig,
@@ -32,6 +36,10 @@ export function createProject(discovery: Discovery, fileSystem?: FileSystemHost)
     posix.join(discovery.appDir, SOURCE_GLOB),
     `!${posix.join(discovery.appDir, '**/node_modules/**')}`,
   ])
+  // Excluded app files (tests, stories...) are not scanned. Their imports may still pull them in.
+  for (const file of project.getSourceFiles()) {
+    if (!scanned(file.getFilePath())) project.removeSourceFile(file)
+  }
   project.resolveSourceFileDependencies()
   return project
 }

@@ -74,9 +74,11 @@ try {
       "import { defineConfig } from '@integr8/flow-checker/config'",
       "import { installClientRuntime } from '@integr8/flow-checker/runtime/client'",
       "import { registerServerRuntime } from '@integr8/flow-checker/runtime/server'",
+      "import { withFlowChecker } from '@integr8/flow-checker/next'",
+      'export const nextConfig = withFlowChecker({ reactStrictMode: true })',
       'installClientRuntime()',
       'registerServerRuntime()',
-      'export default defineConfig({ capture: { storeRaw: false }, ports: { app: 3000 } })',
+      "export default defineConfig({ root: '.', include: ['**'], exclude: ['**/*.test.*'], apiClients: [{ module: 'ky', methods: ['get'] }], capture: { storeRaw: false }, ports: { app: 3000 } })",
       '',
     ].join('\n'),
   )
@@ -99,7 +101,16 @@ try {
     [
       '--input-type=module',
       '-e',
-      "await import('@integr8/flow-checker'); await import('@integr8/flow-checker/config')",
+      "await import('@integr8/flow-checker'); await import('@integr8/flow-checker/config'); const { withFlowChecker } = await import('@integr8/flow-checker/next'); if (typeof withFlowChecker !== 'function') throw new Error('withFlowChecker missing')",
+    ],
+    app,
+  )
+  // next.config.js of older Next.js versions is CommonJS.
+  run(
+    process.execPath,
+    [
+      '-e',
+      "const { withFlowChecker } = require('@integr8/flow-checker/next'); const c = { a: 1 }; if (withFlowChecker(c) !== c) throw new Error('withFlowChecker changed the config without FLOW_CHECKER=1')",
     ],
     app,
   )

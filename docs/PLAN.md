@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M10 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export). M11 (public release) is next. Updated: 2026-10-29.
+> Status: M0–M10 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export). M11 (public release) is built; v0.1.0 is ready to tag and publish. Updated: 2026-10-29.
 
 ## 1. Goal
 
@@ -203,7 +203,7 @@ Detect each call, then **trace it back up the call graph** to the component and 
 - **Live update.** The server applies the new model, matches every capture again and sends a `scan` event on `/api/live` (server-sent events, which the dashboard already uses, rather than a WebSocket): files, entity counts added/removed/changed, sites whose code changed, and sites that now need a re-check. `/api/live` is on whenever files are watched, even without capture. Capture summaries carry `stale`.
 - Dashboard: refetches the model on `scan`, `↻ needs re-check` badge, `stale` badge on captures (Live screen and request panel), a "code changed" banner and the changed file next to the scan time, and a "Requests whose code changed since they were captured" group on the overview.
 - **Check:** `watch.test.ts` (CLI) runs `dev` on a copy of the basic fixture with its recorded captures. Moving lines keeps every site verified. Editing `getUsers` makes only that site `needs-recheck`, with the `scan` event and the model update arriving in under 1 s (about 170 ms). A new capture verifies it again. An edit made while the tool was off is noticed on start. `incremental.test.ts` checks that every session update equals a fresh scan, and the hash rules. `e2e/watch.spec.ts` edits `LoginForm.tsx` in the running next-intl fixture: the dashboard shows `↻ needs re-check` within 1 s (about 480 ms), then a new login shows `✓ verified` again.
-- Not done yet: re-scanning runs on the main thread (a large repo blocks the server while it scans; see M11), and middleware is still not scanned.
+- **M11:** the warm session runs in a worker thread (`dist/scan-worker.js`), so the server keeps answering during large re-scans. Scans are queued one at a time. From source (tests) it runs in-process. Middleware is still not scanned.
 
 ## 7. Runtime capture (`packages/runtime`)
 
@@ -215,7 +215,8 @@ The tool runs the dev command with `FLOW_CHECKER=1`, `PORT=<app port>`, and the 
 - **Next 13.4–15.2:** `instrumentation.ts` for the server (with `experimental.instrumentationHook` where needed). The browser runtime comes from a small `withFlowChecker()` wrapper in `next.config` that prepends the client entry.
 - `flow-checker init` makes these one-line additions, with your confirmation. Every hook is a **no-op unless `FLOW_CHECKER=1`**, and the runtime is excluded from production builds.
 - `flow-checker doctor` checks the setup.
-- **Built in M5:** the 15.3+ path. For older versions `init` prints a note; the `withFlowChecker()` wrapper is left for the M11 version matrix. `dev` warns when a hook is missing.
+- **Built in M5:** the 15.3+ path. `dev` warns when a hook is missing.
+- **Built in M11:** `withFlowChecker()` (`@integr8/flow-checker/next`, ESM and CommonJS). Before 15.3 it prepends the project's own `instrumentation-client.*` to the webpack `main-app` client entry in dev, so the same hook files work on every version; before 15.0 it also sets `experimental.instrumentationHook`. It returns the config untouched without `FLOW_CHECKER=1` or on 15.3+, and accepts config functions. Turbopack ignores webpack config, so browser capture before 15.3 needs `next dev` without `--turbo` (`doctor` warns). `init` prints the wrapper snippet when it is needed.
 
 ### 7.2 Browser side
 
@@ -369,7 +370,16 @@ Options: `--port`, `--app-port`, `--dev-command "pnpm dev"`, `--no-open`, `--no-
 
 Package manager (npm, pnpm, yarn or bun) is detected from the lockfile.
 
+**Built in M11:** `doctor` checks Node (22.12+, 22.18+ for a `.ts` config), the config file, the App Router directory (warns about `pages/`), the Next version (13.4+), `tsconfig`/`jsconfig` (parse errors, path aliases), that the package is installed, both hooks, `withFlowChecker()` before 15.3, Turbopack before 15.3, both ports and `.gitignore`. Each problem comes with a fix; exit code 1 on a failed check. `scan` now loads the config too. `--no-app` prints the environment to start the app with. Not done: `scan --fail-on`.
+
 ## 12. Config file (`flow-checker.config.ts`)
+
+**Built in M11** (documented in [config.md](config.md); `init` writes the defaults into the new file):
+
+- `root`: resolved from the config file's folder (default `.`); `.flow-checker/` and the dev command use it. `doctor` loads the config first, so every check uses it.
+- `include` / `exclude`: globs from the root (`packages/shared/src/glob.ts`). Defaults `['**']` and tests/specs/stories/`__tests__`/`__mocks__`; a user list replaces the default. Excluded pages and route handlers are dropped, components declared in excluded files appear as `resolution: 'excluded'` and are not walked, and the request walk doesn't enter excluded functions.
+- `apiClients`: `{ module, methods }[]`, default `[]`. A call becomes a site with transport `api-client` and `client: { module, name }` when its callee is a listed name imported from the module (as written, or resolving to the same project file, also through barrels), a method on such an import, or on an instance created from it (`ky.create()`, also when imported from another file). `default` = calling the import or instance. Method from a verb name, else the `method` option, else GET; URL from the first argument (or `url`), with `prefixUrl`/`baseURL` from the instance; body from `json`/`body`/`data` or the second argument of `post`/`put`/`patch`; response from a type argument. A configured project module is the request itself (not entered). `doctor` warns when a listed package isn't installed.
+- `types.maxDepth` is passed to the type resolver.
 
 ```ts
 import { defineConfig } from 'flow-checker/config'
@@ -409,20 +419,28 @@ Every file is checked against a zod schema with a `version` field, so the format
 
 ## 14. Milestones
 
-| #   | Milestone                                                                                                                                                   | Done when                                                                         | Status  |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------- |
-| M0  | **Setup:** monorepo, tsup/Vite builds, Vitest, fixtures (basic, react-query, server-actions, bff, next-intl)                                                | CI green on an empty pipeline                                                     | ✅ Done |
-| M1  | **Routes + components** scan                                                                                                                                | Snapshot tests: route tree and component trees for all fixtures                   | ✅ Done |
-| M2  | **Request sites:** fetch/axios/wrappers, React Query/SWR, server actions, route handlers + chain, triggers, URL patterns                                    | Every fixture request detected with the right component and trigger               | ✅ Done |
-| M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      | ✅ Done |
-| M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done |
-| M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done |
-| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done |
-| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done |
-| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done |
-| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done |
-| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | ✅ Done |
-| M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | To do   |
+| #   | Milestone                                                                                                                                                   | Done when                                                                         | Status               |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------- |
+| M0  | **Setup:** monorepo, tsup/Vite builds, Vitest, fixtures (basic, react-query, server-actions, bff, next-intl)                                                | CI green on an empty pipeline                                                     | ✅ Done              |
+| M1  | **Routes + components** scan                                                                                                                                | Snapshot tests: route tree and component trees for all fixtures                   | ✅ Done              |
+| M2  | **Request sites:** fetch/axios/wrappers, React Query/SWR, server actions, route handlers + chain, triggers, URL patterns                                    | Every fixture request detected with the right component and trigger               | ✅ Done              |
+| M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      | ✅ Done              |
+| M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done              |
+| M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done              |
+| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done              |
+| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done              |
+| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done              |
+| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done              |
+| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | ✅ Done              |
+| M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | Built, not published |
+
+### M11 notes
+
+- **Docs:** user README in `packages/flow-checker/README.md` (shown on npm), `docs/config.md`, `CHANGELOG.md`, MIT `LICENSE`.
+- **Next.js matrix:** `scripts/next-matrix.mjs` creates a small app per version (13.4.19, 14.2.35, 15.2.9, 15.5.28, 16.4.3), installs the packed package, runs `init` (+ `withFlowChecker()` before 15.3), `doctor`, `scan`, then `dev` with Chromium: a page-load server fetch, a click-triggered browser fetch and the route handler's upstream fetch must be captured, matched, and linked as a two-hop chain. CI runs every version on Linux, and 13.4 and 16 also on Windows and macOS. Next 13.4–13.5 dev-server IPC to its render workers (`/?key=…&method=…`) is ignored by default.
+- **OS:** lint/typecheck/test/build/package checks and the Playwright e2e suite run on Linux, Windows and macOS in CI.
+- **Performance:** `scripts/perf/generate-app.mjs` writes a synthetic app; `scripts/perf/bench.mjs` measures it. At 200 features (1,808 files, 401 pages, 804 components, 1,000 requests): cold scan ~9–10 s, re-scan after an edit ~3.4 s, and the slowest dashboard API answer during re-scans fell from ~4,000 ms (main thread) to ~170 ms (worker). CI fails above 25 s / 8 s / 1 s. Profiling shows the time spread over import resolution (~4 s cold) and symbol/type lookups, with no single hot spot; per-file caching and lazy type resolution remain options for later.
+- **Release:** `.github/workflows/release.yml` publishes on a `v*` tag that matches the package version, after every check, with `pnpm publish --provenance` (needs `NPM_TOKEN` or npm trusted publishing, and an `npm` environment). `verify:package` also checks `./next` from ESM, CommonJS and TypeScript.
 
 Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11.
 
