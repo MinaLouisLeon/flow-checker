@@ -19,7 +19,7 @@ import {
   typeTable,
   type VerificationSummary,
 } from '@flow-checker/shared'
-import { ServerActionResolver } from './actions'
+import { type ServerActionInfo, ServerActionResolver } from './actions'
 import { BEGINNING, CodeHistory } from './history'
 import { fingerprint, Matcher } from './matcher'
 import { OverridesFile } from './overrides'
@@ -33,6 +33,10 @@ export interface VerifierOptions {
   store: CaptureStore
   /** Shared with the flow tracker. Default: a new one for `root`. */
   overrides?: OverridesFile
+  /** Don't save the code history (export). Pair it with a read-only store. */
+  readOnly?: boolean
+  /** Server action id → action. Default: Next's manifest in `root`. */
+  resolveAction?: (id: string) => ServerActionInfo | undefined
 }
 
 export class Verifier {
@@ -42,7 +46,7 @@ export class Verifier {
   private types: TypeTable
   private readonly store: CaptureStore
   private readonly mapper: SourceMapper
-  private readonly actions: ServerActionResolver
+  private readonly resolveAction: (id: string) => ServerActionInfo | undefined
   readonly overrides: OverridesFile
   private readonly history: CodeHistory
   /** During a re-scan: old site id -> new id, for sites whose lines moved. */
@@ -57,9 +61,10 @@ export class Verifier {
     this.types = typeTable(options.model.types)
     this.store = options.store
     this.mapper = new SourceMapper(options.root)
-    this.actions = new ServerActionResolver(options.root)
+    const actions = new ServerActionResolver(options.root)
+    this.resolveAction = options.resolveAction ?? ((id) => actions.resolve(id))
     this.overrides = options.overrides ?? new OverridesFile(options.root)
-    this.history = new CodeHistory(options.root)
+    this.history = new CodeHistory(options.root, { persist: !options.readOnly })
     this.history.update(options.model)
     // Captures from earlier runs: match them against the current scan.
     this.rematch(this.store.all())
@@ -230,7 +235,7 @@ export class Verifier {
     const parentId = capture.origin === 'server' ? capture.parent?.captureId : undefined
     return this.matcher.match(capture, {
       frames: capture.sourceStack ?? [],
-      resolveAction: (id) => this.actions.resolve(id),
+      resolveAction: this.resolveAction,
       parentMatch: parentId ? this.store.get(parentId)?.match : undefined,
       override: decision ? decision.siteId : undefined,
     })

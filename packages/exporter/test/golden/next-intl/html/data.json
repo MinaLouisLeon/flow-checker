@@ -1,0 +1,1888 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "next-intl",
+  "model": {
+    "version": 1,
+    "project": {
+      "appDir": "src/app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "src/app",
+      "files": {},
+      "children": [
+        {
+          "segment": {
+            "raw": "[locale]",
+            "kind": "dynamic",
+            "name": "locale"
+          },
+          "dir": "src/app/[locale]",
+          "files": {
+            "layout": "src/app/[locale]/layout.tsx",
+            "page": "src/app/[locale]/page.tsx"
+          },
+          "children": [
+            {
+              "segment": {
+                "raw": "dashboard",
+                "kind": "static",
+                "name": "dashboard"
+              },
+              "dir": "src/app/[locale]/dashboard",
+              "files": {
+                "page": "src/app/[locale]/dashboard/page.tsx"
+              },
+              "children": []
+            },
+            {
+              "segment": {
+                "raw": "login",
+                "kind": "static",
+                "name": "login"
+              },
+              "dir": "src/app/[locale]/login",
+              "files": {
+                "page": "src/app/[locale]/login/page.tsx"
+              },
+              "children": []
+            },
+            {
+              "segment": {
+                "raw": "verify",
+                "kind": "static",
+                "name": "verify"
+              },
+              "dir": "src/app/[locale]/verify",
+              "files": {
+                "page": "src/app/[locale]/verify/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_27sgeyuy9pv",
+        "path": "/[locale]",
+        "kind": "page",
+        "file": "src/app/[locale]/page.tsx",
+        "segments": [
+          {
+            "raw": "[locale]",
+            "kind": "dynamic",
+            "name": "locale"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/[locale]/layout.tsx",
+            "componentId": "cmp_0jf6im1pjt6"
+          }
+        ],
+        "componentId": "cmp_0nwenv6i3tq"
+      },
+      {
+        "id": "rt_0nr7aw4u4g0",
+        "path": "/[locale]/dashboard",
+        "kind": "page",
+        "file": "src/app/[locale]/dashboard/page.tsx",
+        "segments": [
+          {
+            "raw": "[locale]",
+            "kind": "dynamic",
+            "name": "locale"
+          },
+          {
+            "raw": "dashboard",
+            "kind": "static",
+            "name": "dashboard"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/[locale]/layout.tsx",
+            "componentId": "cmp_0jf6im1pjt6"
+          }
+        ],
+        "componentId": "cmp_1uzxf8sin17"
+      },
+      {
+        "id": "rt_1cprhxt7jgk",
+        "path": "/[locale]/login",
+        "kind": "page",
+        "file": "src/app/[locale]/login/page.tsx",
+        "segments": [
+          {
+            "raw": "[locale]",
+            "kind": "dynamic",
+            "name": "locale"
+          },
+          {
+            "raw": "login",
+            "kind": "static",
+            "name": "login"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/[locale]/layout.tsx",
+            "componentId": "cmp_0jf6im1pjt6"
+          }
+        ],
+        "componentId": "cmp_01kdhdsgw4y"
+      },
+      {
+        "id": "rt_0s0435jzyyw",
+        "path": "/[locale]/verify",
+        "kind": "page",
+        "file": "src/app/[locale]/verify/page.tsx",
+        "segments": [
+          {
+            "raw": "[locale]",
+            "kind": "dynamic",
+            "name": "locale"
+          },
+          {
+            "raw": "verify",
+            "kind": "static",
+            "name": "verify"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/[locale]/layout.tsx",
+            "componentId": "cmp_0jf6im1pjt6"
+          }
+        ],
+        "componentId": "cmp_2awb26rqgh7"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_1uzxf8sin17",
+        "name": "DashboardPage",
+        "file": "src/app/[locale]/dashboard/page.tsx",
+        "loc": {
+          "file": "src/app/[locale]/dashboard/page.tsx",
+          "line": 3,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "DashboardProfile",
+            "resolution": "project",
+            "componentId": "cmp_0bpwse6tsg4",
+            "module": "@/components/DashboardProfile",
+            "loc": {
+              "file": "src/app/[locale]/dashboard/page.tsx",
+              "line": 6,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0jf6im1pjt6",
+        "name": "LocaleLayout",
+        "file": "src/app/[locale]/layout.tsx",
+        "loc": {
+          "file": "src/app/[locale]/layout.tsx",
+          "line": 11,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "NextIntlClientProvider",
+            "resolution": "external",
+            "module": "next-intl",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 25,
+              "column": 9
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode; params: Promise<{ locale: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              },
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "locale",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_01kdhdsgw4y",
+        "name": "LoginPage",
+        "file": "src/app/[locale]/login/page.tsx",
+        "loc": {
+          "file": "src/app/[locale]/login/page.tsx",
+          "line": 3,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "LoginForm",
+            "resolution": "project",
+            "componentId": "cmp_0skl5lm1a9a",
+            "module": "@/components/LoginForm",
+            "loc": {
+              "file": "src/app/[locale]/login/page.tsx",
+              "line": 6,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0nwenv6i3tq",
+        "name": "HomePage",
+        "file": "src/app/[locale]/page.tsx",
+        "loc": {
+          "file": "src/app/[locale]/page.tsx",
+          "line": 4,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "@/i18n/navigation",
+            "factory": "next-intl/navigation",
+            "loc": {
+              "file": "src/app/[locale]/page.tsx",
+              "line": 12,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ params: Promise<{ locale: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "locale",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_2awb26rqgh7",
+        "name": "VerifyPage",
+        "file": "src/app/[locale]/verify/page.tsx",
+        "loc": {
+          "file": "src/app/[locale]/verify/page.tsx",
+          "line": 3,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "VerifyOtpForm",
+            "resolution": "project",
+            "componentId": "cmp_1hlwjtaw6e6",
+            "module": "@/components/VerifyOtpForm",
+            "loc": {
+              "file": "src/app/[locale]/verify/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ searchParams: Promise<{ challenge?: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "searchParams",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "challenge",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          },
+                          "optional": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0bpwse6tsg4",
+        "name": "DashboardProfile",
+        "file": "src/components/DashboardProfile.tsx",
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 10,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "@/i18n/navigation",
+            "factory": "next-intl/navigation",
+            "conditional": true,
+            "loc": {
+              "file": "src/components/DashboardProfile.tsx",
+              "line": 25,
+              "column": 29
+            }
+          }
+        ],
+        "usedTypes": [
+          "typ_1tpxqokvkch"
+        ]
+      },
+      {
+        "id": "cmp_0skl5lm1a9a",
+        "name": "LoginForm",
+        "file": "src/components/LoginForm.tsx",
+        "loc": {
+          "file": "src/components/LoginForm.tsx",
+          "line": 9,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_1hlwjtaw6e6",
+        "name": "VerifyOtpForm",
+        "file": "src/components/VerifyOtpForm.tsx",
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 13,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "@/i18n/navigation",
+            "factory": "next-intl/navigation",
+            "conditional": true,
+            "loc": {
+              "file": "src/components/VerifyOtpForm.tsx",
+              "line": 19,
+              "column": 12
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "VerifyOtpFormProps",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1c9vagn0sce",
+            "name": "VerifyOtpFormProps"
+          }
+        }
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_1c9vagn0sce",
+        "name": "VerifyOtpFormProps",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 8,
+          "column": 11
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "challengeId",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "primitive",
+                    "name": "string"
+                  },
+                  {
+                    "kind": "primitive",
+                    "name": "null"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1tpxqokvkch",
+        "name": "User",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/auth.ts",
+          "line": 1,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "role",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "literal",
+                    "value": "admin"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": "member"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_0soatqi8re7",
+        "name": "LoginRequest",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/auth.ts",
+          "line": 8,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "password",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1ywasj4ylf5",
+        "name": "LoginResponse",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/auth.ts",
+          "line": 13,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "otpRequired",
+              "type": {
+                "kind": "literal",
+                "value": true
+              }
+            },
+            {
+              "name": "challengeId",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_0picqcg78cw",
+        "name": "VerifyOtpRequest",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/auth.ts",
+          "line": 18,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "challengeId",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "code",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1pi4a892sek",
+        "name": "VerifyOtpResponse",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/auth.ts",
+          "line": 23,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "token",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "user",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_1tpxqokvkch",
+                "name": "User"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_1ostg0bhzmk",
+        "origin": "component",
+        "componentId": "cmp_0bpwse6tsg4",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/me`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/me"
+        },
+        "trigger": {
+          "kind": "effect",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 15,
+            "column": 3
+          }
+        },
+        "responseType": {
+          "text": "User | null",
+          "shape": {
+            "kind": "union",
+            "types": [
+              {
+                "kind": "ref",
+                "typeId": "typ_1tpxqokvkch",
+                "name": "User"
+              },
+              {
+                "kind": "primitive",
+                "name": "null"
+              }
+            ]
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 16,
+            "column": 5,
+            "callee": "getMe"
+          },
+          {
+            "file": "src/lib/auth-api.ts",
+            "line": 25,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1hvf877plw1"
+      },
+      {
+        "id": "req_0ldgejuv5rs",
+        "origin": "component",
+        "componentId": "cmp_0skl5lm1a9a",
+        "transport": "fetch",
+        "method": "POST",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/auth/login"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        },
+        "bodyType": {
+          "text": "LoginRequest",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0soatqi8re7",
+            "name": "LoginRequest"
+          }
+        },
+        "responseType": {
+          "text": "LoginResponse",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1ywasj4ylf5",
+            "name": "LoginResponse"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/LoginForm.tsx",
+            "line": 18,
+            "column": 37,
+            "callee": "login"
+          },
+          {
+            "file": "src/lib/auth-api.ts",
+            "line": 17,
+            "column": 47,
+            "callee": "post"
+          },
+          {
+            "file": "src/lib/auth-api.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0e8ff5tnkzd"
+      },
+      {
+        "id": "req_0ivpze9dolu",
+        "origin": "component",
+        "componentId": "cmp_1hlwjtaw6e6",
+        "transport": "fetch",
+        "method": "POST",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/auth/verify-otp"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        "bodyType": {
+          "text": "VerifyOtpRequest",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0picqcg78cw",
+            "name": "VerifyOtpRequest"
+          }
+        },
+        "responseType": {
+          "text": "VerifyOtpResponse",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1pi4a892sek",
+            "name": "VerifyOtpResponse"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 27,
+            "column": 31,
+            "callee": "verifyOtp"
+          },
+          {
+            "file": "src/lib/auth-api.ts",
+            "line": 20,
+            "column": 3,
+            "callee": "post"
+          },
+          {
+            "file": "src/lib/auth-api.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0skdmbnza9l"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_15nvkgumvy5",
+        "origin": "component",
+        "componentId": "cmp_0nwenv6i3tq",
+        "kind": "link",
+        "api": "next-intl",
+        "href": {
+          "text": "\"/login\"",
+          "confidence": "exact",
+          "path": "/login"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/app/[locale]/page.tsx",
+            "line": 12,
+            "column": 7
+          }
+        },
+        "loc": {
+          "file": "src/app/[locale]/page.tsx",
+          "line": 12,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/app/[locale]/page.tsx",
+            "line": 12,
+            "column": 7,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_1cprhxt7jgk"
+      },
+      {
+        "id": "nav_1zfhub5393t",
+        "origin": "component",
+        "componentId": "cmp_0bpwse6tsg4",
+        "kind": "push",
+        "api": "next-intl",
+        "href": {
+          "text": "'/login'",
+          "confidence": "exact",
+          "path": "/login"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 31,
+            "column": 29
+          }
+        },
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 21,
+          "column": 5
+        },
+        "callStack": [
+          {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 21,
+            "column": 5,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_1cprhxt7jgk"
+      },
+      {
+        "id": "nav_1jxvbqpyff7",
+        "origin": "component",
+        "componentId": "cmp_0bpwse6tsg4",
+        "kind": "link",
+        "api": "next-intl",
+        "href": {
+          "text": "\"/login\"",
+          "confidence": "exact",
+          "path": "/login"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 25,
+            "column": 29
+          }
+        },
+        "conditional": true,
+        "loc": {
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 25,
+          "column": 29
+        },
+        "callStack": [
+          {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 25,
+            "column": 29,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_1cprhxt7jgk"
+      },
+      {
+        "id": "nav_0i71joksxg5",
+        "origin": "component",
+        "componentId": "cmp_0skl5lm1a9a",
+        "kind": "push",
+        "api": "next-intl",
+        "href": {
+          "text": "`/verify?challenge=${challengeId}`",
+          "confidence": "pattern",
+          "path": "/verify",
+          "query": "challenge=:challengeId"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/LoginForm.tsx",
+          "line": 22,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/components/LoginForm.tsx",
+            "line": 22,
+            "column": 7,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_0s0435jzyyw"
+      },
+      {
+        "id": "nav_271y09boqq4",
+        "origin": "component",
+        "componentId": "cmp_1hlwjtaw6e6",
+        "kind": "link",
+        "api": "next-intl",
+        "href": {
+          "text": "\"/login\"",
+          "confidence": "exact",
+          "path": "/login"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 19,
+            "column": 12
+          }
+        },
+        "conditional": true,
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 19,
+          "column": 12
+        },
+        "callStack": [
+          {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 19,
+            "column": 12,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_1cprhxt7jgk"
+      },
+      {
+        "id": "nav_12qmtlo0oqp",
+        "origin": "component",
+        "componentId": "cmp_1hlwjtaw6e6",
+        "kind": "replace",
+        "api": "next-intl",
+        "href": {
+          "text": "'/dashboard'",
+          "confidence": "exact",
+          "path": "/dashboard"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 29,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 29,
+            "column": 7,
+            "callee": "router.replace"
+          }
+        ],
+        "targetRouteId": "rt_0nr7aw4u4g0"
+      }
+    ],
+    "flows": [
+      {
+        "id": "flw_1my9reuz10k",
+        "name": "LoginForm submit",
+        "routeId": "rt_1cprhxt7jgk",
+        "componentId": "cmp_0skl5lm1a9a",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_1cprhxt7jgk",
+            "componentId": "cmp_0skl5lm1a9a",
+            "event": "onSubmit",
+            "loc": {
+              "file": "src/components/LoginForm.tsx",
+              "line": 29,
+              "column": 11
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0ldgejuv5rs"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_0i71joksxg5",
+            "routeId": "rt_0s0435jzyyw"
+          },
+          {
+            "kind": "interaction",
+            "routeId": "rt_0s0435jzyyw",
+            "componentId": "cmp_1hlwjtaw6e6",
+            "event": "onSubmit",
+            "loc": {
+              "file": "src/components/VerifyOtpForm.tsx",
+              "line": 36,
+              "column": 11
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0ivpze9dolu"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_12qmtlo0oqp",
+            "routeId": "rt_0nr7aw4u4g0"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_1ostg0bhzmk",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_1cprhxt7jgk",
+          "rt_0s0435jzyyw",
+          "rt_0nr7aw4u4g0"
+        ]
+      }
+    ]
+  },
+  "verification": {
+    "sites": {
+      "req_0ldgejuv5rs": {
+        "captures": 1,
+        "lastAt": "2026-10-28T10:58:00.757Z",
+        "lastCaptureId": "cap_mvs03jjp9jifcbw5",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0ivpze9dolu": {
+        "captures": 1,
+        "lastAt": "2026-10-28T10:58:04.052Z",
+        "lastCaptureId": "cap_mvs03m38qj1vxekc",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1ostg0bhzmk": {
+        "captures": 2,
+        "lastAt": "2026-10-28T10:58:07.174Z",
+        "lastCaptureId": "cap_mvs03ohyl778o85f",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 4,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {
+      "flw_1my9reuz10k": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      }
+    },
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvs03jjp9jifcbw5",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:00.757Z",
+      "durationMs": 12,
+      "pageUrl": "http://localhost:3077/en/login",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/auth/login",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "email": "ada@example.com",
+            "password": "[REDACTED:string]"
+          },
+          "size": 49
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "otpRequired": true,
+            "challengeId": "515708eb-7e2d-462b-b51a-de5c05e6f6f7"
+          },
+          "size": 73
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Sign inContinue\"",
+        "componentChain": [
+          "LoginForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:00.755Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at post (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:167:23)",
+        "at login (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:178:24)",
+        "at handleSubmit (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:31:209)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.body.password"
+      ],
+      "sourceStack": [
+        {
+          "fn": "post",
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "login",
+          "file": "src/lib/auth-api.ts",
+          "line": 17,
+          "column": 47
+        },
+        {
+          "fn": "handleSubmit",
+          "file": "src/components/LoginForm.tsx",
+          "line": 18,
+          "column": 42
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0ldgejuv5rs",
+        "score": 180,
+        "candidates": [
+          {
+            "siteId": "req_0ldgejuv5rs",
+            "score": 180,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /auth/login"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "login"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "LoginForm"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/en/login"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0ldgejuv5rs",
+        "parts": [
+          {
+            "part": "request",
+            "type": "LoginRequest",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "LoginResponse",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs03m38qj1vxekc",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:04.052Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/en/verify?challenge=515708eb-7e2d-462b-b51a-de5c05e6f6f7",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/auth/verify-otp",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "challengeId": "515708eb-7e2d-462b-b51a-de5c05e6f6f7",
+            "code": "[REDACTED:string]"
+          },
+          "size": 70
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "token": "[REDACTED:string]",
+            "user": {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            }
+          },
+          "size": 127
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Enter your codeVerify\"",
+        "componentChain": [
+          "VerifyOtpForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:04.052Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at post (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:167:23)",
+        "at verifyOtp (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:179:28)",
+        "at handleSubmit (http://localhost:3077/_next/static/chunks/_16isr7klsg8uo._.js:42:207)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.body.code",
+        "response.body.token"
+      ],
+      "sourceStack": [
+        {
+          "fn": "post",
+          "file": "src/lib/auth-api.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "verifyOtp",
+          "file": "src/lib/auth-api.ts",
+          "line": 20,
+          "column": 3
+        },
+        {
+          "fn": "handleSubmit",
+          "file": "src/components/VerifyOtpForm.tsx",
+          "line": 27,
+          "column": 40
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0ivpze9dolu",
+        "score": 180,
+        "candidates": [
+          {
+            "siteId": "req_0ivpze9dolu",
+            "score": 180,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /auth/verify-otp"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "verifyOtp"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "VerifyOtpForm"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/en/verify"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0ivpze9dolu",
+        "parts": [
+          {
+            "part": "request",
+            "type": "VerifyOtpRequest",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "VerifyOtpResponse",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs03ohrtukrhxrt",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:07.167Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/en/dashboard",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Enter your codeVerify\"",
+        "componentChain": [
+          "VerifyOtpForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:04.052Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at getMe (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:183:23)",
+        "at DashboardProfile.useEffect (http://localhost:3077/_next/static/chunks/_0gat20k9u9v_r._.js:29:179)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getMe",
+          "file": "src/lib/auth-api.ts",
+          "line": 25,
+          "column": 21
+        },
+        {
+          "fn": "DashboardProfile.useEffect",
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 16,
+          "column": 10
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1ostg0bhzmk",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_1ostg0bhzmk",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /me"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "DashboardProfile.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getMe"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/en/dashboard"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1ostg0bhzmk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User | null",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvs03ohyl778o85f",
+      "sessionId": "ses_mvs03hkcblxzoooi",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-28T10:58:07.174Z",
+      "durationMs": 55,
+      "pageUrl": "http://localhost:3077/en/dashboard",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Enter your codeVerify\"",
+        "componentChain": [
+          "VerifyOtpForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "IntlProvider"
+        ],
+        "at": "2026-10-28T10:58:04.052Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0x0v17rc8n3yt._.js:763:195)",
+        "at getMe (http://localhost:3077/_next/static/chunks/_19auxmbdb0vyh._.js:183:23)",
+        "at DashboardProfile.useEffect (http://localhost:3077/_next/static/chunks/_0gat20k9u9v_r._.js:29:179)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getMe",
+          "file": "src/lib/auth-api.ts",
+          "line": 25,
+          "column": 21
+        },
+        {
+          "fn": "DashboardProfile.useEffect",
+          "file": "src/components/DashboardProfile.tsx",
+          "line": 16,
+          "column": 10
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1ostg0bhzmk",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_1ostg0bhzmk",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /me"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "DashboardProfile.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getMe"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/en/dashboard"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1ostg0bhzmk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User | null",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 4,
+    "included": 4
+  },
+  "redacted": true
+}

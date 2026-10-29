@@ -2,6 +2,7 @@
 // manager and dev command to use, and whether capture data is gitignored.
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export type PackageManager = 'npm' | 'pnpm' | 'yarn' | 'bun'
 
@@ -131,4 +132,14 @@ export function nextVersion(root: string): { major: number; minor: number; text:
   }
   const match = text?.match(/(\d+)\.(\d+)/)
   return match && text ? { major: Number(match[1]), minor: Number(match[2]), text } : undefined
+}
+
+/** The built dashboard: next to the bundled CLI, or in the workspace when run from source. */
+export function findDashboardDir(): string | undefined {
+  const here = fileURLToPath(new URL('.', import.meta.url))
+  const candidates = [
+    join(here, 'dashboard'), // dist/cli.js → dist/dashboard
+    join(here, '..', '..', '..', 'dashboard', 'dist'), // src/cli/dev.ts → packages/dashboard/dist
+  ]
+  return candidates.find((dir) => existsSync(join(dir, 'index.html')))
 }

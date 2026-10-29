@@ -124,7 +124,7 @@ function FlowDetail({
   captureOn: boolean
   variants: RecordedFlow[]
 }) {
-  const { index } = useData()
+  const { index, meta } = useData()
   const rename = useRenameFlow()
   const [editing, setEditing] = useState<string | undefined>(undefined)
   const done = status?.best?.steps ?? 0
@@ -142,7 +142,7 @@ function FlowDetail({
       {editing === undefined ? (
         <h2 className="flow-title">
           {flow.name}{' '}
-          {captureOn && (
+          {captureOn && !meta.exported && (
             <button type="button" className="button button-small" onClick={() => setEditing(flow.name)}>
               Rename
             </button>
@@ -298,7 +298,7 @@ function StepView({ step }: { step: FlowStep }) {
 }
 
 function RecordingDetail({ recording }: { recording: RecordedFlow }) {
-  const { index } = useData()
+  const { index, meta } = useData()
   const remove = useDeleteRecording()
   const flow = recording.flowId ? index.flows.get(recording.flowId) : undefined
   return (
@@ -361,7 +361,7 @@ function RecordingDetail({ recording }: { recording: RecordedFlow }) {
           ))}
         </ol>
       </Section>
-      {recording.kind === 'named' && (
+      {recording.kind === 'named' && !meta.exported && (
         <button
           type="button"
           className="button"

@@ -10,6 +10,7 @@ export type Screen =
   | { name: 'live'; captureId?: string; q: string; filter?: MatchFilter }
   /** `flowId` is an inferred flow id, or a recorded flow id (`rec_...`, `var_...`). */
   | { name: 'flows'; flowId?: string; q: string }
+  | { name: 'export' }
   | { name: 'not-found' }
 
 /** Live screen: show only captures with this match status. */
@@ -38,6 +39,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'types', typeId: parts[1], q: params.get('q') ?? '' }
     case 'flows':
       return { name: 'flows', flowId: parts[1], q: params.get('q') ?? '' }
+    case 'export':
+      return { name: 'export' }
     case 'live':
       return {
         name: 'live',
@@ -70,6 +73,8 @@ export function href(screen: Screen): string {
       return withQuery(screen.typeId ? `/types/${encodeURIComponent(screen.typeId)}` : '/types', {
         q: screen.q,
       })
+    case 'export':
+      return '#/export'
     case 'live':
       return withQuery(screen.captureId ? `/live/${encodeURIComponent(screen.captureId)}` : '/live', {
         q: screen.q,

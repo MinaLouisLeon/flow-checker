@@ -19,9 +19,12 @@ export class CodeHistory {
   #hashes: Map<string, string>
   /** No history file yet: the first scan sets the baseline. */
   #first: boolean
+  readonly #persist: boolean
 
-  constructor(root: string) {
+  /** `persist: false` keeps the history in memory only (export). */
+  constructor(root: string, options: { persist?: boolean } = {}) {
     this.file = join(root, '.flow-checker', 'cache', 'code-hashes.json')
+    this.#persist = options.persist ?? true
     const data = read(this.file)
     this.#first = !data
     this.#hashes = new Map(Object.entries(data?.hashes ?? {}))
@@ -45,7 +48,7 @@ export class CodeHistory {
     const changed = added.size > 0 || next.size !== this.#hashes.size || this.#first
     this.#hashes = next
     this.#first = false
-    if (changed) this.save()
+    if (changed && this.#persist) this.save()
     return added
   }
 

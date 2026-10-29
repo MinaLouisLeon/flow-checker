@@ -24,11 +24,14 @@ export interface CaptureStoreOptions {
   root: string
   /** Captures kept in memory. Default: 2000. */
   limit?: number
+  /** Never write to disk. Export reads the store without changing it. */
+  readOnly?: boolean
 }
 
 export class CaptureStore {
   readonly dir: string
   private readonly limit: number
+  private readonly readOnly: boolean
   private captures: Capture[] = []
   private readonly byId = new Map<string, Capture>()
   /** Capture id → folder its file is in. */
@@ -42,6 +45,7 @@ export class CaptureStore {
   constructor(options: CaptureStoreOptions) {
     this.dir = join(options.root, '.flow-checker')
     this.limit = options.limit ?? 2000
+    this.readOnly = options.readOnly ?? false
   }
 
   /** Reads captures and sessions saved by earlier runs. Unreadable files are skipped. */
@@ -79,6 +83,16 @@ export class CaptureStore {
    * folder of the site it matched, and moves when that changes.
    */
   add(capture: Capture): void {
+    if (!this.readOnly) this.write(capture)
+    this.remember(capture)
+    for (const listener of this.listeners) {
+      try {
+        listener(capture)
+      } catch {}
+    }
+  }
+
+  private write(capture: Capture) {
     const folderName =
       capture.match?.status === 'matched' && capture.match.siteId
         ? safeName(capture.match.siteId)
@@ -94,12 +108,6 @@ export class CaptureStore {
       } catch {}
     }
     this.folders.set(capture.id, folderName)
-    this.remember(capture)
-    for (const listener of this.listeners) {
-      try {
-        listener(capture)
-      } catch {}
-    }
   }
 
   addEvents(sessionId: string, events: SessionEvent[]): void {
@@ -113,7 +121,7 @@ export class CaptureStore {
     session.events.push(...events)
     session.updatedAt = now
     this.dirtySessions.add(sessionId)
-    this.sessionTimer ??= setTimeout(() => this.writeSessions(), SESSION_WRITE_MS)
+    if (!this.readOnly) this.sessionTimer ??= setTimeout(() => this.writeSessions(), SESSION_WRITE_MS)
     for (const listener of this.sessionListeners) {
       try {
         listener(sessionId)
@@ -187,7 +195,7 @@ export class CaptureStore {
   writeSessions(): void {
     if (this.sessionTimer) clearTimeout(this.sessionTimer)
     this.sessionTimer = undefined
-    if (this.dirtySessions.size === 0) return
+    if (this.dirtySessions.size === 0 || this.readOnly) return
     const folder = join(this.dir, 'sessions')
     mkdirSync(folder, { recursive: true })
     for (const id of this.dirtySessions) {
