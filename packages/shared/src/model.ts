@@ -367,8 +367,18 @@ export const TriggerSchema = z.object({
 export type Trigger = z.infer<typeof TriggerSchema>
 
 export const FlagSchema = z.object({
-  /** `type-mismatch` is added by the tool server when captured data doesn't fit the declared types (M8). */
-  kind: z.enum(['dynamic-url', 'unknown-method', 'unknown-response', 'unknown-trigger', 'type-mismatch']),
+  /**
+   * Added by the tool server: `type-mismatch` when captured data doesn't fit the declared types
+   * (M8), `stale` when the code changed after the last capture (M9).
+   */
+  kind: z.enum([
+    'dynamic-url',
+    'unknown-method',
+    'unknown-response',
+    'unknown-trigger',
+    'type-mismatch',
+    'stale',
+  ]),
   message: z.string(),
 })
 export type Flag = z.infer<typeof FlagSchema>
@@ -412,7 +422,16 @@ export const RequestSiteSchema = z.object({
   targetRouteId: z.string().optional(),
   /** Requests this one leads to on the server: route handler (BFF) hops or fetches in the server action. */
   chain: z.array(z.string()).optional(),
-  /** `inferred` until live capture confirms it (M6). `mismatch`: confirmed, but the data doesn't fit the types (M8). */
+  /**
+   * Hash of the code that sends the request: the functions on its call path, its URL, method and
+   * trigger. Whitespace, comments and line numbers don't count, so moving code doesn't change it.
+   * When it changes, captures taken before are stale and the site needs a re-check (M9).
+   */
+  hash: z.string().optional(),
+  /**
+   * `inferred` until live capture confirms it (M6). `mismatch`: confirmed, but the data doesn't
+   * fit the types (M8). `needs-recheck`: confirmed, but the code changed since (M9).
+   */
   status: z.enum(['inferred', 'verified', 'needs-recheck', 'mismatch']),
   flags: z.array(FlagSchema),
 })

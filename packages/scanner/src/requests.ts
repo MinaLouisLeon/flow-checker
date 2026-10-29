@@ -42,6 +42,7 @@ import {
   type TypeNode,
   ts,
 } from 'ts-morph'
+import { siteHash } from './code-hash'
 import { directives, importModuleOf, isConditional, unalias } from './components'
 import { linkApi, type NavApi, type NavKind, navigationCall, outcomeOf } from './navigation'
 import { compare, relativeTo } from './paths'
@@ -712,6 +713,7 @@ export class RequestScanner {
       flags: [],
     }
     site.flags = flagsOf(site)
+    site.hash = siteHash(frames, site, (node) => this.#loc(node).file)
     this.#sites.set(id, site)
   }
 

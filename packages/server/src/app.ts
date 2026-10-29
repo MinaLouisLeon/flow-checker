@@ -2,12 +2,19 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { RuntimeCaptureOptions } from '@flow-checker/runtime/options'
 import { compileRules, redactCapture } from '@flow-checker/runtime/redact'
-import { type AppModel, IngestBatchSchema, summarizeCapture } from '@flow-checker/shared'
+import {
+  type AppModel,
+  diffCounts,
+  diffModels,
+  IngestBatchSchema,
+  type ScanEvent,
+} from '@flow-checker/shared'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { streamSSE } from 'hono/streaming'
 import { FlowTracker } from './flows'
 import { OverridesFile } from './overrides'
+import type { ScanFeed } from './scan-feed'
 import type { CaptureStore } from './store'
 import { Verifier } from './verify'
 
@@ -40,6 +47,8 @@ export interface AppOptions {
   version?: string
   /** Live capture: the ingest endpoint and capture API. Without it, both are off. */
   capture?: CaptureOptions
+  /** Scan results from the file watcher (M9). Each one replaces the model and is announced live. */
+  scans?: ScanFeed
 }
 
 /** What the dashboard needs besides the model. */
@@ -51,6 +60,8 @@ export interface ServerMeta {
   /** ISO time of the last scan. */
   scannedAt: string
   canRescan: boolean
+  /** Files are watched and re-scanned on change (M9). */
+  watching: boolean
   /** Present when live capture is on. */
   capture?: { storeRaw: boolean }
 }
@@ -86,6 +97,39 @@ export function createApp(options: AppOptions): Hono {
     return flows ? flows.withNames(current) : current
   }
 
+  // Live feed clients (server-sent events).
+  const live = new Set<(event: string, data: unknown) => void>()
+  const broadcast = (event: string, data: unknown) => {
+    for (const send of live) send(event, data)
+  }
+
+  /** Replaces the model with a new scan and tells the dashboard what changed. */
+  const applyScan = (next: AppModel, info: { durationMs?: number; files?: string[] } = {}): ScanEvent => {
+    const diff = diffModels(model, next)
+    const before = new Set(
+      served()
+        .requests.filter((s) => s.status === 'needs-recheck')
+        .map((s) => s.id),
+    )
+    model = next
+    scannedAt = new Date().toISOString()
+    verifier?.setModel(next)
+    flows?.setModel(next)
+    const event: ScanEvent = {
+      scannedAt,
+      ...(info.durationMs !== undefined ? { durationMs: Math.round(info.durationMs) } : {}),
+      files: info.files ?? [],
+      changes: diffCounts(diff),
+      changedCode: diff.changedCode,
+      needsRecheck: served()
+        .requests.filter((s) => s.status === 'needs-recheck' && !before.has(s.id))
+        .map((s) => s.id),
+    }
+    broadcast('scan', event)
+    return event
+  }
+  options.scans?.subscribe((update) => applyScan(update.model, update))
+
   const app = new Hono()
 
   app.use('*', async (c, next) => {
@@ -104,6 +148,7 @@ export function createApp(options: AppOptions): Hono {
       version: options.version,
       scannedAt,
       canRescan: Boolean(options.rescan),
+      watching: Boolean(options.scans),
       capture: options.capture ? { storeRaw: options.capture.options.storeRaw } : undefined,
     } satisfies ServerMeta),
   )
@@ -118,10 +163,8 @@ export function createApp(options: AppOptions): Hono {
         scanning = undefined
       })
     try {
-      model = await scanning
-      scannedAt = new Date().toISOString()
-      verifier?.setModel(model)
-      flows?.setModel(model)
+      const started = performance.now()
+      applyScan(await scanning, { durationMs: performance.now() - started })
       return c.json(served())
     } catch (error) {
       return c.json({ error: (error as Error).message }, 500)
@@ -129,6 +172,51 @@ export function createApp(options: AppOptions): Hono {
   })
 
   if (options.capture && verifier && flows) mountCapture(app, options.capture, verifier, flows)
+
+  // Live feed for the dashboard: `scan` when the model changed (M9). With capture on, also a
+  // `capture` event per new or re-matched capture, `verification` when site statuses may have
+  // changed, and `flows` for flow results.
+  app.get('/api/live', (c) =>
+    streamSSE(c, async (stream) => {
+      const timers = new Map<string, ReturnType<typeof setTimeout>>()
+      const send = (event: string, data: unknown) => {
+        if (!stream.aborted) void stream.writeSSE({ event, data: JSON.stringify(data) })
+      }
+      // Batches bursts (a re-scan re-matches every capture) into one event.
+      const later = (event: string, data: () => unknown) => {
+        if (timers.has(event)) return
+        timers.set(
+          event,
+          setTimeout(() => {
+            timers.delete(event)
+            send(event, data())
+          }, VERIFICATION_EVENT_MS),
+        )
+      }
+      live.add(send)
+      const stops: (() => unknown)[] = [() => live.delete(send)]
+      const store = options.capture?.store
+      if (store && verifier && flows) {
+        stops.push(
+          store.subscribe((item) => send('capture', verifier.summarize(item))),
+          verifier.subscribe(() => later('verification', () => verifier.summary())),
+          flows.subscribe(() => later('flows', () => flows.summary())),
+        )
+      }
+      const unsubscribe = () => {
+        for (const stop of stops.splice(0)) stop()
+        for (const timer of timers.values()) clearTimeout(timer)
+        timers.clear()
+      }
+      stream.onAbort(unsubscribe)
+      await stream.writeSSE({ event: 'ready', data: '{}' })
+      while (!stream.aborted && !stream.closed) {
+        await stream.sleep(SSE_PING_MS)
+        if (!stream.aborted) await stream.writeSSE({ event: 'ping', data: '{}' })
+      }
+      unsubscribe()
+    }),
+  )
 
   app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
 
@@ -183,10 +271,13 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
   app.get('/api/captures', (c) => {
     const limit = Number(c.req.query('limit') ?? 500)
     return c.json(
-      store.list({
-        limit: Number.isFinite(limit) && limit > 0 ? limit : 500,
-        sessionId: c.req.query('session') || undefined,
-      }),
+      store.list(
+        {
+          limit: Number.isFinite(limit) && limit > 0 ? limit : 500,
+          sessionId: c.req.query('session') || undefined,
+        },
+        (item) => verifier.summarize(item),
+      ),
     )
   })
 
@@ -199,7 +290,10 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
   app.get('/api/captures/:id', (c) => {
     const found = store.get(c.req.param('id'))
     if (!found) return c.json({ error: 'Capture not found' }, 404)
-    return c.json({ capture: found, children: store.children(found.id).map(summarizeCapture) })
+    return c.json({
+      capture: found,
+      children: store.children(found.id).map((child) => verifier.summarize(child)),
+    })
   })
 
   // Manual assignment: `{ "siteId": "req_..." }`, or `null` for "no site". Remembered for
@@ -213,7 +307,7 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     try {
       const updated = verifier.assign(c.req.param('id'), siteId)
       if (!updated) return c.json({ error: 'Capture not found' }, 404)
-      return c.json(summarizeCapture(updated))
+      return c.json(verifier.summarize(updated))
     } catch (error) {
       return c.json({ error: (error as Error).message }, 400)
     }
@@ -223,7 +317,7 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
   app.delete('/api/captures/:id/match', (c) => {
     const updated = verifier.assign(c.req.param('id'), undefined)
     if (!updated) return c.json({ error: 'Capture not found' }, 404)
-    return c.json(summarizeCapture(updated))
+    return c.json(verifier.summarize(updated))
   })
 
   app.get('/api/verification', (c) => c.json(verifier.summary()))
@@ -260,7 +354,7 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     const list = store
       .all()
       .filter((item) => item.match?.status === 'matched' && item.match.siteId === id)
-      .map(summarizeCapture)
+      .map((item) => verifier.summarize(item))
       .reverse()
     return c.json(list)
   })
@@ -269,44 +363,4 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     const session = store.session(c.req.param('id'))
     return session ? c.json(session) : c.json({ error: 'Session not found' }, 404)
   })
-
-  // Live feed for the dashboard: a `capture` event per new or re-matched capture, a
-  // `verification` event when site statuses may have changed, and `flows` for flow results.
-  app.get('/api/live', (c) =>
-    streamSSE(c, async (stream) => {
-      let timer: ReturnType<typeof setTimeout> | undefined
-      const stopCaptures = store.subscribe((item) => {
-        void stream.writeSSE({ event: 'capture', data: JSON.stringify(summarizeCapture(item)) })
-      })
-      const stopVerification = verifier.subscribe(() => {
-        timer ??= setTimeout(() => {
-          timer = undefined
-          if (!stream.aborted) {
-            void stream.writeSSE({ event: 'verification', data: JSON.stringify(verifier.summary()) })
-          }
-        }, VERIFICATION_EVENT_MS)
-      })
-      let flowsTimer: ReturnType<typeof setTimeout> | undefined
-      const stopFlows = flows.subscribe(() => {
-        flowsTimer ??= setTimeout(() => {
-          flowsTimer = undefined
-          if (!stream.aborted) void stream.writeSSE({ event: 'flows', data: JSON.stringify(flows.summary()) })
-        }, VERIFICATION_EVENT_MS)
-      })
-      const unsubscribe = () => {
-        stopCaptures()
-        stopVerification()
-        stopFlows()
-        if (timer) clearTimeout(timer)
-        if (flowsTimer) clearTimeout(flowsTimer)
-      }
-      stream.onAbort(unsubscribe)
-      await stream.writeSSE({ event: 'ready', data: '{}' })
-      while (!stream.aborted && !stream.closed) {
-        await stream.sleep(SSE_PING_MS)
-        if (!stream.aborted) await stream.writeSSE({ event: 'ping', data: '{}' })
-      }
-      unsubscribe()
-    }),
-  )
 }

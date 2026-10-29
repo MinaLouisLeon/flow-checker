@@ -15,6 +15,7 @@
     "@flow-checker/shared": "workspace:*",
     "@hono/node-server": "catalog:",
     "@jridgewell/trace-mapping": "catalog:",
+    "chokidar": "catalog:",
     "hono": "catalog:"
   },
   "devDependencies": {

@@ -69,6 +69,7 @@
   "dependencies": {
     "@hono/node-server": "catalog:",
     "@jridgewell/trace-mapping": "catalog:",
+    "chokidar": "catalog:",
     "hono": "catalog:",
     "ts-morph": "catalog:",
     "zod": "catalog:"

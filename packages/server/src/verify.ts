@@ -1,14 +1,18 @@
 // Runs the matcher on captures as they arrive and after each re-scan, keeps your manual
 // decisions in `.flow-checker/overrides.json`, compares matched captures with the site's
-// declared types (M8), and derives each request site's status.
+// declared types (M8), and derives each request site's status. Captures taken before a site's
+// code last changed are stale, and a site with only stale captures needs a re-check (M9).
 import {
   type AppModel,
   applyVerification,
   type Capture,
   type CaptureMatch,
+  type CaptureSummary,
   checkCapture,
+  pairRenamedSites,
   type RequestSite,
   type SiteVerification,
+  summarizeCapture,
   summarizeTypeChecks,
   type TypeCheck,
   type TypeTable,
@@ -16,6 +20,7 @@ import {
   type VerificationSummary,
 } from '@flow-checker/shared'
 import { ServerActionResolver } from './actions'
+import { BEGINNING, CodeHistory } from './history'
 import { fingerprint, Matcher } from './matcher'
 import { OverridesFile } from './overrides'
 import { SourceMapper } from './stack'
@@ -39,6 +44,9 @@ export class Verifier {
   private readonly mapper: SourceMapper
   private readonly actions: ServerActionResolver
   readonly overrides: OverridesFile
+  private readonly history: CodeHistory
+  /** During a re-scan: old site id -> new id, for sites whose lines moved. */
+  private renamed: Record<string, string> = {}
   private served: AppModel | undefined
   private readonly listeners = new Set<() => void>()
 
@@ -51,17 +59,52 @@ export class Verifier {
     this.mapper = new SourceMapper(options.root)
     this.actions = new ServerActionResolver(options.root)
     this.overrides = options.overrides ?? new OverridesFile(options.root)
+    this.history = new CodeHistory(options.root)
+    this.history.update(options.model)
     // Captures from earlier runs: match them against the current scan.
     this.rematch(this.store.all())
   }
 
-  /** A new scan result. Every capture is matched again (site ids are stable across scans). */
+  /**
+   * A new scan result. Every capture is matched again. Site ids include line numbers, so a site
+   * whose lines moved gets a new id: its captures and manual matches move with it.
+   */
   setModel(model: AppModel): void {
+    const renamed = pairRenamedSites(this.model.requests, model.requests)
+    if (this.overrides.get().matches.some((m) => m.siteId && renamed[m.siteId])) {
+      this.overrides.update((current) => ({
+        ...current,
+        matches: current.matches.map((m) => {
+          const to = m.siteId ? renamed[m.siteId] : undefined
+          return to ? { ...m, siteId: to } : m
+        }),
+      }))
+    }
+    this.history.update(model)
     this.model = model
     this.matcher = new Matcher(model)
     this.sites = new Map(model.requests.map((s) => [s.id, s]))
     this.types = typeTable(model.types)
-    this.rematch(this.store.all(), true)
+    this.renamed = renamed
+    try {
+      this.rematch(this.store.all(), true)
+    } finally {
+      this.renamed = {}
+    }
+  }
+
+  /** Taken before the code of the site it matched last changed. */
+  isStale(capture: Capture): boolean {
+    const match = capture.match
+    if (match?.status !== 'matched' || !match.siteId) return false
+    const since = this.history.since(this.sites.get(match.siteId)?.hash)
+    return since !== undefined && since !== BEGINNING && Date.parse(capture.timestamp) < Date.parse(since)
+  }
+
+  /** A capture for lists, with `stale` set. */
+  summarize(capture: Capture): CaptureSummary {
+    const summary = summarizeCapture(capture)
+    return this.isStale(capture) ? { ...summary, stale: true } : summary
   }
 
   /** Matches and stores new captures from the runtime. */
@@ -129,13 +172,15 @@ export class Verifier {
 
   private siteVerification(): Record<string, SiteVerification> {
     const sites: Record<string, SiteVerification> = {}
-    const checks = new Map<string, { captureId: string; check: TypeCheck }[]>()
+    const checks = new Map<string, { captureId: string; check: TypeCheck; stale: boolean }[]>()
     for (const capture of this.store.all()) {
       const match = capture.match
       if (match?.status !== 'matched' || !match.siteId) continue
       const entry = sites[match.siteId] ?? { captures: 0 }
       sites[match.siteId] = entry
       entry.captures++
+      const stale = this.isStale(capture)
+      if (stale) entry.stale = (entry.stale ?? 0) + 1
       if (!entry.lastAt || capture.timestamp >= entry.lastAt) {
         entry.lastAt = capture.timestamp
         entry.lastCaptureId = capture.id
@@ -143,12 +188,18 @@ export class Verifier {
       if (capture.typeCheck?.siteId === match.siteId) {
         const list = checks.get(match.siteId) ?? []
         checks.set(match.siteId, list)
-        list.push({ captureId: capture.id, check: capture.typeCheck })
+        list.push({ captureId: capture.id, check: capture.typeCheck, stale })
       }
+    }
+    for (const [siteId, entry] of Object.entries(sites)) {
+      const since = this.history.since(this.sites.get(siteId)?.hash)
+      if (since && since !== BEGINNING) entry.changedAt = since
     }
     for (const [siteId, list] of checks) {
       const entry = sites[siteId]
-      const typeCheck = summarizeTypeChecks(list)
+      // Captures of the current code decide. Stale ones count only while there are no others.
+      const fresh = list.filter((c) => !c.stale)
+      const typeCheck = summarizeTypeChecks(fresh.length > 0 ? fresh : list)
       if (entry && typeCheck) entry.typeCheck = typeCheck
     }
     return sites
@@ -164,6 +215,16 @@ export class Verifier {
   }
 
   private matchOne(capture: Capture): CaptureMatch {
+    // The site's lines moved: keep the match instead of scoring again with outdated line numbers.
+    const previous = capture.match
+    const movedTo = previous?.siteId ? this.renamed[previous.siteId] : undefined
+    if (previous?.status === 'matched' && previous.by === 'auto' && movedTo) {
+      return {
+        ...previous,
+        siteId: movedTo,
+        candidates: previous.candidates.map((c) => ({ ...c, siteId: this.renamed[c.siteId] ?? c.siteId })),
+      }
+    }
     const print = fingerprint(capture)
     const decision = this.overrides.get().matches.find((m) => m.fingerprint === print)
     const parentId = capture.origin === 'server' ? capture.parent?.captureId : undefined

@@ -1,6 +1,6 @@
 import { CLI_NAME } from '@flow-checker/shared'
 import { useMemo } from 'react'
-import { useLiveFeed, useMeta, useModel, useRescan } from './api'
+import { useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
@@ -27,7 +27,8 @@ export function App() {
   const rescan = useRescan()
   const screen = useScreen()
   const captureOn = Boolean(meta.data?.capture)
-  const live = useLiveFeed(captureOn)
+  const live = useLiveFeed(captureOn || Boolean(meta.data?.watching))
+  const lastScan = useLastScan()
   const index = useMemo(() => (model.data ? buildIndex(model.data) : undefined), [model.data])
 
   const error = model.error ?? meta.error
@@ -50,8 +51,21 @@ export function App() {
         </nav>
         <span className="spacer" />
         {meta.data?.scannedAt && (
-          <span className="muted topbar-meta" title={meta.data.scannedAt}>
+          <span
+            className="muted topbar-meta"
+            title={
+              lastScan?.files.length
+                ? `Re-scanned after a change to ${lastScan.files.join(', ')}`
+                : meta.data.scannedAt
+            }
+          >
+            {meta.data.watching && (
+              <span className={`live-status live-${live}`} title={`Watching files (${live})`}>
+                <span className="dot" />{' '}
+              </span>
+            )}
             Scanned {new Date(meta.data.scannedAt).toLocaleTimeString()}
+            {lastScan?.files.length ? ` · ${shortFiles(lastScan.files)}` : ''}
           </span>
         )}
         {meta.data?.canRescan && (
@@ -68,6 +82,13 @@ export function App() {
       </header>
 
       {rescan.error && <div className="banner banner-error">Re-scan failed: {rescan.error.message}</div>}
+      {lastScan && lastScan.needsRecheck.length > 0 && (
+        <div className="banner banner-warn">
+          The code of {lastScan.needsRecheck.length} captured request
+          {lastScan.needsRecheck.length === 1 ? '' : 's'} changed. Use the app again to re-check{' '}
+          {lastScan.needsRecheck.length === 1 ? 'it' : 'them'}.
+        </div>
+      )}
 
       <main className="content">
         {error ? (
@@ -86,6 +107,12 @@ export function App() {
       </main>
     </div>
   )
+}
+
+/** `page.tsx changed`, `page.tsx and 2 more changed`. */
+function shortFiles(files: string[]): string {
+  const name = (files[0] ?? '').split('/').pop()
+  return files.length === 1 ? `${name} changed` : `${name} and ${files.length - 1} more changed`
 }
 
 function ScreenView({ screen }: { screen: Screen }) {

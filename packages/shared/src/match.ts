@@ -90,9 +90,19 @@ export type Overrides = z.infer<typeof OverridesSchema>
 export interface SiteVerification {
   /** Matched captures (among those the server keeps in memory). */
   captures: number
+  /**
+   * Of those, the ones taken before the site's code last changed (M9). When every capture is
+   * stale, the site needs a re-check.
+   */
+  stale?: number
+  /** ISO time the site's current code was first seen, when it changed while the tool ran. */
+  changedAt?: string
   lastCaptureId?: string
   lastAt?: string
-  /** Type comparison of those captures (M8). Absent when the site declares no types. */
+  /**
+   * Type comparison of those captures (M8), leaving out stale ones while there are fresh ones.
+   * Absent when the site declares no types.
+   */
   typeCheck?: SiteTypeCheck
 }
 

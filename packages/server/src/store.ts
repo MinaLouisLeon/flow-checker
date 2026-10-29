@@ -122,12 +122,15 @@ export class CaptureStore {
   }
 
   /** Newest first. */
-  list(options: { limit?: number; sessionId?: string } = {}): CaptureSummary[] {
+  list(
+    options: { limit?: number; sessionId?: string } = {},
+    summarize: (capture: Capture) => CaptureSummary = summarizeCapture,
+  ): CaptureSummary[] {
     const out: CaptureSummary[] = []
     for (let i = this.captures.length - 1; i >= 0 && out.length < (options.limit ?? 500); i--) {
       const capture = this.captures[i]
       if (!capture || (options.sessionId && capture.sessionId !== options.sessionId)) continue
-      out.push(summarizeCapture(capture))
+      out.push(summarize(capture))
     }
     return out
   }

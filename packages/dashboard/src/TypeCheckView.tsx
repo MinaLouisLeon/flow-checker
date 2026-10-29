@@ -19,8 +19,15 @@ const KIND_LABEL: Record<TypeMismatch['kind'], string> = {
 
 const PART_LABEL = { request: 'Request body', response: 'Response' } as const
 
-/** `✓ verified` or `✗ type mismatch` for sites live capture has seen. */
+/** `✓ verified`, `✗ type mismatch` or `↻ needs re-check` for sites live capture has seen. */
 export function SiteStatusBadge({ site }: { site: RequestSite }) {
+  if (site.status === 'needs-recheck') {
+    return (
+      <Badge tone="warn" title="The code changed after the last capture. Use the app again to re-check it.">
+        ↻ needs re-check
+      </Badge>
+    )
+  }
   if (site.status === 'verified') {
     return (
       <Badge tone="ok" title="Live capture recorded this request">
@@ -36,6 +43,16 @@ export function SiteStatusBadge({ site }: { site: RequestSite }) {
     )
   }
   return null
+}
+
+/** Marks a capture taken before its request site's code last changed. */
+export function StaleBadge({ stale }: { stale?: boolean }) {
+  if (!stale) return null
+  return (
+    <Badge tone="muted" title="Taken before the code that sends this request changed">
+      stale
+    </Badge>
+  )
 }
 
 /** Badge for one capture's type check. `ok` and `skipped` only show when asked. */

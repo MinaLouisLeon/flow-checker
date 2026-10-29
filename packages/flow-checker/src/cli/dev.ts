@@ -1,12 +1,19 @@
 import { spawn } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/runtime/options'
-import { ScanError, scanProject } from '@flow-checker/scanner'
-import { CaptureStore, startServer } from '@flow-checker/server'
-import { DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-checker/shared'
+import { createScanSession, ScanError, type ScanSession } from '@flow-checker/scanner'
+import {
+  CaptureStore,
+  type ProjectWatcher,
+  ScanFeed,
+  startServer,
+  type WatchBatch,
+  watchProject,
+} from '@flow-checker/server'
+import { type AppModel, DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
 import { ConfigError, loadConfig } from './config'
@@ -29,6 +36,10 @@ export interface DevCommandOptions {
   app?: boolean
   /** Command that starts the app. Default: the `dev` script, or `next dev`. */
   devCommand?: string
+  /** Re-scan when source files change. Default: true. */
+  watch?: boolean
+  /** Called after each re-scan triggered by a file change (tests). */
+  onRescan?: (model: AppModel, files: string[]) => void
 }
 
 export interface DevSession {
@@ -62,15 +73,17 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 
   const appDir = options.appDir ?? config.appDir
+  // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7).
+  let session: ScanSession | undefined
   const scan = () => {
     const started = performance.now()
-    const model = scanProject({ root, appDir })
-    writeModel(root, model)
-    io.out(summary(model, performance.now() - started))
-    return model
+    session = createScanSession({ root, appDir })
+    writeModel(root, session.model)
+    io.out(summary(session.model, performance.now() - started))
+    return session.model
   }
 
-  let model: ReturnType<typeof scanProject>
+  let model: AppModel
   try {
     model = scan()
   } catch (error) {
@@ -97,10 +110,13 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')
 
+  const watching = options.watch !== false
+  const scans = watching ? new ScanFeed() : undefined
   const server = await startServer({
     root,
     model,
     rescan: scan,
+    scans,
     dashboardDir,
     appPort,
     version,
@@ -108,6 +124,41 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     capture: { store, token, options: captureOptions },
   })
   io.out(`Dashboard: ${server.url}`)
+
+  let watcher: ProjectWatcher | undefined
+  let warmTimer: ReturnType<typeof setTimeout> | undefined
+  if (scans) {
+    const onChange = (batch: WatchBatch) => {
+      const files = [...batch.changed, ...batch.added, ...batch.removed].map((f) =>
+        relative(root, f).replaceAll('\\', '/'),
+      )
+      const started = performance.now()
+      try {
+        // A failed scan leaves no session: start over.
+        const next = session ? session.update(batch) : scan()
+        const durationMs = performance.now() - started
+        writeModel(root, next)
+        scans.publish({ model: next, durationMs, files })
+        io.out(`Re-scanned in ${Math.round(durationMs)} ms (${describeFiles(files)} changed).`)
+        options.onRescan?.(next, files)
+      } catch (error) {
+        session = undefined
+        io.err(`Re-scan failed after ${describeFiles(files)} changed: ${(error as Error).message}`)
+      }
+    }
+    try {
+      watcher = await watchProject({ root, onChange })
+      io.out('Watching for file changes.')
+      // The first re-scan is the slow one: pay for it now, after startup, not on the first edit.
+      warmTimer = setTimeout(() => {
+        try {
+          session?.warm()
+        } catch {}
+      }, 0)
+    } catch (error) {
+      io.err(`Could not watch files, so changes need a manual re-scan: ${(error as Error).message}`)
+    }
+  }
 
   const ingestUrl = `${server.url}/ingest`
   const runtimeConfig: RuntimeConfig = { ingest: ingestUrl, token, capture: captureOptions }
@@ -149,11 +200,18 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     ingestUrl,
     appEnv,
     close: async () => {
+      clearTimeout(warmTimer)
+      await watcher?.close()
       await app?.stop()
       store.writeSessions()
       await server.close()
     },
   }
+}
+
+function describeFiles(files: string[]): string {
+  if (files.length === 1) return files[0] ?? ''
+  return `${files[0]} and ${files.length - 1} more`
 }
 
 /** CLI entry: runs until Ctrl+C. */

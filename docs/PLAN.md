@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M8 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison). M9 (watch + incremental re-scan) is next. Updated: 2026-10-29.
+> Status: M0–M9 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan). M10 (export) is next. Updated: 2026-10-29.
 
 ## 1. Goal
 
@@ -113,7 +113,7 @@ RequestSite    { id, componentId, routeId, trigger: page-load|event(onSubmit|onC
                  transport: fetch|axios|client-wrapper|react-query|swr|server-action|route-handler,
                  method, urlPattern: "/api/users/:id", urlConfidence: exact|pattern|unknown,
                  bodyType?: TypeRef, responseType?: TypeRef, chain?: RequestSiteId[],  // BFF hop
-                 callStack: SourceLoc[], status: inferred|verified|needs-recheck|mismatch, flags: Flag[] }
+                 callStack: SourceLoc[], hash, status: inferred|verified|needs-recheck|mismatch, flags: Flag[] }
 TypeRef        { name, definedAt: SourceLoc, resolved: TypeShape }   // TypeShape = JSON-like IR
 Navigation     { id, origin: component|server-action, kind: link|push|replace|redirect|permanent-redirect,
                  api: next|next-intl, href: RequestUrl, targetRouteId?, trigger, outcome?: success|error, loc }
@@ -191,6 +191,19 @@ Detect each call, then **trace it back up the call graph** to the component and 
 - Keep a reverse dependency map (file → entities that depend on it).
 - On a chokidar change: refresh that file in ts-morph, re-run the stages for the affected entities, compare old and new entities, and push the changes over WebSocket.
 - If a request site's hash changed, set its status to `needs-recheck` and keep the old captures, marked stale.
+
+**Built in M9** (`packages/scanner`: `scan.ts` `createScanSession`, `code-hash.ts`; `packages/server`: `watch.ts`, `history.ts`, `scan-feed.ts`; `packages/shared`: `diff.ts`):
+
+- **Warm session instead of a dependency map.** `createScanSession()` keeps the ts-morph project. `update({ changed, added, removed })` re-reads only those files, then runs every stage again on the warm project. The compiler reuses everything else, so this takes about 75–300 ms on the fixtures (a cold scan takes 0.8–2.5 s). That is fast enough without tracking which entities depend on which file. Imports are only resolved again when a file was added or a changed file's imports changed (it's the slowest step). Changes to `tsconfig.json`, `jsconfig.json`, `package.json` or `next.config.*` start a fresh project.
+- **Warm-up.** The first program rebuild after any change costs about a second, later ones much less. `session.warm()` pays for it right after start, so the first edit is fast too.
+- **Watcher.** chokidar watches the project root, skipping `node_modules`, `.next`, `.git`, `.flow-checker` and build output, and only reports source files and project config files. Events are batched (40 ms). Each batch is re-scanned, written to `model.json` and published to the server. A failed re-scan is printed and the next change starts over. `--no-watch` turns it off.
+- **Code hash.** Each request site has a `hash` of the code that sends it: the transport, method, URL, trigger and hook, plus the code along its call path. In the origin (component, route handler or action) only the part around the call counts: the JSX attribute, the nearest function inside it (handler, effect), or the statement. The functions the path enters (handlers, wrappers) count in full. The code is hashed as AST tokens, so whitespace, comments and line numbers don't count. Types don't count either: they don't change what is sent, and M8 re-checks old captures against new types anyway.
+- **Stale captures.** `.flow-checker/cache/code-hashes.json` remembers when each hash was first seen. A capture taken before its site's current hash appeared is **stale**. A site with only stale captures is `needs-recheck`, with a `stale` flag. A new capture makes it `verified` again. The type check uses captures of the current code while there are some. The first run ever sets a baseline (existing captures count as current). Code edited while the tool was off is noticed on the next start. Hashes no longer in the code are forgotten, so undoing an edit also asks for a re-check.
+- **Ids that moved.** Site ids include line numbers, so adding a line above a request gives it a new id. After a re-scan, removed and added sites are paired by hash (only moved), then by call path without line numbers (moved and changed). Only unambiguous pairs. A paired site keeps its automatic matches (instead of scoring again with outdated lines), and manual matches in `overrides.json` move to the new id.
+- **Live update.** The server applies the new model, matches every capture again and sends a `scan` event on `/api/live` (server-sent events, which the dashboard already uses, rather than a WebSocket): files, entity counts added/removed/changed, sites whose code changed, and sites that now need a re-check. `/api/live` is on whenever files are watched, even without capture. Capture summaries carry `stale`.
+- Dashboard: refetches the model on `scan`, `↻ needs re-check` badge, `stale` badge on captures (Live screen and request panel), a "code changed" banner and the changed file next to the scan time, and a "Requests whose code changed since they were captured" group on the overview.
+- **Check:** `watch.test.ts` (CLI) runs `dev` on a copy of the basic fixture with its recorded captures. Moving lines keeps every site verified. Editing `getUsers` makes only that site `needs-recheck`, with the `scan` event and the model update arriving in under 1 s (about 170 ms). A new capture verifies it again. An edit made while the tool was off is noticed on start. `incremental.test.ts` checks that every session update equals a fresh scan, and the hash rules. `e2e/watch.spec.ts` edits `LoginForm.tsx` in the running next-intl fixture: the dashboard shows `↻ needs re-check` within 1 s (about 480 ms), then a new login shows `✓ verified` again.
+- Not done yet: re-scanning runs on the main thread (a large repo blocks the server while it scans; see M11), and middleware is still not scanned.
 
 ## 7. Runtime capture (`packages/runtime`)
 
@@ -341,7 +354,7 @@ flow-checker export     # --md <dir> | --html <dir> [--raw]
 flow-checker doctor     # check Next version, hooks, ports, tsconfig
 ```
 
-Options: `--port`, `--app-port`, `--dev-command "pnpm dev"`, `--no-open`, `--config`.
+Options: `--port`, `--app-port`, `--dev-command "pnpm dev"`, `--no-open`, `--no-watch`, `--config`.
 
 Package manager (npm, pnpm, yarn or bun) is detected from the lockfile.
 
@@ -378,7 +391,7 @@ export default defineConfig({
 ├─ overrides.json      # user decisions: renamed flows, manual matches (safe to commit)
 ├─ captures/<siteId>/<captureId>.json   # gitignored by default (`_unmatched/` until matched to a site)
 ├─ sessions/<sessionId>.json            # gitignored by default
-└─ cache/              # scan cache keyed by file hash (gitignored)
+└─ cache/              # gitignored: ingest token, code-hashes.json (when each request's code was first seen, M9)
 ```
 
 Every file is checked against a zod schema with a `version` field, so the format can change safely later.
@@ -396,7 +409,7 @@ Every file is checked against a zod schema with a `version` field, so the format
 | M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done |
 | M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done |
 | M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done |
-| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | To do   |
+| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done |
 | M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | To do   |
 | M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | To do   |
 

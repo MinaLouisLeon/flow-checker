@@ -5,6 +5,7 @@ import {
   type CaptureSummary,
   type FlowsSummary,
   type RecordedFlow,
+  type ScanEvent,
   type VerificationSummary,
 } from '@flow-checker/shared'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -19,6 +20,8 @@ export interface Meta {
   canRescan: boolean
   /** Present when live capture is on. */
   capture?: { storeRaw: boolean }
+  /** Files are watched and re-scanned on change. */
+  watching?: boolean
 }
 
 interface Embedded {
@@ -82,6 +85,7 @@ export function useRescan() {
 const CAPTURES_KEY = ['captures']
 const VERIFICATION_KEY = ['verification']
 const FLOWS_KEY = ['flows']
+const LAST_SCAN_KEY = ['last-scan']
 /** Keep the newest captures in the list. */
 const MAX_LIST = 1000
 
@@ -222,9 +226,22 @@ export function useDeleteRecording() {
 
 export type LiveStatus = 'connecting' | 'live' | 'offline'
 
+/** The latest re-scan the live feed announced (a file changed, or a manual re-scan). */
+export function useLastScan(): ScanEvent | undefined {
+  return (
+    useQuery<ScanEvent | null>({
+      queryKey: LAST_SCAN_KEY,
+      queryFn: () => null,
+      staleTime: Number.POSITIVE_INFINITY,
+      enabled: false,
+    }).data ?? undefined
+  )
+}
+
 /**
- * Subscribes to the live feed (server-sent events): new and re-matched captures, and site
- * verification changes, which also update the cached model's request statuses.
+ * Subscribes to the live feed (server-sent events): re-scans after a file change, new and
+ * re-matched captures, and site verification changes, which also update the cached model's
+ * request statuses.
  */
 export function useLiveFeed(enabled: boolean): LiveStatus {
   const client = useQueryClient()
@@ -238,6 +255,13 @@ export function useLiveFeed(enabled: boolean): LiveStatus {
       void client.invalidateQueries({ queryKey: CAPTURES_KEY })
       void client.invalidateQueries({ queryKey: VERIFICATION_KEY })
       void client.invalidateQueries({ queryKey: FLOWS_KEY })
+    })
+    source.addEventListener('scan', (event) => {
+      client.setQueryData(LAST_SCAN_KEY, JSON.parse((event as MessageEvent<string>).data) as ScanEvent)
+      // The model changed: fetch it again, with everything that depends on it.
+      for (const key of [['model'], ['meta'], VERIFICATION_KEY, FLOWS_KEY, ['site-captures'], ['capture']]) {
+        void client.invalidateQueries({ queryKey: key })
+      }
     })
     source.addEventListener('flows', (event) => {
       client.setQueryData(FLOWS_KEY, JSON.parse((event as MessageEvent<string>).data) as FlowsSummary)

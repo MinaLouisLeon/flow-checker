@@ -30,6 +30,7 @@ export interface TypeUsage {
 }
 
 export type NoteKind =
+  | 'needs-recheck'
   | 'type-mismatch'
   | 'unresolved-component'
   | 'unresolved-type'
@@ -300,7 +301,12 @@ function scanNotes(model: AppModel): ScanNote[] {
     const first = site.callStack[0]
     for (const flag of site.flags) {
       notes.push({
-        kind: flag.kind === 'type-mismatch' ? 'type-mismatch' : 'request',
+        kind:
+          flag.kind === 'stale'
+            ? 'needs-recheck'
+            : flag.kind === 'type-mismatch'
+              ? 'type-mismatch'
+              : 'request',
         message: `${requestLabel(site)}: ${flag.message}`,
         file: first?.file ?? '',
         ...(first ? { line: first.line, column: first.column } : {}),
