@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M10 done (scanner, types, read-only dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export). M11 (public release) is built; v0.1.0 is ready to tag and publish. Updated: 2026-10-29.
+> Status: M0–M11 done. **v0.1.0 is published on npm** (scanner, types, dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export, public release). Next: **v0.2.0** (M12–M20, see [§14](#14-milestones)): CLI progress output, more React Query APIs and keys, middleware, Postman collection import, tRPC, GraphQL, SSE and WebSockets. Updated: 2026-10-30.
 
 ## 1. Goal
 
@@ -419,20 +419,135 @@ Every file is checked against a zod schema with a `version` field, so the format
 
 ## 14. Milestones
 
-| #   | Milestone                                                                                                                                                   | Done when                                                                         | Status               |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------- |
-| M0  | **Setup:** monorepo, tsup/Vite builds, Vitest, fixtures (basic, react-query, server-actions, bff, next-intl)                                                | CI green on an empty pipeline                                                     | ✅ Done              |
-| M1  | **Routes + components** scan                                                                                                                                | Snapshot tests: route tree and component trees for all fixtures                   | ✅ Done              |
-| M2  | **Request sites:** fetch/axios/wrappers, React Query/SWR, server actions, route handlers + chain, triggers, URL patterns                                    | Every fixture request detected with the right component and trigger               | ✅ Done              |
-| M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      | ✅ Done              |
-| M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done              |
-| M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done              |
-| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done              |
-| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done              |
-| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done              |
-| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done              |
-| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | ✅ Done              |
-| M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | Built, not published |
+| #   | Milestone                                                                                                                                                   | Done when                                                                         | Status  |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------- |
+| M0  | **Setup:** monorepo, tsup/Vite builds, Vitest, fixtures (basic, react-query, server-actions, bff, next-intl)                                                | CI green on an empty pipeline                                                     | ✅ Done |
+| M1  | **Routes + components** scan                                                                                                                                | Snapshot tests: route tree and component trees for all fixtures                   | ✅ Done |
+| M2  | **Request sites:** fetch/axios/wrappers, React Query/SWR, server actions, route handlers + chain, triggers, URL patterns                                    | Every fixture request detected with the right component and trigger               | ✅ Done |
+| M3  | **Types:** resolution into TypeShape IR, zod `z.infer`                                                                                                      | Resolved shapes match the expected snapshots                                      | ✅ Done |
+| M4  | **Dashboard (read-only):** server, overview, map (graph + tree), page view, component panel, types                                                          | You can browse a fixture's full scan                                              | ✅ Done |
+| M5  | **Runtime capture:** client + server runtime, `init`, ingest, **redaction**, store                                                                          | Playwright test: a click in the fixture shows a redacted capture in the dashboard | ✅ Done |
+| M6  | **Matching + verification:** scoring, flags, manual assignment, status changes                                                                              | ≥95% of fixture captures auto-matched                                             | ✅ Done |
+| M7  | **Flows:** navigation edges, inferred flows, session recording, flow merge                                                                                  | Login → OTP → dashboard flow inferred and confirmed in the fixture                | ✅ Done |
+| M8  | **Type comparison** of captures vs. types                                                                                                                   | Mismatch fixture produces the expected type-mismatch flags                        | ✅ Done |
+| M9  | **Watch + incremental re-scan**                                                                                                                             | Editing a fixture file updates the UI in under 1 s and marks `needs-recheck`      | ✅ Done |
+| M10 | **Export:** Markdown + static HTML                                                                                                                          | Export of each fixture matches the golden files                                   | ✅ Done |
+| M11 | **Public release:** README, config docs, `doctor`, Next 13.4/14/15/16 matrix, Windows/macOS/Linux, performance on a large repo, npm publish with provenance | v0.1.0 on npm                                                                     | ✅ Done |
+
+### v0.2.0 milestones
+
+Decided on 2026-10-30. Everything ships together as **v0.2.0** (new features, so a minor release). Order: CLI progress → React Query → middleware → Postman import → tRPC → GraphQL → SSE → WebSockets → release. Supported library versions: **React Query v4 + v5, tRPC v10 + v11, Apollo Client 3 + 4**, urql and Relay (current). Each gets its own fixture.
+
+| #   | Milestone                                                                                                                                                                                                                                                                                                                                                                                               | Done when                                                                                                                                                                                          | Status                             |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| M12 | **CLI progress output for every command** (`dev`, `scan`, `export`, `init`, `doctor`): scanner `onProgress` phases with counts, spinner + progress bar + ✓ done lines in a terminal, plain lines in CI / piped output, `--verbose` / `--quiet`, `scan` and `export` scan in the worker                                                                                                                  | Each command on the perf app shows its current step and bar within 1 s of the step starting, and the bar only moves forward; CI output has no ANSI codes; `--quiet` prints only results and errors | Built (branch `feat/cli-progress`) |
+| M13 | **React Query APIs and keys:** `useQueries`, `useSuspenseQueries`, `queryClient.fetchQuery / prefetchQuery / ensureQueryData / fetchInfiniteQuery / prefetchInfiniteQuery`, `queryOptions()` / `infiniteQueryOptions()` / `mutationOptions()`, server prefetch + `HydrationBoundary`, structured keys and key factories, invalidation links, runtime `QueryCache` key capture, `query-key` match signal | v4 and v5 fixtures: every query and mutation detected with its structured key; mutation → invalidated query links shown; captures matched by key                                                   | Planned                            |
+| M14 | **Middleware:** `middleware.ts` and `proxy.ts` (Next 16), `config.matcher` → affected routes, redirects as navigation edges, rewrites used for URL resolution, fetches inside with a `middleware` trigger, best-effort edge capture                                                                                                                                                                     | Middleware fixture: matcher routes, redirect edge and middleware fetch are all correct (on Next 15 and 16)                                                                                         | Planned                            |
+| M15 | **Postman collection import:** v2.1 JSON, v3 YAML folder and cloud collection by ID, plus environments. Used as an API contract, a types source and for URL resolution                                                                                                                                                                                                                                  | Fixture with a collection: sites matched to collection requests, example-based types fill `unknown-response`, `{{baseUrl}}` URLs resolved, missing / unused endpoints flagged                      | Planned                            |
+| M16 | **tRPC:** client calls (React hooks, vanilla, v11 `queryOptions`), router procedures with input / output types, runtime batch splitting, match by procedure path                                                                                                                                                                                                                                        | v10 and v11 fixtures: every procedure call detected, typed and matched, including batched requests                                                                                                 | Planned                            |
+| M17 | **GraphQL:** Apollo 3 + 4, urql, Relay. Operations by name + type, fragments. Types from codegen, then a schema file, then live introspection. Runtime operation parsing, batching, persisted queries. `graphql-operation` match signal                                                                                                                                                                 | One fixture per client: every operation detected, typed and matched by operation name                                                                                                              | Planned                            |
+| M18 | **SSE:** `EventSource`, streamed `fetch`, `text/event-stream` route handlers. Runtime captures events (redacted, size-capped bodies); type check per event                                                                                                                                                                                                                                              | SSE fixture: stream and events captured, matched and type-checked                                                                                                                                  | Planned                            |
+| M19 | **WebSockets:** native `WebSocket` and socket.io-client. Connection + send/emit sites. Runtime captures messages (redacted, size-capped bodies); message timeline in the dashboard                                                                                                                                                                                                                      | WS fixture: connection and messages captured, matched and shown in the timeline                                                                                                                    | Planned                            |
+| M20 | **Release v0.2.0:** README, config docs for the new options, CHANGELOG, Next matrix extended with the new fixtures, performance budgets rechecked                                                                                                                                                                                                                                                       | v0.2.0 on npm                                                                                                                                                                                      | Planned                            |
+
+### v0.2.0 notes
+
+**Shared model changes (`packages/shared`):**
+
+- Site `transport`: `fetch | axios | api-client | server-action | graphql | trpc | websocket | sse`. Capture `transport` gains `websocket` and `eventsource`.
+- New trigger kind `middleware`.
+- New optional site fields: `queryKey` (structured segments: static, or `:param` for dynamic parts), `operation` (GraphQL `{ name, type: query | mutation | subscription, document }`), `procedure` (tRPC `{ path, type: query | mutation | subscription }`), `contract` (the matched Postman request).
+- Captures gain the same `queryKey` / `operation` / `procedure` fields, and a `messages` list for WS / SSE (direction, event name, time, size, redacted body).
+- New match signals: `query-key`, `graphql-operation`, `trpc-procedure`.
+- All schema changes bump the `version` field, with migration of existing `.flow-checker/` files.
+
+**M12 — CLI progress output:**
+
+Today the first scan runs as one blocking step and nothing prints until the summary, so `dev`, `scan` and `export` look stuck on large repos (~10 s on the perf app).
+
+- **Scanner:** `ScanOptions.onProgress(event)` with `{ phase, done?, total?, detail? }`, fired at phase boundaries and every few items inside long phases. Phases: `discover` (Next version, app dir) → `load` (files) → `routes` → `components` → `requests` (route i of N, includes types) → `flows` → `write`. Re-scans report the same phases. From the worker, events are posted to the main thread as messages.
+- **Terminal (TTY), on by default:** one live line with a spinner, an overall progress bar, the percentage, the current step with its count and the elapsed time, replaced by a done line when the step ends:
+
+  ```text
+  ✓ Project found: Next 16.0, src/app (0.1 s)
+  ✓ Files loaded: 1,808 (2.0 s)
+  ✓ Routes: 401 (0.3 s)
+  ✓ Components: 804 (1.1 s)
+  ⠋ [██████████░░░░░░░░░░] 52%  Scanning requests… route 120/401  4.2 s
+  ```
+
+  - The bar shows the **whole command**, not just the current step. Each step has a weight (scan phases weighted by their share of time on the perf app, e.g. `load` ~25%, `requests` ~40%), and steps with a count (files, routes, checks, pages) fill their share item by item. The bar never moves backwards.
+  - A step with no count (waiting for a port, starting a process) keeps the bar still while the spinner and timer keep moving.
+  - The bar shrinks to fit narrow terminals and is dropped below 60 columns (spinner + text only). Redrawn at most every 80 ms, written to stderr so piped stdout stays clean. The line is cleared on exit and on Ctrl+C.
+- **Not a TTY (CI, pipes) or `NO_COLOR` / `TERM=dumb`:** plain lines, one per finished step, no spinner, bar or ANSI codes.
+- **Per command:**
+  - **`dev`:** loading config → scan phases → starting dashboard → starting your app → waiting for the app on its port → `App ready (2.3 s)`. After that the live line is gone, and the app's own log lines show as today. Watch re-scans show a short spinner + bar line while they run, then their one-line summary.
+  - **`scan`:** loading config → scan phases → writing `model.json`, then the summary and any `--tree` / `--types` / `--requests` / `--flows` output.
+  - **`export`:** loading config → scan phases → loading captures → building the model → writing Markdown (page i of N) → writing the static site (file i of N).
+  - **`init`:** checking the project → each planned change (hooks, config, `.gitignore`, `next.config` wrapper). The live line pauses while the `[y/N]` question is shown, then continues.
+  - **`doctor`:** check i of N, with each check's ✓ / ⚠ / ✗ line left behind as it finishes (ports and the Next version can take a moment).
+- **`--verbose`:** also prints timings per phase, the resolved config (root, app dir, include / exclude, apiClients), skipped / excluded file counts and the scan worker in use. **`--quiet`:** no progress, only results, warnings and errors.
+- **`scan` and `export`** run their scan in the worker too (same as `dev`), so the spinner keeps moving while the scan blocks.
+- A small helper in `packages/flow-checker/src/cli/progress.ts` (no new dependency) handles the spinner, the weighted bar, terminal width, TTY detection and cleanup on Ctrl+C. Every command reports through it, and `CliIO` gets a `progress` handle so tests can record steps. Tests use a fake TTY and check both output modes, bar weights and that the bar never goes back.
+
+- **Built:** `ScanOptions.onProgress` / `SCAN_PHASES` in the scanner, `writeExport({ onFile })` in the exporter, `src/cli/progress.ts` in the CLI. `CliIO` got `display` and `verbose`, `runDoctor` an `onCheck` callback, and the scan runner forwards phase events from the worker (`scan(onProgress)`, `update(changes, onProgress)`, `writeModel: false` for `export`). Bar weights come from the perf app (1,806 files): load 3.8 s, components 2.6 s, requests 3.4 s, the rest under 0.3 s. `dev` waits for the app's port in the background (only when progress is shown), and re-scan lines wait until the start-up line is done. Tests: `packages/scanner/test/progress.test.ts`, `packages/flow-checker/test/progress.test.ts`.
+
+**M13 — React Query:**
+
+- Scanner adds the hooks and `queryClient` methods above (on `@tanstack/react-query` v5 and `react-query` / `@tanstack/react-query` v4, including v4's positional `useQuery(key, fn)` form). `queryOptions()` objects are followed to where they're used.
+- Keys are parsed into segments. Literals and constants are static; variables become `:name`. Key factories (`userKeys.detail(id)`, objects or functions returning arrays) are resolved by following the call.
+- `invalidateQueries`, `refetchQueries`, `resetQueries`, `removeQueries` and `setQueryData` (by exact key or prefix) become links from the code that calls them (usually a mutation's `onSuccess`) to the queries they hit. Shown on the page view and in flows.
+- `prefetchQuery` in a server component + `HydrationBoundary` → trigger `server-render`, linked to the client `useQuery` with the same key.
+- Runtime: when the app has a `QueryClient`, subscribe to its `QueryCache` / `MutationCache` (found via the `QueryClientProvider` fiber), and tag each fetch started during a query run with its key.
+
+**M14 — Middleware:**
+
+- Scan `middleware.ts` (Next ≤15) and `proxy.ts` (Next 16) in the root or `src/`.
+- `config.matcher` (strings, regex-like paths, `has` / `missing` objects) is matched against the route tree; each page shows the middleware that runs on it.
+- `NextResponse.redirect(...)` → navigation edges (kind `redirect`, with the condition text). `NextResponse.rewrite(...)` → a rewrite map used when resolving captured URLs to routes.
+- Fetch calls inside → sites with trigger `middleware`. Captures come from the existing edge-runtime `fetch` patch (best effort, documented).
+
+**M15 — Postman collection import:**
+
+- Sources: v2.1 JSON export, the git-native v3 YAML folder (`postman/collections/`), and a cloud collection by ID (Postman API key from an env var, never stored). Environments are imported the same way for `{{variables}}`.
+- Command `flow-checker postman import` (also re-read on `dev` start when configured). The imported collection is cached in `.flow-checker/postman/`.
+- **Contract check:** each request site is matched to a collection request by method + URL pattern (`{{baseUrl}}/users/:id` ≈ `/users/${id}`). New flags: `not-in-collection` (site with no collection request) and `unused-endpoint` (collection request no site calls, shown in an overview list).
+- **Types:** saved response examples are turned into TypeShapes. They fill types only where the code has none (`unknown-response`), and are marked as source `postman`. When both exist, a mismatch between them is flagged.
+- **URLs:** collection URLs and environment values resolve dynamic URLs the scanner left as `unknown` (matched by the call's code path and method), with confidence `postman`.
+- GraphQL bodies in collections are recognized after M17.
+
+**M16 — tRPC:**
+
+- Client: `trpc.a.b.useQuery()` / `useSuspenseQuery()` / `useInfiniteQuery()` / `useMutation()` / `useSubscription()`, vanilla `client.a.b.query()` / `mutate()`, and v11 `trpc.a.b.queryOptions()` / `mutationOptions()` with React Query. The proxy is found from `createTRPCReact` / `createTRPCProxyClient` / `createTRPCClient` / `createTRPCContext`.
+- Server: the router (`router({...})`, `t.router`, merged routers) is read into a procedure list with input (zod) and output types, and linked to the route handler that serves it (`fetchRequestHandler`).
+- Runtime: `/api/trpc/a.b,c.d?batch=1&input=...` and batched POST bodies are split into one capture per procedure. Streaming (`httpBatchStreamLink`) is supported.
+
+**M17 — GraphQL:**
+
+- Documents: `gql` / `graphql` tags, codegen `graphql()` (client preset), imported `.graphql` files, and Relay `graphql` tags.
+- Calls: Apollo `useQuery`, `useLazyQuery`, `useMutation`, `useSubscription`, `useSuspenseQuery`, `useBackgroundQuery`, `client.query` / `mutate` / `subscribe`; urql `useQuery`, `useMutation`, `useSubscription`, `client.query` / `mutation`; Relay `useLazyLoadQuery`, `usePreloadedQuery`, `useQueryLoader`, `useMutation`, `commitMutation`, `useSubscription`. `useFragment` is recorded as a data dependency of the component.
+- Types, in order: codegen `TypedDocumentNode` / Relay generated `$data` / `$variables`, then a local schema file, then **live introspection** of an endpoint (URL + headers from env vars, dev only, cached in `.flow-checker/cache/`).
+- Runtime: read `operationName`, query and variables from the body (and GET params), split batched arrays, recognize persisted queries by hash (mapped to documents when a manifest exists). Subscriptions over WS are handled after M19.
+
+**M18 — SSE / M19 — WebSockets:**
+
+- Browser runtime patches `EventSource` and `WebSocket`; socket.io-client is recognized through its WS frames (engine.io packet parsing for event names). Streamed `fetch` responses with `text/event-stream` are read through a tee.
+- Message bodies are **stored, redacted and capped**: new options `capture.maxMessages` (per connection) and `capture.maxMessageBytes` (per message). Over the limit, only metadata is kept and the connection is marked `truncated`.
+- Each event / message name gets its own expected type when the code declares one (`onmessage` handler annotations, socket.io typed events), and captured messages are type-checked against it.
+
+**New config options:**
+
+```ts
+graphql: {
+  schema: 'schema.graphql',                      // optional local schema
+  introspection: { url: 'http://localhost:4000/graphql', headers: { Authorization: 'env:GQL_TOKEN' } }, // optional, dev only
+},
+postman: {
+  collection: 'postman/collections/my-api',    // v2.1 JSON file, v3 YAML folder, or { id, apiKeyEnv: 'POSTMAN_API_KEY' }
+  environment: 'postman/environments/dev.yaml',  // optional
+},
+capture: { maxMessages: 200, maxMessageBytes: 64_000 },
+```
 
 ### M11 notes
 
@@ -440,9 +555,10 @@ Every file is checked against a zod schema with a `version` field, so the format
 - **Next.js matrix:** `scripts/next-matrix.mjs` creates a small app per version (13.4.19, 14.2.35, 15.2.9, 15.5.28, 16.4.3), installs the packed package, runs `init` (+ `withFlowChecker()` before 15.3), `doctor`, `scan`, then `dev` with Chromium: a page-load server fetch, a click-triggered browser fetch and the route handler's upstream fetch must be captured, matched, and linked as a two-hop chain. CI runs every version on Linux, and 13.4 and 16 also on Windows and macOS. Next 13.4–13.5 dev-server IPC to its render workers (`/?key=…&method=…`) is ignored by default.
 - **OS:** lint/typecheck/test/build/package checks and the Playwright e2e suite run on Linux, Windows and macOS in CI.
 - **Performance:** `scripts/perf/generate-app.mjs` writes a synthetic app; `scripts/perf/bench.mjs` measures it. At 200 features (1,808 files, 401 pages, 804 components, 1,000 requests): cold scan ~9–10 s, re-scan after an edit ~3.4 s, and the slowest dashboard API answer during re-scans fell from ~4,000 ms (main thread) to ~170 ms (worker). CI fails above 25 s / 8 s / 1 s. Profiling shows the time spread over import resolution (~4 s cold) and symbol/type lookups, with no single hot spot; per-file caching and lazy type resolution remain options for later.
+- **Published:** v0.1.0 is on npm as `@integr8-media/flow-checker` and was tested by hand after release (2026-10-30).
 - **Release:** `.github/workflows/release.yml` publishes on a `v*` tag that matches the package version, after every check, with `pnpm publish --provenance` (needs `NPM_TOKEN` or npm trusted publishing, and an `npm` environment). `verify:package` also checks `./next` from ESM, CommonJS and TypeScript.
 
-Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11.
+Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11. For v0.2.0: M12 → M13 → M14 → M15 → M16 → M17 → M18 → M19 → M20.
 
 ## 15. Risks and mitigations
 
@@ -455,10 +571,14 @@ Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map
 | **Edge runtime / middleware**                                                                                                       | Best-effort fetch patch, documented limits.                                                                                                                                           |
 | **Secrets leaking** into the repo or docs                                                                                           | Redaction ON by default, done in the runtime, plus gitignore entries, a startup warning when `storeRaw` is on, and exports that redact unless `--raw`.                                |
 | **Runtime affecting the app**                                                                                                       | Dev-only, no-op without `FLOW_CHECKER=1`, never throws (all wrapped), body cloning with size limits.                                                                                  |
+| **WS / SSE message volume and secrets** (v0.2.0)                                                                                    | Redaction on every message, `maxMessages` / `maxMessageBytes` caps with metadata-only fallback, captures still gitignored.                                                            |
+| **GraphQL introspection** needs a running server and auth (v0.2.0)                                                                  | Last of three type sources, opt-in, headers only from env vars, result cached; clear `doctor` message when it fails.                                                                  |
+| **Postman cloud API key** (v0.2.0)                                                                                                  | Read only from an env var named in config, never written to disk or logs; local files work without it.                                                                                |
+| **Library API drift** (React Query v4/v5, tRPC v10/v11, Apollo 3/4)                                                                 | One fixture per supported major version, run in CI.                                                                                                                                   |
 
 ## 16. Out of scope for v1
 
 - Pages Router (`pages/`).
-- GraphQL operation-level analysis, WebSockets and SSE streams (they're captured only as raw requests).
-- OpenAPI and Postman export. These are easy to add later from the same model.
+- ~~GraphQL operation-level analysis, WebSockets and SSE streams~~ → planned for v0.2.0 (M17–M19).
+- OpenAPI and Postman **export**. These are easy to add later from the same model. (Postman collection **import** is planned for v0.2.0, M15.)
 - Live iframe preview with element highlighting.

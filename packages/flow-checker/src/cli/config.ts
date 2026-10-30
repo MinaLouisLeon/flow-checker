@@ -29,6 +29,23 @@ export function scanSettings(config: FlowCheckerConfig) {
   }
 }
 
+/** What `--verbose` prints about the resolved config. */
+export function configDetails(root: string, file: string | undefined, config: FlowCheckerConfig): string[] {
+  const list = (items: readonly string[] | undefined, fallback: string) =>
+    items && items.length > 0 ? items.join(', ') : fallback
+  return [
+    `config: ${file ?? 'none (defaults)'}`,
+    `root: ${root}`,
+    `app dir: ${config.appDir ?? 'auto (src/app or app)'}`,
+    `include: ${list(config.include, 'default')}`,
+    `exclude: ${list(config.exclude, 'default')}`,
+    `api clients: ${list(
+      config.apiClients?.map((c) => c.module),
+      'none',
+    )}`,
+  ]
+}
+
 /**
  * Loads the config file (default export). `root` is the project root: the config's `root`
  * resolved from the config file's folder, or the given root. `.ts` files load through Node's built-in type

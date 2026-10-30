@@ -4,6 +4,7 @@ import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs
 import { join, relative, resolve } from 'node:path'
 import { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, PACKAGE_NAME } from '@flow-checker/shared'
 import { findConfigFile } from './config'
+import { createProgress, type Progress } from './progress'
 import {
   detectPackageManager,
   ensureGitignore,
@@ -83,7 +84,20 @@ const REGISTER_EXPORT =
   /export\s+(?:async\s+)?function\s+register\b|export\s+(?:const|let|var)\s+register\b|export\s*\{[^}]*\bregister\b/
 
 export async function initCommand(options: InitCommandOptions, io: CliIO): Promise<number> {
+  const progress = createProgress(io, [
+    { id: 'check', weight: 30 },
+    { id: 'apply', weight: 70 },
+  ])
+  try {
+    return await init(options, io, progress)
+  } finally {
+    progress.finish()
+  }
+}
+
+async function init(options: InitCommandOptions, io: CliIO, progress: Progress): Promise<number> {
   const root = resolve(options.root ?? process.cwd())
+  progress.start('check', 'Checking the project…')
   const appDir = options.appDir
     ? resolve(root, options.appDir)
     : [join(root, 'src', 'app'), join(root, 'app')].find((dir) => existsSync(dir))
@@ -151,6 +165,7 @@ It does nothing unless the app was started by flow-checker. Browser capture need
     }
   }
 
+  progress.done()
   if (changes.length === 0 && ignore.length === 0) {
     io.out('flow-checker is already set up in this project.')
     for (const note of manual) io.out(`\n${note}`)
@@ -165,22 +180,29 @@ It does nothing unless the app was started by flow-checker. Browser capture need
   io.out('')
 
   if (!options.yes) {
+    // No live line while the question waits for an answer.
+    progress.pause()
     const ok = io.confirm ? await io.confirm('Apply these changes?') : false
+    progress.resume()
     if (!ok) {
       io.err(io.confirm ? 'Nothing changed.' : 'Nothing changed. Run "flow-checker init --yes" to apply.')
       return 1
     }
   }
 
-  for (const change of changes) {
+  const steps = changes.length + (ignore.length > 0 ? 1 : 0)
+  progress.start('apply', 'Applying changes…', steps)
+  for (const [index, change] of changes.entries()) {
     if (change.action === 'create') writeFileSync(change.file, change.content)
     else {
       const text = readFileSync(change.file, 'utf8')
       appendFileSync(change.file, `${text.endsWith('\n') ? '' : '\n'}${change.content}`)
     }
     io.out(`${change.action === 'create' ? 'Created' : 'Updated'} ${rel(change.file)}`)
+    progress.update(index + 1)
   }
   if (ensureGitignore(root).length > 0) io.out('Updated .gitignore')
+  progress.done()
 
   for (const note of manual) io.out(`\nTo do: ${note}`)
 

@@ -76,6 +76,18 @@ flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitig
 | `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
 | `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
 | `--force`                                    | export                    | Write into a folder that has other files                                                      |
+| `--verbose`                                  | all                       | Also print the resolved config, where the scan runs and other details                         |
+| `-q, --quiet`                                | all                       | No progress output: only results, warnings and errors                                         |
+
+Every command shows its progress on stderr. In a terminal, a live line shows a spinner, a bar for the whole command, the current step and its time, and each finished step leaves a `✓` line with what it found:
+
+```text
+✓ Loaded: 1,806 files (3.8 s)
+✓ Routes: 401 pages, 200 route handlers (0.2 s)
+⠸ [█████████░░░░░░░░░░░]  47%  Walking components… route 300/601  1.3 s
+```
+
+In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` lines are printed, as plain text.
 
 ## Setup in detail
 

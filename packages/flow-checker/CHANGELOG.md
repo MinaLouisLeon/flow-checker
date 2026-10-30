@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Progress output for every command.** `dev`, `scan`, `export`, `init` and `doctor` no longer look stuck on large projects: in a terminal a live line shows a spinner, a progress bar for the whole command, the current step with its count and time, and each scan phase leaves a `✓` line (files loaded, routes, components, requests, flows). `dev` also shows starting the dashboard and waiting for your app's port until it is ready, and re-scans show a short progress line. `doctor` prints each check as it runs. Plain lines in CI and piped output.
+- **`--verbose`** prints the resolved config and where the scan runs; **`-q, --quiet`** turns progress output off.
+- `scan` and `export` scan in a worker thread, like `dev`.
+
 ## 0.1.0
 
 First public release.

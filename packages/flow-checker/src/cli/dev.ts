@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { connect } from 'node:net'
 import { isAbsolute, join, relative, resolve } from 'node:path'
 import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/runtime/options'
 import { ScanError } from '@flow-checker/scanner'
@@ -15,8 +16,9 @@ import {
 import { type AppModel, DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
-import { ConfigError, loadConfig, scanSettings } from './config'
+import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
 import { configExportDirs, writeFormat } from './export'
+import { createProgress, scanReporter, scanSteps } from './progress'
 import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
 import type { CliIO } from './run'
 import { summary } from './scan'
@@ -59,15 +61,25 @@ export interface DevSession {
  */
 export async function startDev(options: DevCommandOptions, io: CliIO): Promise<DevSession | number> {
   let root = resolve(options.root ?? process.cwd())
+  const progress = createProgress(io, [
+    { id: 'config', weight: 1 },
+    ...scanSteps(69),
+    { id: 'dashboard', weight: 3 },
+    { id: 'app', weight: 27 },
+  ])
 
   let config: FlowCheckerConfig
+  progress.start('config', 'Loading config…')
   try {
     const loaded = await loadConfig(root, options.config)
     config = loaded.config
+    progress.done()
     if (loaded.file) io.out(`Config: ${loaded.file}`)
     if (loaded.root !== root) io.out(`Project root: ${loaded.root}`)
     root = loaded.root
+    for (const line of configDetails(root, loaded.file, config)) progress.detail(line)
   } catch (error) {
+    progress.finish()
     if (error instanceof ConfigError) {
       io.err(error.message)
       return 1
@@ -79,6 +91,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7). From the
   // build it runs in a worker thread, so the server keeps answering during large re-scans.
   const scanner = createScanRunner({ root, appDir, ...scanSettings(config) })
+  progress.detail(`scan runs ${scanner.inWorker ? 'in a worker thread' : 'in this thread'}`)
   // One scan at a time: a change that arrives during a scan waits for it.
   let queue: Promise<unknown> = Promise.resolve()
   const serial = <T>(task: () => Promise<T>): Promise<T> => {
@@ -86,11 +99,25 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     queue = next.catch(() => {})
     return next
   }
+  // The first scan shows each phase; a full re-scan from the dashboard shows the live line only.
+  // Re-scans show a live line too, once the start-up steps are done (one live line at a time).
+  const rescanProgress = () =>
+    createProgress(progress.active ? { ...io, display: undefined } : io, scanSteps(100))
+  let firstScan = true
   const scan = () =>
     serial(async () => {
-      const { model, durationMs } = await scanner.scan()
-      io.out(summary(model, durationMs))
-      return model
+      const shown = firstScan ? progress : rescanProgress()
+      const lines = firstScan
+      firstScan = false
+      try {
+        const { model, durationMs } = await scanner.scan(scanReporter(shown, { lines }))
+        if (!lines) shown.finish()
+        io.out(summary(model, durationMs))
+        return model
+      } catch (error) {
+        shown.finish()
+        throw error
+      }
     })
 
   let model: AppModel
@@ -121,6 +148,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')
 
+  progress.start('dashboard', 'Starting the dashboard…')
   const exportDirs = configExportDirs(root, config)
   const watching = options.watch !== false
   const scans = watching ? new ScanFeed() : undefined
@@ -145,6 +173,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
       },
     },
   })
+  progress.done()
   io.out(`Dashboard: ${server.url}`)
 
   let watcher: ProjectWatcher | undefined
@@ -155,12 +184,18 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
         relative(root, f).replaceAll('\\', '/'),
       )
       return serial(async () => {
+        const rescan = rescanProgress()
         try {
-          const { model: next, durationMs } = await scanner.update(batch)
+          const { model: next, durationMs } = await scanner.update(
+            batch,
+            scanReporter(rescan, { lines: false }),
+          )
+          rescan.finish()
           scans.publish({ model: next, durationMs, files })
           io.out(`Re-scanned in ${Math.round(durationMs)} ms (${describeFiles(files)} changed).`)
           options.onRescan?.(next, files)
         } catch (error) {
+          rescan.finish()
           io.err(`Re-scan failed after ${describeFiles(files)} changed: ${(error as Error).message}`)
         }
       })
@@ -188,6 +223,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 
   let app: AppProcess | undefined
+  let stopped = false
   if (options.app) {
     const hooks = hookStatus(root, model.project.appDir ? resolve(root, model.project.appDir) : root)
     if (!hooks.client || !hooks.server) {
@@ -198,16 +234,30 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     }
     const command = options.devCommand ?? config.devCommand ?? defaultDevCommand(root)
     io.out(`Starting your app: ${command} (port ${appPort})`)
+    progress.start('app', `Starting your app… waiting for port ${appPort}`)
+    let appExited = false
     app = startApp({
       command,
       cwd: root,
       env: appEnv,
       onLine: (line, stream) => (stream === 'err' ? io.err : io.out)(`[app] ${line}`),
       onExit: (code) => {
+        appExited = true
+        progress.finish()
         if (code !== null && code !== 0) io.err(`[app] exited with code ${code}`)
       },
     })
+    // Only with progress output: tests and --quiet don't wait for the port.
+    if (io.display) {
+      void waitForPort(appPort, () => appExited || stopped).then((ready) => {
+        if (ready) progress.done(`App ready on port ${appPort}`)
+        progress.finish()
+      })
+    } else {
+      progress.finish()
+    }
   } else {
+    progress.finish()
     // Without --app the user starts it (Docker, a task runner...) and needs this env.
     io.out('Start your app with capture on using this environment:')
     for (const [name, value] of Object.entries(appEnv)) io.out(`  ${name}=${shellQuote(value)}`)
@@ -221,6 +271,8 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     ingestUrl,
     appEnv,
     close: async () => {
+      stopped = true
+      progress.finish()
       clearTimeout(warmTimer)
       await watcher?.close()
       await app?.stop()
@@ -229,6 +281,29 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
       await scanner.close()
     },
   }
+}
+
+/**
+ * Resolves when something listens on the port (true), or when `cancelled()` says to stop
+ * waiting (false). Tries IPv4 and IPv6, since Next may listen on either.
+ */
+async function waitForPort(port: number, cancelled: () => boolean): Promise<boolean> {
+  const tryConnect = (host: string) =>
+    new Promise<boolean>((done) => {
+      const socket = connect({ port, host })
+      const finish = (ok: boolean) => {
+        socket.destroy()
+        done(ok)
+      }
+      socket.once('connect', () => finish(true))
+      socket.once('error', () => finish(false))
+      socket.setTimeout(1000, () => finish(false))
+    })
+  while (!cancelled()) {
+    if ((await tryConnect('127.0.0.1')) || (await tryConnect('::1'))) return !cancelled()
+    await new Promise((r) => setTimeout(r, 250).unref())
+  }
+  return false
 }
 
 /** A folder relative to the project root (forward slashes), or absolute when outside it. */
