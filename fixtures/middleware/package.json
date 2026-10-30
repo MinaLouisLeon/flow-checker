@@ -1,0 +1,24 @@
+{
+  "name": "@fixtures/middleware",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: Next 16 proxy.ts (middleware) with a matcher, redirects, a rewrite and a session fetch.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@integr8-media/flow-checker": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

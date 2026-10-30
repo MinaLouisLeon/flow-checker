@@ -5,6 +5,7 @@
 //   components/<name>.md props, types, requests
 //   types.md             all types with resolved shapes and usages
 //   issues.md            open flags, type mismatches, unmatched captures
+//   middleware.md        middleware / proxy: matcher, routes it runs on, redirects, rewrites, requests
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
@@ -18,6 +19,8 @@ import {
   type FlowStep,
   formatQueryKey,
   isVerified,
+  type MatcherCondition,
+  type MiddlewareMatcher,
   type ModelIndex,
   mismatchField,
   type Navigation,
@@ -35,7 +38,7 @@ import {
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
-import { type DocNames, docNames, ISSUES, README, RECORDED, TYPES } from './names'
+import { type DocNames, docNames, ISSUES, MIDDLEWARE, README, RECORDED, TYPES } from './names'
 import { declaration, prettyShape } from './shape'
 
 /** Generated files: path (forward slashes, relative to the output folder) → content. */
@@ -92,6 +95,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   }
   const recorded = data.flows?.recorded ?? []
   if (recorded.length > 0) files[RECORDED] = recordedDoc(ctx, recorded)
+  if (model.middleware) files[MIDDLEWARE] = middlewareDoc(ctx)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -169,6 +173,18 @@ function readme(ctx: Ctx): string {
         ]),
       ),
     )
+  }
+  const mw = model.middleware
+  if (mw) {
+    const conditional = mw.routes.filter((r) => r.conditional).length
+    const redirects = model.navigations.filter((n) => n.origin === 'middleware').length
+    const parts = [
+      `runs on ${plural(mw.routes.length, 'route')}${conditional > 0 ? ` (${conditional} only for some requests)` : ''}`,
+      plural(redirects, 'redirect'),
+      plural(mw.rewrites.length, 'rewrite'),
+      plural(index.middlewareRequests.length, 'request'),
+    ]
+    sections.push('## Middleware', `${link(code(mw.file), from, MIDDLEWARE)}: ${parts.join(', ')}.`)
   }
   if (model.flows.length > 0) {
     sections.push(
@@ -350,6 +366,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
         .join('\n'),
     flows.length > 0 && '## Flows',
     flows.length > 0 && flows.map((f) => `- ${flowLink(ctx, f, from)}`).join('\n'),
+    ...routeMiddleware(ctx, route, from),
     '## Requests',
     sites.length === 0 ? 'This page sends no requests the scan found.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
@@ -366,6 +383,7 @@ function handlerDoc(ctx: Ctx, route: Route, from: string): string {
       ['File', code(route.file)],
       ['Methods', (route.methods ?? []).join(', ') || undefined],
     ]),
+    ...routeMiddleware(ctx, route, from),
     '## Called by',
     callers.length === 0
       ? 'No request in the app calls it (it may be called from outside).'
@@ -376,6 +394,128 @@ function handlerDoc(ctx: Ctx, route: Route, from: string): string {
     '## Requests it sends',
     sends.length === 0 ? 'None found.' : requestTable(ctx, sends, from),
     ...sends.map((s) => requestSection(ctx, s, from, 3)),
+  ])
+}
+
+// --- Middleware (M14) -----------------------------------------------------------------------
+
+/** On a page or handler doc: whether the middleware runs, its redirects away and rewrites to it. */
+function routeMiddleware(ctx: Ctx, route: Route, from: string): (string | false)[] {
+  const mw = ctx.model.middleware
+  if (!mw) return []
+  const runs = ctx.index.middlewareRoutes.get(route.id)
+  const redirects = ctx.index.middlewareRedirects.get(route.id) ?? []
+  const rewrites = ctx.index.rewritesTo.get(route.id) ?? []
+  if (!runs && rewrites.length === 0) return []
+  const file = link(code(mw.file), from, MIDDLEWARE)
+  const intro = runs
+    ? runs.conditional
+      ? `${file} runs here only for some requests (${conditionalReason(mw)}).`
+      : `${file} runs before every request to this route.`
+    : `${file} rewrites other paths to this route.`
+  const lines: string[] = []
+  for (const nav of redirects) {
+    const target = nav.targetRouteId ? ctx.index.routes.get(nav.targetRouteId) : undefined
+    const to = target ? routeLink(ctx, target, from) : code(urlText(nav.href))
+    lines.push(`- Redirects to ${to}${nav.condition ? ` if ${code(nav.condition)}` : ''}`)
+  }
+  for (const rw of rewrites) {
+    lines.push(
+      `- Answers ${code(rewriteFrom(rw.from))} (rewrite)${rw.condition ? ` if ${code(rw.condition)}` : ''}`,
+    )
+  }
+  return ['## Middleware', intro, lines.length > 0 && lines.join('\n')]
+}
+
+function conditionalReason(mw: NonNullable<AppModel['middleware']>): string {
+  if (mw.matcherText !== undefined) return 'the matcher could not be read'
+  return 'see the matcher'
+}
+
+function rewriteFrom(from: { kind: 'prefix' | 'exact'; path: string } | undefined): string {
+  return from ? `${from.path}${from.kind === 'prefix' ? '/*' : ''}` : 'every path it runs on'
+}
+
+function middlewareMatcherText(m: MiddlewareMatcher): string {
+  const cond = (word: string, list: MatcherCondition[] | undefined) =>
+    list?.map((c) => `${word} ${c.type} ${c.key}${c.value !== undefined ? `=${c.value}` : ''}`) ?? []
+  const extra = [...cond('has', m.has), ...cond('missing', m.missing)]
+  return `${code(m.source)}${extra.length > 0 ? ` (${extra.join(', ')})` : ''}`
+}
+
+function middlewareDoc(ctx: Ctx): string {
+  const { model, index } = ctx
+  const mw = model.middleware
+  if (!mw) return ''
+  const from = MIDDLEWARE
+  const redirects = model.navigations.filter((n) => n.origin === 'middleware')
+  const routeOf = (id: string | undefined) => (id ? index.routes.get(id) : undefined)
+  const routeText = (id: string | undefined) => {
+    const route = routeOf(id)
+    return route ? routeLink(ctx, route, from) : '—'
+  }
+  const sites = index.middlewareRequests
+  return doc([
+    `# Middleware ${code(mw.file)}`,
+    link('← Overview', from, README),
+    facts([
+      ['File', code(`${mw.loc.file}:${mw.loc.line}`)],
+      ['Convention', mw.convention === 'proxy' ? '`proxy` (Next.js 16+)' : '`middleware`'],
+      ['Export', mw.exportName ? code(mw.exportName) : undefined],
+      ['Made with', mw.factory ? `${code(mw.factory.name)} from ${code(mw.factory.module)}` : undefined],
+      [
+        'Matcher',
+        mw.matcherText !== undefined
+          ? `could not be read: ${code(mw.matcherText)}`
+          : mw.matchers.length === 0
+            ? 'every request'
+            : mw.matchers.map(middlewareMatcherText).join(', '),
+      ],
+      [
+        'Locales',
+        mw.i18n
+          ? `${mw.i18n.locales.map(code).join(', ')}${mw.i18n.defaultLocale ? ` (default ${code(mw.i18n.defaultLocale)})` : ''}`
+          : undefined,
+      ],
+    ]),
+    '## Runs on',
+    mw.routes.length === 0
+      ? 'No route in the app matches.'
+      : table(
+          ['Route', 'Kind', 'When'],
+          mw.routes.map((r) => [
+            routeText(r.routeId),
+            routeOf(r.routeId)?.kind === 'route-handler' ? 'route handler' : 'page',
+            r.conditional ? 'some requests' : 'every request',
+          ]),
+        ),
+    redirects.length > 0 && '## Redirects',
+    redirects.length > 0 &&
+      table(
+        ['To', 'From', 'If', 'Source'],
+        redirects.map((nav) => [
+          nav.targetRouteId ? routeText(nav.targetRouteId) : code(urlText(nav.href)),
+          // The pages it runs on, or the path it checks when no page has that path.
+          (nav.sourceRouteIds ?? []).map((id) => routeText(id)).join(', ') ||
+            (nav.from ? code(rewriteFrom(nav.from)) : '—'),
+          nav.condition ? code(nav.condition) : '—',
+          code(`${nav.loc.file}:${nav.loc.line}`),
+        ]),
+      ),
+    mw.rewrites.length > 0 && '## Rewrites',
+    mw.rewrites.length > 0 &&
+      table(
+        ['Path', 'Answered by', 'If', 'Source'],
+        mw.rewrites.map((rw) => [
+          code(rewriteFrom(rw.from)),
+          rw.targetRouteId ? routeText(rw.targetRouteId) : code(urlText(rw.href)),
+          rw.condition ? code(rw.condition) : '—',
+          code(`${rw.loc.file}:${rw.loc.line}`),
+        ]),
+      ),
+    '## Requests',
+    sites.length === 0 ? 'The middleware sends no requests the scan found.' : requestTable(ctx, sites, from),
+    ...sites.map((s) => requestSection(ctx, s, from, 3)),
   ])
 }
 
@@ -1096,6 +1236,7 @@ function siteLink(ctx: Ctx, site: RequestSite, from: string): string {
 function siteHome(ctx: Ctx, site: RequestSite, seen = new Set<string>()): string | undefined {
   if (site.origin === 'component' && site.componentId) return ctx.names.component(site.componentId)
   if (site.origin === 'route-handler' && site.routeId) return ctx.names.route(site.routeId)
+  if (site.origin === 'middleware') return MIDDLEWARE
   const caller = ctx.callers.get(site.id)
   if (!caller || seen.has(caller.id)) return undefined
   return siteHome(ctx, caller, new Set([...seen, site.id]))
@@ -1108,6 +1249,8 @@ function ownerText(ctx: Ctx, site: RequestSite, from: string): string {
     const route = ctx.index.routes.get(site.routeId)
     return `${site.handlerMethod ?? '?'} ${route ? routeLink(ctx, route, from) : '?'}`
   }
+  if (site.origin === 'middleware')
+    return from === MIDDLEWARE ? 'middleware' : link('middleware', from, MIDDLEWARE)
   return `server action ${code(site.serverAction?.name ?? '?')}`
 }
 

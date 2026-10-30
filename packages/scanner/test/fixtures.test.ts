@@ -18,6 +18,7 @@ const FIXTURES = [
   'bff',
   'next-intl',
   'mismatch',
+  'middleware',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 

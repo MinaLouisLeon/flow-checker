@@ -16,8 +16,10 @@ import {
   type Flag,
   HTTP_METHODS,
   type HttpMethod,
+  type MiddlewareRewrite,
   makeId,
   type Navigation,
+  type PathCheck,
   type QueryKeyPart,
   type QueryLink,
   queryKeyHits,
@@ -240,6 +242,9 @@ interface NavFound {
   kind: NavKind
   api: NavApi
   href: RequestUrl
+  /** Middleware: the `if` conditions around it, and the request path check. */
+  condition?: string
+  from?: PathCheck
 }
 
 interface Walk {
@@ -294,6 +299,9 @@ export class RequestScanner {
   readonly #resolveModule: (specifier: string) => string | undefined
   readonly #clientFiles = new Map<string, string | undefined>()
   readonly #links = new Map<string, LinkFound>()
+  /** Middleware rewrites (M14), and the path checks around middleware redirects by navigation id. */
+  readonly #rewrites = new Map<string, MiddlewareRewrite>()
+  readonly #navExclude = new Map<string, PathCheck[]>()
   /** Hook call (or `useQueries` entry) -> ids of the sites it runs. */
   readonly #hookSites = new Map<Node, string[]>()
   /** Site id -> what its hook does, for React Query sites. */
@@ -337,6 +345,28 @@ export class RequestScanner {
     }
   }
 
+  /** Requests, redirects and rewrites in `middleware.ts` / `proxy.ts` (M14). */
+  addMiddleware(file: string, fn: Node) {
+    const origin: Origin = { kind: 'middleware', key: `middleware:${file}`, client: false }
+    this.#walk(fn, fn, EMPTY_ENV, { origin, frames: [], active: new Set([fn]) })
+  }
+
+  /** Middleware rewrites, with the route that answers when the target resolves to one. */
+  rewrites(routes: Route[]): MiddlewareRewrite[] {
+    const pages = pageTargets(routes, true)
+    const out = [...this.#rewrites.values()]
+    for (const rewrite of out) {
+      const target = resolveTarget(pages, rewrite.href, 'next')
+      if (target) rewrite.targetRouteId = target
+    }
+    return out.sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** Paths a middleware redirect is ruled out on (`if (pathname === '/x') return` before it). */
+  navigationExcludes(id: string): PathCheck[] {
+    return this.#navExclude.get(id) ?? []
+  }
+
   /** Every site, sorted by where it starts, with route handler and server action chains linked. */
   sites(routes: Route[]): RequestSite[] {
     const sites = [...this.#sites.values()]
@@ -371,28 +401,11 @@ export class RequestScanner {
 
   /** Every navigation, sorted by where it is, with the page it goes to when that resolves. */
   navigations(routes: Route[]): Navigation[] {
-    const pages = routes
-      .filter((r) => r.kind === 'page' && !r.slot && !r.intercepting)
-      .map((r) => ({ route: r, re: routeRegex(r.path), dynamic: (r.path.match(/\[/g) ?? []).length }))
-      // Static segments win: `/products/new` before `/products/[id]`.
-      .sort((a, b) => a.dynamic - b.dynamic)
+    const pages = pageTargets(routes, false)
     const navs = [...this.#navs.values()]
     for (const nav of navs) {
-      const path = nav.href.path
-      if (!path?.startsWith('/') || nav.href.base) continue
-      const sample = path.replace(/:[^/]+/g, 'x')
-      const direct = () => pages.find((p) => p.re.test(sample))
-      // next-intl (and other locale-prefix setups) leave the `[locale]` segment out of hrefs.
-      const prefixed = () =>
-        pages.find((p) => {
-          const first = p.route.segments.find((s) => s.kind !== 'group')
-          if (first?.kind !== 'dynamic') return false
-          if (nav.api !== 'next-intl' && !/^(locale|lang|lng)$/.test(first.name)) return false
-          return p.re.test(`/x${sample === '/' ? '' : sample}`)
-        })
-      // With next-intl, `/login` is `/[locale]/login`, not the `[locale]` page itself.
-      const target = nav.api === 'next-intl' ? (prefixed() ?? direct()) : (direct() ?? prefixed())
-      if (target) nav.targetRouteId = target.route.id
+      const target = resolveTarget(pages, nav.href, nav.api)
+      if (target) nav.targetRouteId = target
     }
     return navs.sort((a, b) => compareLoc(a.loc, b.loc))
   }
@@ -418,6 +431,13 @@ export class RequestScanner {
 
   /** Handles one call. Returns true when its arguments were handled too and should be skipped. */
   #call(call: CallExpression, scope: Node, env: Env, w: Walk): boolean {
+    if (w.origin.kind === 'middleware') {
+      const response = middlewareResponse(call)
+      if (response) {
+        this.#middlewareResponse(call, response, scope, env, w)
+        return true
+      }
+    }
     const nav = navigationCall(call)
     if (nav) {
       const href = this.#href(call.getArguments()[0], env)
@@ -542,6 +562,150 @@ export class RequestScanner {
       return { text, confidence: 'unknown' }
     }
     return toUrl(this.#str(arg, env), text)
+  }
+
+  /** `NextResponse.redirect(url)` -> a navigation, `NextResponse.rewrite(url)` -> a rewrite. */
+  #middlewareResponse(call: CallExpression, kind: 'redirect' | 'rewrite', scope: Node, env: Env, w: Walk) {
+    const last = this.#frame(call, scope)
+    const frames = [...w.frames, last]
+    const { from, exclude, rest } = this.#pathChecks(frames.flatMap((f) => guardsOf(f.node, f.scope)))
+    const condition = conditionText(rest)
+    const href = this.#middlewareUrl(call.getArguments()[0], env, scope)
+    if (kind === 'redirect') {
+      const status = call.getArguments()[1]
+      const permanent = !!status && /^(301|308)$/.test(status.getText())
+      const found: NavFound = {
+        kind: permanent ? 'permanent-redirect' : 'redirect',
+        api: 'next',
+        href,
+        ...(condition ? { condition } : {}),
+        ...(from ? { from } : {}),
+      }
+      const id = this.#emitNav(w, last, found, call)
+      if (id && exclude.length > 0) this.#navExclude.set(id, exclude)
+      return
+    }
+    const callStack = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
+    const id = makeId('rw', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#rewrites.has(id)) return
+    this.#rewrites.set(id, {
+      id,
+      href,
+      ...(from ? { from } : {}),
+      ...(condition ? { condition } : {}),
+      loc: this.#loc(call),
+    })
+  }
+
+  /**
+   * The URL a middleware response goes to: `new URL('/login', request.url)`, a string, or a copy
+   * of the request URL with a new path (`const url = request.nextUrl.clone(); url.pathname = '/x'`).
+   */
+  #middlewareUrl(arg: Node | undefined, env: Env, scope: Node): RequestUrl {
+    if (!arg) return { text: '', confidence: 'unknown' }
+    const text = oneLine(arg.getText())
+    const r = this.#resolve(arg, env)
+    const node = r.node ? skipWrappers(r.node) : undefined
+    if (node && N.isNewExpression(node) && node.getExpression().getText() === 'URL') {
+      const path = node.getArguments()[0]
+      return path ? { ...toUrl(this.#str(path, r.env), text), text } : { text, confidence: 'unknown' }
+    }
+    if (node && (N.isCallExpression(node) || N.isPropertyAccessExpression(node))) {
+      // A copy of the request URL: the last `x.pathname = ...` before the call says where it goes.
+      const name = skipWrappers(arg)
+      const symbol = N.isIdentifier(name) ? name.getSymbol() : undefined
+      let assigned: Node | undefined
+      if (symbol) {
+        for (const binary of scope.getDescendantsOfKind(ts.SyntaxKind.BinaryExpression)) {
+          if (binary.getStart() > arg.getStart()) break
+          const left = binary.getLeft()
+          if (binary.getOperatorToken().getKind() !== ts.SyntaxKind.EqualsToken) continue
+          if (!N.isPropertyAccessExpression(left) || left.getName() !== 'pathname') continue
+          if (left.getExpression().getSymbol() === symbol) assigned = binary.getRight()
+        }
+      }
+      if (assigned) return { ...toUrl(this.#str(assigned, r.env), text), text }
+      return { text, confidence: 'unknown' }
+    }
+    return toUrl(this.#str(arg, env), text)
+  }
+
+  /**
+   * Splits the guards around a middleware response into request path checks and the rest. A
+   * guard that is only a path check holds (`from`, innermost wins) or rules a path out
+   * (`exclude`, e.g. `if (pathname === '/login') return ...` earlier). Other guards stay as the
+   * condition, and a path check inside them (`pathname.startsWith('/admin') && !isAdmin`) can
+   * still give `from`.
+   */
+  #pathChecks(guards: Guard[]): { from?: PathCheck; exclude: PathCheck[]; rest: Guard[] } {
+    let from: PathCheck | undefined
+    const exclude: PathCheck[] = []
+    const rest: Guard[] = []
+    for (let i = guards.length - 1; i >= 0; i--) {
+      const guard = guards[i] as Guard
+      const test = this.#pathTest(guard.node)
+      if (test) {
+        const check: PathCheck = { kind: test.kind, path: test.path }
+        if (test.positive !== guard.negated) from ??= check
+        else exclude.push(check)
+        continue
+      }
+      rest.unshift(guard)
+      from ??= this.#pathIn(guard.node, guard.negated)
+    }
+    return { ...(from ? { from } : {}), exclude, rest }
+  }
+
+  /** A path check that holds inside `a && b` (or `!(a || b)`). */
+  #pathIn(expr: Node, negated: boolean): PathCheck | undefined {
+    const node = skipWrappers(expr)
+    const test = this.#pathTest(node)
+    if (test) return test.positive !== negated ? { kind: test.kind, path: test.path } : undefined
+    if (N.isPrefixUnaryExpression(node) && node.getOperatorToken() === ts.SyntaxKind.ExclamationToken)
+      return this.#pathIn(node.getOperand(), !negated)
+    if (!N.isBinaryExpression(node)) return undefined
+    const op = node.getOperatorToken().getKind()
+    const both =
+      (op === ts.SyntaxKind.AmpersandAmpersandToken && !negated) ||
+      (op === ts.SyntaxKind.BarBarToken && negated)
+    return both
+      ? (this.#pathIn(node.getLeft(), negated) ?? this.#pathIn(node.getRight(), negated))
+      : undefined
+  }
+
+  /** `pathname === '/x'` / `!==`, `pathname.startsWith('/x')`, each maybe under `!`. */
+  #pathTest(expr: Node): (PathCheck & { positive: boolean }) | undefined {
+    let positive = true
+    let node = skipWrappers(expr)
+    while (N.isPrefixUnaryExpression(node) && node.getOperatorToken() === ts.SyntaxKind.ExclamationToken) {
+      positive = !positive
+      node = skipWrappers(node.getOperand())
+    }
+    const literalPath = (n: Node) => {
+      const value = this.#str(n, EMPTY_ENV)
+      const part = value?.parts.length === 1 ? value.parts[0] : undefined
+      return part && 'text' in part && part.text.startsWith('/') ? part.text : undefined
+    }
+    const isPathname = (n: Node) => /\bpathname$/.test(skipWrappers(n).getText())
+    if (N.isBinaryExpression(node)) {
+      const op = node.getOperatorToken().getKind()
+      const equal = op === ts.SyntaxKind.EqualsEqualsEqualsToken || op === ts.SyntaxKind.EqualsEqualsToken
+      const unequal =
+        op === ts.SyntaxKind.ExclamationEqualsEqualsToken || op === ts.SyntaxKind.ExclamationEqualsToken
+      if (!equal && !unequal) return undefined
+      const [left, right] = [node.getLeft(), node.getRight()]
+      const path = isPathname(left) ? literalPath(right) : isPathname(right) ? literalPath(left) : undefined
+      return path ? { kind: 'exact', path, positive: positive === equal } : undefined
+    }
+    if (N.isCallExpression(node)) {
+      const callee = node.getExpression()
+      const arg = node.getArguments()[0]
+      if (N.isPropertyAccessExpression(callee) && callee.getName() === 'startsWith' && arg) {
+        const path = isPathname(callee.getExpression()) ? literalPath(arg) : undefined
+        return path ? { kind: 'prefix', path, positive } : undefined
+      }
+    }
+    return undefined
   }
 
   #enter(fn: Node, env: Env, frame: Frame, w: Walk) {
@@ -1207,7 +1371,8 @@ export class RequestScanner {
         hookOf(d) ||
         queryClientMethod(d) ||
         isActionStateHook(d) ||
-        navigationCall(d)
+        navigationCall(d) ||
+        middlewareResponse(d)
       ) {
         found = true
         return
@@ -1283,17 +1448,17 @@ export class RequestScanner {
     }
   }
 
-  #emitNav(w: Walk, last: Frame, found: NavFound, node: Node, conditional = false) {
+  #emitNav(w: Walk, last: Frame, found: NavFound, node: Node, conditional = false): string | undefined {
     // Route handlers answer with NextResponse.redirect(); not a page navigation.
-    if (w.origin.kind === 'route-handler') return
+    if (w.origin.kind === 'route-handler') return undefined
     const frames = [...w.frames, last]
     const callStack: CallFrame[] = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
     const id = makeId('nav', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
-    if (this.#navs.has(id)) return
+    if (this.#navs.has(id)) return id
     const outcome = found.kind === 'link' ? undefined : navOutcome(frames)
     this.#navs.set(id, {
       id,
-      origin: w.origin.kind === 'server-action' ? 'server-action' : 'component',
+      origin: w.origin.kind,
       ...(w.origin.componentId ? { componentId: w.origin.componentId } : {}),
       ...(w.origin.serverAction ? { serverAction: w.origin.serverAction } : {}),
       kind: found.kind,
@@ -1302,9 +1467,12 @@ export class RequestScanner {
       trigger: this.#trigger(frames, w.origin),
       ...(outcome ? { outcome } : {}),
       ...(conditional ? { conditional } : {}),
+      ...(found.condition ? { condition: found.condition } : {}),
+      ...(found.from ? { from: found.from } : {}),
       loc: this.#loc(node),
       callStack,
     })
+    return id
   }
 
   // --- Triggers ------------------------------------------------------------------------------
@@ -1319,6 +1487,7 @@ export class RequestScanner {
     }
     if (origin.kind === 'route-handler') return { kind: 'route-handler' }
     if (origin.kind === 'server-action') return { kind: 'server-action' }
+    if (origin.kind === 'middleware') return { kind: 'middleware' }
     return { kind: origin.client ? 'page-load' : 'server-render' }
   }
 
@@ -1694,6 +1863,16 @@ export class RequestScanner {
       const prop = this.#prop(node.getExpression(), env, node.getName())
       return prop === 'absent' || prop === 'unknown' ? undefined : next(prop.node, prop.env)
     }
+    if (N.isNewExpression(node) && node.getExpression().getText() === 'URL') {
+      // `new URL('/x', base)`: a path on a string base, or on the current request's origin.
+      const [path, base] = node.getArguments()
+      const value = path ? next(path) : undefined
+      if (!value || !base) return value
+      const first = value.parts[0]
+      if (!(first && 'text' in first && first.text.startsWith('/'))) return value
+      const baseValue = N.isStringLiteral(skipWrappers(base)) ? next(base) : undefined
+      return baseValue ? joinUrl(baseValue, value) : value
+    }
     if (N.isCallExpression(node)) {
       const callee = node.getExpression()
       // `String(x)`, `encodeURIComponent(x)`, `x.toString()`: the value of x.
@@ -1823,6 +2002,136 @@ function routeRegex(path: string): RegExp {
     else source += `/${segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
   }
   return new RegExp(`^${source || '/'}/?$`)
+}
+
+interface PageTarget {
+  route: Route
+  re: RegExp
+  dynamic: number
+}
+
+/** Pages (and route handlers) an href can go to, static segments first (`/new` before `/[id]`). */
+function pageTargets(routes: Route[], withHandlers: boolean): PageTarget[] {
+  return routes
+    .filter((r) => (r.kind === 'page' || withHandlers) && !r.slot && !r.intercepting)
+    .map((r) => ({ route: r, re: routeRegex(r.path), dynamic: (r.path.match(/\[/g) ?? []).length }))
+    .sort((a, b) => a.dynamic - b.dynamic)
+}
+
+/** The route an href goes to. */
+function resolveTarget(pages: PageTarget[], href: RequestUrl, api: NavApi): string | undefined {
+  const path = href.path
+  if (!path?.startsWith('/') || href.base) return undefined
+  const sample = path.replace(/:[^/]+/g, 'x')
+  const direct = () => pages.find((p) => p.re.test(sample))
+  // next-intl (and other locale-prefix setups) leave the `[locale]` segment out of hrefs.
+  const prefixed = () =>
+    pages.find((p) => {
+      const first = p.route.segments.find((s) => s.kind !== 'group')
+      if (first?.kind !== 'dynamic') return false
+      if (api !== 'next-intl' && !/^(locale|lang|lng)$/.test(first.name)) return false
+      return p.re.test(`/x${sample === '/' ? '' : sample}`)
+    })
+  // With next-intl, `/login` is `/[locale]/login`, not the `[locale]` page itself.
+  const target = api === 'next-intl' ? (prefixed() ?? direct()) : (direct() ?? prefixed())
+  return target?.route.id
+}
+
+// --- Middleware helpers ----------------------------------------------------------------------
+
+/** `NextResponse.redirect()` / `.rewrite()` (from next/server), or `Response.redirect()`. */
+function middlewareResponse(call: CallExpression): 'redirect' | 'rewrite' | undefined {
+  const callee = call.getExpression()
+  if (!N.isPropertyAccessExpression(callee)) return undefined
+  const name = callee.getName()
+  if (name !== 'redirect' && name !== 'rewrite') return undefined
+  const target = callee.getExpression()
+  if (!N.isIdentifier(target)) return undefined
+  const module = importModuleOf(target)
+  if (module === 'next/server' && unaliasedText(target) === 'NextResponse') return name
+  if (!module && target.getText() === 'Response' && name === 'redirect') return name
+  return undefined
+}
+
+function unaliasedText(identifier: Node): string {
+  const symbol = identifier.getSymbol()
+  return symbol ? unalias(symbol).getName() : identifier.getText()
+}
+
+/** An `if` (or `?:`) condition the code is under. `negated`: it runs when the condition is false. */
+interface Guard {
+  node: Node
+  negated: boolean
+}
+
+/**
+ * The conditions code at `node` runs under inside `scope`, outermost first: enclosing `if` and
+ * `?:` branches, and `if (x) return` guards earlier in an enclosing block.
+ */
+function guardsOf(node: Node, scope: Node): Guard[] {
+  const out: Guard[] = []
+  let child: Node = node
+  for (let current = node.getParent(); current && child !== scope; current = current.getParent()) {
+    if (N.isIfStatement(current) && child !== current.getExpression()) {
+      out.push({ node: current.getExpression(), negated: child !== current.getThenStatement() })
+    } else if (N.isConditionalExpression(current) && child !== current.getCondition()) {
+      out.push({ node: current.getCondition(), negated: child === current.getWhenFalse() })
+    } else if (N.isBlock(current)) {
+      const before: Guard[] = []
+      for (const statement of current.getStatements()) {
+        if (statement === child) break
+        if (
+          N.isIfStatement(statement) &&
+          !statement.getElseStatement() &&
+          exits(statement.getThenStatement())
+        )
+          before.push({ node: statement.getExpression(), negated: true })
+      }
+      out.push(...before.reverse())
+    }
+    child = current
+  }
+  return out.reverse()
+}
+
+/** A statement that always leaves the function: `return`, `throw`, or a block ending in one. */
+function exits(statement: Node): boolean {
+  if (N.isReturnStatement(statement) || N.isThrowStatement(statement)) return true
+  if (N.isBlock(statement)) {
+    const last = statement.getStatements().at(-1)
+    return !!last && exits(last)
+  }
+  return false
+}
+
+function conditionText(guards: Guard[]): string | undefined {
+  if (guards.length === 0) return undefined
+  return guards
+    .map((g) => (g.negated ? negate(g.node) : oneLine(skipWrappers(g.node).getText())))
+    .join(' && ')
+}
+
+function negate(expr: Node): string {
+  const node = skipWrappers(expr)
+  if (N.isPrefixUnaryExpression(node) && node.getOperatorToken() === ts.SyntaxKind.ExclamationToken)
+    return oneLine(skipWrappers(node.getOperand()).getText())
+  if (N.isBinaryExpression(node)) {
+    const swap: Partial<Record<ts.SyntaxKind, string>> = {
+      [ts.SyntaxKind.EqualsEqualsEqualsToken]: '!==',
+      [ts.SyntaxKind.ExclamationEqualsEqualsToken]: '===',
+      [ts.SyntaxKind.EqualsEqualsToken]: '!=',
+      [ts.SyntaxKind.ExclamationEqualsToken]: '==',
+    }
+    const op = swap[node.getOperatorToken().getKind()]
+    if (op) return oneLine(`${node.getLeft().getText()} ${op} ${node.getRight().getText()}`)
+  }
+  const text = oneLine(node.getText())
+  const simple =
+    N.isIdentifier(node) ||
+    N.isPropertyAccessExpression(node) ||
+    N.isCallExpression(node) ||
+    N.isElementAccessExpression(node)
+  return simple ? `!${text}` : `!(${text})`
 }
 
 function flagsOf(site: RequestSite): Flag[] {

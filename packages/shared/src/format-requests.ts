@@ -69,6 +69,7 @@ export function formatRequests(model: AppModel): string {
       const r = site.routeId ? routes.get(site.routeId) : undefined
       return `route handler ${site.handlerMethod ?? '?'} ${r?.path ?? '?'}  ${r?.file ?? ''}`.trimEnd()
     }
+    if (site.origin === 'middleware') return `middleware  ${site.callStack[0]?.file ?? ''}`.trimEnd()
     const a = site.serverAction
     return `server action ${a?.name ?? '?'}  ${a ? `${a.loc.file}:${a.loc.line}` : ''}`.trimEnd()
   }

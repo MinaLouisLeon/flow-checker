@@ -350,6 +350,7 @@ export const TriggerSchema = z.object({
    * `effect`: inside `useEffect` / `useLayoutEffect`.
    * `event`: a user interaction, see `event`.
    * `route-handler` / `server-action`: runs when the handler or action is called (second hop).
+   * `middleware`: runs in `middleware.ts` / `proxy.ts` before a matching request is handled (M14).
    */
   kind: z.enum([
     'server-render',
@@ -358,6 +359,7 @@ export const TriggerSchema = z.object({
     'event',
     'route-handler',
     'server-action',
+    'middleware',
     'unknown',
   ]),
   /** Event prop, e.g. `onSubmit`, `onClick`, or `action` for `<form action={...}>`. */
@@ -421,8 +423,8 @@ export type ServerActionRef = z.infer<typeof ServerActionRefSchema>
 
 export const RequestSiteSchema = z.object({
   id: z.string(),
-  /** Where the code that sends the request runs. */
-  origin: z.enum(['component', 'route-handler', 'server-action']),
+  /** Where the code that sends the request runs. `middleware`: `middleware.ts` / `proxy.ts` (M14). */
+  origin: z.enum(['component', 'route-handler', 'server-action', 'middleware']),
   /** Origin `component`: the component. */
   componentId: z.string().optional(),
   /** Origin `route-handler`: the handler's route and exported method. */
@@ -509,10 +511,17 @@ export type QueryLink = z.infer<typeof QueryLinkSchema>
 // Navigation and flows (M7, docs/PLAN.md 6.6): where the app moves between pages, and the user
 // flows inferred from event handlers (event -> requests -> navigation -> next page -> ...).
 
+/** A request path check in middleware: `pathname === '/x'` (`exact`) or `pathname.startsWith('/x')`. */
+export const PathCheckSchema = z.object({
+  kind: z.enum(['prefix', 'exact']),
+  path: z.string(),
+})
+export type PathCheck = z.infer<typeof PathCheckSchema>
+
 export const NavigationSchema = z.object({
   id: z.string(),
-  /** Where the code that navigates runs. */
-  origin: z.enum(['component', 'server-action']),
+  /** Where the code that navigates runs. `middleware`: a `NextResponse.redirect()` in middleware (M14). */
+  origin: z.enum(['component', 'server-action', 'middleware']),
   componentId: z.string().optional(),
   /** Origin `server-action`: the action that redirects. */
   serverAction: ServerActionRefSchema.optional(),
@@ -536,6 +545,18 @@ export const NavigationSchema = z.object({
   outcome: z.enum(['success', 'error']).optional(),
   /** Only rendered or reached on some paths. */
   conditional: z.boolean().optional(),
+  /**
+   * Origin `middleware`: the other conditions it is under, as written (`!token`). Checks of the
+   * request path are left out: they are in `from` and `sourceRouteIds`.
+   */
+  condition: z.string().optional(),
+  /** Origin `middleware`: the request path check it is under, e.g. `pathname === '/old-home'`. */
+  from: PathCheckSchema.optional(),
+  /**
+   * Origin `middleware`: the pages it can redirect away from. Those the middleware runs on, narrowed
+   * by the path checks around it.
+   */
+  sourceRouteIds: z.array(z.string()).optional(),
   loc: SourceLocSchema,
   /** From the origin down to the navigation call. */
   callStack: z.array(CallFrameSchema),
@@ -597,6 +618,84 @@ export const FlowSchema = z.object({
 })
 export type Flow = z.infer<typeof FlowSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Middleware (M14, docs/PLAN.md): `middleware.ts` (Next <= 15) or `proxy.ts` (Next 16), which runs
+// before the requests its `config.matcher` selects.
+
+export const MatcherConditionSchema = z.object({
+  type: z.enum(['header', 'query', 'cookie', 'host']),
+  key: z.string(),
+  value: z.string().optional(),
+})
+export type MatcherCondition = z.infer<typeof MatcherConditionSchema>
+
+export const MiddlewareMatcherSchema = z.object({
+  /** The path pattern as written, e.g. `/dashboard/:path*`. */
+  source: z.string(),
+  /** Runs only when these are present (`has`) or absent (`missing`). */
+  has: z.array(MatcherConditionSchema).optional(),
+  missing: z.array(MatcherConditionSchema).optional(),
+  /** `locale: false`: the pattern ignores the i18n locale prefix (Pages Router i18n only). */
+  locale: z.literal(false).optional(),
+})
+export type MiddlewareMatcher = z.infer<typeof MiddlewareMatcherSchema>
+
+export const MiddlewareRouteSchema = z.object({
+  routeId: z.string(),
+  /**
+   * Runs only for some requests to the route: a matcher with `has` / `missing`, or one that only
+   * fits some values of a dynamic segment (`/(en|de)/:path*` on `/[locale]`).
+   */
+  conditional: z.boolean().optional(),
+})
+export type MiddlewareRoute = z.infer<typeof MiddlewareRouteSchema>
+
+/** `NextResponse.rewrite(url)`: the URL stays, another route answers. */
+export const MiddlewareRewriteSchema = z.object({
+  id: z.string(),
+  /** The route that answers, as written and resolved like request URLs. */
+  href: RequestUrlSchema,
+  targetRouteId: z.string().optional(),
+  /** Where it applies, read from the check around it. Absent: wherever the middleware runs. */
+  from: PathCheckSchema.optional(),
+  /** The `if` conditions it is under, as written. */
+  condition: z.string().optional(),
+  loc: SourceLocSchema,
+})
+export type MiddlewareRewrite = z.infer<typeof MiddlewareRewriteSchema>
+
+export const MiddlewareSchema = z.object({
+  /** `middleware.ts` or `proxy.ts`, project-relative. */
+  file: z.string(),
+  /** `proxy` from Next 16 on, `middleware` before (deprecated in 16). */
+  convention: z.enum(['middleware', 'proxy']),
+  /** How the function is exported: `default`, or the named `proxy` / `middleware` export. */
+  exportName: z.string().optional(),
+  /** The function, or the factory call it is made with. */
+  loc: SourceLocSchema,
+  /** Created by a package factory, e.g. next-intl's `createMiddleware(routing)`. */
+  factory: z.object({ module: z.string(), name: z.string() }).optional(),
+  /** `config.matcher`. Empty: it runs on every request. */
+  matchers: z.array(MiddlewareMatcherSchema),
+  /** Set when `config.matcher` could not be read statically (the routes are then all conditional). */
+  matcherText: z.string().optional(),
+  /** Routes (pages and route handlers) it runs on. */
+  routes: z.array(MiddlewareRouteSchema),
+  rewrites: z.array(MiddlewareRewriteSchema),
+  /**
+   * next-intl `createMiddleware(routing)`: the locales from `defineRouting()`. Paths without a
+   * locale prefix are rewritten to the default locale.
+   */
+  i18n: z
+    .object({
+      locales: z.array(z.string()),
+      defaultLocale: z.string().optional(),
+      localePrefix: z.string().optional(),
+    })
+    .optional(),
+})
+export type Middleware = z.infer<typeof MiddlewareSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -607,8 +706,11 @@ export const ProjectInfoSchema = z.object({
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 
 export const AppModelSchema = z.object({
-  /** Version 1 files (before M13) have no query keys or links and read as the current version. */
-  version: z.union([z.literal(1), z.literal(MODEL_VERSION)]).transform(() => MODEL_VERSION),
+  /**
+   * Older files read as the current version: version 1 (before M13) has no query keys or links,
+   * version 2 (before M14) no middleware.
+   */
+  version: z.union([z.literal(1), z.literal(2), z.literal(MODEL_VERSION)]).transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
   routes: z.array(RouteSchema),
@@ -623,5 +725,7 @@ export const AppModelSchema = z.object({
   flows: z.array(FlowSchema).default([]),
   /** React Query cache calls and the queries they hit (M13). */
   queryLinks: z.array(QueryLinkSchema).default([]),
+  /** `middleware.ts` / `proxy.ts`, when the project has one (M14). */
+  middleware: MiddlewareSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

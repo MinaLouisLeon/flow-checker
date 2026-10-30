@@ -46,6 +46,10 @@
       "types": "./dist/runtime-server.d.ts",
       "default": "./dist/runtime-server.js"
     },
+    "./runtime/edge": {
+      "types": "./dist/runtime-edge.d.ts",
+      "default": "./dist/runtime-edge.js"
+    },
     "./next": {
       "import": {
         "types": "./dist/next.d.ts",

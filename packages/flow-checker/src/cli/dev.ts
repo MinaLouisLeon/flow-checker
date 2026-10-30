@@ -191,7 +191,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
             scanReporter(rescan, { lines: false }),
           )
           rescan.finish()
-          scans.publish({ model: next, durationMs, files })
+          scans.publish({ model: next, durationMs, files, changedAt: batch.at })
           io.out(`Re-scanned in ${Math.round(durationMs)} ms (${describeFiles(files)} changed).`)
           options.onRescan?.(next, files)
         } catch (error) {

@@ -1,0 +1,13 @@
+# Types
+
+User  interface  types/user.ts:1
+  { id: number; name: string; email: string; role: "admin" | "member" }
+Settings  interface  types/user.ts:8
+  { theme: string; locale: string; digest: string | null }
+Product  interface  types/user.ts:14
+  { id: number; name: string; price: number; stock: number }
+
+# Component types
+
+RootLayout  app/layout.tsx:6
+  props: { children: ReactNode }

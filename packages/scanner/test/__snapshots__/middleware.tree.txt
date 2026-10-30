@@ -1,0 +1,57 @@
+# Route tree
+
+app [layout, page]
+├─ api
+│  └─ health [route]
+├─ dashboard [page]
+│  └─ settings [page]
+├─ login [page]
+└─ products [page]
+
+# Routes
+
+/  page  app/page.tsx
+/api/health  route GET  app/api/health/route.ts
+/dashboard  page  app/dashboard/page.tsx
+/dashboard/settings  page  app/dashboard/settings/page.tsx
+/login  page  app/login/page.tsx
+/products  page  app/products/page.tsx
+
+# Middleware
+
+proxy.ts  proxy  export proxy
+matcher: /dashboard/:path*, /shop/:path*, /old-home, /login (has cookie session)
+runs on:
+  /dashboard  page
+  /dashboard/settings  page
+  /login  page  [conditional]
+rewrite /shop/* to /products -> /products
+
+# Layouts
+
+RootLayout  server  app/layout.tsx:6
+└─ Link  external next/link
+
+# Pages
+
+## /  app/page.tsx
+layouts: app/layout.tsx
+HomePage  server  app/page.tsx:3
+└─ Link  external next/link
+
+## /dashboard  app/dashboard/page.tsx
+layouts: app/layout.tsx
+DashboardPage  server  app/dashboard/page.tsx:6
+└─ Link  external next/link
+
+## /dashboard/settings  app/dashboard/settings/page.tsx
+layouts: app/layout.tsx
+SettingsPage  server  app/dashboard/settings/page.tsx:5
+
+## /login  app/login/page.tsx
+layouts: app/layout.tsx
+LoginPage  server  app/login/page.tsx:1
+
+## /products  app/products/page.tsx
+layouts: app/layout.tsx
+ProductsPage  server  app/products/page.tsx:5

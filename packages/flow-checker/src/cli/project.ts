@@ -59,6 +59,33 @@ export interface HookStatus {
   server: boolean
 }
 
+/**
+ * The middleware file (M14): `proxy.*` (Next 16) or `middleware.*`, next to the app directory
+ * (`src/` for `src/app`) or in the root.
+ */
+export function findMiddlewareFile(root: string, appDir: string): string | undefined {
+  const dirs = [...new Set([join(appDir, '..'), root])]
+  for (const name of ['proxy', 'middleware']) {
+    for (const dir of dirs) {
+      for (const ext of HOOK_EXTENSIONS) {
+        const file = join(dir, `${name}${ext}`)
+        if (existsSync(file)) return file
+      }
+    }
+  }
+  return undefined
+}
+
+/**
+ * Whether the middleware runs on the edge runtime: `middleware.*` before Next 16, unless its
+ * config asks for Node.js (15.5+). `proxy.*` always runs on Node.js.
+ */
+export function middlewareOnEdge(file: string, next: { major: number } | undefined): boolean {
+  if (/[\\/]proxy\.[^\\/]+$/.test(file)) return false
+  if (next && next.major >= 16) return false
+  return !/runtime\s*:\s*['"]nodejs['"]/.test(readFileSync(file, 'utf8'))
+}
+
 /** Whether both hooks exist and load flow-checker. */
 export function hookStatus(root: string, appDir: string): HookStatus {
   const dir = hookDir(root, appDir)

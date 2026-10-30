@@ -8,7 +8,16 @@ import { describe, expect, it } from 'vitest'
 import type { ServerActionInfo } from '../src/actions'
 import { Matcher } from '../src/matcher'
 
-const FIXTURES = ['basic', 'react-query', 'react-query-v4', 'server-actions', 'bff', 'next-intl', 'mismatch']
+const FIXTURES = [
+  'basic',
+  'react-query',
+  'react-query-v4',
+  'server-actions',
+  'bff',
+  'next-intl',
+  'mismatch',
+  'middleware',
+]
 const repo = join(import.meta.dirname, '..', '..', '..')
 
 interface Recording {
@@ -52,7 +61,13 @@ function label(model: AppModel, siteId: string | undefined): string {
   if (!site) return '-'
   const component = model.components.find((c) => c.id === site.componentId)
   const route = model.routes.find((r) => r.id === site.routeId)
-  const owner = component?.name ?? (route ? `${site.handlerMethod} ${route.path}` : site.serverAction?.name)
+  const owner =
+    component?.name ??
+    (route
+      ? `${site.handlerMethod} ${route.path}`
+      : site.origin === 'middleware'
+        ? 'middleware'
+        : site.serverAction?.name)
   const target =
     site.transport === 'server-action'
       ? `action ${site.serverAction?.name}`

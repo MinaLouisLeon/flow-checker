@@ -7,14 +7,24 @@ import {
   DEFAULT_INCLUDE,
   HTTP_METHODS,
   type HttpMethod,
+  type Middleware,
   MODEL_VERSION,
   makeId,
+  type Navigation,
   type Route,
+  servedPaths,
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
+import {
+  MIDDLEWARE_FILE,
+  type MiddlewareFile,
+  middlewareRoutes,
+  readMiddleware,
+  routesUnder,
+} from './middleware'
 import { relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { RequestScanner } from './requests'
@@ -152,6 +162,8 @@ export function createScanSession(options: ScanOptions): ScanSession {
 
       const restart =
         all.some((f) => PROJECT_FILES.test(f)) ||
+        // A middleware file appeared or went away: discovery picks the file.
+        [...added, ...removed].some((f) => MIDDLEWARE_FILE.test(relativeTo(root, f))) ||
         // The app directory appeared or went away (e.g. `src/app` created next to `app`).
         removed.some((f) => f === discovery.appDir || discovery.appDir.startsWith(`${f}/`))
       if (restart) {
@@ -330,7 +342,11 @@ function analyze(
   })
   const bodies = graph.bodies()
   const handlers = routes.filter((r) => r.kind === 'route-handler')
-  const requestTotal = components.length + handlers.length
+  const middlewareFile =
+    discovery.middleware && settings.scanned(discovery.middleware)
+      ? sourceFile(project, discovery.middleware)
+      : undefined
+  const requestTotal = components.length + handlers.length + (middlewareFile ? 1 : 0)
   const requestDone = counter(report, 'requests', requestTotal)
   let done = 0
   for (const component of components) {
@@ -341,6 +357,11 @@ function analyze(
   for (const route of handlers) {
     const file = sourceFile(project, resolveFrom(root, route.file))
     if (file) requests.addRouteHandler(route, file)
+    requestDone(++done)
+  }
+  const middlewareRead = middlewareFile ? readMiddleware(middlewareFile, root) : undefined
+  if (middlewareRead) {
+    for (const fn of middlewareRead.functions) requests.addMiddleware(middlewareRead.info.file, fn)
     requestDone(++done)
   }
 
@@ -356,6 +377,9 @@ function analyze(
 
   report({ phase: 'flows', done: 0 })
   const navigations = requests.navigations(routes)
+  const middleware = middlewareRead
+    ? buildMiddleware(middlewareRead, routes, navigations, requests)
+    : undefined
   const flows = inferFlows({ routes, components, requests: sites, navigations, queryLinks })
   const modelTypes = types.types()
   report({
@@ -382,7 +406,41 @@ function analyze(
     navigations,
     flows,
     queryLinks,
+    ...(middleware ? { middleware } : {}),
   }
+}
+
+/**
+ * The routes the middleware runs on and its rewrites. Its redirects get the pages they can
+ * happen on: where it runs, narrowed by a path check around the redirect.
+ */
+function buildMiddleware(
+  read: MiddlewareFile,
+  routes: Route[],
+  navigations: Navigation[],
+  requests: RequestScanner,
+): Middleware {
+  const runsOn = middlewareRoutes(read.info, routes)
+  const rewrites = requests.rewrites(routes)
+  const middleware: Middleware = { ...read.info, routes: runsOn, rewrites }
+  const pages = routes.filter((r) => r.kind === 'page')
+  const candidates = runsOn.map((r) => r.routeId).filter((id) => pages.some((p) => p.id === id))
+  for (const nav of navigations) {
+    if (nav.origin === 'middleware') {
+      const sources = nav.from ? routesUnder(nav.from, pages, candidates) : candidates
+      const excluded = new Set(
+        requests.navigationExcludes(nav.id).flatMap((check) => routesUnder(check, pages, sources)),
+      )
+      nav.sourceRouteIds = sources.filter((id) => id !== nav.targetRouteId && !excluded.has(id))
+    }
+    // A link to a path the middleware rewrites goes to the page that answers it.
+    if (!nav.targetRouteId && nav.href.path?.startsWith('/') && !nav.href.base) {
+      const served = servedPaths(middleware, nav.href.path.replace(/:[^/]+/g, 'x'))[0]
+      const rewrite = rewrites.find((r) => r.targetRouteId && r.href.path?.replace(/:[^/]+/g, 'x') === served)
+      if (rewrite?.targetRouteId) nav.targetRouteId = rewrite.targetRouteId
+    }
+  }
+  return middleware
 }
 
 /** The project file a module specifier (e.g. `@/lib/api`) points to, as seen from the root. */

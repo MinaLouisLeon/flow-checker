@@ -53,6 +53,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [`/[locale]/login`](pages/%5Blocale%5D.login.md) | `src/app/[locale]/login/page.tsx` | 1 | ✓ 1 verified |
 | [`/[locale]/verify`](pages/%5Blocale%5D.verify.md) | `src/app/[locale]/verify/page.tsx` | 1 | ✓ 1 verified |
 
+## Middleware
+
+[`src/proxy.ts`](middleware.md): runs on 4 routes, 0 redirects, 0 rewrites, 0 requests.
+
 ## Flows
 
 | Flow | Pages | Status |

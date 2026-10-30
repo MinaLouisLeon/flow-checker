@@ -12,7 +12,7 @@ Then use your app as usual. Each request the app sends shows up in the dashboard
 
 ## What it does
 
-- **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
+- **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Middleware (`middleware.ts`, or `proxy.ts` on Next.js 16) is read too: which routes its `config.matcher` selects, its redirects (with the condition around each one), its rewrites (used to tell which page answered a URL) and the requests it sends. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
 - **Captures real traffic** while you test, in the browser and on the server, with passwords, tokens and auth headers **masked before anything is saved**.
 - **Verifies the map.** Each capture is matched to the request site that sent it, which marks that site `✓ verified`. The captured data is compared with the declared types (missing fields, extra fields, wrong types, unexpected `null`), and flows are confirmed when you walk them.
 - **Keeps up with your edits.** Files are watched and re-scanned incrementally. Requests whose code changed since they were captured are marked `↻ needs re-check`.
@@ -93,7 +93,7 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 
 `flow-checker init` shows what it will change and asks first:
 
-- `instrumentation-client.ts` (browser hook) and `instrumentation.ts` (server hook), next to your `app` directory (in `src/` when you use `src/app`). If `instrumentation.ts` already exports `register()`, it prints the lines to add instead of editing it.
+- `instrumentation-client.ts` (browser hook) and `instrumentation.ts` (server hook), next to your `app` directory (in `src/` when you use `src/app`). If `instrumentation.ts` already exports `register()`, it prints the lines to add instead of editing it. The server hook also registers a small edge runtime, so requests sent from middleware on the edge runtime (`middleware.ts` before Next.js 16) are captured too; hooks written by 0.1 can get it from `init` or `doctor`.
 - `flow-checker.config.ts`.
 - `.gitignore` entries for captured data.
 
@@ -151,7 +151,8 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 ## Limits
 
 - App Router only. GraphQL, WebSockets and SSE streams are captured as plain requests only.
-- Edge runtime and middleware: server capture is best effort (`fetch` only), and middleware redirects are not scanned yet.
+- Edge runtime (middleware before Next.js 16): capture is best effort, `fetch` only and without the incoming request. Middleware on Node.js (`proxy.ts`, or `runtime: 'nodejs'`) is captured like the rest of the server.
+- Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.
 - Next.js before 15.3: browser capture needs webpack (no Turbopack) and `withFlowChecker()`.
 - Large repositories: the first scan of a ~1,800-file app takes about 10 s and a re-scan after an edit a few seconds. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
 

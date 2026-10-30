@@ -24,6 +24,10 @@
 
 - [LoginForm submit](../flows/loginform-submit.md)
 
+## Middleware
+
+[`src/proxy.ts`](../middleware.md) runs before every request to this route.
+
 ## Requests
 
 | Request | Trigger | From | Status |

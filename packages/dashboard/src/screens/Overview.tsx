@@ -12,6 +12,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
   request: 'Requests the scan could not fully resolve',
+  middleware: 'Middleware the scan could not fully read',
 }
 
 export function Overview() {

@@ -111,7 +111,7 @@ function setup(requests: RequestSite[]) {
   const status = async () =>
     Object.fromEntries((await json<AppModel>('/api/model')).requests.map((s) => [s.id, s.status]))
   const rescan = (next: RequestSite[]) => scans.publish({ model: model(next), files: ['src/UsersTable.tsx'] })
-  return { root, json, call, ingest, status, rescan }
+  return { root, scans, json, call, ingest, status, rescan }
 }
 
 const TABLE = 'src/UsersTable.tsx'
@@ -146,6 +146,16 @@ describe('needs-recheck', () => {
       ['cap_new', false],
       ['cap_old', true],
     ])
+  })
+
+  it('counts captures sent while a slow re-scan ran as the new code', async () => {
+    const { scans, ingest, status } = setup([site('req_table', TABLE, 'h1')])
+    await ingest(capture('cap_old', minutesAgo(5)))
+    // The file changed 3 s ago; a request ran the new code 1 s ago; the re-scan ends only now.
+    const changedAt = new Date(Date.now() - 3000)
+    await ingest(capture('cap_during', new Date(Date.now() - 1000).toISOString()))
+    scans.publish({ model: model([site('req_table', TABLE, 'h2')]), files: [TABLE], changedAt })
+    expect(await status()).toEqual({ req_table: 'verified' })
   })
 
   it('leaves sites whose code did not change alone', async () => {

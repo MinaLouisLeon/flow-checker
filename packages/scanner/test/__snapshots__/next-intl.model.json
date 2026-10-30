@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -1135,5 +1135,46 @@
       ]
     }
   ],
-  "queryLinks": []
+  "queryLinks": [],
+  "middleware": {
+    "file": "src/proxy.ts",
+    "convention": "proxy",
+    "exportName": "default",
+    "loc": {
+      "file": "src/proxy.ts",
+      "line": 5,
+      "column": 16
+    },
+    "factory": {
+      "module": "next-intl/middleware",
+      "name": "createMiddleware"
+    },
+    "matchers": [
+      {
+        "source": "/((?!api|_next|_vercel|.*\\..*).*)"
+      }
+    ],
+    "i18n": {
+      "locales": [
+        "en",
+        "ar"
+      ],
+      "defaultLocale": "en"
+    },
+    "routes": [
+      {
+        "routeId": "rt_27sgeyuy9pv"
+      },
+      {
+        "routeId": "rt_0nr7aw4u4g0"
+      },
+      {
+        "routeId": "rt_1cprhxt7jgk"
+      },
+      {
+        "routeId": "rt_0s0435jzyyw"
+      }
+    ],
+    "rewrites": []
+  }
 }

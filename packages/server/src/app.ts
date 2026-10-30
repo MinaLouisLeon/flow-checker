@@ -123,7 +123,10 @@ export function createApp(options: AppOptions): Hono {
   }
 
   /** Replaces the model with a new scan and tells the dashboard what changed. */
-  const applyScan = (next: AppModel, info: { durationMs?: number; files?: string[] } = {}): ScanEvent => {
+  const applyScan = (
+    next: AppModel,
+    info: { durationMs?: number; files?: string[]; changedAt?: Date } = {},
+  ): ScanEvent => {
     const diff = diffModels(model, next)
     const before = new Set(
       served()
@@ -132,7 +135,7 @@ export function createApp(options: AppOptions): Hono {
     )
     model = next
     scannedAt = new Date().toISOString()
-    verifier?.setModel(next)
+    verifier?.setModel(next, info.changedAt)
     flows?.setModel(next)
     const event: ScanEvent = {
       scannedAt,
