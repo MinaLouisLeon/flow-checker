@@ -1,0 +1,19 @@
+# Types
+
+Todo  interface  src/types/todo.ts:1
+  { id: number; userId: number; title: string; done: boolean }
+TodoPage  interface  src/types/todo.ts:8
+  { items: Todo[]; nextCursor: number | null }
+User  interface  src/types/user.ts:1
+  { id: number; name: string; email: string; role: "admin" | "member" }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:8
+  props: { children: ReactNode }
+TodoPage  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+TodoDetail  src/components/TodoDetail.tsx:5
+  props: { id: number }

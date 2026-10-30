@@ -1,0 +1,129 @@
+# Requests
+
+## AddTodoForm  src/components/AddTodoForm.tsx:7
+POST /api/trpc/todo.add  trpc useMutation  event onSubmit
+  procedure: todo.add (mutation)
+  body: z.input<typeof NewTodoSchema>
+  response: Todo
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  then: POST {API_URL ?? http://localhost:4010}/todos
+  via: trpc.todo.add.useMutation src/components/AddTodoForm.tsx:11
+
+## HealthBadge  src/components/HealthBadge.tsx:5
+GET /api/trpc/ping  trpc useQuery  page-load
+  procedure: ping (query)
+  response: { ok: true; at: string; }
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  via: trpc.ping.useQuery src/components/HealthBadge.tsx:6
+
+## TodoDetail  src/components/TodoDetail.tsx:5
+GET /api/trpc/todo.byId  trpc useQuery  page-load
+  procedure: todo.byId (query)
+  body: { id: number }
+  response: Todo
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  then: GET {API_URL ?? http://localhost:4010}/todos/:id
+  via: trpc.todo.byId.useQuery src/components/TodoDetail.tsx:7
+POST /api/trpc/todo.toggle  trpc  event onClick
+  procedure: todo.toggle (mutation)
+  body: { id: number; done: boolean }
+  response: Todo
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  then: PATCH {API_URL ?? http://localhost:4010}/todos/:id
+  via: client.todo.toggle.mutate src/components/TodoDetail.tsx:11
+
+## TodoFeed  src/components/TodoFeed.tsx:5
+GET /api/trpc/todo.feed  trpc useInfiniteQuery  page-load
+  procedure: todo.feed (query)
+  body: { limit: number; cursor?: number | null }
+  response: TodoPage
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  then: GET {API_URL ?? http://localhost:4010}/todos
+  via: trpc.todo.feed.useInfiniteQuery src/components/TodoFeed.tsx:6
+
+## TodoList  src/components/TodoList.tsx:6
+GET /api/trpc/todo.list  trpc useQuery  page-load
+  procedure: todo.list (query)
+  body: { userId?: number } | undefined
+  response: Todo[]
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  then: GET {API_URL ?? http://localhost:4010}/todos
+  via: trpc.todo.list.useQuery src/components/TodoList.tsx:7
+
+## UserList  src/components/UserList.tsx:5
+GET /api/trpc/user.list  trpc useQuery  page-load
+  procedure: user.list (query)
+  response: User[]
+  handled by: src/app/api/trpc/[trpc]/route.ts
+  then: GET {API_URL ?? http://localhost:4010}/users
+  via: trpc.user.list.useQuery src/components/UserList.tsx:6
+
+## route handler GET /api/trpc/[trpc]  src/app/api/trpc/[trpc]/route.ts
+GET {API_URL ?? http://localhost:4010}/todos  fetch  route-handler
+  procedure: todo.list (query)
+  response: Todo[]
+  via: listTodos src/server/routers/todo.ts:15 > api src/server/upstream.ts:16 > fetch src/server/upstream.ts:7
+GET {API_URL ?? http://localhost:4010}/todos/:id  fetch  route-handler
+  procedure: todo.byId (query)
+  response: Todo
+  via: getTodo src/server/routers/todo.ts:17 > api src/server/upstream.ts:17 > fetch src/server/upstream.ts:7
+GET {API_URL ?? http://localhost:4010}/todos  fetch  route-handler
+  procedure: todo.feed (query)
+  response: Todo[]
+  via: listTodos src/server/routers/todo.ts:27 > api src/server/upstream.ts:16 > fetch src/server/upstream.ts:7
+GET {API_URL ?? http://localhost:4010}/users  fetch  route-handler
+  procedure: user.list (query)
+  response: User[]
+  via: listUsers src/server/routers/user.ts:5 > api src/server/upstream.ts:22 > fetch src/server/upstream.ts:7
+
+## route handler POST /api/trpc/[trpc]  src/app/api/trpc/[trpc]/route.ts
+POST {API_URL ?? http://localhost:4010}/todos  fetch  route-handler
+  procedure: todo.add (mutation)
+  body: { title: string; userId: number }
+  response: Todo
+  via: createTodo src/server/routers/todo.ts:20 > api src/server/upstream.ts:19 > fetch src/server/upstream.ts:7
+PATCH {API_URL ?? http://localhost:4010}/todos/:id  fetch  route-handler
+  procedure: todo.toggle (mutation)
+  body: Partial<Pick<Todo, 'done' | 'title'>>
+  response: Todo
+  via: patchTodo src/server/routers/todo.ts:23 > api src/server/upstream.ts:21 > fetch src/server/upstream.ts:7
+
+# tRPC
+
+endpoint: /api/trpc  src/app/api/trpc/[trpc]/route.ts
+router: appRouter  src/server/root.ts:6
+
+query ping  1 caller(s)  src/server/routers/health.ts:5
+  output: { ok: true; at: string; }
+
+mutation todo.add  1 caller(s)  src/server/routers/todo.ts:20
+  input: z.input<typeof NewTodoSchema>
+  output: Todo
+
+query todo.byId  1 caller(s)  src/server/routers/todo.ts:17
+  input: { id: number }
+  output: Todo
+
+query todo.feed  1 caller(s)  src/server/routers/todo.ts:26
+  input: { limit: number; cursor?: number | null }
+  output: TodoPage
+
+query todo.list  1 caller(s)  src/server/routers/todo.ts:14
+  input: { userId?: number } | undefined
+  output: Todo[]
+
+mutation todo.toggle  1 caller(s)  src/server/routers/todo.ts:23
+  input: { id: number; done: boolean }
+  output: Todo
+
+query user.list  1 caller(s)  src/server/routers/user.ts:5
+  output: User[]
+
+# Query cache links
+
+invalidate tRPC todo.list  invalidate  AddTodoForm  event onSubmit  success  src/components/AddTodoForm.tsx:13
+  after: POST /api/trpc/todo.add
+  hits: GET /api/trpc/todo.list  (TodoList)
+
+invalidate tRPC todo.byId  invalidate  TodoDetail  event onClick  src/components/TodoDetail.tsx:12
+  hits: GET /api/trpc/todo.byId  (TodoDetail)

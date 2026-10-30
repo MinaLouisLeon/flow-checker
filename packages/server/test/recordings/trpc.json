@@ -1,0 +1,1655 @@
+{
+  "fixture": "trpc",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvumsmwa0y8fk5qn-0",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:55.402Z",
+      "durationMs": 1624,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/health.ping",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:57 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "ok": true
+          }
+        }
+      },
+      "procedure": {
+        "path": "health.ping",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvumsmwa0y8fk5qn",
+          "index": 0,
+          "size": 2
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0xg00gfgxqn",
+        "parts": [
+          {
+            "part": "response",
+            "type": "{ ok: boolean; }",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsmwa0y8fk5qn-1",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:55.402Z",
+      "durationMs": 1624,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.list",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:57 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ]
+        }
+      },
+      "procedure": {
+        "path": "todo.list",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvumsmwa0y8fk5qn",
+          "index": 1,
+          "size": 2
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0td0aq6jy41",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumso4zmvlt4dyn",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:57.011Z",
+      "durationMs": 34,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:57 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/health.ping,todo.list?batch=1&input=%7B%7D",
+        "captureId": "cap_mvumsmwa0y8fk5qn"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at listTodos (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:159:23)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:66:341",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "listTodos",
+          "file": "src/server/upstream.ts",
+          "line": 15,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 7,
+          "column": 46
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1tdume4or33",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsq77e2e0frns",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:59.683Z",
+      "durationMs": 77,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/trpc/todo.add",
+        "headers": {
+          "content-type": "application/json",
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Record captures"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:59 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "TRPCProvider",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:08:59.676Z"
+      },
+      "procedure": {
+        "path": "todo.add",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_2e9reb96ytq",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ title: string }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsq9e7jfe7rwx",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:59.762Z",
+      "durationMs": 5,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Record captures"
+          },
+          "size": 27
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:59 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          },
+          "size": 58
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/api/trpc/todo.add?batch=1",
+        "captureId": "cap_mvumsq77e2e0frns"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at createTodo (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:161:29)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:72:193",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "createTodo",
+          "file": "src/server/upstream.ts",
+          "line": 18,
+          "column": 3
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 11,
+          "column": 40
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1pnj4az8jd4",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ title: string; }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsq9t0pz44lm6",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:59.777Z",
+      "durationMs": 24,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.list",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:59 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Record captures"
+            }
+          ]
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "TRPCProvider",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:08:59.676Z"
+      },
+      "procedure": {
+        "path": "todo.list",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0td0aq6jy41",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsqabhild521w",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:08:59.795Z",
+      "durationMs": 6,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:08:59 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Record captures"
+            }
+          ],
+          "size": 182
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.list?batch=1&input=%7B%7D",
+        "captureId": "cap_mvumsq9t0pz44lm6"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at listTodos (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:159:23)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:66:341",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "listTodos",
+          "file": "src/server/upstream.ts",
+          "line": 15,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 7,
+          "column": 46
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1tdume4or33",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsro1hjaagwlh",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:01.585Z",
+      "durationMs": 43,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.byId",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:01 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "TRPCProvider",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:08:59.676Z"
+      },
+      "procedure": {
+        "path": "todo.byId",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1130uk5gwu8",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsrp5a9n129k5",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:01.625Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:01 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          },
+          "size": 58
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.byId?batch=1&input=%7B%220%22%3A%7B%22id%22%3A3%7D%7D",
+        "captureId": "cap_mvumsro1hjaagwlh"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at getTodo (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:160:23)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:69:187",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "getTodo",
+          "file": "src/server/upstream.ts",
+          "line": 16,
+          "column": 40
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 8,
+          "column": 89
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1pf3v7qr14b",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsrpm9yxb2kkj",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:01.642Z",
+      "durationMs": 22,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/user.byId",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:01 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "TRPCProvider",
+          "QueryClientProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:08:59.676Z"
+      },
+      "procedure": {
+        "path": "user.byId",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1jhjx2h6c0y",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "z.output<typeof UserSchema>",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsrq5vhcvoi9z",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:01.661Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:01 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/user.byId?batch=1&input=%7B%220%22%3A%7B%22id%22%3A1%7D%7D",
+        "captureId": "cap_mvumsrpm9yxb2kkj"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at fetchUser (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:174:25)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:111:208",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "fetchUser",
+          "file": "src/server/upstream.ts",
+          "line": 23,
+          "column": 60
+        },
+        {
+          "file": "src/server/routers/user.ts",
+          "line": 18,
+          "column": 36
+        }
+      ]
+    },
+    {
+      "id": "cap_mvumssuhai3asgqa",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:03.113Z",
+      "durationMs": 37,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/trpc/todo.toggle",
+        "headers": {
+          "content-type": "application/json",
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "done": true
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T07:09:03.102Z"
+      },
+      "procedure": {
+        "path": "todo.toggle",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1yefdvziu6b",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number; done: boolean }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumssvju7a4rda5",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:03.151Z",
+      "durationMs": 4,
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "done": true
+          },
+          "size": 13
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          },
+          "size": 57
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/api/trpc/todo.toggle?batch=1",
+        "captureId": "cap_mvumssuhai3asgqa"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at patchTodo (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:167:31)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:76:192",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "patchTodo",
+          "file": "src/server/upstream.ts",
+          "line": 20,
+          "column": 3
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 14,
+          "column": 39
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0e790agvf59",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ done: boolean; }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumssvv46i5qsly",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:03.163Z",
+      "durationMs": 22,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.byId",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T07:09:03.102Z"
+      },
+      "procedure": {
+        "path": "todo.byId",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1130uk5gwu8",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsswe9zwb4st9",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:03.182Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          },
+          "size": 57
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.byId?batch=1&input=%7B%220%22%3A%7B%22id%22%3A3%7D%7D",
+        "captureId": "cap_mvumssvv46i5qsly"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at getTodo (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:160:23)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:69:187",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "getTodo",
+          "file": "src/server/upstream.ts",
+          "line": 16,
+          "column": 40
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 8,
+          "column": 89
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1pf3v7qr14b",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsuh66wcj1gfu",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:05.226Z",
+      "durationMs": 41,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/user.list",
+        "headers": {
+          "trpc-accept": "application/jsonl"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, trpc-accept, accept"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ]
+        }
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          [
+            "user",
+            "list"
+          ],
+          {
+            "type": "query"
+          }
+        ]
+      },
+      "procedure": {
+        "path": "user.list",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1r1k5oh094plc._.js:1251:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4186:32)",
+        "at async Object.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_033avzt9s-h6c._.js:4440:33)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0mfdzrz4ekf",
+        "parts": [
+          {
+            "part": "response",
+            "type": "{ id: number; name: string; email: string; role: \"admin\" | \"member\" }[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumsuiauak3ttxu",
+      "sessionId": "ses_mvumsmoyksb40sul",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:09:05.266Z",
+      "durationMs": 17,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:09:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/user.list?batch=1&input=%7B%7D",
+        "captureId": "cap_mvumsuh66wcj1gfu"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:235:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__1lw38kbg_0ut_._.js:893:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:148:23)",
+        "at fetchUsers (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:173:24)",
+        "at <repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\[root-of-the-server]__06wh06hakaxqq._.js:108:608",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1457:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc\\.next\\dev\\server\\chunks\\1ila_@trpc_server_dist_1k0ulipaawznq._.js:1493:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "fetchUsers",
+          "file": "src/server/upstream.ts",
+          "line": 22,
+          "column": 51
+        },
+        {
+          "file": "src/server/routers/user.ts",
+          "line": 14,
+          "column": 75
+        }
+      ]
+    }
+  ]
+}

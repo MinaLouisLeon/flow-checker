@@ -4,6 +4,7 @@ import {
   formatQueryKey,
   hasCaptures,
   type QueryLink,
+  queryLinkTarget,
   type RequestSite,
   type Trigger,
   urlText,
@@ -13,6 +14,7 @@ import { useData } from './context'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
+import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
 import { Badge, Empty, SourceLink } from './ui'
@@ -178,6 +180,7 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
             </>
           )}
           <PostmanFact site={site} index={index} />
+          <TrpcFact site={site} index={index} />
           {(site.queryKey || site.hook?.key) && (
             <>
               <dt>Key</dt>
@@ -317,7 +320,7 @@ export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[
               <Badge tone="muted" title={link.method}>
                 {LINK_LABEL[link.kind]}
               </Badge>{' '}
-              <code>{link.key ? formatQueryKey(link.key) : 'all queries'}</code>
+              <code>{queryLinkTarget(link)}</code>
               {link.exact && <span className="muted"> exact</span>}
               {link.outcome && <span className="muted"> on {link.outcome}</span>}
               {owner && (

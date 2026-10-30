@@ -19,6 +19,8 @@ const FIXTURES = [
   'mismatch',
   'middleware',
   'postman',
+  'trpc-v10',
+  'trpc',
 ]
 const repo = join(import.meta.dirname, '..', '..', '..')
 
@@ -62,13 +64,22 @@ function replay(model: AppModel, recording: Recording, degrade?: { noStack?: boo
   for (const original of ordered) {
     const capture = degrade?.noStack ? { ...original, stack: [] } : original
     const parentId = capture.origin === 'server' ? capture.parent?.captureId : undefined
+    // A tRPC batch was split into pieces (M16): the hop's parent is one of them.
+    const parents = !parentId
+      ? []
+      : matches.has(parentId)
+        ? [matches.get(parentId)]
+        : recording.captures.filter((c) => c.procedure?.batch?.id === parentId).map((c) => matches.get(c.id))
     matches.set(
       capture.id,
-      matcher.match(capture, {
-        frames: degrade?.noStack ? [] : (capture.sourceStack ?? []),
-        resolveAction: (id) => (degrade?.noActions ? undefined : recording.actions[id]),
-        parentMatch: parentId ? matches.get(parentId) : undefined,
-      }),
+      matcher.matchWithParents(
+        capture,
+        {
+          frames: degrade?.noStack ? [] : (capture.sourceStack ?? []),
+          resolveAction: (id) => (degrade?.noActions ? undefined : recording.actions[id]),
+        },
+        parents,
+      ),
     )
   }
   return matches
@@ -97,7 +108,11 @@ function label(model: AppModel, siteId: string | undefined): string {
 
 function describeCapture(c: Capture): string {
   const url = new URL(c.request.url)
-  const action = c.serverAction ? ` [action]` : ''
+  const action = c.serverAction
+    ? ` [action]`
+    : c.procedure?.batch
+      ? ` [batch ${c.procedure.batch.index + 1}/${c.procedure.batch.size}]`
+      : ''
   const parent = c.parent ? ` (in ${c.parent.method} ${new URL(c.parent.url, url).pathname})` : ''
   return `${c.origin} ${c.request.method} ${url.host}${url.pathname}${action}${parent}`
 }

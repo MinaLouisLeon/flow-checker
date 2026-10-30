@@ -116,3 +116,9 @@ export function queryLinkVerb(kind: QueryLinkKind): string {
       return 'hydrates'
   }
 }
+
+/** What a cache link targets, for display: its key, a tRPC procedure path (M16), or every query. */
+export function queryLinkTarget(link: Pick<QueryLink, 'key' | 'procedure'>): string {
+  if (link.procedure !== undefined) return `tRPC ${link.procedure || 'all procedures'}`
+  return link.key ? formatQueryKey(link.key) : 'all queries'
+}

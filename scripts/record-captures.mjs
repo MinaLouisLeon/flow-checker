@@ -155,6 +155,33 @@ const scripts = {
     await page.waitForURL(`${app}/`)
     await settle(page)
   },
+  // tRPC (M16): the home page batches several queries into one request.
+  'trpc-v10': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/feed`)
+    await settle(page)
+    await page.click('button:has-text("More")')
+    await settle(page)
+  },
+  trpc: async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+  },
 }
 
 /** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */

@@ -106,6 +106,10 @@ export class ComponentGraph {
     const ids = new Set<string>()
     for (const ref of body.getDescendantsOfKind(ts.SyntaxKind.TypeReference)) {
       if (props && ref.getPos() >= props.getPos() && ref.getEnd() <= props.getEnd()) continue
+      // `createTRPCClient<AppRouter>()`: the router's type is plumbing, not data the component uses.
+      const call = ref.getParent()
+      if (call && N.isCallExpression(call) && importModuleOf(call.getExpression())?.startsWith('@trpc/'))
+        continue
       const id = this.#types.namedTypeIdOf(ref)
       if (id) ids.add(id)
     }

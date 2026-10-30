@@ -11,6 +11,7 @@
     "./edge": "./src/edge.ts",
     "./options": "./src/options.ts",
     "./redact": "./src/redact.ts",
+    "./trpc": "./src/trpc.ts",
     "./next": "./src/next.ts"
   },
   "scripts": {
@@ -21,6 +22,8 @@
   },
   "devDependencies": {
     "@tanstack/query-core": "^5.105.0",
+    "@trpc/server": "11.22.1",
+    "trpc-server-v10": "npm:@trpc/server@10.45.4",
     "query-core-v4": "npm:@tanstack/query-core@^4.36.1"
   }
 }

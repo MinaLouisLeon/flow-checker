@@ -28,6 +28,7 @@ import {
   type PostmanContract,
   type PostmanRequest,
   type PostmanSource,
+  queryLinkTarget,
   queryLinkVerb,
   type RecordedFlow,
   type RecordedStep,
@@ -36,13 +37,14 @@ import {
   requestLabel,
   type ScanNote,
   type SiteTypeCheck,
+  type Trpc,
   type TypeRef,
   triggerText,
   typeRefs,
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
-import { type DocNames, docNames, ISSUES, MIDDLEWARE, POSTMAN, README, RECORDED, TYPES } from './names'
+import { type DocNames, docNames, ISSUES, MIDDLEWARE, POSTMAN, README, RECORDED, TRPC, TYPES } from './names'
 import { declaration, prettyShape } from './shape'
 
 /** Generated files: path (forward slashes, relative to the output folder) → content. */
@@ -101,6 +103,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (recorded.length > 0) files[RECORDED] = recordedDoc(ctx, recorded)
   if (model.middleware) files[MIDDLEWARE] = middlewareDoc(ctx)
   if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
+  if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -196,6 +199,9 @@ function readme(ctx: Ctx): string {
       '## Postman collection',
       `${link(text(model.postman.collection.name), from, POSTMAN)}: ${postmanCounts(ctx, model.postman)}.`,
     )
+  }
+  if (model.trpc) {
+    sections.push('## tRPC', `${link(code(model.trpc.endpoint), from, TRPC)}: ${trpcCounts(model.trpc)}.`)
   }
   if (model.flows.length > 0) {
     sections.push(
@@ -615,6 +621,70 @@ function postmanDoc(ctx: Ctx, contract: PostmanContract): string {
   ])
 }
 
+// --- tRPC (M16) ----------------------------------------------------------------------------
+
+function trpcCounts(trpc: Trpc): string {
+  const called = trpc.procedures.filter((p) => p.siteIds.length > 0).length
+  return `${called} of ${plural(trpc.procedures.length, 'procedure')} called by the app`
+}
+
+/** Procedure anchors use the path, so links from requests survive re-scans. */
+function trpcAnchor(path: string): string {
+  return `procedure-${path}`
+}
+
+function trpcDoc(ctx: Ctx, trpc: Trpc): string {
+  const from = TRPC
+  const route = trpc.routeId ? ctx.index.routes.get(trpc.routeId) : undefined
+  const unused = trpc.procedures.filter((p) => p.siteIds.length === 0)
+  const resolverRequests = (path: string) =>
+    ctx.model.requests.filter((s) => s.transport !== 'trpc' && s.procedure?.path === path)
+  return doc([
+    '# tRPC',
+    link('← Overview', from, README),
+    facts([
+      ['Endpoint', code(trpc.endpoint)],
+      ['Served by', route ? routeLink(ctx, route, from) : 'no route handler found'],
+      [
+        'Router',
+        trpc.router
+          ? `${code(trpc.router.name)} · ${code(`${trpc.router.loc.file}:${trpc.router.loc.line}`)}`
+          : undefined,
+      ],
+      ['Summary', trpcCounts(trpc)],
+    ]),
+    'Each procedure call in the code is a request to the endpoint. Batched calls (`/api/trpc/a,b?batch=1`) are recorded as one capture per procedure.',
+    '## Procedures',
+    trpc.procedures.length === 0 && 'The router was not found, so the procedures are unknown.',
+    ...trpc.procedures.map((p) => {
+      const callers = p.siteIds
+        .map((id) => ctx.index.requests.get(id))
+        .filter((s): s is RequestSite => Boolean(s))
+      const sends = resolverRequests(p.path)
+      return doc([
+        `### ${anchor(trpcAnchor(p.path))}${code(p.path)}`,
+        facts([
+          ['Type', p.type],
+          ['Defined at', code(`${p.loc.file}:${p.loc.line}`)],
+          [
+            'Called by',
+            callers.length === 0
+              ? 'nothing in the code'
+              : callers.map((s) => `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}`).join('<br>'),
+          ],
+          ['Sends', sends.length > 0 ? sends.map((s) => siteLink(ctx, s, from)).join('<br>') : undefined],
+        ]),
+        p.inputType && `**Input** ${typeBlock(ctx, p.inputType, from)}`,
+        p.outputType && `**Output** ${typeBlock(ctx, p.outputType, from)}`,
+      ]).trimEnd()
+    }),
+    `## Procedures no request calls (${unused.length})`,
+    unused.length === 0
+      ? 'The app calls every procedure.'
+      : unused.map((p) => `- [${code(p.path)}](#${anchorId(trpcAnchor(p.path))}) (${p.type})`).join('\n'),
+  ])
+}
+
 /** Path and query of a collection request; the host comes from the environment. */
 function postmanPath(r: PostmanRequest): string {
   const url = r.url
@@ -799,6 +869,12 @@ function requestSection(
       ],
       ['URL', url],
       ['Postman', contract],
+      [
+        site.transport === 'trpc' ? 'tRPC' : 'In procedure',
+        site.procedure
+          ? `${link(code(site.procedure.path), from, TRPC, anchorId(trpcAnchor(site.procedure.path)))} (${site.procedure.type})`
+          : undefined,
+      ],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
       [
         'Call path',
@@ -1005,7 +1081,7 @@ function stepText(ctx: Ctx, step: FlowStep, from: string): string {
     case 'query-update': {
       const link = ctx.index.queryLinks.get(step.linkId)
       if (!link) return `Cache update ${code(step.linkId)}`
-      return `${code(link.method)} ${code(link.key ? formatQueryKey(link.key) : 'all queries')}`
+      return `${code(link.method)} ${code(queryLinkTarget(link))}`
     }
   }
 }
@@ -1099,7 +1175,7 @@ function sequence(ctx: Ctx, flow: Flow): string {
         }
         case 'query-update': {
           const link = ctx.index.queryLinks.get(step.linkId)
-          const key = link?.key ? formatQueryKey(link.key) : 'all queries'
+          const key = link ? queryLinkTarget(link) : 'all queries'
           lines.push(`${indent}Note over ${current}: ${mermaid(`${link?.method ?? 'cache update'} ${key}`)}`)
           break
         }

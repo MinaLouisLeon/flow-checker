@@ -1,0 +1,15 @@
+# Types
+
+Todo  interface  src/types/todo.ts:1
+  { id: number; userId: number; title: string; done: boolean }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:9
+  props: { children: ReactNode }
+TodoPage  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+TodoDetail  src/components/TodoDetail.tsx:6
+  props: { id: number }

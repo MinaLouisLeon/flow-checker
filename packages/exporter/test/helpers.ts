@@ -18,6 +18,8 @@ export const FIXTURES = [
   'mismatch',
   'middleware',
   'postman',
+  'trpc-v10',
+  'trpc',
 ]
 export const NOW = new Date('2026-10-29T12:00:00.000Z')
 

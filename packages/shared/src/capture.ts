@@ -105,6 +105,25 @@ export const CaptureSchema = z.object({
       key: z.array(z.unknown()).optional(),
     })
     .optional(),
+  /**
+   * tRPC call (M16). A batched request (`/api/trpc/a.b,c.d?batch=1`) is split into one capture
+   * per procedure: each has its own input as the request body, its own result (or error) as the
+   * response, and `batch` says where it came from. The URL is the single-procedure form.
+   */
+  procedure: z
+    .object({
+      path: z.string(),
+      type: z.enum(['query', 'mutation', 'subscription']),
+      batch: z
+        .object({
+          /** Id the runtime gave the whole request. Server hops still point to it as `parent.captureId`. */
+          id: z.string(),
+          index: z.number().int().nonnegative(),
+          size: z.number().int().positive(),
+        })
+        .optional(),
+    })
+    .optional(),
   parent: CaptureParentSchema.optional(),
   /** Stack frames where the request was sent, innermost first. */
   stack: z.array(z.string()),
@@ -178,6 +197,8 @@ export interface CaptureSummary {
   pageUrl?: string
   serverActionId?: string
   parentCaptureId?: string
+  /** tRPC procedure path (M16). */
+  procedure?: string
   /** Nearest component from the interaction, if any. */
   component?: string
   redacted: boolean
@@ -203,6 +224,7 @@ export function summarizeCapture(c: Capture): CaptureSummary {
     pageUrl: c.pageUrl,
     serverActionId: c.serverAction?.id,
     parentCaptureId: c.parent?.captureId,
+    ...(c.procedure ? { procedure: c.procedure.path } : {}),
     component: c.interaction?.componentChain[0],
     redacted: c.redacted,
     match: c.match && {

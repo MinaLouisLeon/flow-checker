@@ -8,6 +8,7 @@ import { callerStack, headersToObject, readStream, requestBody, textBody } from 
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
 import { createQueryTracker, findQueryClient } from './query'
 import { compileRules, redactCapture } from './redact'
+import { splitTrpcCapture } from './trpc'
 
 export type { RuntimeConfig } from './options'
 
@@ -103,9 +104,11 @@ function start(config: RuntimeConfig) {
 
   const pushCapture = (capture: Capture) => {
     try {
-      const out = redactCapture(capture, rules, options.storeRaw)
-      captures.push(out)
-      pushEvent({ kind: 'capture', at: capture.timestamp, captureId: capture.id })
+      // A batched tRPC request becomes one capture per procedure (M16).
+      for (const piece of splitTrpcCapture(capture)) {
+        captures.push(redactCapture(piece, rules, options.storeRaw))
+        pushEvent({ kind: 'capture', at: piece.timestamp, captureId: piece.id })
+      }
     } catch {}
   }
 
