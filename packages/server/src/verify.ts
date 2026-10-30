@@ -223,12 +223,22 @@ export class Verifier {
   }
 
   /** The capture with its match and, when matched, the type comparison against that site. */
-  private evaluate(capture: Capture): Capture {
+  private evaluate(incoming: Capture): Capture {
+    const capture = this.namePersisted(incoming)
     const { typeCheck: _, ...rest } = capture
     const match = this.matchOne(capture)
     const site = match.status === 'matched' && match.siteId ? this.sites.get(match.siteId) : undefined
     const typeCheck = site ? checkCapture(capture, site, this.types) : undefined
     return typeCheck ? { ...rest, match, typeCheck } : { ...rest, match }
+  }
+
+  /** A GraphQL query sent by persisted id only: the operation that id belongs to (M17). */
+  private namePersisted(capture: Capture): Capture {
+    const op = capture.operation
+    const hash = op?.hash
+    if (!op || !hash || op.name) return capture
+    const found = this.model.graphql?.operations.find((o) => o.hashes.includes(hash))
+    return found ? { ...capture, operation: { ...op, name: found.name, type: found.type } } : capture
   }
 
   private matchOne(capture: Capture): CaptureMatch {

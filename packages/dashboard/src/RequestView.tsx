@@ -11,6 +11,7 @@ import {
 } from '@flow-checker/shared'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
+import { GraphqlFact } from './GraphqlView'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
@@ -181,6 +182,7 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           )}
           <PostmanFact site={site} index={index} />
           <TrpcFact site={site} index={index} />
+          <GraphqlFact site={site} index={index} />
           {(site.queryKey || site.hook?.key) && (
             <>
               <dt>Key</dt>

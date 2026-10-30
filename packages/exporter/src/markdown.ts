@@ -19,6 +19,8 @@ import {
   type FlowStatus,
   type FlowStep,
   formatQueryKey,
+  type GraphqlInfo,
+  type GraphqlOperation,
   isVerified,
   type MatcherCondition,
   type MiddlewareMatcher,
@@ -44,7 +46,18 @@ import {
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
-import { type DocNames, docNames, ISSUES, MIDDLEWARE, POSTMAN, README, RECORDED, TRPC, TYPES } from './names'
+import {
+  type DocNames,
+  docNames,
+  GRAPHQL,
+  ISSUES,
+  MIDDLEWARE,
+  POSTMAN,
+  README,
+  RECORDED,
+  TRPC,
+  TYPES,
+} from './names'
 import { declaration, prettyShape } from './shape'
 
 /** Generated files: path (forward slashes, relative to the output folder) → content. */
@@ -104,6 +117,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.middleware) files[MIDDLEWARE] = middlewareDoc(ctx)
   if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
+  if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -202,6 +216,10 @@ function readme(ctx: Ctx): string {
   }
   if (model.trpc) {
     sections.push('## tRPC', `${link(code(model.trpc.endpoint), from, TRPC)}: ${trpcCounts(model.trpc)}.`)
+  }
+  if (model.graphql) {
+    const endpoint = model.graphql.endpoint ? urlText(model.graphql.endpoint) : 'GraphQL'
+    sections.push('## GraphQL', `${link(code(endpoint), from, GRAPHQL)}: ${graphqlCounts(model.graphql)}.`)
   }
   if (model.flows.length > 0) {
     sections.push(
@@ -685,6 +703,123 @@ function trpcDoc(ctx: Ctx, trpc: Trpc): string {
   ])
 }
 
+// --- GraphQL (M17) -------------------------------------------------------------------------
+
+function graphqlCounts(graphql: GraphqlInfo): string {
+  const sent = graphql.operations.filter((o) => o.siteIds.length > 0).length
+  return `${sent} of ${plural(graphql.operations.length, 'operation')} sent by the app`
+}
+
+/** Operation anchors use the name, so links from requests survive re-scans. */
+function graphqlAnchor(op: Pick<GraphqlOperation, 'name' | 'id'>): string {
+  return `operation-${op.name || op.id}`
+}
+
+const TYPES_FROM: Record<NonNullable<GraphqlOperation['typesFrom']>, string> = {
+  code: 'type arguments in the code',
+  codegen: 'GraphQL Code Generator',
+  relay: 'the Relay compiler',
+  schema: 'the schema file',
+  introspection: 'live introspection',
+}
+
+function graphqlDoc(ctx: Ctx, graphql: GraphqlInfo): string {
+  const from = GRAPHQL
+  const route = graphql.routeId ? ctx.index.routes.get(graphql.routeId) : undefined
+  const unused = graphql.operations.filter((o) => o.siteIds.length === 0)
+  const schema = graphql.schema
+  const schemaText = schema
+    ? `${schema.source === 'file' ? code(schema.path ?? '') : `introspection of ${code(schema.url ?? '')}`}${
+        schema.error ? ` (could not be read: ${text(schema.error)})` : ` · ${plural(schema.types, 'type')}`
+      }`
+    : 'none'
+  const components = (ids: string[]) =>
+    ids
+      .map((id) => ctx.index.components.get(id)?.name ?? id)
+      .map((n) => code(n))
+      .join(', ')
+  return doc([
+    '# GraphQL',
+    link('← Overview', from, README),
+    facts([
+      ['Endpoint', graphql.endpoint ? code(urlText(graphql.endpoint)) : 'not found'],
+      ['Served by', route ? routeLink(ctx, route, from) : undefined],
+      [
+        'Clients',
+        graphql.clients.length > 0
+          ? graphql.clients
+              .map((c) => {
+                const features = [
+                  c.batching && 'batching',
+                  c.persisted && 'persisted queries',
+                  c.getForQueries && 'GET queries',
+                ]
+                  .filter(Boolean)
+                  .join(', ')
+                return `${c.library}${features ? ` (${features})` : ''} · ${code(`${c.loc.file}:${c.loc.line}`)}`
+              })
+              .join('<br>')
+          : undefined,
+      ],
+      ['Schema', schemaText],
+      [
+        'Persisted queries',
+        graphql.manifest
+          ? `${code(graphql.manifest.path)} · ${plural(graphql.manifest.operations, 'entry', 'entries')}`
+          : undefined,
+      ],
+      ['Summary', graphqlCounts(graphql)],
+    ]),
+    'Every operation goes to the same endpoint, so requests are matched by operation name (or persisted query id). Batched requests are recorded as one capture per operation.',
+    '## Operations',
+    graphql.operations.length === 0 && 'No GraphQL documents were found.',
+    ...graphql.operations.map((op) => {
+      const callers = op.siteIds
+        .map((id) => ctx.index.requests.get(id))
+        .filter((s): s is RequestSite => Boolean(s))
+      return doc([
+        `### ${anchor(graphqlAnchor(op))}${code(op.name || '(anonymous)')}`,
+        facts([
+          ['Type', op.type],
+          ['Defined at', code(`${op.loc.file}:${op.loc.line}`)],
+          ['Fragments', op.fragments.length > 0 ? op.fragments.map((f) => code(f)).join(', ') : undefined],
+          ['Types from', op.typesFrom ? TYPES_FROM[op.typesFrom] : undefined],
+          [
+            'Sent by',
+            callers.length === 0
+              ? 'nothing in the code'
+              : callers.map((s) => `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}`).join('<br>'),
+          ],
+          [
+            'Schema errors',
+            op.errors && op.errors.length > 0 ? op.errors.map((e) => text(e)).join('<br>') : undefined,
+          ],
+        ]),
+        block('graphql', op.document),
+        op.variablesType && `**Variables** ${typeBlock(ctx, op.variablesType, from)}`,
+        op.resultType && `**Data** ${typeBlock(ctx, op.resultType, from)}`,
+      ]).trimEnd()
+    }),
+    graphql.fragments.length > 0 && '## Fragments',
+    graphql.fragments.length > 0 &&
+      table(
+        ['Fragment', 'On', 'Read by', 'Defined at'],
+        graphql.fragments.map((f) => [
+          code(f.name),
+          code(f.on),
+          f.componentIds.length > 0 ? components(f.componentIds) : '',
+          code(`${f.loc.file}:${f.loc.line}`),
+        ]),
+      ),
+    `## Operations no request sends (${unused.length})`,
+    unused.length === 0
+      ? 'The app sends every operation.'
+      : unused
+          .map((o) => `- [${code(o.name || '(anonymous)')}](#${anchorId(graphqlAnchor(o))}) (${o.type})`)
+          .join('\n'),
+  ])
+}
+
 /** Path and query of a collection request; the host comes from the environment. */
 function postmanPath(r: PostmanRequest): string {
   const url = r.url
@@ -873,6 +1008,12 @@ function requestSection(
         site.transport === 'trpc' ? 'tRPC' : 'In procedure',
         site.procedure
           ? `${link(code(site.procedure.path), from, TRPC, anchorId(trpcAnchor(site.procedure.path)))} (${site.procedure.type})`
+          : undefined,
+      ],
+      [
+        'GraphQL',
+        site.operation
+          ? `${link(code(site.operation.name || '(anonymous)'), from, GRAPHQL, anchorId(graphqlAnchor(site.operation)))} (${site.operation.type})`
           : undefined,
       ],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],

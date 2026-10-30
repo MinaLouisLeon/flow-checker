@@ -22,6 +22,8 @@ export function formatRequests(model: AppModel): string {
     for (const site of list) {
       out.push(siteLine(site))
       if (site.procedure) out.push(`  procedure: ${site.procedure.path} (${site.procedure.type})`)
+      if (site.operation)
+        out.push(`  operation: ${site.operation.name || '(anonymous)'} (${site.operation.type})`)
       if (site.queryKey) out.push(`  key: ${formatQueryKey(site.queryKey)}`)
       if (site.bodyType) out.push(`  body: ${site.bodyType.text}`)
       if (site.responseType) out.push(`  response: ${site.responseType.text}`)
@@ -50,6 +52,50 @@ export function formatRequests(model: AppModel): string {
     }
   }
 
+  const graphql = model.graphql
+  if (graphql) {
+    out.push('', '# GraphQL', '')
+    out.push(`endpoint: ${graphql.endpoint ? urlText(graphql.endpoint) : '(not found)'}`)
+    for (const c of graphql.clients) {
+      const features = [
+        c.batching ? 'batching' : '',
+        c.persisted ? 'persisted' : '',
+        c.getForQueries ? 'GET queries' : '',
+      ]
+        .filter(Boolean)
+        .join(', ')
+      out.push(
+        `client: ${c.library}${c.endpoint ? ` ${urlText(c.endpoint)}` : ''}${features ? ` (${features})` : ''}  ${c.loc.file}:${c.loc.line}`,
+      )
+    }
+    const schema = graphql.schema
+    if (schema) {
+      const from = schema.source === 'file' ? schema.path : schema.url
+      out.push(
+        `schema: ${schema.source} ${from ?? ''}, ${schema.types} types${schema.error ? `  error: ${schema.error}` : ''}`,
+      )
+    }
+    if (graphql.manifest)
+      out.push(`manifest: ${graphql.manifest.path}, ${graphql.manifest.operations} operations`)
+    for (const op of graphql.operations) {
+      const callers = op.siteIds.length === 0 ? 'not sent' : `${op.siteIds.length} caller(s)`
+      const from = op.typesFrom ? `  types: ${op.typesFrom}` : ''
+      out.push(
+        '',
+        `${op.type} ${op.name || '(anonymous)'}  ${op.source}  ${callers}${from}  ${op.loc.file}:${op.loc.line}`,
+      )
+      if (op.fragments.length > 0) out.push(`  fragments: ${op.fragments.join(', ')}`)
+      if (op.variablesType) out.push(`  variables: ${op.variablesType.text}`)
+      if (op.resultType) out.push(`  data: ${op.resultType.text}`)
+      for (const error of op.errors ?? []) out.push(`  error: ${error}`)
+    }
+    for (const f of graphql.fragments) {
+      const users = f.componentIds.map((id) => components.get(id)?.name ?? id)
+      out.push('', `fragment ${f.name} on ${f.on}  ${f.loc.file}:${f.loc.line}`)
+      if (users.length > 0) out.push(`  read by: ${users.join(', ')}`)
+    }
+  }
+
   if (model.queryLinks.length > 0) {
     out.push('', '# Query cache links')
     for (const link of model.queryLinks) {
@@ -70,7 +116,8 @@ export function formatRequests(model: AppModel): string {
 
   function linkLine(link: QueryLink): string {
     const owner = link.componentId ? (components.get(link.componentId)?.name ?? '?') : link.origin
-    const key = link.key || link.procedure !== undefined ? queryLinkTarget(link) : '(all queries)'
+    const key =
+      link.key || link.procedure !== undefined || link.operation ? queryLinkTarget(link) : '(all queries)'
     const extra = [link.exact ? 'exact' : '', link.outcome ?? ''].filter(Boolean).join(' ')
     return `${link.kind} ${key}  ${link.method}  ${owner}  ${triggerText(link.trigger)}${extra ? `  ${extra}` : ''}  ${link.loc.file}:${link.loc.line}`
   }

@@ -12,6 +12,7 @@
     "./options": "./src/options.ts",
     "./redact": "./src/redact.ts",
     "./trpc": "./src/trpc.ts",
+    "./graphql": "./src/graphql.ts",
     "./next": "./src/next.ts"
   },
   "scripts": {

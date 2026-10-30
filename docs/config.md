@@ -174,6 +174,31 @@ postman: {
 
 Only what the check needs is kept: method, URL, folder, saved example bodies and the request's JSON body, redacted with the `capture.redact` rules. Headers, auth and scripts are dropped, and only variables a URL uses are kept (never `secret` ones or names the redaction rules mask).
 
+### `graphql`
+
+Where GraphQL operation types come from when the code has none (no codegen, Relay compiler or type arguments), and how persisted queries map to operations. All fields are optional.
+
+```ts
+graphql: {
+  schema: 'schema.graphql',                      // SDL (.graphql / .gql) or an introspection result (.json)
+  introspection: {                               // used when there is no schema file
+    url: 'http://localhost:4000/graphql',
+    headers: { Authorization: 'env:GQL_TOKEN' }, // env:NAME is read from that variable
+  },
+  persistedQueries: 'persisted-documents.json',  // id -> document manifest
+  endpoint: '/api/graphql',                      // when the client setup doesn't say
+},
+```
+
+| Field              | Meaning                                                                                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema`           | Relative to the project root. Default: the `schema` of `relay.config.json` or of the codegen config (`codegen.ts`, `.graphqlrc.yml`, ...), else `schema.graphql`, `schema.gql`, `src/schema.graphql` or `schema.json`.                         |
+| `introspection`    | Asks a running endpoint for its schema on `flow-checker dev` and `scan`. The result is cached in `.flow-checker/cache/` (gitignored) and used when the endpoint can't be reached. Header values `env:NAME` are only read from the environment. |
+| `persistedQueries` | codegen's `persisted-documents.json`, Apollo's `persisted-query-manifest.json` or Relay's `persisted_queries.json`. Default: found by those names in the root, or the Relay config's `persistConfig.file`.                                     |
+| `endpoint`         | A path (`/api/graphql`) or full URL. Default: from `new ApolloClient()` / `HttpLink`, urql's `createClient()`, Relay's `Network.create()`, or a route handler whose path ends in `/graphql`.                                                   |
+
+When the endpoint is your own app (a route handler), it isn't running yet when `dev` starts: the first start has no introspection result. Run `flow-checker scan` once while the app runs (or use a schema file); later starts use the cache.
+
 ## Next.js config: `withFlowChecker()`
 
 Only needed on Next.js 13.4–15.2 (see the [README](../packages/flow-checker/README.md#nextjs-before-153)).

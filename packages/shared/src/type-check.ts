@@ -93,7 +93,7 @@ export function typeTable(types: readonly NamedType[]): TypeTable {
  */
 export function checkCapture(
   capture: CheckableCapture,
-  site: Pick<RequestSite, 'id' | 'transport' | 'bodyType' | 'responseType'>,
+  site: Pick<RequestSite, 'id' | 'transport' | 'bodyType' | 'responseType' | 'hook'>,
   types: TypeTable,
 ): TypeCheck | undefined {
   const parts: TypeCheckPart[] = []
@@ -115,12 +115,28 @@ function checkRequest(
   types: TypeTable,
 ): TypeCheckPart {
   if (site.transport === 'server-action') return skipped('request', type, SERVER_ACTION_REASON)
+  if (site.transport === 'graphql') {
+    // The body is `{ query, variables, ... }`: the type is the variables'.
+    const payload = capture.request.body.kind === 'json' ? capture.request.body.value : undefined
+    if (!isRecord(payload)) return skipped('request', type, 'No GraphQL payload was captured.')
+    const value = payload.variables ?? {}
+    return checkBody('request', { kind: 'json', value }, type, types, capture.redactedPaths, 'variables')
+  }
   return checkBody('request', capture.request.body, type, types, capture.redactedPaths)
+}
+
+/** Fields GraphQL clients add to every selection (Apollo's and urql's caches). */
+const GRAPHQL_EXTRA = new Set(['__typename'])
+/** The Relay compiler also selects `id` wherever the type has one; its generated types leave it out. */
+const RELAY_EXTRA = new Set(['__typename', 'id'])
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 function checkResponse(
   capture: CheckableCapture,
-  site: Pick<RequestSite, 'transport'>,
+  site: Pick<RequestSite, 'transport' | 'hook'>,
   type: TypeRef,
   types: TypeTable,
 ): TypeCheckPart {
@@ -135,6 +151,26 @@ function checkResponse(
       `Error response (${response.status}) is not checked against the success type.`,
     )
   }
+  if (site.transport === 'graphql') {
+    // `{ data, errors }`: the type is `data`. GraphQL errors come with status 200.
+    const result = response.body.kind === 'json' ? response.body.value : undefined
+    if (!isRecord(result)) return checkBody('response', response.body, type, types, capture.redactedPaths)
+    const errors = Array.isArray(result.errors) ? result.errors : []
+    if (result.data === undefined || result.data === null) {
+      const first = errors[0]
+      const message = isRecord(first) && typeof first.message === 'string' ? `: ${first.message}` : ''
+      return skipped('response', type, `GraphQL error${message}`)
+    }
+    return checkBody(
+      'response',
+      { kind: 'json', value: result.data },
+      type,
+      types,
+      capture.redactedPaths,
+      'data',
+      site.hook && /relay/.test(site.hook.module) ? RELAY_EXTRA : GRAPHQL_EXTRA,
+    )
+  }
   return checkBody('response', response.body, type, types, capture.redactedPaths)
 }
 
@@ -144,8 +180,11 @@ function checkBody(
   type: TypeRef,
   types: TypeTable,
   redactedPaths: readonly string[],
+  /** GraphQL: the property of the body that holds the value (`variables`, `data`). */
+  inner?: string,
+  allowExtra: ReadonlySet<string> = GRAPHQL_EXTRA,
 ): TypeCheckPart {
-  const root = `${part}.body`
+  const root = inner ? `${part}.body.${inner}` : `${part}.body`
   let value: unknown
   switch (body.kind) {
     case 'json':
@@ -164,7 +203,12 @@ function checkBody(
     case 'binary':
       return skipped(part, type, 'Binary content is not compared with types.')
   }
-  const result = checkValue(value, type.shape, { types, root, redactedPaths })
+  const result = checkValue(value, type.shape, {
+    types,
+    root,
+    redactedPaths,
+    ...(inner ? { allowExtra } : {}),
+  })
   return {
     part,
     type: type.text,
@@ -182,6 +226,8 @@ export interface CheckOptions {
   root?: string
   /** Paths the runtime masked: masked values only need the right JSON type. */
   redactedPaths?: readonly string[]
+  /** Property names that may be there without being declared, e.g. GraphQL's `__typename`. */
+  allowExtra?: ReadonlySet<string>
 }
 
 /** Compares a JSON value with a TypeShape. Mismatches at the same path are merged. */
@@ -190,7 +236,7 @@ export function checkValue(
   shape: TypeShape,
   options: CheckOptions,
 ): { mismatches: TypeMismatch[]; truncated: boolean } {
-  const checker = new Checker(options.types, options.redactedPaths ?? [])
+  const checker = new Checker(options.types, options.redactedPaths ?? [], options.allowExtra)
   const raw = checker.check(value, shape, options.root ?? 'body', 0)
   const merged = new Map<string, TypeMismatch>()
   for (const m of raw) {
@@ -211,6 +257,7 @@ class Checker {
   constructor(
     private readonly types: TypeTable,
     private readonly redacted: readonly string[],
+    private readonly allowExtra: ReadonlySet<string> = new Set(),
   ) {}
 
   check(value: unknown, shape: TypeShape, path: string, depth: number): Raw[] {
@@ -318,7 +365,7 @@ class Checker {
         shape.indexSignatures?.find((s) => s.key === 'number' && /^-?\d+(\.\d+)?$/.test(key)) ??
         shape.indexSignatures?.find((s) => s.key === 'string')
       if (index) out.push(...this.check(v, index.type, child, depth + 1))
-      else if (!open && v !== undefined) {
+      else if (!open && v !== undefined && !this.allowExtra.has(key)) {
         out.push({
           kind: 'extra-field',
           path: child,

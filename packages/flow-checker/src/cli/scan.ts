@@ -10,6 +10,7 @@ import {
   formatTypes,
 } from '@flow-checker/shared'
 import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
+import { graphqlForScan } from './graphql'
 import { appOrigins, contractSummary, postmanForScan } from './postman'
 import { createProgress, scanReporter, scanSteps } from './progress'
 import type { CliIO } from './run'
@@ -49,12 +50,14 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
   }
 
   const postman = await postmanForScan(root, config, io, progress)
+  const graphql = await graphqlForScan(root, config, io, progress, { refresh: true })
   const started = performance.now()
   // In the worker thread (from the build), so the progress line keeps moving during the scan.
   const runner = createScanRunner({
     root,
     appDir: options.appDir ?? config.appDir,
     ...scanSettings(config),
+    graphql,
     postman,
     appOrigins: appOrigins(config),
   })

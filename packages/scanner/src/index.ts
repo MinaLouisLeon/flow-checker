@@ -1,6 +1,8 @@
 export { ComponentGraph, directives } from './components'
 export { type Discovery, discoverProject, ScanError } from './discovery'
 export { type FlowInput, inferFlows } from './flows'
+export { readSchema as readGraphqlSchema } from './graphql-schema'
+export type { GraphqlScanOptions } from './graphql-setup'
 export { RequestScanner } from './requests'
 export {
   createScanSession,

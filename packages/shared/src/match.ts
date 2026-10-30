@@ -30,6 +30,8 @@ export const MATCH_SIGNALS = [
   'middleware',
   /** The tRPC procedure the capture called (or the incoming batch it ran in) is the site's (M16). */
   'trpc-procedure',
+  /** The GraphQL operation the capture sent (by name or persisted hash) is the site's (M17). */
+  'graphql-operation',
   /** You assigned captures like this one to the site. */
   'manual',
 ] as const

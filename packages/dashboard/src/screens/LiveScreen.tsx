@@ -10,6 +10,7 @@ import {
   useRecording,
 } from '../api'
 import { useData } from '../context'
+import { GraphqlCaptureFact } from '../GraphqlView'
 import { siteHref, siteLabel, siteOwner } from '../RequestView'
 import { href, type MatchFilter, replaceScreen } from '../router'
 import { TrpcCaptureFact } from '../TrpcView'
@@ -36,6 +37,7 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   'query-key': 'query key',
   middleware: 'middleware',
   'trpc-procedure': 'tRPC procedure',
+  'graphql-operation': 'GraphQL operation',
   manual: 'manual',
 }
 
@@ -292,6 +294,7 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
             </>
           )}
           <TrpcCaptureFact capture={c} q={q} />
+          <GraphqlCaptureFact capture={c} q={q} />
           {c.serverAction && (
             <>
               <dt>Server action</dt>

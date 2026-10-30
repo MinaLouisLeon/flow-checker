@@ -18,6 +18,7 @@ import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
 import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
 import { configExportDirs, writeFormat } from './export'
+import { graphqlForScan } from './graphql'
 import { appOrigins, contractSummary, postmanForScan } from './postman'
 import { createProgress, scanReporter, scanSteps } from './progress'
 import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
@@ -92,12 +93,15 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   const appPort = options.appPort ?? config.ports?.app ?? DEFAULT_PORTS.app
   // A cloud collection is fetched again on each start (local files on every scan).
   const postman = await postmanForScan(root, config, io, progress, { refresh: true })
+  // Live introspection is asked again on each start (M17).
+  const graphql = await graphqlForScan(root, config, io, progress, { refresh: true })
   // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7). From the
   // build it runs in a worker thread, so the server keeps answering during large re-scans.
   const scanner = createScanRunner({
     root,
     appDir,
     ...scanSettings(config),
+    graphql,
     postman,
     appOrigins: appOrigins(config, appPort),
   })

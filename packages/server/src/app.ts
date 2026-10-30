@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { splitGraphqlCapture } from '@flow-checker/runtime/graphql'
 import type { RuntimeCaptureOptions } from '@flow-checker/runtime/options'
 import { compileRules, redactCapture } from '@flow-checker/runtime/redact'
 import {
@@ -317,10 +318,11 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     if (batch.token !== token) return c.json({ error: 'Invalid token' }, 403)
 
     // Safety net: the runtime already redacted, unless it was misconfigured.
-    // Batched tRPC requests are split here too when the runtime didn't (M16).
+    // Batched tRPC and GraphQL requests are split here too when the runtime didn't (M16, M17).
     verifier.ingest(
       batch.captures
         .flatMap((item) => verifier.splitTrpc(item))
+        .flatMap((item) => splitGraphqlCapture(item))
         .map((item) => redactCapture(item, rules, capture.options.storeRaw)),
     )
     if (batch.sessionId) store.addEvents(batch.sessionId, batch.events)

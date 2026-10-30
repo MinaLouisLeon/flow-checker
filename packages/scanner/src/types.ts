@@ -77,6 +77,11 @@ export class TypeResolver {
     )
   }
 
+  /** The shape of a named type referenced so far (`{ kind: 'ref' }` targets). */
+  namedShape(id: string): TypeShape | undefined {
+    return this.#named.get(id)?.shape
+  }
+
   /** Resolves a written type annotation, e.g. the `ProfileCardProps` in `(props: ProfileCardProps)`. */
   fromTypeNode(node: TypeNode): TypeRef {
     return { text: oneLine(node.getText()), shape: this.#fromTypeNode(node, 0) }

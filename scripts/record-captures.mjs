@@ -182,6 +182,74 @@ const scripts = {
     await page.goto(`${app}/users`)
     await settle(page)
   },
+  // GraphQL (M17): every fixture serves the same schema from its own /api/graphql route.
+  // Apollo 4: the home page sends Viewer + Todos as one batched POST (array body).
+  'graphql-apollo': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.click('input[type=checkbox]')
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.fill('input[placeholder="Search"]', 'a')
+    await page.click('button[type=submit]')
+    await settle(page)
+    await page.click('button:has-text("Load users")')
+    await settle(page)
+  },
+  // Apollo 3 with automatic persisted queries: each first request is hash-only and retried with the query.
+  'graphql-apollo-v3': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Delete")')
+    await page.waitForURL(`${app}/`)
+    await settle(page)
+    await page.goto(`${app}/search`)
+    await settle(page)
+    await page.fill('input[placeholder="Search"]', 'a')
+    await page.click('button[type=submit]')
+    await settle(page)
+  },
+  // urql: queries are GET requests, mutations POST.
+  'graphql-urql': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.click('button:has-text("Load users")')
+    await settle(page)
+  },
+  // Relay: persisted documents only ({ doc_id, variables }, no query text).
+  'graphql-relay': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.click('button:has-text("Load users")')
+    await settle(page)
+  },
 }
 
 /** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */

@@ -3,6 +3,7 @@ export type {
   ApiClientConfig,
   CaptureConfig,
   FlowCheckerConfig,
+  GraphqlConfig,
   PostmanCloudSource,
   PostmanConfig,
   RedactConfig,

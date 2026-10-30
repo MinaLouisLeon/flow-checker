@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@flow-checker/shared": "workspace:*",
+    "graphql": "catalog:",
     "ts-morph": "catalog:"
   }
 }

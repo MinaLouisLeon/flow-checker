@@ -1,0 +1,53 @@
+# Types
+
+FragmentType<typeof TodoItemFragment>  type-alias  src/gql/fragment-masking.ts:7
+  { " $fragmentRefs"?: { TodoItemFragment: TodoItemFragment } }
+Exact<{ [key: string]: never; }>  type-alias  src/gql/graphql.ts:3
+  { [key: string]: never }
+Exact<{ id: string | number; }>  type-alias  src/gql/graphql.ts:3
+  { id: string | number }
+Exact<{ input: AddTodoInput; }>  type-alias  src/gql/graphql.ts:3
+  { input: AddTodoInput }
+Exact<{ status?: TodoStatus | null | undefined; }>  type-alias  src/gql/graphql.ts:3
+  { status?: "DONE" | "OPEN" | null }
+Exact<{ text: string; }>  type-alias  src/gql/graphql.ts:3
+  { text: string }
+AddTodoInput  type-alias  src/gql/graphql.ts:7
+  { ownerId?: string | number | null; title: string }
+TodoStatus  type-alias  src/gql/graphql.ts:12
+  "DONE" | "OPEN"
+AddTodoMutation  type-alias  src/gql/graphql.ts:21
+  { addTodo: { id: string; title: string } }
+TodoQuery  type-alias  src/gql/graphql.ts:28
+  { todo: { id: string; title: string; done: boolean; status: TodoStatus; owner: { name: string } } | null }
+ToggleTodoMutation  type-alias  src/gql/graphql.ts:35
+  { toggleTodo: { id: string; done: boolean; status: TodoStatus } }
+TodoItemFragment  type-alias  src/gql/graphql.ts:37
+  { id: string; title: string; done: boolean; " $fragmentName"?: "TodoItemFragment" }
+TodosQuery  type-alias  src/gql/graphql.ts:44
+  { todos: { id: string; " $fragmentRefs"?: { TodoItemFragment: TodoItemFragment } }[] }
+SearchQuery  type-alias  src/gql/graphql.ts:54
+  { search: ({ __typename: "Todo"; id: string; title: string } | { __typename: "User"; id: string; name: string })[] }
+UsersQuery  type-alias  src/gql/graphql.ts:62
+  { users: { id: string; name: string; email: string }[] }
+ViewerQuery  type-alias  src/gql/graphql.ts:67
+  { viewer: { id: string; name: string } }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:7
+  props: { children: ReactNode }
+TodoPage  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+ClientOnly  src/components/ClientOnly.tsx:8
+  props: { children: ReactNode; fallback: ReactNode }
+TodoView  src/components/TodoDetail.tsx:32
+  props: { id: string }
+TodoDetail  src/components/TodoDetail.tsx:49
+  props: { id: string }
+TodoItem  src/components/TodoItem.tsx:15
+  props: { todo: FragmentType<typeof TodoItemFragment> }
+UserSearch  src/components/UserSearch.tsx:34
+  uses: UsersQuery

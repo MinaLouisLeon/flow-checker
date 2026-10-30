@@ -31,6 +31,8 @@ catalog:
   "@xyflow/react": ^12.12.0
   chokidar: ^5.0.0
   yaml: ^2.8.1
+  # GraphQL (M17): the scanner parses documents and schemas with graphql-js.
+  graphql: ^16.14.2
 
 # pnpm 11 blocks dependency install scripts unless listed here.
 allowBuilds:

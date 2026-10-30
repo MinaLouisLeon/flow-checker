@@ -439,6 +439,27 @@ export const ProcedureRefSchema = z.object({
 })
 export type ProcedureRef = z.infer<typeof ProcedureRefSchema>
 
+// ---------------------------------------------------------------------------------------------
+// GraphQL (M17).
+
+export const GRAPHQL_OPERATION_TYPES = ['query', 'mutation', 'subscription'] as const
+export const GraphqlOperationTypeSchema = z.enum(GRAPHQL_OPERATION_TYPES)
+export type GraphqlOperationType = z.infer<typeof GraphqlOperationTypeSchema>
+
+export const GRAPHQL_LIBRARIES = ['apollo', 'urql', 'relay'] as const
+export const GraphqlLibrarySchema = z.enum(GRAPHQL_LIBRARIES)
+export type GraphqlLibrary = z.infer<typeof GraphqlLibrarySchema>
+
+/** The GraphQL operation a request site sends, see `AppModel.graphql.operations`. */
+export const OperationRefSchema = z.object({
+  /** See `GraphqlOperation.id`. */
+  id: z.string(),
+  /** e.g. `GetTodos`. Empty for an anonymous operation. */
+  name: z.string(),
+  type: GraphqlOperationTypeSchema,
+})
+export type OperationRef = z.infer<typeof OperationRefSchema>
+
 export const ServerActionRefSchema = z.object({
   name: z.string(),
   loc: SourceLocSchema,
@@ -459,8 +480,9 @@ export const RequestSiteSchema = z.object({
   /**
    * `api-client`: a call to a function listed in the config's `apiClients` (see `client`).
    * `trpc`: a tRPC procedure call (hooks, `queryOptions()`, the vanilla client), see `procedure`.
+   * `graphql`: a GraphQL operation sent by Apollo, urql or Relay, see `operation`.
    */
-  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc']),
+  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc', 'graphql']),
   /** Transport `api-client`: the configured module and the function or method called. */
   client: z.object({ module: z.string(), name: z.string() }).optional(),
   /**
@@ -481,6 +503,8 @@ export const RequestSiteSchema = z.object({
    * whose resolver sends this request (the handler is the tRPC endpoint).
    */
   procedure: ProcedureRefSchema.optional(),
+  /** Transport `graphql` (M17): the operation sent. `bodyType` is its variables, `responseType` its `data`. */
+  operation: OperationRefSchema.optional(),
   /** Absent when it could not be resolved. Server actions are always `POST`. */
   method: HttpMethodSchema.optional(),
   /** Absent for server actions, which post to the current page. */
@@ -540,6 +564,8 @@ export const QueryLinkSchema = z.object({
    * `utils.todo.list.invalidate()` or `trpc.todo.list.pathFilter()`. `''`: every tRPC query.
    */
   procedure: z.string().optional(),
+  /** GraphQL (M17): the operation whose queries it refetches, e.g. Apollo's `refetchQueries: ['Todos']`. */
+  operation: z.string().optional(),
   /** Only queries with exactly this key (`exact: true`, `setQueryData`). */
   exact: z.boolean().optional(),
   /** Requests it runs after: the mutation whose callback calls it, or the server prefetch (`hydrate`). */
@@ -778,8 +804,10 @@ export const PostmanRequestSchema = z.object({
   unresolved: z.array(z.string()).optional(),
   /** From the saved examples with a 2xx JSON body (`source: 'postman'`). */
   responseType: TypeRefSchema.optional(),
-  /** From the request's JSON body. */
+  /** From the request's JSON body (GraphQL: its variables). */
   bodyType: TypeRefSchema.optional(),
+  /** GraphQL (M17): the operation the request's body sends, e.g. `Todos`. */
+  operation: z.string().optional(),
   examples: z.array(PostmanExampleSchema),
   /** Request sites that call it. */
   siteIds: z.array(z.string()),
@@ -826,6 +854,103 @@ export const TrpcSchema = z.object({
 })
 export type Trpc = z.infer<typeof TrpcSchema>
 
+// ---------------------------------------------------------------------------------------------
+// GraphQL (M17): the operations and fragments written in the code, and where their types come from.
+
+export const GraphqlOperationSchema = z.object({
+  id: z.string(),
+  /** Empty for an anonymous operation. */
+  name: z.string(),
+  type: GraphqlOperationTypeSchema,
+  /**
+   * How the document is written. `tag`: a `gql` / `graphql` tagged template (Apollo, urql,
+   * graphql-tag, Relay). `codegen`: the GraphQL Code Generator client preset's `graphql()`.
+   * `generated`: a document constant written by codegen. `file`: an imported `.graphql` file.
+   */
+  source: z.enum(['tag', 'codegen', 'generated', 'file']),
+  /** The tag, call or file. */
+  loc: SourceLocSchema,
+  /** The operation as written, without the fragments it spreads. */
+  document: z.string(),
+  /** Fragments it spreads, directly or through other fragments, by name. */
+  fragments: z.array(z.string()),
+  /**
+   * Persisted query ids: the sha256 of the document as printed with its fragments, and the ids a
+   * persisted query manifest gives it.
+   */
+  hashes: z.array(z.string()),
+  variablesType: TypeRefSchema.optional(),
+  /** The `data` it answers with. */
+  resultType: TypeRefSchema.optional(),
+  /**
+   * `code`: type arguments written in the code (`useQuery<Data, Vars>()`). `codegen`: a
+   * `TypedDocumentNode`. `relay`: the Relay compiler's `$data` / `$variables` types.
+   * `schema` / `introspection`: worked out from the schema file or the live endpoint.
+   */
+  typesFrom: z.enum(['code', 'codegen', 'relay', 'schema', 'introspection']).optional(),
+  /** Where the document doesn't fit the schema, e.g. `Cannot query field "x" on type "Todo".` */
+  errors: z.array(z.string()).optional(),
+  /** Request sites that send it. */
+  siteIds: z.array(z.string()),
+})
+export type GraphqlOperation = z.infer<typeof GraphqlOperationSchema>
+
+export const GraphqlFragmentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** The type it is on, e.g. `Todo`. */
+  on: z.string(),
+  loc: SourceLocSchema,
+  document: z.string(),
+  /** Components that read it (`useFragment`). */
+  componentIds: z.array(z.string()),
+})
+export type GraphqlFragment = z.infer<typeof GraphqlFragmentSchema>
+
+export const GraphqlClientSchema = z.object({
+  library: GraphqlLibrarySchema,
+  /** `new ApolloClient()`, `createClient()`, `Network.create()`. */
+  loc: SourceLocSchema,
+  /** The URL it sends to, when it could be read. */
+  endpoint: RequestUrlSchema.optional(),
+  /** Sends several operations in one request (Apollo's `BatchHttpLink`). */
+  batching: z.boolean().optional(),
+  /** Sends persisted query hashes (Apollo's `createPersistedQueryLink`, urql's persisted exchange). */
+  persisted: z.boolean().optional(),
+  /** Sends queries as GET (urql's default, Apollo's `useGETForQueries`). */
+  getForQueries: z.boolean().optional(),
+})
+export type GraphqlClient = z.infer<typeof GraphqlClientSchema>
+
+export const GraphqlInfoSchema = z.object({
+  /** Where operations are sent. From the clients, the config, or a `/graphql` route handler. */
+  endpoint: RequestUrlSchema.optional(),
+  /** The route handler that serves it, when it is in the app. */
+  routeId: z.string().optional(),
+  clients: z.array(GraphqlClientSchema),
+  /** The schema types were worked out from, when there is one. */
+  schema: z
+    .object({
+      source: z.enum(['file', 'introspection']),
+      /** `file`: project-relative path. */
+      path: z.string().optional(),
+      /** `introspection`: the endpoint asked. */
+      url: z.string().optional(),
+      /** `introspection`: when it was fetched (ISO time). */
+      fetchedAt: z.string().optional(),
+      /** Named types in it (without built-ins). */
+      types: z.number().int().nonnegative(),
+      /** Set when the schema could not be read. */
+      error: z.string().optional(),
+    })
+    .optional(),
+  /** Persisted query manifest whose ids map to the operations. */
+  manifest: z.object({ path: z.string(), operations: z.number().int().nonnegative() }).optional(),
+  operations: z.array(GraphqlOperationSchema),
+  fragments: z.array(GraphqlFragmentSchema),
+})
+export type GraphqlInfo = z.infer<typeof GraphqlInfoSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -839,10 +964,10 @@ export const AppModelSchema = z.object({
   /**
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
    * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
-   * (before M16) no tRPC.
+   * (before M16) no tRPC, version 5 (before M17) no GraphQL.
    */
   version: z
-    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(MODEL_VERSION)])
+    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(MODEL_VERSION)])
     .transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
@@ -864,5 +989,7 @@ export const AppModelSchema = z.object({
   postman: PostmanContractSchema.optional(),
   /** The tRPC router and endpoint, when the project uses tRPC (M16). */
   trpc: TrpcSchema.optional(),
+  /** GraphQL operations, fragments, clients and schema, when the project uses GraphQL (M17). */
+  graphql: GraphqlInfoSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

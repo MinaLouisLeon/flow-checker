@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/__snapshots__", "!**/test/recordings", "!**/test/golden"]
+    "includes": [
+      "**",
+      "!**/__snapshots__",
+      "!**/test/recordings",
+      "!**/test/golden",
+      "!fixtures/*/src/gql",
+      "!fixtures/*/src/__generated__",
+      "!fixtures/*/persisted_queries.json"
+    ]
   },
   "formatter": {
     "enabled": true,

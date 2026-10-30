@@ -87,7 +87,7 @@ re-run them on their own before assuming a regression.
 | M14 | Middleware / proxy                                | Done    |
 | M15 | Postman collection import                         | Done    |
 | M16 | tRPC                                              | Done    |
-| M17 | GraphQL                                           | Planned |
+| M17 | GraphQL                                           | Done    |
 | M18 | SSE                                               | Planned |
 | M19 | WebSockets                                        | Planned |
 | M20 | Release v0.2.0                                    | Planned |

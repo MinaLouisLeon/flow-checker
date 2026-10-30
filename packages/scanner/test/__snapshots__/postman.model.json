@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
