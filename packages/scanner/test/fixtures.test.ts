@@ -19,6 +19,7 @@ const FIXTURES = [
   'next-intl',
   'mismatch',
   'middleware',
+  'postman',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 

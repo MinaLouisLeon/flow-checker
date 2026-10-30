@@ -1,0 +1,12 @@
+$kind: http-example
+order: 1000
+request:
+  url: "{{baseUrl}}/users/1"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      { "id": 1, "name": "Ada Lovelace", "email": "ada@example.com", "role": "admin" }

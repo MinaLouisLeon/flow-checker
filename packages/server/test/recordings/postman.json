@@ -1,0 +1,1424 @@
+{
+  "fixture": "postman",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvugag00n4ew8wdy",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:48.960Z",
+      "durationMs": 188,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:49 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:132:17)",
+        "at async HomePage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:24:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 17
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0iv5kcsl9up",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagd0chi70u6r",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.428Z",
+      "durationMs": 18,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:49 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:132:17)",
+        "at async HomePage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:24:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 17
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0iv5kcsl9up",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagoxl2nq3u9l",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.857Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:200:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagoz2i06zh97",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.859Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagp4cce9gyma",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.864Z",
+      "durationMs": 8,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:200:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagp6wy0d9ztn",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.866Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugaim1vbegm98t",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:52.345Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Check the contract",
+            "userId": 1
+          },
+          "size": 41
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Check the contract"
+          },
+          "size": 61
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "TodoPanel",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-30T04:06:52.344Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at createTodo (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:204:23)",
+        "at onSubmit (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:94:179)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "createTodo",
+          "file": "lib/api.ts",
+          "line": 28,
+          "column": 21
+        },
+        {
+          "fn": "onSubmit",
+          "file": "components/TodoPanel.tsx",
+          "line": 18,
+          "column": 34
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_07zzxwzir2w",
+        "parts": [
+          {
+            "part": "request",
+            "type": "NewTodo",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugal2km8jscstw",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:55.532Z",
+      "durationMs": 31,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUser (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:138:17)",
+        "at async UserPage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1iy4ebnff1z-v._.js:21:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUser",
+          "file": "lib/api.ts",
+          "line": 12,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0zfyatg6d3b",
+        "parts": [
+          {
+            "part": "response",
+            "type": "{ id: number; name: string; email: string; role: string }",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan3gssk071e2",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.156Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:4010/users/2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 204,
+        "statusText": "No Content",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at deleteUser (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:76:11)",
+        "at onClick (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:24:170)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "deleteUser",
+          "file": "lib/api.ts",
+          "line": 18,
+          "column": 9
+        },
+        {
+          "fn": "onClick",
+          "file": "components/DeleteUserButton.tsx",
+          "line": 13,
+          "column": 25
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1nhvqmicx4q",
+        "parts": [
+          {
+            "part": "response",
+            "type": "void",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7n4syihlpr",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.307Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:81:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7o5i7vgkot",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.308Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Check the contract"
+            }
+          ],
+          "size": 185
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7rx35c2gaw",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.311Z",
+      "durationMs": 5,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:81:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7s8epabo45",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.312Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Check the contract"
+            }
+          ],
+          "size": 185
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan5vjc6a4a18",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.243Z",
+      "durationMs": 8,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            }
+          ],
+          "size": 73
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/?_rsc=UNYZX3PacoQ5wtLo"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:132:17)",
+        "at async HomePage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:24:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 17
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0iv5kcsl9up",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}

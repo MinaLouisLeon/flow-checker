@@ -6,6 +6,7 @@ import { devCommand } from './dev'
 import { doctorCommand } from './doctor'
 import { exportCommand } from './export'
 import { initCommand } from './init'
+import { postmanCommand } from './postman'
 import { isLiveTerminal, type ProgressDisplay, terminalDisplay } from './progress'
 import { scanCommand } from './scan'
 
@@ -15,6 +16,7 @@ const COMMANDS = {
   init: 'Add instrumentation hooks, config file and .gitignore entries',
   export: 'Export Markdown docs and a static HTML site (--md <dir>, --html <dir>)',
   doctor: 'Check Next.js version, hooks, ports and tsconfig',
+  postman: 'postman import: read a Postman collection to check the code against',
 } as const
 
 type Command = keyof typeof COMMANDS
@@ -46,6 +48,10 @@ Options:
   --md <dir>              export: write Markdown docs to this folder
   --html <dir>            export: write the static HTML site to this folder
                           (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
+  --collection <src>      postman import: v2.1 JSON file, v3 YAML folder or cloud collection id
+                          (default: "postman.collection" in the config)
+  --environment <src>     postman import: environment file or cloud id for {{variables}}
+  --api-key-env <name>    postman import: env variable with the Postman API key (default: POSTMAN_API_KEY)
   --raw                   export: keep captures as saved, without redacting them again
   --force                 export: write into a folder that has other files
   --verbose               Show more detail: timings, the resolved config, the scan worker
@@ -170,6 +176,21 @@ export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
     )
   }
 
+  if (command === 'postman') {
+    return postmanCommand(
+      positionals[1],
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        collection: values.collection,
+        environment: values.environment,
+        apiKeyEnv: values['api-key-env'],
+      },
+      io,
+    )
+  }
+
   const port = toPort(values.port, '--port', io)
   const appPort = toPort(values['app-port'], '--app-port', io)
   if (port === null || appPort === null) return 1
@@ -206,6 +227,9 @@ function parse(argv: string[]) {
       html: { type: 'string' },
       raw: { type: 'boolean' },
       force: { type: 'boolean' },
+      collection: { type: 'string' },
+      environment: { type: 'string' },
+      'api-key-env': { type: 'string' },
       verbose: { type: 'boolean' },
       quiet: { type: 'boolean', short: 'q' },
     },

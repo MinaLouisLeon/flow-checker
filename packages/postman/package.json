@@ -1,0 +1,22 @@
+{
+  "name": "@flow-checker/postman",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Postman collection import: v2.1 JSON, v3 YAML folders and cloud collections, used as an API contract (internal).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flow-checker/runtime": "workspace:*",
+    "@flow-checker/shared": "workspace:*",
+    "yaml": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@flow-checker/scanner": "workspace:*"
+  }
+}

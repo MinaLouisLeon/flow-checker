@@ -1,0 +1,14 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/todos"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      [
+        { "id": 1, "userId": 1, "title": "Write the first program", "done": true },
+        { "id": 2, "userId": 2, "title": "Break Enigma", "done": false }
+      ]

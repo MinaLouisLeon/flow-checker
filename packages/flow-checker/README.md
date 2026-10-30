@@ -58,6 +58,7 @@ flow-checker scan       # scan only, write .flow-checker/model.json
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
 flow-checker export     # Markdown docs and/or a static HTML site
 flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitignore
+flow-checker postman import   # read a Postman collection to check the code against
 ```
 
 | Option                                       | Commands                  | Meaning                                                                                       |
@@ -76,6 +77,9 @@ flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitig
 | `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
 | `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
 | `--force`                                    | export                    | Write into a folder that has other files                                                      |
+| `--collection <src>`                         | postman import            | v2.1 JSON file, v3 YAML folder or cloud collection id (default: `postman.collection`)         |
+| `--environment <src>`                        | postman import            | Environment file or cloud id for `{{variables}}`                                              |
+| `--api-key-env <name>`                       | postman import            | Env variable with the Postman API key, for cloud ids (default `POSTMAN_API_KEY`)              |
 | `--verbose`                                  | all                       | Also print the resolved config, where the scan runs and other details                         |
 | `-q, --quiet`                                | all                       | No progress output: only results, warnings and errors                                         |
 
@@ -88,6 +92,16 @@ Every command shows its progress on stderr. In a terminal, a live line shows a s
 ```
 
 In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` lines are printed, as plain text.
+
+### Postman collections
+
+Point flow-checker at a Postman collection (config `postman`, or `flow-checker postman import --collection <src>`) and every scan is checked against it:
+
+- Each request in the code is matched to a collection request by method and URL (`{{baseUrl}}/users/:id` fits `` `${API}/users/${id}` ``). Requests the collection doesn't have are flagged **not in collection**; collection requests nothing calls are listed as **unused endpoints**.
+- Saved response examples give a type to requests whose code has none (marked "from Postman example"), and captures are then checked against it. When the code declares a type, it is checked against the examples (**contract mismatch**).
+- A URL the scan can't resolve is filled in from the collection request its function names and method point to, when exactly one fits.
+
+`postman import` prints a summary and the list of findings; the dashboard overview and the Markdown export (`postman.md`) show them too.
 
 ## Setup in detail
 
@@ -124,6 +138,8 @@ export default defineConfig({
     ignore: ['/api/health'],
   },
   export: { md: 'docs/flow', html: '.flow-checker/site' },
+  // A Postman collection to check the code against (v2.1 JSON, v3 YAML folder or { id, apiKeyEnv }).
+  postman: { collection: 'postman/collections/My API', environment: 'postman/environments/dev.yaml' },
 })
 ```
 
@@ -145,7 +161,8 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 ├─ overrides.json      your decisions: manual matches, flow names, recordings (safe to commit)
 ├─ captures/           captured requests (gitignored)
 ├─ sessions/           browsing sessions used to confirm flows (gitignored)
-└─ cache/              ingest token, code hashes (gitignored)
+├─ cache/              ingest token, code hashes (gitignored)
+└─ postman/            the last imported Postman collection (gitignored)
 ```
 
 ## Limits

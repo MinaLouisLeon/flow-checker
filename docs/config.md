@@ -152,6 +152,28 @@ Folders `flow-checker export` (with neither `--md` nor `--html`) and the dashboa
 
 Each export folder gets a `.flow-checker-export.json` listing the files it wrote. The next export replaces those files and nothing else. A folder that has other files and no such list is refused unless `--force`.
 
+### `postman`
+
+A Postman collection to check the code against (the API contract). See `flow-checker postman import` in the README.
+
+```ts
+postman: {
+  collection: 'postman/collections/My API',     // v3 YAML folder
+  // collection: 'api.postman_collection.json',  // or a v2.1 JSON export
+  // collection: { id: '12345-abcd…', apiKeyEnv: 'POSTMAN_API_KEY' }, // or a cloud collection
+  environment: 'postman/environments/dev.yaml',  // optional: values for {{variables}}
+},
+```
+
+| Field         | Meaning                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `collection`  | A v2.1 JSON export, a git-native v3 YAML collection folder (`postman/collections/<name>`), or `{ id, apiKeyEnv }` for a collection in Postman's cloud. Paths are relative to the project root. |
+| `environment` | Optional. An environment JSON export, a v3 YAML environment file, or `{ id, apiKeyEnv }`. Its values win over collection variables.                                                            |
+
+`apiKeyEnv` names the environment variable that holds your Postman API key (default `POSTMAN_API_KEY`). The key is only read from there, never written anywhere. Local files are read on every scan; cloud collections are fetched when `flow-checker dev` starts and by `flow-checker postman import`, and otherwise come from the last import in `.flow-checker/postman/` (gitignored). If a source can't be read, the last import is used with a warning.
+
+Only what the check needs is kept: method, URL, folder, saved example bodies and the request's JSON body, redacted with the `capture.redact` rules. Headers, auth and scripts are dropped, and only variables a URL uses are kept (never `secret` ones or names the redaction rules mask).
+
 ## Next.js config: `withFlowChecker()`
 
 Only needed on Next.js 13.4–15.2 (see the [README](../packages/flow-checker/README.md#nextjs-before-153)).

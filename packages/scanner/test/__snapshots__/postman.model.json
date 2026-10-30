@@ -1,0 +1,894 @@
+{
+  "version": 4,
+  "project": {
+    "appDir": "app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "app",
+    "files": {
+      "layout": "app/layout.tsx",
+      "page": "app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        },
+        "dir": "app/users",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "app/users/[id]",
+            "files": {
+              "page": "app/users/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_12v7saiyoj2",
+      "path": "/",
+      "kind": "page",
+      "file": "app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_0ku4o3jpe9o"
+    },
+    {
+      "id": "rt_2656kti2wza",
+      "path": "/users/[id]",
+      "kind": "page",
+      "file": "app/users/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_0vmo84pmvzo"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_2dznycb4aq7",
+      "name": "RootLayout",
+      "file": "app/layout.tsx",
+      "loc": {
+        "file": "app/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0ku4o3jpe9o",
+      "name": "HomePage",
+      "file": "app/page.tsx",
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 9,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 17,
+            "column": 13
+          }
+        },
+        {
+          "name": "ProductPanel",
+          "resolution": "project",
+          "componentId": "cmp_1n9jz878unm",
+          "module": "@/components/ProductPanel",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 21,
+            "column": 7
+          }
+        },
+        {
+          "name": "TodoPanel",
+          "resolution": "project",
+          "componentId": "cmp_1t97i8o4yqd",
+          "module": "@/components/TodoPanel",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 22,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0vmo84pmvzo",
+      "name": "UserPage",
+      "file": "app/users/[id]/page.tsx",
+      "loc": {
+        "file": "app/users/[id]/page.tsx",
+        "line": 7,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "DeleteUserButton",
+          "resolution": "project",
+          "componentId": "cmp_0yr9r67zb7l",
+          "module": "@/components/DeleteUserButton",
+          "loc": {
+            "file": "app/users/[id]/page.tsx",
+            "line": 14,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0yr9r67zb7l",
+      "name": "DeleteUserButton",
+      "file": "components/DeleteUserButton.tsx",
+      "loc": {
+        "file": "components/DeleteUserButton.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1n9jz878unm",
+      "name": "ProductPanel",
+      "file": "components/ProductPanel.tsx",
+      "loc": {
+        "file": "components/ProductPanel.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_1f1vojxmn7g"
+      ]
+    },
+    {
+      "id": "cmp_1t97i8o4yqd",
+      "name": "TodoPanel",
+      "file": "components/TodoPanel.tsx",
+      "loc": {
+        "file": "components/TodoPanel.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_29n1iw0u1hd"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_2ao02lpx6nv",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "types/index.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "role",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "admin"
+                },
+                {
+                  "kind": "literal",
+                  "value": "member"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1f1vojxmn7g",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "types/index.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_29n1iw0u1hd",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "types/index.ts",
+        "line": 16,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1hvhy5iwv7p",
+      "name": "NewTodo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "types/index.ts",
+        "line": 23,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_0iv5kcsl9up",
+      "origin": "component",
+      "componentId": "cmp_0ku4o3jpe9o",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/users`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_2ao02lpx6nv",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 23,
+          "callee": "getUsers"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0fg187m8sqo"
+    },
+    {
+      "id": "req_0zfyatg6d3b",
+      "origin": "component",
+      "componentId": "cmp_0vmo84pmvzo",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/users/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users/:id"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "callStack": [
+        {
+          "file": "app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 22,
+          "callee": "getUser"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 12,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "0cjc3ugqn3q"
+    },
+    {
+      "id": "req_1nhvqmicx4q",
+      "origin": "component",
+      "componentId": "cmp_0yr9r67zb7l",
+      "transport": "fetch",
+      "method": "DELETE",
+      "url": {
+        "text": "`${API_URL}/users/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 12,
+          "column": 7
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 13,
+          "column": 15,
+          "callee": "deleteUser"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 18,
+          "column": 9,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0v5hvfeh041"
+    },
+    {
+      "id": "req_08kv7zxxjyg",
+      "origin": "component",
+      "componentId": "cmp_1n9jz878unm",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "components/ProductPanel.tsx",
+          "line": 10,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1f1vojxmn7g",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 5,
+          "callee": "getProducts"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1ftdj3a383s"
+    },
+    {
+      "id": "req_1e93pbv41le",
+      "origin": "component",
+      "componentId": "cmp_1t97i8o4yqd",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "todosUrl()",
+        "confidence": "unknown"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "components/TodoPanel.tsx",
+          "line": 11,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_29n1iw0u1hd",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 5,
+          "callee": "listTodos"
+        },
+        {
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "dynamic-url",
+          "message": "The URL could not be resolved: todosUrl()"
+        }
+      ],
+      "hash": "0a6z6pqzkty"
+    },
+    {
+      "id": "req_07zzxwzir2w",
+      "origin": "component",
+      "componentId": "cmp_1t97i8o4yqd",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "components/TodoPanel.tsx",
+          "line": 30,
+          "column": 13
+        }
+      },
+      "bodyType": {
+        "text": "NewTodo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1hvhy5iwv7p",
+          "name": "NewTodo"
+        }
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_29n1iw0u1hd",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/TodoPanel.tsx",
+          "line": 18,
+          "column": 24,
+          "callee": "createTodo"
+        },
+        {
+          "file": "lib/api.ts",
+          "line": 28,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0vavnv5rl27"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_187trj3je4u",
+      "origin": "component",
+      "componentId": "cmp_0ku4o3jpe9o",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/users/${user.id}`",
+        "confidence": "pattern",
+        "path": "/users/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 17,
+          "column": 13
+        }
+      },
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 17,
+        "column": 13
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 17,
+          "column": 13,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_2656kti2wza"
+    },
+    {
+      "id": "nav_0sd8psgs88b",
+      "origin": "component",
+      "componentId": "cmp_0yr9r67zb7l",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "'/'",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 12,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "components/DeleteUserButton.tsx",
+        "line": 14,
+        "column": 9
+      },
+      "callStack": [
+        {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 14,
+          "column": 9,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_12v7saiyoj2"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_0fqpu2cziqz",
+      "name": "DeleteUserButton click",
+      "routeId": "rt_2656kti2wza",
+      "componentId": "cmp_0yr9r67zb7l",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_2656kti2wza",
+          "componentId": "cmp_0yr9r67zb7l",
+          "event": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 12,
+            "column": 7
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1nhvqmicx4q"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_0sd8psgs88b",
+          "routeId": "rt_12v7saiyoj2"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0iv5kcsl9up",
+          "onLoad": true
+        },
+        {
+          "kind": "request",
+          "siteId": "req_08kv7zxxjyg",
+          "onLoad": true
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1e93pbv41le",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_2656kti2wza",
+        "rt_12v7saiyoj2"
+      ]
+    },
+    {
+      "id": "flw_1t5pivgbvgp",
+      "name": "TodoPanel submit",
+      "routeId": "rt_12v7saiyoj2",
+      "componentId": "cmp_1t97i8o4yqd",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_12v7saiyoj2",
+          "componentId": "cmp_1t97i8o4yqd",
+          "event": "onSubmit",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 30,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_07zzxwzir2w"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_12v7saiyoj2"
+      ]
+    }
+  ],
+  "queryLinks": []
+}

@@ -6,6 +6,7 @@
 //   types.md             all types with resolved shapes and usages
 //   issues.md            open flags, type mismatches, unmatched captures
 //   middleware.md        middleware / proxy: matcher, routes it runs on, redirects, rewrites, requests
+//   postman.md           the imported Postman collection: its requests, callers, unused endpoints, gaps
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
@@ -24,6 +25,9 @@ import {
   type ModelIndex,
   mismatchField,
   type Navigation,
+  type PostmanContract,
+  type PostmanRequest,
+  type PostmanSource,
   queryLinkVerb,
   type RecordedFlow,
   type RecordedStep,
@@ -38,7 +42,7 @@ import {
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
-import { type DocNames, docNames, ISSUES, MIDDLEWARE, README, RECORDED, TYPES } from './names'
+import { type DocNames, docNames, ISSUES, MIDDLEWARE, POSTMAN, README, RECORDED, TYPES } from './names'
 import { declaration, prettyShape } from './shape'
 
 /** Generated files: path (forward slashes, relative to the output folder) → content. */
@@ -96,6 +100,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   const recorded = data.flows?.recorded ?? []
   if (recorded.length > 0) files[RECORDED] = recordedDoc(ctx, recorded)
   if (model.middleware) files[MIDDLEWARE] = middlewareDoc(ctx)
+  if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -185,6 +190,12 @@ function readme(ctx: Ctx): string {
       plural(index.middlewareRequests.length, 'request'),
     ]
     sections.push('## Middleware', `${link(code(mw.file), from, MIDDLEWARE)}: ${parts.join(', ')}.`)
+  }
+  if (model.postman) {
+    sections.push(
+      '## Postman collection',
+      `${link(text(model.postman.collection.name), from, POSTMAN)}: ${postmanCounts(ctx, model.postman)}.`,
+    )
   }
   if (model.flows.length > 0) {
     sections.push(
@@ -519,6 +530,129 @@ function middlewareDoc(ctx: Ctx): string {
   ])
 }
 
+// --- Postman collection (M15) -------------------------------------------------------------------
+
+function postmanSourceText(source: PostmanSource): string {
+  if (source.kind === 'cloud') return `Postman cloud${source.id ? ` (${code(source.id)})` : ''}`
+  const what = source.kind === 'folder' ? 'collection folder' : 'file'
+  return source.path ? `${what} ${code(source.path)}` : what
+}
+
+/** Request sites with a flag from the collection. */
+function postmanSites(ctx: Ctx, kind: 'not-in-collection' | 'contract-mismatch'): RequestSite[] {
+  return ctx.model.requests.filter((s) => s.flags.some((f) => f.kind === kind))
+}
+
+function postmanCounts(ctx: Ctx, contract: PostmanContract): string {
+  const total = contract.requests.length
+  const used = contract.requests.filter((r) => r.siteIds.length > 0).length
+  return [
+    `${used} of ${plural(total, 'request')} called by the app`,
+    plural(total - used, 'unused endpoint'),
+    `${plural(postmanSites(ctx, 'not-in-collection').length, 'request')} in the code not in the collection`,
+    plural(postmanSites(ctx, 'contract-mismatch').length, 'contract mismatch', 'contract mismatches'),
+  ].join(', ')
+}
+
+function postmanDoc(ctx: Ctx, contract: PostmanContract): string {
+  const from = POSTMAN
+  const requests = contract.requests
+  const unused = requests.filter((r) => r.siteIds.length === 0)
+  const missing = postmanSites(ctx, 'not-in-collection')
+  const mismatched = postmanSites(ctx, 'contract-mismatch')
+  // Grouped by folder, in collection order.
+  const folders = new Map<string, PostmanRequest[]>()
+  for (const r of requests) {
+    const key = r.folder.join(' / ')
+    const list = folders.get(key)
+    if (list) list.push(r)
+    else folders.set(key, [r])
+  }
+  const requestRef = (r: PostmanRequest) =>
+    `[${text(r.name)}](#${anchorId(r.id)}) ${code(`${r.method} ${postmanPath(r)}`)}${r.folder.length > 0 ? ` (${text(r.folder.join(' / '))})` : ''}`
+  return doc([
+    `# Postman collection: ${text(contract.collection.name)}`,
+    link('← Overview', from, README),
+    facts([
+      ['Collection', `${text(contract.collection.name)} · ${postmanSourceText(contract.collection.source)}`],
+      [
+        'Environment',
+        contract.environment
+          ? `${text(contract.environment.name)} · ${postmanSourceText(contract.environment.source)}`
+          : undefined,
+      ],
+      ['Imported', time(contract.importedAt)],
+      ['Summary', postmanCounts(ctx, contract)],
+    ]),
+    'The collection is the API contract: each request in the code is matched to a collection request by method and URL, or by its names and method when the scan could not resolve the URL. Types marked "from Postman examples" come from the saved responses, not the code.',
+    '## Requests',
+    requests.length === 0 && 'The collection has no requests.',
+    ...[...folders].flatMap(([folder, list]) => [
+      `### ${folder ? text(folder) : 'Not in a folder'}`,
+      ...list.map((r) => postmanRequestSection(ctx, r, from)),
+    ]),
+    `## Unused endpoints (${unused.length})`,
+    unused.length === 0
+      ? 'Every collection request is called by the app.'
+      : `No request in the code calls these.\n\n${unused.map((r) => `- ${requestRef(r)}`).join('\n')}`,
+    `## Requests not in the collection (${missing.length})`,
+    missing.length === 0
+      ? "Every request the scan matched to the collection's APIs is in it."
+      : `Requests in the code the collection has no request for.\n\n${table(
+          ['Request', 'From', 'Status'],
+          missing.map((s) => [siteLink(ctx, s, from), ownerText(ctx, s, from), statusText(ctx, s)]),
+        )}`,
+    `## Contract mismatches (${mismatched.length})`,
+    mismatched.length === 0
+      ? "No type in the code disagrees with the collection's examples."
+      : `Types in the code that don't fit the collection's saved examples.\n\n${mismatched
+          .flatMap((s) =>
+            s.flags
+              .filter((f) => f.kind === 'contract-mismatch')
+              .map((f) => `- ${siteLink(ctx, s, from)}: ${text(f.message)}`),
+          )
+          .join('\n')}`,
+  ])
+}
+
+/** Path and query of a collection request; the host comes from the environment. */
+function postmanPath(r: PostmanRequest): string {
+  const url = r.url
+  return url.path ? `${url.path}${url.query ? `?${url.query}` : ''}` : url.text
+}
+
+function postmanRequestSection(ctx: Ctx, r: PostmanRequest, from: string): string {
+  const callers = r.siteIds
+    .map((id) => ctx.index.requests.get(id))
+    .filter((s): s is RequestSite => Boolean(s))
+  const resolved = urlText(r.url)
+  // `200 OK` already says its status; other names get it added.
+  const examples = r.examples.map(
+    (e) =>
+      `${text(e.name)}${e.status !== undefined && !e.name.startsWith(String(e.status)) ? ` (${e.status})` : ''}`,
+  )
+  const caller = (s: RequestSite) => {
+    const byCode = s.contract?.requestId === r.id && s.contract.by === 'code'
+    return `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}${byCode ? ' (matched by name and method)' : ''}`
+  }
+  return doc([
+    `#### ${anchor(r.id)}${text(r.name)}`,
+    facts([
+      ['Request', code(`${r.method} ${r.url.text}`)],
+      ['URL', resolved !== r.url.text ? code(resolved) : undefined],
+      [
+        'Unresolved variables',
+        r.unresolved?.length ? r.unresolved.map((v) => code(`{{${v}}}`)).join(', ') : undefined,
+      ],
+      ['Called by', callers.length === 0 ? 'nothing in the code' : callers.map(caller).join('<br>')],
+      ['Examples', examples.join(', ') || undefined],
+    ]),
+    r.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
+    r.bodyType && `**Request body** ${typeBlock(ctx, r.bodyType, from)}`,
+    r.responseType && `**Response** (from the examples) ${typeBlock(ctx, r.responseType, from)}`,
+  ]).trimEnd()
+}
+
 /** Nested list of components, with links to their docs. */
 function componentTree(ctx: Ctx, rootId: string, from: string): string {
   const lines: string[] = []
@@ -642,8 +776,11 @@ function requestSection(
   const queryKey = site.queryKey ? ` · key ${code(formatQueryKey(site.queryKey))}` : ''
   const url =
     site.url && site.transport !== 'server-action'
-      ? `${code(urlText(site.url))}${site.url.confidence === 'exact' ? '' : ` (${site.url.confidence})`}`
+      ? `${code(urlText(site.url))}${urlConfidence(site.url.confidence)}`
       : undefined
+  const contract = site.contract
+    ? `${link(text(site.contract.name), from, POSTMAN, anchorId(site.contract.requestId))}${site.contract.by === 'code' ? ' · matched by name and method, URL from the collection' : ''}`
+    : undefined
   const check = ctx.data.verification?.sites[site.id]?.typeCheck
   const next = (site.chain ?? [])
     .map((id) => ctx.index.requests.get(id))
@@ -661,6 +798,7 @@ function requestSection(
         `${site.transport}${site.client ? ` (${code(`${site.client.module}#${site.client.name}`)})` : ''}${hook}${queryKey}`,
       ],
       ['URL', url],
+      ['Postman', contract],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
       [
         'Call path',
@@ -668,13 +806,25 @@ function requestSection(
       ],
     ]),
     site.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
-    site.bodyType && `**Request body** ${typeBlock(ctx, site.bodyType, from)}`,
-    site.responseType && `**Response** ${typeBlock(ctx, site.responseType, from)}`,
+    site.bodyType && `**Request body**${typeSource(site.bodyType)} ${typeBlock(ctx, site.bodyType, from)}`,
+    site.responseType &&
+      `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,
     check && check.mismatches.length > 0 && typeCheckTable(check),
     examples(ctx, site),
     next.length > 0 && `**Leads to** ${next.map((s) => code(requestLabel(s))).join(', ')}:`,
     ...next.filter((s) => !inner.has(s.id)).map((s) => requestSection(ctx, s, from, level + 1, inner)),
   ]).trimEnd()
+}
+
+/** `pattern` and `unknown` as they are; `postman` says where the URL came from. */
+function urlConfidence(confidence: NonNullable<RequestSite['url']>['confidence']): string {
+  if (confidence === 'exact') return ''
+  return confidence === 'postman' ? ' (from Postman)' : ` (${confidence})`
+}
+
+/** Marks a type the code doesn't declare, taken from the collection's saved examples. */
+function typeSource(ref: TypeRef): string {
+  return ref.source === 'postman' ? ' (from Postman examples)' : ''
 }
 
 function typeCheckTable(check: SiteTypeCheck): string {

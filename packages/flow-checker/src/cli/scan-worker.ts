@@ -20,6 +20,7 @@ parentPort?.on('message', (request: WorkerRequest) => {
     let result: ScanResult | undefined
     if (request.type === 'scan') result = handler.scan(onProgress)
     else if (request.type === 'update') result = handler.update(request.changes, onProgress)
+    else if (request.type === 'postman') handler.setPostman(request.imported)
     else handler.warm()
     response = { id: request.id, ok: true, result }
   } catch (error) {

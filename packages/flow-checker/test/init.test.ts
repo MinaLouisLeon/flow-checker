@@ -106,8 +106,16 @@ describe('flow-checker init', () => {
 describe('project helpers', () => {
   it('only adds the .gitignore entries that are missing', () => {
     const root = project({ '.gitignore': 'node_modules\n.flow-checker/captures/' })
-    expect(missingGitignoreEntries(root)).toEqual(['.flow-checker/sessions/', '.flow-checker/cache/'])
-    expect(ensureGitignore(root)).toEqual(['.flow-checker/sessions/', '.flow-checker/cache/'])
+    expect(missingGitignoreEntries(root)).toEqual([
+      '.flow-checker/sessions/',
+      '.flow-checker/cache/',
+      '.flow-checker/postman/',
+    ])
+    expect(ensureGitignore(root)).toEqual([
+      '.flow-checker/sessions/',
+      '.flow-checker/cache/',
+      '.flow-checker/postman/',
+    ])
     expect(missingGitignoreEntries(root)).toEqual([])
 
     const whole = project({ '.gitignore': '/.flow-checker/\n' })

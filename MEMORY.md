@@ -22,6 +22,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M12 | CLI progress          | `ScanOptions.onProgress`; progress goes to stderr; plain lines when not a TTY.                                           |
 | M13 | React Query           | Model version 2. Runtime patches `Query`/`Mutation` prototypes rather than cache events (those fire too late).           |
 | M14 | Middleware / proxy    | Model version 3. Matcher = path-to-regexp v6 port in `shared/src/middleware.ts`; edge hook `runtime/edge` for Next < 16. |
+| M15 | Postman import        | Model version 4. `packages/postman`; applied after each scan in the CLI scan runner, never inside the scanner.           |
 
 ## Gotchas
 
@@ -59,3 +60,17 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - The `middleware` fixture's proxy deletes the session cookie when the session is invalid; without that, the login
   redirect loops (a real bug the recording script caught).
 - Verified on the Next matrix 13.4, 14.2, 15.2, 15.5 and 16 (scan + middleware fetch captured and matched).
+
+## M15 — Postman collection import (done, branch `feat/postman-import`)
+
+- The scanner stays Postman-free: `applyPostman(model, import)` runs in `createScanHandler` (CLI scan runner), so
+  scan, dev, re-scans and export all get it. Tests that need it (server matching, exporter goldens) apply it
+  themselves with `importLocalPostman` (sync, local files only).
+- The cache `.flow-checker/postman/collection.json` is the normalized, redacted import, not the raw collection.
+  Without `postman` in the config, scans still use it (after a manual `postman import --collection`).
+- The scanner only leaves a URL `unknown` when the whole URL is a runtime value; `${fn()}/todos` is `pattern`
+  with base `{param}` and matches by URL. The fixture's `listTodos` reads its URL from the page for that reason.
+- Recordings for the `postman` fixture were made on app port 3077, so tests pass
+  `appOrigins: ['http://localhost:3077']`.
+- Postman flags are filed as generic `request` notes in `buildIndex`; the dashboard overview filters them into its
+  Postman section, and the Markdown `issues.md` doesn't list them (they're in `postman.md`).

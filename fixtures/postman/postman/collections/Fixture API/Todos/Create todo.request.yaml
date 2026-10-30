@@ -1,0 +1,11 @@
+$kind: http-request
+method: POST
+url: "{{baseUrl}}/todos"
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    { "title": "Buy milk", "userId": 1 }

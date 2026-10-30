@@ -18,6 +18,7 @@ import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
 import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
 import { configExportDirs, writeFormat } from './export'
+import { appOrigins, contractSummary, postmanForScan } from './postman'
 import { createProgress, scanReporter, scanSteps } from './progress'
 import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
 import type { CliIO } from './run'
@@ -88,9 +89,18 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 
   const appDir = options.appDir ?? config.appDir
+  const appPort = options.appPort ?? config.ports?.app ?? DEFAULT_PORTS.app
+  // A cloud collection is fetched again on each start (local files on every scan).
+  const postman = await postmanForScan(root, config, io, progress, { refresh: true })
   // The scan stays warm, so a file change only re-reads that file (docs/PLAN.md 6.7). From the
   // build it runs in a worker thread, so the server keeps answering during large re-scans.
-  const scanner = createScanRunner({ root, appDir, ...scanSettings(config) })
+  const scanner = createScanRunner({
+    root,
+    appDir,
+    ...scanSettings(config),
+    postman,
+    appOrigins: appOrigins(config, appPort),
+  })
   progress.detail(`scan runs ${scanner.inWorker ? 'in a worker thread' : 'in this thread'}`)
   // One scan at a time: a change that arrives during a scan waits for it.
   let queue: Promise<unknown> = Promise.resolve()
@@ -110,9 +120,15 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
       const lines = firstScan
       firstScan = false
       try {
+        // A full re-scan (dashboard) reads the collection's local files again.
+        if (!lines && config.postman) {
+          await scanner.setPostman(await postmanForScan(root, config, io, undefined))
+        }
         const { model, durationMs } = await scanner.scan(scanReporter(shown, { lines }))
         if (!lines) shown.finish()
         io.out(summary(model, durationMs))
+        const contract = contractSummary(model)
+        if (contract) io.out(contract)
         return model
       } catch (error) {
         shown.finish()
@@ -143,7 +159,6 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
 
   const store = new CaptureStore({ root }).load()
   const token = ingestToken(root)
-  const appPort = options.appPort ?? config.ports?.app ?? DEFAULT_PORTS.app
 
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')

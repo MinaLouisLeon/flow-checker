@@ -11,6 +11,7 @@ import {
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import type { ModelIndex } from './model-index'
+import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
@@ -170,9 +171,13 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
               <dt>URL as written</dt>
               <dd>
                 <code>{site.url.text}</code>
+                {site.url.confidence === 'postman' && (
+                  <span className="muted"> · path from the Postman collection</span>
+                )}
               </dd>
             </>
           )}
+          <PostmanFact site={site} index={index} />
           {(site.queryKey || site.hook?.key) && (
             <>
               <dt>Key</dt>
@@ -226,11 +231,17 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           )}
         </dl>
 
-        <TypeBlock title="Request body" text={site.bodyType?.text} shape={site.bodyType?.shape} />
+        <TypeBlock
+          title="Request body"
+          text={site.bodyType?.text}
+          shape={site.bodyType?.shape}
+          source={site.bodyType?.source}
+        />
         <TypeBlock
           title="Response"
           text={site.responseType?.text}
           shape={site.responseType?.shape}
+          source={site.responseType?.source}
           empty="Not found in the code. Live capture will fill it in."
         />
 
@@ -392,10 +403,12 @@ function TypeBlock({
   title,
   text,
   shape,
+  source,
   empty,
 }: {
   title: string
   text?: string
+  source?: 'postman'
   shape?: Parameters<typeof TypeShapeView>[0]['shape']
   empty?: string
 }) {
@@ -410,7 +423,7 @@ function TypeBlock({
   return (
     <div className="request-type">
       <h4>
-        {title} <code className="muted">{text}</code>
+        {title} <code className="muted">{text}</code> <PostmanTypeBadge source={source} />
       </h4>
       <TypeShapeView shape={shape} />
     </div>

@@ -4,6 +4,7 @@
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { Worker } from 'node:worker_threads'
+import { applyPostman, type PostmanImport } from '@flow-checker/postman'
 import {
   createScanSession,
   type FileChanges,
@@ -21,6 +22,10 @@ export type ScanOptions = Pick<
 > & {
   /** Write `.flow-checker/model.json` after each scan. Default: true (`export` turns it off). */
   writeModel?: boolean
+  /** Postman collection each scan is checked against (M15). */
+  postman?: PostmanImport
+  /** The app's own origins, e.g. `http://localhost:3000` (collection URLs there are same-origin). */
+  appOrigins?: string[]
 }
 
 export interface ScanResult {
@@ -40,10 +45,16 @@ export interface ScanRunner {
   update(changes: FileChanges, onProgress?: OnScanProgress): Promise<ScanResult>
   /** Prepares the first re-scan while nothing waits for it. */
   warm(): Promise<void>
+  /** Uses another Postman collection (or none) from the next scan on. */
+  setPostman(imported: PostmanImport | undefined): Promise<void>
   close(): Promise<void>
 }
 
-type WorkerTask = { type: 'scan' } | { type: 'update'; changes: FileChanges } | { type: 'warm' }
+type WorkerTask =
+  | { type: 'scan' }
+  | { type: 'update'; changes: FileChanges }
+  | { type: 'warm' }
+  | { type: 'postman'; imported: PostmanImport | undefined }
 
 export type WorkerRequest = WorkerTask & { id: number }
 
@@ -68,11 +79,13 @@ export function createScanHandler(options: ScanOptions) {
   let session: ScanSession | undefined
   // The session keeps its options, so progress goes to whoever runs the current scan.
   let report: OnScanProgress | undefined
+  let postman = options.postman
   const run = (onProgress: OnScanProgress | undefined, scan: () => AppModel): ScanResult => {
     report = onProgress
     try {
       const started = performance.now()
-      const model = scan()
+      const scanned = scan()
+      const model = postman ? applyPostman(scanned, postman, { appOrigins: options.appOrigins }) : scanned
       const durationMs = performance.now() - started
       if (options.writeModel !== false) writeModel(options.root, model)
       return { model, durationMs }
@@ -82,7 +95,7 @@ export function createScanHandler(options: ScanOptions) {
   }
   const fresh = () => {
     session = undefined
-    const { writeModel: _, ...scanOptions } = options
+    const { writeModel: _, postman: __, appOrigins: ___, ...scanOptions } = options
     session = createScanSession({ ...scanOptions, onProgress: (event) => report?.(event) })
     return session.model
   }
@@ -100,6 +113,9 @@ export function createScanHandler(options: ScanOptions) {
         }
       }),
     warm: () => session?.warm(),
+    setPostman: (imported: PostmanImport | undefined) => {
+      postman = imported
+    },
   }
 }
 
@@ -110,6 +126,7 @@ function localRunner(options: ScanOptions): ScanRunner {
     scan: async (onProgress) => handler.scan(onProgress),
     update: async (changes, onProgress) => handler.update(changes, onProgress),
     warm: async () => handler.warm(),
+    setPostman: async (imported) => handler.setPostman(imported),
     close: async () => {},
   }
 }
@@ -160,6 +177,9 @@ function workerRunner(options: ScanOptions): ScanRunner {
       (await send({ type: 'update', changes }, onProgress)) as ScanResult,
     warm: async () => {
       await send({ type: 'warm' })
+    },
+    setPostman: async (imported) => {
+      await send({ type: 'postman', imported })
     },
     close: async () => {
       worker.removeAllListeners('exit')
