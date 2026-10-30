@@ -15,6 +15,7 @@ export const RECORDED = 'flows/recorded.md'
 export const MIDDLEWARE = 'middleware.md'
 export const POSTMAN = 'postman.md'
 export const TRPC = 'trpc.md'
+export const GRAPHQL = 'graphql.md'
 
 export function docNames(model: AppModel): DocNames {
   const routes = unique(model.routes, (r) => `pages/${routeSlug(r)}`)

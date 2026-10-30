@@ -107,7 +107,12 @@ export function applyPostman(model: AppModel, imported: PostmanImport, options: 
     } else if (site.responseType && hasType(site.responseType)) {
       const examples = e.request.examples.filter(isSuccess)
       const found = checkExamples(
-        examples.map((x) => ({ name: x.name, body: x.body as JsonBody })),
+        examples.map((x) => ({
+          name: x.name,
+          body: (e.request.operation
+            ? { ...(x.body as JsonBody), value: graphqlData(x.body?.value) }
+            : x.body) as JsonBody,
+        })),
         site.responseType,
         types,
         'response.body',
@@ -167,7 +172,10 @@ function endpoint(request: ImportedRequest, imported: PostmanImport, appOrigins:
   }
   const resolved = resolveUrl(request.url, variables, appOrigins)
   const success = request.examples.filter(isSuccess)
-  const responseShape = shapeOfValues(success.map((x) => x.body?.value))
+  // GraphQL answers `{ data, errors }`: the type is `data` (M17).
+  const responseShape = shapeOfValues(
+    success.map((x) => (request.operation ? graphqlData(x.body?.value) : x.body?.value)),
+  )
   const bodyShape = request.body ? shapeOfValues([request.body.value]) : undefined
   const path = renderPath(resolved.segments)
   const hasParam = resolved.segments.some((s) => s.kind === 'param')
@@ -197,6 +205,7 @@ function endpoint(request: ImportedRequest, imported: PostmanImport, appOrigins:
     ...(resolved.unresolved.length > 0 ? { unresolved: resolved.unresolved } : {}),
     ...(responseShape ? { responseType: postmanType(responseShape, `${request.name} example`) } : {}),
     ...(bodyShape ? { bodyType: postmanType(bodyShape, `${request.name} body`) } : {}),
+    ...(request.operation?.name ? { operation: request.operation.name } : {}),
     examples: request.examples.map((x) => ({
       name: x.name,
       ...(x.status !== undefined ? { status: x.status } : {}),
@@ -211,6 +220,10 @@ function endpoint(request: ImportedRequest, imported: PostmanImport, appOrigins:
     staticWords,
     words: new Set([...staticWords, ...words(request.name)]),
   }
+}
+
+function graphqlData(value: unknown): unknown {
+  return value && typeof value === 'object' && 'data' in value ? (value as { data: unknown }).data : undefined
 }
 
 function postmanType(shape: NonNullable<TypeRef['shape']>, fallback: string): TypeRef {
@@ -329,7 +342,16 @@ function compatible(a: Target, b: Target): boolean {
 /** Points for a site URL vs a collection URL, or `undefined` when they can't be the same. */
 function urlScore(site: RequestSite, target: Target, e: Endpoint): number | undefined {
   let score = 0
-  if (site.method && site.method !== e.entry.method) return undefined
+  // GraphQL (M17): every operation has the same URL, so the operation decides.
+  const op = e.request.operation
+  if (site.transport === 'graphql' || op) {
+    if (site.operation?.name && op?.name) {
+      if (site.operation.name !== op.name) return undefined
+      score += 10
+    } else if (site.transport !== 'graphql' || !op) {
+      return undefined
+    }
+  } else if (site.method && site.method !== e.entry.method) return undefined
   if (!site.method) score -= 1
   if (target.origin !== undefined && e.origin !== undefined) {
     if (target.origin === e.origin) score += 2

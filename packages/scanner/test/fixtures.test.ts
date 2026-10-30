@@ -22,6 +22,10 @@ const FIXTURES = [
   'postman',
   'trpc-v10',
   'trpc',
+  'graphql-apollo',
+  'graphql-apollo-v3',
+  'graphql-urql',
+  'graphql-relay',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 

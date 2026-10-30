@@ -87,7 +87,17 @@ function label(model: AppModel, siteId: string): string {
 }
 
 describe('type comparison on recorded fixture captures', () => {
-  it.each(['basic', 'react-query', 'server-actions', 'bff', 'next-intl'])(
+  it.each([
+    'basic',
+    'react-query',
+    'server-actions',
+    'bff',
+    'next-intl',
+    'graphql-apollo',
+    'graphql-apollo-v3',
+    'graphql-urql',
+    'graphql-relay',
+  ])(
     '%s: correct types give no mismatches',
     (fixture) => {
       const { model, verification } = verify(fixture)

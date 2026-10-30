@@ -1,0 +1,93 @@
+# Requests
+
+## AddTodoForm  src/components/AddTodoForm.tsx:17
+POST /api/graphql  graphql useMutation  event onSubmit
+  operation: AddTodo (mutation)
+  body: Exact<{ input: AddTodoInput; }>
+  response: AddTodoMutation
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/AddTodoForm.tsx:20
+
+## TodoView  src/components/TodoDetail.tsx:32
+POST /api/graphql  graphql useSuspenseQuery  page-load
+  operation: Todo (query)
+  body: Exact<{ id: string | number; }>
+  response: TodoQuery
+  handled by: src/app/api/graphql/route.ts
+  via: useSuspenseQuery src/components/TodoDetail.tsx:33
+POST /api/graphql  graphql useMutation  event onClick
+  operation: ToggleTodo (mutation)
+  body: Exact<{ id: string | number; }>
+  response: ToggleTodoMutation
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/TodoDetail.tsx:34
+
+## TodoList  src/components/TodoList.tsx:17
+POST /api/graphql  graphql useQuery  page-load
+  operation: Todos (query)
+  body: Exact<{ status?: TodoStatus | null | undefined; }>
+  response: TodosQuery
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/TodoList.tsx:19
+
+## UserSearch  src/components/UserSearch.tsx:34
+POST /api/graphql  graphql useLazyQuery  event onSubmit
+  operation: Search (query)
+  body: Exact<{ text: string; }>
+  response: SearchQuery
+  handled by: src/app/api/graphql/route.ts
+  via: useLazyQuery src/components/UserSearch.tsx:38
+POST /api/graphql  graphql client.query  event onClick
+  operation: Users (query)
+  response: UsersResult
+  handled by: src/app/api/graphql/route.ts
+  via: client.query src/components/UserSearch.tsx:46
+
+## ViewerBadge  src/components/ViewerBadge.tsx:15
+POST /api/graphql  graphql useQuery  page-load
+  operation: Viewer (query)
+  response: ViewerQuery
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/ViewerBadge.tsx:16
+
+# GraphQL
+
+endpoint: /api/graphql
+client: apollo /api/graphql (batching)  src/lib/apollo.ts:6
+schema: file schema.graphql, 7 types
+
+mutation AddTodo  codegen  1 caller(s)  types: codegen  src/components/AddTodoForm.tsx:8
+  variables: Exact<{ input: AddTodoInput; }>
+  data: AddTodoMutation
+
+query Todo  codegen  1 caller(s)  types: codegen  src/components/TodoDetail.tsx:8
+  variables: Exact<{ id: string | number; }>
+  data: TodoQuery
+
+mutation ToggleTodo  codegen  1 caller(s)  types: codegen  src/components/TodoDetail.tsx:22
+  variables: Exact<{ id: string | number; }>
+  data: ToggleTodoMutation
+
+query Todos  codegen  1 caller(s)  types: codegen  src/components/TodoList.tsx:8
+  fragments: TodoItem
+  variables: Exact<{ status?: TodoStatus | null | undefined; }>
+  data: TodosQuery
+
+query Search  codegen  1 caller(s)  types: codegen  src/components/UserSearch.tsx:8
+  variables: Exact<{ text: string; }>
+  data: SearchQuery
+
+query Users  codegen  1 caller(s)  types: codegen  src/components/UserSearch.tsx:24
+  data: UsersResult
+
+query Viewer  codegen  1 caller(s)  types: codegen  src/components/ViewerBadge.tsx:6
+  data: ViewerQuery
+
+fragment TodoItem on Todo  src/components/TodoItem.tsx:7
+  read by: TodoItem
+
+# Query cache links
+
+refetch GraphQL Todos  refetchQueries  AddTodoForm  event onSubmit  success  src/components/AddTodoForm.tsx:21
+  after: POST /api/graphql
+  hits: POST /api/graphql  (TodoList)

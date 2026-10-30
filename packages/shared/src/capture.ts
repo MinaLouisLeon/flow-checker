@@ -124,6 +124,30 @@ export const CaptureSchema = z.object({
         .optional(),
     })
     .optional(),
+  /**
+   * GraphQL operation (M17), read from the body (or the GET query). A batched request (an array
+   * of operations) is split into one capture per operation: each has its own operation as the
+   * request body and its own result as the response, and `batch` says where it came from.
+   */
+  operation: z
+    .object({
+      /** `operationName`, else the name in the query text. Absent when only a hash was sent. */
+      name: z.string().optional(),
+      type: z.enum(['query', 'mutation', 'subscription']).optional(),
+      /** Persisted query hash or document id (`extensions.persistedQuery.sha256Hash`, `doc_id`, `documentId`). */
+      hash: z.string().optional(),
+      /** Only the hash was sent, no query text. */
+      persisted: z.boolean().optional(),
+      batch: z
+        .object({
+          /** Id the runtime gave the whole request. */
+          id: z.string(),
+          index: z.number().int().nonnegative(),
+          size: z.number().int().positive(),
+        })
+        .optional(),
+    })
+    .optional(),
   parent: CaptureParentSchema.optional(),
   /** Stack frames where the request was sent, innermost first. */
   stack: z.array(z.string()),
@@ -199,6 +223,8 @@ export interface CaptureSummary {
   parentCaptureId?: string
   /** tRPC procedure path (M16). */
   procedure?: string
+  /** GraphQL operation name (M17), or its hash when only that was sent. */
+  operation?: string
   /** Nearest component from the interaction, if any. */
   component?: string
   redacted: boolean
@@ -225,6 +251,9 @@ export function summarizeCapture(c: Capture): CaptureSummary {
     serverActionId: c.serverAction?.id,
     parentCaptureId: c.parent?.captureId,
     ...(c.procedure ? { procedure: c.procedure.path } : {}),
+    ...(c.operation && (c.operation.name || c.operation.hash)
+      ? { operation: c.operation.name || `#${c.operation.hash?.slice(0, 12)}` }
+      : {}),
     component: c.interaction?.componentChain[0],
     redacted: c.redacted,
     match: c.match && {

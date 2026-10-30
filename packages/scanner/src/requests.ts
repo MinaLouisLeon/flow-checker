@@ -15,11 +15,17 @@ import {
   type Component,
   type Flag,
   formatTypeShape,
+  type GraphqlClient,
+  type GraphqlFragment,
+  type GraphqlInfo,
+  type GraphqlOperation,
+  type GraphqlOperationType,
   HTTP_METHODS,
   type HttpMethod,
   type MiddlewareRewrite,
   makeId,
   type Navigation,
+  type OperationRef,
   type PathCheck,
   type ProcedureRef,
   type QueryKeyPart,
@@ -55,6 +61,17 @@ import {
 } from 'ts-morph'
 import { siteHash } from './code-hash'
 import { directives, importModuleOf, isConditional, unalias } from './components'
+import {
+  type DocRef,
+  documentHashes,
+  type GraphqlCall,
+  type GraphqlCatalog,
+  graphqlCall,
+  isApolloRefetch,
+  type OperationEntry,
+} from './graphql'
+import { type GraphQLSchema, operationShapes, usedFragments } from './graphql-schema'
+import { unmask } from './graphql-types'
 import { linkApi, type NavApi, type NavKind, navigationCall, outcomeOf } from './navigation'
 import { compare, relativeTo } from './paths'
 import {
@@ -225,6 +242,27 @@ interface Origin {
   procedure?: ProcedureRef
 }
 
+/** GraphQL (M17): what the scan found before the walk. */
+export interface GraphqlState {
+  catalog: GraphqlCatalog
+  /** Where operations go when a client doesn't say. */
+  endpoint?: RequestUrl
+  clients: GraphqlClient[]
+  /** Types for operations the code has none for. */
+  schema?: { schema: GraphQLSchema; from: 'schema' | 'introspection' }
+  /** The Relay compiler's generated file for an operation or fragment, by name. */
+  relayArtifact?: (name: string) => SourceFile | undefined
+  /** Persisted query ids by operation name, from a manifest. */
+  manifest?: Map<string, string[]>
+}
+
+/** Types a GraphQL site's own call gives (type arguments). */
+interface OperationTypes {
+  result?: TypeRef
+  variables?: TypeRef
+  from: NonNullable<GraphqlOperation['typesFrom']>
+}
+
 /** A procedure read from the router, with its types. */
 interface TrpcInfo {
   def: ProcedureDef
@@ -287,6 +325,7 @@ interface Found {
   serverAction?: ServerActionRef
   client?: { module: string; name: string }
   procedure?: ProcedureRef
+  operation?: OperationRef
 }
 
 export interface RequestScannerOptions {
@@ -335,6 +374,14 @@ export class RequestScanner {
   #evalDepth = 0
   /** tRPC (M16): the endpoint and the router's procedures by path. */
   #trpc: { endpoint: string; procedures: Map<string, TrpcInfo> } | undefined
+  /** GraphQL (M17): documents, clients and schema. */
+  #graphql: GraphqlState | undefined
+  /** Fragment name -> components that read it (`useFragment`). */
+  readonly #fragmentUses = new Map<string, Set<string>>()
+  /** Operation id -> types the first call with type arguments gave. */
+  readonly #callTypes = new Map<string, OperationTypes>()
+  /** Operation id -> document values used at calls, for codegen's typed documents. */
+  readonly #docExprs = new Map<string, Node[]>()
 
   constructor(root: string, types: TypeResolver, options: RequestScannerOptions = {}) {
     this.#root = root
@@ -451,6 +498,177 @@ export class RequestScanner {
     return N.isIdentifier(skipWrappers(node)) ? ref : { ...ref, text: oneLine(formatTypeShape(ref.shape)) }
   }
 
+  /** GraphQL documents, clients and schema (M17). Call before walking components. */
+  setGraphql(state: GraphqlState) {
+    this.#graphql = state
+  }
+
+  /** A URL expression, evaluated like request URLs (constants, env variables). */
+  urlOf(expr: Node): RequestUrl {
+    return toUrl(this.#str(expr, EMPTY_ENV), oneLine(expr.getText()))
+  }
+
+  /**
+   * The GraphQL operations and fragments with their types (generated, written at the calls, then
+   * from the schema) and the sites that send them. Sites without types of their own get their
+   * operation's.
+   */
+  graphqlInfo(
+    sites: RequestSite[],
+    base: Omit<GraphqlInfo, 'operations' | 'fragments' | 'clients'>,
+  ): GraphqlInfo | undefined {
+    const state = this.#graphql
+    if (!state) return undefined
+    const { catalog } = state
+    const hasSites = sites.some((s) => s.transport === 'graphql')
+    if (
+      catalog.operations.size === 0 &&
+      catalog.fragments.size === 0 &&
+      state.clients.length === 0 &&
+      !hasSites
+    )
+      return undefined
+    const fragmentNodes = catalog.fragmentNodes()
+    const operations: GraphqlOperation[] = []
+    const byId = new Map<string, GraphqlOperation>()
+    for (const entry of catalog.operations.values()) {
+      const op = entry.definition.node
+      if (op.kind !== 'OperationDefinition') continue
+      const spreads = usedFragments(op.selectionSet, fragmentNodes)
+      const computed = state.schema ? operationShapes(state.schema.schema, op, fragmentNodes) : undefined
+      const types = this.#documentTypes(entry) ?? this.#callTypes.get(entry.id)
+      const base = typeBaseName(entry.name, entry.type)
+      let resultType = types?.result
+      let variablesType = types?.variables
+      let typesFrom = types?.from
+      if (computed && !resultType) {
+        resultType = { text: base, shape: computed.result }
+        typesFrom = state.schema?.from
+      }
+      if (computed && !variablesType) variablesType = { text: `${base}Variables`, shape: computed.variables }
+      // An operation without variables sends none: nothing to check.
+      if (!op.variableDefinitions?.length) variablesType = undefined
+      const hashes = [...documentHashes(op, spreads), ...(state.manifest?.get(entry.name) ?? [])]
+      const out: GraphqlOperation = {
+        id: entry.id,
+        name: entry.name,
+        type: entry.type,
+        source: entry.doc.source,
+        loc: entry.doc.file
+          ? { ...entry.doc.loc, line: op.loc?.startToken.line ?? entry.doc.loc.line }
+          : entry.doc.loc,
+        document: entry.definition.text,
+        fragments: spreads.map((f) => f.name.value),
+        hashes: [...new Set(hashes)],
+        ...(variablesType ? { variablesType } : {}),
+        ...(resultType ? { resultType } : {}),
+        ...(typesFrom && (resultType || variablesType) ? { typesFrom } : {}),
+        ...(computed && computed.errors.length > 0 ? { errors: computed.errors } : {}),
+        siteIds: [],
+      }
+      operations.push(out)
+      byId.set(out.id, out)
+    }
+    for (const site of sites) {
+      if (site.transport !== 'graphql' || !site.operation) continue
+      const op = byId.get(site.operation.id)
+      if (!op) continue
+      op.siteIds.push(site.id)
+      let changed = false
+      if (!site.responseType && op.resultType) {
+        site.responseType = op.resultType
+        changed = true
+      }
+      if (!site.bodyType && op.variablesType) {
+        site.bodyType = op.variablesType
+        changed = true
+      }
+      if (changed) site.flags = flagsOf(site)
+    }
+    const fragments: GraphqlFragment[] = [...catalog.fragments.values()].map((f) => ({
+      id: f.id,
+      name: f.name,
+      on: f.on,
+      loc: f.doc.loc,
+      document: f.definition.text,
+      componentIds: [...(this.#fragmentUses.get(f.name) ?? [])].sort(compare),
+    }))
+    return {
+      ...base,
+      clients: state.clients,
+      operations: operations.sort((a, b) => compareLoc(a.loc, b.loc) || compare(a.name, b.name)),
+      fragments: fragments.sort((a, b) => compareLoc(a.loc, b.loc) || compare(a.name, b.name)),
+    }
+  }
+
+  /** Types that come with the document: codegen's `TypedDocumentNode`, or the Relay compiler's. */
+  #documentTypes(entry: OperationEntry): OperationTypes | undefined {
+    const candidates = [entry.doc.node, ...(this.#docExprs.get(entry.id) ?? [])]
+    for (const node of candidates) {
+      const typed = this.#typedDocument(node)
+      if (typed) return typed
+    }
+    if (entry.name && this.#graphql?.relayArtifact) {
+      const relay = this.#relayTypes(entry.name)
+      if (relay) return relay
+    }
+    return undefined
+  }
+
+  /** `__apiType?: (variables: V) => R` on a typed document (codegen, `TypedDocumentNode`). */
+  #typedDocument(node: Node): OperationTypes | undefined {
+    let outer = node
+    for (let parent = outer.getParent(); parent; parent = outer.getParent()) {
+      if (
+        !N.isAsExpression(parent) &&
+        !N.isParenthesizedExpression(parent) &&
+        !N.isSatisfiesExpression(parent)
+      )
+        break
+      outer = parent
+    }
+    if (N.isSourceFile(outer)) return undefined
+    const api = outer.getType().getProperty('__apiType')?.getTypeAtLocation(outer).getNonNullableType()
+    const signature = api?.getCallSignatures()[0]
+    if (!signature) return undefined
+    const result = signature.getReturnType()
+    // urql's and Apollo's untyped `gql` are typed documents of `any`: no types there.
+    if (!isMeaningful(result)) return undefined
+    const variables = signature.getParameters()[0]?.getTypeAtLocation(outer)
+    return {
+      result: this.#unmasked(this.#types.fromType(result, outer)),
+      ...(variables && isMeaningful(variables) ? { variables: this.#types.fromType(variables, outer) } : {}),
+      from: 'codegen',
+    }
+  }
+
+  /** The Relay compiler's `<Name>$data` and `<Name>$variables` types. */
+  #relayTypes(name: string): OperationTypes | undefined {
+    const file = this.#graphql?.relayArtifact?.(name)
+    if (!file) return undefined
+    const data = file.getTypeAlias(`${name}$data`)
+    const variables = file.getTypeAlias(`${name}$variables`)
+    if (!data) return undefined
+    return {
+      result: this.#unmasked(this.#types.fromType(data.getType(), data)),
+      ...(variables ? { variables: this.#types.fromType(variables.getType(), variables) } : {}),
+      from: 'relay',
+    }
+  }
+
+  /** A generated type with the fragments it masks merged back in. */
+  #unmasked(ref: TypeRef): TypeRef {
+    const shape = unmask(ref.shape, {
+      deref: (id) => this.#types.namedShape(id),
+      relayFragment: (name) => {
+        const file = this.#graphql?.relayArtifact?.(name)
+        const data = file?.getTypeAlias(`${name}$data`)
+        return data ? this.#types.fromType(data.getType(), data).shape : undefined
+      },
+    })
+    return shape === ref.shape ? ref : { ...ref, shape }
+  }
+
   /** Middleware rewrites, with the route that answers when the target resolves to one. */
   rewrites(routes: Route[]): MiddlewareRewrite[] {
     const pages = pageTargets(routes, true)
@@ -549,6 +767,17 @@ export class RequestScanner {
     const trpc = procedureCall(call)
     if (trpc && trpc.proxy !== 'server') {
       this.#trpcCall(call, trpc, scope, env, w)
+      return true
+    }
+    const gql = graphqlCall(call)
+    if (gql) {
+      this.#graphqlCall(call, gql, scope, env, w)
+      return true
+    }
+    if (isApolloRefetch(call)) {
+      const options = call.getArguments()[0]
+      const include = options ? this.#propOf({ node: options, env }, 'include') : undefined
+      if (include) this.#refetchLinks(include, this.#frame(call, scope), call, w)
       return true
     }
     if (this.#isFetch(call)) {
@@ -813,6 +1042,208 @@ export class RequestScanner {
       }
     }
     return undefined
+  }
+
+  // --- GraphQL (M17) -------------------------------------------------------------------------
+
+  /**
+   * An Apollo, urql or Relay call. Hooks that return a function to send (`useLazyQuery`,
+   * `useMutation`, `useQueryLoader`) are triggered where that function is called; mutation
+   * callbacks (`onCompleted`, `onError`) and `refetchQueries` are followed from there too.
+   */
+  #graphqlCall(call: CallExpression, gql: GraphqlCall, scope: Node, env: Env, w: Walk) {
+    const args = call.getArguments()
+    const docArg: Resolved = { node: args[gql.docArg], env }
+    const docValue = gql.docProp ? this.#propOf(docArg, gql.docProp) : docArg
+    const ref = docValue ? this.#graphqlDoc(docValue) : undefined
+    const catalog = this.#graphql?.catalog
+
+    if (gql.kind === 'fragment') {
+      const component = w.origin.componentId
+      if (!ref || !catalog || !component) return
+      for (const fragment of catalog.fragmentsOf(ref)) {
+        const users = this.#fragmentUses.get(fragment.name) ?? new Set<string>()
+        users.add(component)
+        this.#fragmentUses.set(fragment.name, users)
+      }
+      return
+    }
+    // `usePreloadedQuery` reads what `loadQuery` / `useQueryLoader` fetched.
+    if (gql.kind === 'preloaded') return
+
+    const entry = ref && catalog ? catalog.operationOf(ref) : undefined
+    if (entry && docValue?.node) {
+      const exprs = this.#docExprs.get(entry.id) ?? []
+      if (!exprs.includes(docValue.node)) exprs.push(docValue.node)
+      this.#docExprs.set(entry.id, exprs)
+    }
+    const type = entry?.type ?? gql.type
+    const executor = gql.executor !== undefined ? this.#executorUses(call, scope, gql.executor) : undefined
+    const frame: Frame = {
+      ...this.#frame(call, scope),
+      callee: oneLine(call.getExpression().getText()),
+      hook: { def: { name: gql.name, module: gql.module, kind: type === 'mutation' ? 'mutation' : 'query' } },
+      ...(executor ? { trigger: executor.trigger } : {}),
+    }
+    const own = this.#callTypesOf(call, gql)
+    if (entry && own && !this.#callTypes.has(entry.id)) this.#callTypes.set(entry.id, own)
+    this.#emitGraphql(w, frame, gql, type, entry, own)
+
+    // What runs after it: callbacks in the hook's options and in the calls that send it.
+    const optionsList: Resolved[] = []
+    if (gql.optionsArg !== undefined && args[gql.optionsArg])
+      optionsList.push({ node: args[gql.optionsArg], env })
+    for (const sent of executor?.calls ?? []) {
+      const first = sent.getArguments()[0]
+      if (first && gql.library !== 'urql') optionsList.push({ node: first, env })
+    }
+    for (const options of optionsList) {
+      if (type === 'mutation') {
+        const refetch = this.#propOf(options, 'refetchQueries')
+        if (refetch) this.#refetchLinks(refetch, frame, call, w)
+      }
+      this.#graphqlCallbacks(options, frame, call, w)
+    }
+  }
+
+  /** Follows a document value through parameters and constants to the catalog. */
+  #graphqlDoc(value: Resolved): DocRef | undefined {
+    const catalog = this.#graphql?.catalog
+    if (!catalog || !value.node) return undefined
+    const direct = catalog.resolve(value.node)
+    if (direct) return direct
+    const r = this.#evaluate(value.node, value.env)
+    return r.node ? catalog.resolve(r.node) : undefined
+  }
+
+  /** Type arguments at the call: `useQuery<Data, Vars>(...)`, Relay's `useLazyLoadQuery<Operation>(...)`. */
+  #callTypesOf(call: CallExpression, gql: GraphqlCall): OperationTypes | undefined {
+    const [first, second] = call.getTypeArguments()
+    if (!first || first.getType().isTypeParameter()) return undefined
+    if (gql.typeArgs === 'data-vars') {
+      return {
+        result: this.#unmasked(this.#types.fromTypeNode(first)),
+        ...(second ? { variables: this.#types.fromTypeNode(second) } : {}),
+        from: 'code',
+      }
+    }
+    // Relay: `{ response: X$data; variables: X$variables }`.
+    const type = first.getType()
+    const response = type.getProperty('response')?.getTypeAtLocation(first)
+    const variables = type.getProperty('variables')?.getTypeAtLocation(first)
+    if (!response) return undefined
+    const generated = /__generated__|\.graphql\.[cm]?tsx?$/.test(
+      type.getAliasSymbol()?.getDeclarations()[0]?.getSourceFile().getFilePath() ??
+        type.getSymbol()?.getDeclarations()[0]?.getSourceFile().getFilePath() ??
+        '',
+    )
+    return {
+      result: this.#unmasked(this.#types.fromType(response, first)),
+      ...(variables ? { variables: this.#types.fromType(variables, first) } : {}),
+      from: generated ? 'relay' : 'code',
+    }
+  }
+
+  #emitGraphql(
+    w: Walk,
+    frame: Frame,
+    gql: GraphqlCall,
+    type: GraphqlOperationType,
+    entry: OperationEntry | undefined,
+    own: OperationTypes | undefined,
+  ) {
+    const state = this.#graphql
+    const client = state?.clients.find((c) => c.library === gql.library)
+    const url = client?.endpoint ?? state?.endpoint
+    const get = type === 'query' && !!client && clientGetsQueries(client)
+    this.#emit(w, frame, {
+      transport: 'graphql',
+      method: get ? 'GET' : 'POST',
+      ...(url ? { url } : {}),
+      ...(entry ? { operation: { id: entry.id, name: entry.name, type: entry.type } } : {}),
+      ...(own?.variables ? { bodyType: own.variables } : {}),
+      ...(own?.result ? { responseType: own.result } : {}),
+    })
+  }
+
+  /** Where the function a hook returns (`const [run] = useLazyQuery()`) is called, and what that starts from. */
+  #executorUses(
+    hook: CallExpression,
+    scope: Node,
+    index: number,
+  ): { trigger: Trigger; calls: CallExpression[] } {
+    const pattern = hook.getParentIfKind(ts.SyntaxKind.VariableDeclaration)?.getNameNode()
+    const element = pattern && N.isArrayBindingPattern(pattern) ? pattern.getElements()[index] : undefined
+    const name = element && N.isBindingElement(element) ? element.getNameNode() : undefined
+    if (!name || !N.isIdentifier(name)) return { trigger: { kind: 'unknown' }, calls: [] }
+    const symbol = name.getSymbol()
+    const calls: CallExpression[] = []
+    let trigger: Trigger | undefined
+    for (const ref of scope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
+      if (ref === name || ref.getSymbol() !== symbol) continue
+      const parent = ref.getParent()
+      if (parent && N.isCallExpression(parent) && parent.getExpression() === ref) calls.push(parent)
+      if (trigger) continue
+      const attr =
+        parent && N.isJsxExpression(parent) ? parent.getParentIfKind(ts.SyntaxKind.JsxAttribute) : undefined
+      trigger = attr ? attributeTrigger(attr, this.#loc(attr)) : this.#classify(ref, scope, 0)
+    }
+    if (trigger) return { trigger, calls }
+    const first = calls[0]
+    return { trigger: first ? { kind: 'page-load', loc: this.#loc(first) } : { kind: 'unknown' }, calls }
+  }
+
+  /** Apollo `onCompleted` / `onError`, Relay `onCompleted` / `onError`: what runs after the request. */
+  #graphqlCallbacks(options: Resolved, frame: Frame, anchor: Node, w: Walk) {
+    const { hook: _, ...plain } = frame
+    for (const name of ['onCompleted', 'onError']) {
+      const prop = this.#propOf(options, name)
+      const callback = prop ? this.#functionValue(prop.node, prop.env) : undefined
+      if (!callback || w.active.has(callback)) continue
+      const outcome = name === 'onCompleted' ? 'success' : 'error'
+      this.#enter(callback, prop?.env ?? EMPTY_ENV, { ...plain, outcome, after: anchor }, w)
+    }
+  }
+
+  /** `refetchQueries: ['Todos', { query: TODOS }]`: a refetch link per operation. */
+  #refetchLinks(value: Resolved, frame: Frame, anchor: Node, w: Walk) {
+    if (w.origin.kind === 'route-handler') return
+    const list = this.#evaluate(value.node, value.env)
+    const node = list.node ? skipWrappers(list.node) : undefined
+    if (!node || !N.isArrayLiteralExpression(node)) return
+    for (const element of node.getElements()) {
+      let name: string | undefined
+      const item = this.#evaluate(element, list.env)
+      const inner = item.node ? skipWrappers(item.node) : undefined
+      if (inner && (N.isStringLiteral(inner) || N.isNoSubstitutionTemplateLiteral(inner))) {
+        name = inner.getLiteralText()
+      } else if (inner) {
+        const query = N.isObjectLiteralExpression(inner) ? this.#propOf(item, 'query') : item
+        const ref = query ? this.#graphqlDoc(query) : undefined
+        name = ref ? this.#graphql?.catalog.operationOf(ref)?.name : undefined
+      }
+      if (!name) continue
+      const frames = [...w.frames, { ...frame, node: element, callee: 'refetchQueries' }]
+      const callStack: CallFrame[] = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
+      const id = makeId('qlk', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+      if (this.#links.has(id)) continue
+      this.#links.set(id, {
+        link: {
+          id,
+          kind: 'refetch',
+          method: 'refetchQueries',
+          origin: w.origin.kind === 'server-action' ? 'server-action' : 'component',
+          ...(w.origin.componentId ? { componentId: w.origin.componentId } : {}),
+          operation: name,
+          trigger: this.#trigger(frames, w.origin),
+          // Apollo refetches once the mutation succeeded.
+          outcome: 'success',
+          loc: this.#loc(element),
+          callStack,
+        },
+        after: [anchor, ...frames.flatMap((f) => (f.after ? [f.after] : []))],
+      })
+    }
   }
 
   // --- tRPC (M16) ----------------------------------------------------------------------------
@@ -1223,12 +1654,17 @@ export class RequestScanner {
     const trpcQueries = sites.filter(
       (s) => s.transport === 'trpc' && s.procedure?.type === 'query' && s.trigger.kind !== 'server-render',
     )
+    // GraphQL queries an Apollo refetch can hit, by operation name (M17).
+    const graphqlQueries = sites.filter(
+      (s) => s.transport === 'graphql' && s.operation?.type === 'query' && s.trigger.kind !== 'server-render',
+    )
     const links: QueryLink[] = []
     for (const { link, after } of this.#links.values()) {
       const fromSiteIds = [...new Set(after.flatMap((node) => this.#hookSites.get(node) ?? []))]
       const prefix = link.procedure
-      const targets =
-        prefix !== undefined
+      const targets = link.operation
+        ? graphqlQueries.filter((s) => s.operation?.name === link.operation)
+        : prefix !== undefined
           ? trpcQueries.filter(
               (s) => !prefix || s.procedure?.path === prefix || s.procedure?.path.startsWith(`${prefix}.`),
             )
@@ -1633,7 +2069,8 @@ export class RequestScanner {
         isActionStateHook(d) ||
         navigationCall(d) ||
         middlewareResponse(d) ||
-        (procedureCall(d)?.proxy ?? 'server') !== 'server'
+        (procedureCall(d)?.proxy ?? 'server') !== 'server' ||
+        isGraphqlRequest(d)
       ) {
         found = true
         return
@@ -1697,6 +2134,7 @@ export class RequestScanner {
         : w.origin.procedure
           ? { procedure: w.origin.procedure }
           : {}),
+      ...(found.operation ? { operation: found.operation } : {}),
       ...(found.method ? { method: found.method } : {}),
       ...(found.url ? { url: found.url } : {}),
       trigger,
@@ -2419,6 +2857,24 @@ function flagsOf(site: RequestSite): Flag[] {
     flags.push({ kind: 'unknown-trigger', message: 'Could not find what starts this request.' })
   }
   return flags
+}
+
+/** A GraphQL call that sends a request (not `useFragment` / `usePreloadedQuery`). */
+function isGraphqlRequest(call: CallExpression): boolean {
+  const gql = graphqlCall(call)
+  return !!gql && gql.kind !== 'fragment' && gql.kind !== 'preloaded'
+}
+
+/** urql sends queries as GET (by default), Apollo with `useGETForQueries`. */
+function clientGetsQueries(client: GraphqlClient & { getForQueries?: boolean }): boolean {
+  return !!client.getForQueries
+}
+
+/** `Todos` + query -> `TodosQuery`; names that already end in the type keep it (`TodoListQuery`). */
+function typeBaseName(name: string, type: GraphqlOperationType): string {
+  const suffix = type === 'query' ? 'Query' : type === 'mutation' ? 'Mutation' : 'Subscription'
+  if (!name) return `Anonymous${suffix}`
+  return name.endsWith(suffix) ? name : `${name}${suffix}`
 }
 
 /** Subscriptions are long-running reads: React Query treats them like queries. */

@@ -1,0 +1,48 @@
+# Types
+
+SearchResult  type-alias  src/types/search.ts:1
+  { __typename: "Todo"; id: string; title: string } | { __typename: "User"; id: string; name: string }
+SearchData  interface  src/types/search.ts:5
+  { search: SearchResult[] }
+SearchVars  interface  src/types/search.ts:9
+  { text: string }
+User  interface  src/types/todo.ts:3
+  { id: string; name: string; email: string }
+TodoFields  interface  src/types/todo.ts:9
+  { id: string; title: string; done: boolean }
+TodoDetailFields  interface  src/types/todo.ts:15
+  { status: "OPEN" | "DONE"; owner: { id: string; name: string }; id: string; title: string; done: boolean }
+TodosData  interface  src/types/todo.ts:20
+  { todos: TodoFields[] }
+TodoData  interface  src/types/todo.ts:24
+  { todo: TodoDetailFields | null }
+TodoVars  interface  src/types/todo.ts:28
+  { id: string }
+AddTodoData  interface  src/types/todo.ts:32
+  { addTodo: TodoFields }
+AddTodoVars  interface  src/types/todo.ts:36
+  { input: { title: string; ownerId?: string } }
+DeleteTodoData  interface  src/types/todo.ts:40
+  { deleteTodo: boolean }
+ViewerData  interface  src/types/todo.ts:44
+  { viewer: User }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:7
+  props: { children: ReactNode }
+TodoPage  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+AddTodoForm  src/components/AddTodoForm.tsx:9
+  uses: AddTodoData, AddTodoVars
+Search  src/components/Search.tsx:8
+  uses: SearchData, SearchVars
+TodoDetail  src/components/TodoDetail.tsx:8
+  props: { id: string }
+  uses: TodoData, TodoVars, DeleteTodoData
+TodoList  src/components/TodoList.tsx:8
+  uses: TodosData
+ViewerBadge  src/components/ViewerBadge.tsx:7
+  uses: ViewerData

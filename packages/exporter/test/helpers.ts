@@ -20,6 +20,10 @@ export const FIXTURES = [
   'postman',
   'trpc-v10',
   'trpc',
+  'graphql-apollo',
+  'graphql-apollo-v3',
+  'graphql-urql',
+  'graphql-relay',
 ]
 export const NOW = new Date('2026-10-29T12:00:00.000Z')
 

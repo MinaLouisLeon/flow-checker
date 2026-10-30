@@ -11,6 +11,7 @@ import diagnostics from 'node:diagnostics_channel'
 import { ClientRequest, type IncomingMessage } from 'node:http'
 import type { Capture, CapturedBody, CaptureParent } from '@flow-checker/shared'
 import { bytesBody, callerStack, headersToObject, readStream, requestBody } from './body'
+import { splitGraphqlCapture } from './graphql'
 import {
   createIgnoreMatcher,
   ENV,
@@ -97,7 +98,8 @@ function start(config: RuntimeConfig): ServerRuntime {
 
   const push = (capture: Capture) => {
     try {
-      for (const piece of splitTrpcCapture(capture)) queue.push(redactCapture(piece, rules, options.storeRaw))
+      for (const piece of splitTrpcCapture(capture).flatMap(splitGraphqlCapture))
+        queue.push(redactCapture(piece, rules, options.storeRaw))
       if (!timer) {
         timer = setTimeout(() => void flush(), FLUSH_MS)
         timer.unref?.()

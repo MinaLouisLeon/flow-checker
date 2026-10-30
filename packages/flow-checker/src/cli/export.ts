@@ -13,6 +13,7 @@ import { collectSnapshot, type ExportFormat } from '@flow-checker/server'
 import type { AppModel, ExportData, FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
+import { graphqlForScan } from './graphql'
 import { appOrigins, postmanForScan } from './postman'
 import { createProgress, type Progress, scanReporter, scanSteps } from './progress'
 import { findDashboardDir } from './project'
@@ -83,6 +84,7 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
     root,
     appDir: options.appDir ?? config.appDir,
     ...scanSettings(config),
+    graphql: await graphqlForScan(root, config, io, progress, { save: false }),
     writeModel: false,
     postman: await postmanForScan(root, config, io, progress, { save: false }),
     appOrigins: appOrigins(config),

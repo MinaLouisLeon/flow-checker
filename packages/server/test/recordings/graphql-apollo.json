@@ -1,0 +1,1167 @@
+{
+  "fixture": "graphql-apollo",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvuu3aejss1ylf5u-0",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:09.739Z",
+      "durationMs": 315,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Viewer {\n  viewer {\n    id\n    name\n    __typename\n  }\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:09 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "viewer": {
+                "id": "u1",
+                "name": "Ada Lovelace",
+                "__typename": "User"
+              }
+            }
+          }
+        }
+      },
+      "operation": {
+        "name": "Viewer",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvuu3aejss1ylf5u",
+          "index": 0,
+          "size": 2
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_235i024m0l6",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3aejss1ylf5u-1",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:09.739Z",
+      "durationMs": 315,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {
+              "status": null
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Todos($status: TodoStatus) {\n  todos(status: $status) {\n    id\n    ...TodoItem\n    __typename\n  }\n}\n\nfragment TodoItem on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:09 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "1",
+                  "title": "Write the schema",
+                  "done": true,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvuu3aejss1ylf5u",
+          "index": 1,
+          "size": 2
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1cmdvpo38br",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ status?: TodoStatus | null | undefined; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodosQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3cuq12amnwxh",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:12.914Z",
+      "durationMs": 21,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {
+              "status": "OPEN"
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Todos($status: TodoStatus) {\n  todos(status: $status) {\n    id\n    ...TodoItem\n    __typename\n  }\n}\n\nfragment TodoItem on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:12 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "change",
+        "target": "input[type=checkbox]",
+        "componentChain": [
+          "TodoList",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:12.896Z"
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1cmdvpo38br",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ status?: TodoStatus | null | undefined; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodosQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3e2yebmpepxf",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:14.506Z",
+      "durationMs": 20,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "AddTodo",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "mutation AddTodo($input: AddTodoInput!) {\n  addTodo(input: $input) {\n    id\n    title\n    __typename\n  }\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:14 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "addTodo": {
+                "id": "4",
+                "title": "Record captures",
+                "__typename": "Todo"
+              }
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:14.483Z"
+      },
+      "operation": {
+        "name": "AddTodo",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1se0zfbjglz",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ input: AddTodoInput; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoMutation",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3e3n6ms5zjso",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:14.531Z",
+      "durationMs": 22,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {
+              "status": "OPEN"
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Todos($status: TodoStatus) {\n  todos(status: $status) {\n    id\n    ...TodoItem\n    __typename\n  }\n}\n\nfragment TodoItem on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:14 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "4",
+                  "title": "Record captures",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:14.483Z"
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9421:34",
+        "at execFinalizer (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:896:9)",
+        "at Subscription.unsubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:813:29)",
+        "at Subscriber.unsubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:619:42)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1cmdvpo38br",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ status?: TodoStatus | null | undefined; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodosQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3f3matlhbev4",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:15.826Z",
+      "durationMs": 21,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Todo($id: ID!) {\n  todo(id: $id) {\n    id\n    title\n    done\n    status\n    owner {\n      name\n      __typename\n    }\n    __typename\n  }\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:15 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "status": "OPEN",
+                "owner": {
+                  "name": "Ada Lovelace",
+                  "__typename": "User"
+                },
+                "__typename": "Todo"
+              }
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:14.483Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0y9v4qo3n8x",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ id: string | number; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3gagvl173jzt",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:17.368Z",
+      "durationMs": 20,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "ToggleTodo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "mutation ToggleTodo($id: ID!) {\n  toggleTodo(id: $id) {\n    id\n    done\n    status\n    __typename\n  }\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:17 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "toggleTodo": {
+                "id": "4",
+                "done": true,
+                "status": "DONE",
+                "__typename": "Todo"
+              }
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoView",
+          "ClientOnly",
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider"
+        ],
+        "at": "2026-10-30T10:33:17.347Z"
+      },
+      "operation": {
+        "name": "ToggleTodo",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_08vp0aultnf",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ id: string | number; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "ToggleTodoMutation",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3jk6jq6fg2vd",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:21.606Z",
+      "durationMs": 47,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Search",
+            "variables": {
+              "text": "a"
+            },
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Search($text: String!) {\n  search(text: $text) {\n    __typename\n    ... on Todo {\n      id\n      title\n      __typename\n    }\n    ... on User {\n      id\n      name\n      __typename\n    }\n  }\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:21 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "search": [
+                {
+                  "__typename": "Todo",
+                  "id": "1",
+                  "title": "Write the schema"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "2",
+                  "title": "Add a route handler"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "3",
+                  "title": "Try a persisted query"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "4",
+                  "title": "Record captures"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u1",
+                  "name": "Ada Lovelace"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u2",
+                  "name": "Grace Hopper"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u3",
+                  "name": "Alan Turing"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Search\"",
+        "componentChain": [
+          "UserSearch",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:33:21.581Z"
+      },
+      "operation": {
+        "name": "Search",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_27iyr9uuhkz",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Exact<{ text: string; }>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "SearchQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu3kr3um50tawn",
+      "sessionId": "ses_mvuu3a6o3cgbrite",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:23.151Z",
+      "durationMs": 20,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json,application/json;q=0.9",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Users",
+            "variables": {},
+            "extensions": {
+              "clientLibrary": {
+                "name": "@apollo/client",
+                "version": "4.3.5"
+              }
+            },
+            "query": "query Users {\n  users {\n    id\n    name\n    email\n    __typename\n  }\n}"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:23 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "users": [
+                {
+                  "id": "u1",
+                  "name": "Ada Lovelace",
+                  "email": "ada@example.com",
+                  "__typename": "User"
+                },
+                {
+                  "id": "u2",
+                  "name": "Grace Hopper",
+                  "email": "grace@example.com",
+                  "__typename": "User"
+                },
+                {
+                  "id": "u3",
+                  "name": "Alan Turing",
+                  "email": "alan@example.com",
+                  "__typename": "User"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Load users\"",
+        "componentChain": [
+          "UserSearch",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:33:23.129Z"
+      },
+      "operation": {
+        "name": "Users",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gkwwge4op9t_._.js:1448:195)",
+        "at Observable._subscribe (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9242:17)",
+        "at Observable._trySubscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:196:25)",
+        "at http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:190:121",
+        "at errorContext (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:2575:9)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/0ysz_rxjs_dist_esm5_internal_1e22q2m7tt8cv._.js:188:250)",
+        "at OperationBatcher.consumeQueue (http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9468:48)",
+        "at http://localhost:3077/_next/static/chunks/0hnp_%40apollo_client_1qogm28v40909._.js:9501:18"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0qoh2ov7p3i",
+        "parts": [
+          {
+            "part": "response",
+            "type": "UsersResult",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}

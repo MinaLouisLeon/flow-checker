@@ -5,6 +5,7 @@
 // never in production builds, and it never throws into the app.
 import type { Capture, CapturedBody, Interaction, SessionEvent } from '@flow-checker/shared'
 import { callerStack, headersToObject, readStream, requestBody, textBody } from './body'
+import { splitGraphqlCapture } from './graphql'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
 import { createQueryTracker, findQueryClient } from './query'
 import { compileRules, redactCapture } from './redact'
@@ -104,8 +105,9 @@ function start(config: RuntimeConfig) {
 
   const pushCapture = (capture: Capture) => {
     try {
-      // A batched tRPC request becomes one capture per procedure (M16).
-      for (const piece of splitTrpcCapture(capture)) {
+      // A batched tRPC request becomes one capture per procedure (M16), a batched GraphQL
+      // request one per operation (M17).
+      for (const piece of splitTrpcCapture(capture).flatMap(splitGraphqlCapture)) {
         captures.push(redactCapture(piece, rules, options.storeRaw))
         pushEvent({ kind: 'capture', at: piece.timestamp, captureId: piece.id })
       }

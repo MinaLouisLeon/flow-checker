@@ -1,0 +1,7 @@
+{
+  "3f68cfe7f95fdfd770274ece724d3623c361f4a0c3a21e96fdfbf28d3d75153d": "query TodoListQuery {\n  todos {\n    id\n    ...TodoItem_todo\n  }\n}\n\nfragment TodoItem_todo on Todo {\n  title\n  done\n}\n",
+  "7b287a25c92827de62ee76b0bdbdc3a1f06652f85ea710168f89cd568052bf8d": "mutation AddTodoFormMutation(\n  $input: AddTodoInput!\n) {\n  addTodo(input: $input) {\n    id\n    title\n  }\n}\n",
+  "ca3885e07dab7aa341848f8d0138896377bf5af08ce9e5106c59714b07e26adf": "mutation TodoDetailToggleMutation(\n  $id: ID!\n) {\n  toggleTodo(id: $id) {\n    id\n    done\n  }\n}\n",
+  "fdcca2996f159e3306fc76535a22a6d4afcfa77d41c15bd60b6bd119a64dbe88": "query UserListQuery {\n  users {\n    id\n    name\n    email\n  }\n}\n",
+  "feffca234775cf9b6036b7f757110fbf6f4094f87f75b06bfefb31e31110034d": "query TodoDetailQuery(\n  $id: ID!\n) {\n  todo(id: $id) {\n    id\n    title\n    done\n    status\n    owner {\n      name\n      id\n    }\n  }\n}\n"
+}

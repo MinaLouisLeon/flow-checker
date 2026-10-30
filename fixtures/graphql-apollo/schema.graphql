@@ -1,0 +1,39 @@
+type Query {
+  todos(status: TodoStatus): [Todo!]!
+  todo(id: ID!): Todo
+  viewer: User!
+  users: [User!]!
+  search(text: String!): [SearchResult!]!
+}
+
+type Mutation {
+  addTodo(input: AddTodoInput!): Todo!
+  toggleTodo(id: ID!): Todo!
+  deleteTodo(id: ID!): Boolean!
+}
+
+type Todo {
+  id: ID!
+  title: String!
+  done: Boolean!
+  status: TodoStatus!
+  owner: User!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+}
+
+enum TodoStatus {
+  OPEN
+  DONE
+}
+
+input AddTodoInput {
+  title: String!
+  ownerId: ID
+}
+
+union SearchResult = Todo | User

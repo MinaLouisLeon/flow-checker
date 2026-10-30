@@ -1,6 +1,7 @@
 import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
+import { GraphqlSection } from '../GraphqlView'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
@@ -137,6 +138,8 @@ export function Overview() {
       <PostmanSection index={index} />
 
       <TrpcSection index={index} />
+
+      <GraphqlSection index={index} />
 
       <Section title="Pages">
         <ul className="list">

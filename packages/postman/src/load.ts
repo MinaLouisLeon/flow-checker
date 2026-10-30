@@ -2,6 +2,7 @@
 // import (imported.ts): a v2.1 JSON export, a git-native v3 YAML folder, or Postman's cloud API.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { operationIn, readGraphqlPayload } from '@flow-checker/runtime/graphql'
 import { resolveCaptureOptions } from '@flow-checker/runtime/options'
 import { compileRules, createRedactor, type RedactRules } from '@flow-checker/runtime/redact'
 import {
@@ -51,7 +52,35 @@ interface RawRequest {
   url: string
   variables?: Variable[]
   body?: string
+  /** GraphQL (M17): read from a GraphQL body (`body` is then the variables). */
+  operation?: { name?: string; type: 'query' | 'mutation' | 'subscription' }
   examples: { name: string; status?: number; body?: string }[]
+}
+
+/**
+ * A GraphQL body: Postman's GraphQL mode (`query` + `variables` text), or a raw JSON body with a
+ * `query`. Gives the operation and the variables as the body.
+ */
+function graphqlBody(query: string | undefined, variables: string | undefined, raw?: string) {
+  if (raw !== undefined) {
+    let value: unknown
+    try {
+      value = JSON.parse(raw)
+    } catch {
+      return undefined
+    }
+    const info = readGraphqlPayload(value)
+    if (!info?.type) return undefined
+    const vars = (value as { variables?: unknown }).variables
+    return {
+      operation: { ...(info.name ? { name: info.name } : {}), type: info.type },
+      ...(vars !== undefined ? { body: JSON.stringify(vars) } : {}),
+    }
+  }
+  if (!query) return undefined
+  const found = operationIn(query)
+  if (!found) return undefined
+  return { operation: found, ...(variables?.trim() ? { body: variables } : {}) }
 }
 
 interface RawCollection {
@@ -214,7 +243,14 @@ function v21Request(
   const method = toMethod(str(request.method) ?? 'GET')
   const url = v21Url(request.url)
   if (!method || url === undefined) return undefined
-  const body = isObject(request.body) && request.body.mode === 'raw' ? str(request.body.raw) : undefined
+  let body = isObject(request.body) && request.body.mode === 'raw' ? str(request.body.raw) : undefined
+  const gql =
+    isObject(request.body) && request.body.mode === 'graphql' && isObject(request.body.graphql)
+      ? graphqlBody(str(request.body.graphql.query), str(request.body.graphql.variables))
+      : body
+        ? graphqlBody(undefined, undefined, body)
+        : undefined
+  if (gql) body = gql.body
   const examples = (Array.isArray(item.response) ? item.response : []).filter(isObject).map((r) => ({
     name: str(r.name) ?? '',
     ...(typeof r.code === 'number' ? { status: r.code } : {}),
@@ -227,6 +263,7 @@ function v21Request(
     url,
     ...(variables.length > 0 ? { variables } : {}),
     ...(body ? { body } : {}),
+    ...(gql ? { operation: gql.operation } : {}),
     examples,
   }
 }
@@ -276,7 +313,7 @@ export function fromV3Folder(dir: string): RawCollection {
         })
       } else if (/\.request\.ya?ml$/i.test(entry.name)) {
         const doc = readYaml(path, entry.name)
-        if (!isObject(doc) || doc.$kind !== 'http-request') continue
+        if (!isObject(doc) || (doc.$kind !== 'http-request' && doc.$kind !== 'graphql-request')) continue
         const stem = entry.name.replace(/\.request\.ya?ml$/i, '')
         const name = str(doc.name) ?? stem
         items.push({
@@ -321,13 +358,23 @@ function v3Request(
   folder: string[],
   variables: Variable[],
 ): RawRequest | undefined {
-  const method = toMethod(str(doc.method) ?? 'GET')
+  // GraphQL requests (M17) are POSTs with a query and variables.
+  const graphqlKind = doc.$kind === 'graphql-request'
+  const method = graphqlKind ? 'POST' : toMethod(str(doc.method) ?? 'GET')
   const url = str(doc.url)
   if (!method || url === undefined) return undefined
-  const body =
+  let body =
     isObject(doc.body) && typeof doc.body.content === 'string' && doc.body.type !== 'none'
       ? doc.body.content
       : undefined
+  const gql = graphqlKind
+    ? graphqlBody(str(doc.query), str(doc.variables))
+    : body
+      ? graphqlBody(undefined, undefined, body)
+      : undefined
+  // A GraphQL request without a query says nothing about the API.
+  if (graphqlKind && !gql) return undefined
+  if (gql) body = gql.body
   const examplesDir = str(doc.examples)
     ? resolve(dir, str(doc.examples) as string)
     : join(dir, '.resources', `${stem}.resources`, 'examples')
@@ -360,6 +407,7 @@ function v3Request(
     url,
     ...(variables.length > 0 ? { variables } : {}),
     ...(body ? { body } : {}),
+    ...(gql ? { operation: gql.operation } : {}),
     examples,
   }
 }
@@ -414,6 +462,7 @@ function normalize(
       url: r.url.trim(),
       ...(variables.length > 0 ? { variables } : {}),
       ...(body ? { body } : {}),
+      ...(r.operation ? { operation: r.operation } : {}),
       examples: r.examples.map((e) => {
         const exampleBody = e.body ? jsonBody(e.body, 'response.body', rules) : undefined
         return {

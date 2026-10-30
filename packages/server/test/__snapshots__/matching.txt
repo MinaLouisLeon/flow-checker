@@ -265,3 +265,81 @@ browser GET localhost:3077/api/trpc/user.list
   → matched UserList · GET /api/trpc/user.list
 server GET localhost:4010/users (in GET /api/trpc/user.list)
   → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users
+
+## graphql-apollo
+browser POST localhost:3077/api/graphql [Viewer 1/2]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos 2/2]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todo]
+  → matched TodoView · POST /api/graphql
+browser POST localhost:3077/api/graphql [ToggleTodo]
+  → matched TodoView · POST /api/graphql
+browser POST localhost:3077/api/graphql [Search]
+  → matched UserSearch · POST /api/graphql
+browser POST localhost:3077/api/graphql [Users]
+  → matched UserSearch · POST /api/graphql
+
+## graphql-apollo-v3
+browser POST localhost:3077/api/graphql [Todos persisted]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Viewer persisted]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Viewer]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo persisted]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [Viewer persisted]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos persisted]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todo persisted]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todo]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [DeleteTodo persisted]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [DeleteTodo]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [Search persisted]
+  → matched Search · POST /api/graphql
+browser POST localhost:3077/api/graphql [Search]
+  → matched Search · POST /api/graphql
+
+## graphql-urql
+browser GET localhost:3077/api/graphql [Todos]
+  → matched TodoList · GET /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo]
+  → matched AddTodoForm · POST /api/graphql
+browser GET localhost:3077/api/graphql [Todos]
+  → matched TodoList · GET /api/graphql
+browser GET localhost:3077/api/graphql [Todo]
+  → matched TodoDetail · GET /api/graphql
+browser POST localhost:3077/api/graphql [ToggleTodo]
+  → matched TodoDetail · POST /api/graphql
+browser GET localhost:3077/api/graphql [Todo]
+  → matched TodoDetail · GET /api/graphql
+browser GET localhost:3077/api/graphql [Users]
+  → matched UserList · GET /api/graphql
+
+## graphql-relay
+browser POST localhost:3077/api/graphql [TodoListQuery persisted]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodoFormMutation persisted]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [TodoDetailQuery persisted]
+  → matched TodoPage · POST /api/graphql
+browser POST localhost:3077/api/graphql [TodoDetailToggleMutation persisted]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [UserListQuery persisted]
+  → matched UserList · POST /api/graphql

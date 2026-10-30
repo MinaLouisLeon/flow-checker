@@ -24,6 +24,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M14 | Middleware / proxy    | Model version 3. Matcher = path-to-regexp v6 port in `shared/src/middleware.ts`; edge hook `runtime/edge` for Next < 16. |
 | M15 | Postman import        | Model version 4. `packages/postman`; applied after each scan in the CLI scan runner, never inside the scanner.           |
 | M16 | tRPC                  | Model version 5. Batches split in the runtime before redaction (`runtime/src/trpc.ts`); router read by syntax.           |
+| M17 | GraphQL               | Model version 6. graphql-js in the scanner only; runtime reads operations by regex; fragments are global by name.        |
 
 ## Gotchas
 
@@ -93,3 +94,24 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Shorthand object entries (`router({ items })`) need `ShorthandPropertyAssignment.getValueSymbol()`; the
   name's own symbol is the property.
 - Recordings were made on app port 3077 (`node scripts/record-captures.mjs trpc-v10 trpc`).
+
+## M17 — GraphQL (done, branch `feat/graphql`)
+
+- graphql-js (16) is only in the scanner and the CLI. The runtime reads operation names with a light regex
+  (`runtime/src/graphql.ts`), so nothing GraphQL-sized ends up in the user's bundle.
+- Fragments are looked up globally by name, never by following a template's `${FRAGMENT}`; the catalog sweep
+  (`GraphqlCatalog.addFile`) runs over loaded files before the walk, so a document in a file nothing imports is
+  not found.
+- urql's and Apollo's untyped `gql` return `TypedDocumentNode<any, AnyVariables>`: a typed document only counts
+  when its data type is meaningful, or `AnyVariables` leaks in as the variables type.
+- Codegen's client preset and Relay mask fragment data in their types; `graphql-types.ts` merges it back so type
+  checks against wire data pass. Relay also adds `id` to selections and Apollo / urql add `__typename`: those
+  are allowed as extra fields for GraphQL sites.
+- Shorthand `{ link }` in `new ApolloClient({ link })` needs `getValueSymbol()` (same as M16's routers), and the
+  expanded initializer is itself the `new BatchHttpLink()` node (`forEachDescendant` skips the node itself).
+- Fixtures serve GraphQL from an in-app route handler (batching, GET, APQ, Relay doc ids); `useSuspenseQuery`
+  and `useLazyLoadQuery` are wrapped in `ClientOnly` because the relative `/api/graphql` URL fails during SSR.
+  Relay's compiler needs `--repersist` to keep `persisted_queries.json` complete and stages its output with
+  `git add` on its own. Generated `src/gql`, `src/__generated__` and the manifest are excluded from biome.
+- Recordings were made on app port 3077 (`node scripts/record-captures.mjs graphql-apollo graphql-apollo-v3
+  graphql-urql graphql-relay`).

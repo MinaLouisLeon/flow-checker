@@ -60,6 +60,22 @@ const GENERIC_CALLEES = new Set([
   'mutation',
   'queryOptions',
   'mutationOptions',
+  // GraphQL clients (M17): their own frames carry these names too.
+  'useLazyQuery',
+  'useSubscription',
+  'useBackgroundQuery',
+  'useLazyLoadQuery',
+  'useQueryLoader',
+  'usePreloadedQuery',
+  'useFragment',
+  'commitMutation',
+  'fetchQuery',
+  'loadQuery',
+  'executeQuery',
+  'executeMutation',
+  'client.query',
+  'client.mutate',
+  'client.mutation',
 ])
 
 /** DOM events that fit each trigger event prop. */
@@ -110,12 +126,15 @@ export class Matcher {
   private readonly siteIds: Set<string>
   private readonly middleware: Middleware | undefined
   private readonly trpcEndpoints: string[]
+  /** GraphQL operation id -> its persisted query ids (M17). */
+  private readonly graphqlHashes: Map<string, string[]>
 
   constructor(model: AppModel) {
     this.sites = indexSites(model)
     this.siteIds = new Set(model.requests.map((s) => s.id))
     this.middleware = model.middleware
     this.trpcEndpoints = model.trpc ? [model.trpc.endpoint] : []
+    this.graphqlHashes = new Map((model.graphql?.operations ?? []).map((o) => [o.id, o.hashes]))
   }
 
   hasSite(id: string): boolean {
@@ -148,6 +167,7 @@ export class Matcher {
       middleware: this.middleware,
       fromMiddleware: capture.origin === 'server' && fromMiddleware(capture, context, this.middleware),
       trpcParent: parentUrl ? parseTrpcUrl(parentUrl, { endpoints: this.trpcEndpoints })?.paths : undefined,
+      graphqlHashes: this.graphqlHashes,
     }
     for (const info of this.sites) {
       const evidence = scoreSite(info, capture, context, scoring)
@@ -187,6 +207,8 @@ interface Scoring {
   fromMiddleware: boolean
   /** Server capture made while a tRPC request ran: the procedures that request called (M16). */
   trpcParent: string[] | undefined
+  /** GraphQL operation id -> persisted query ids (M17). */
+  graphqlHashes: Map<string, string[]>
 }
 
 /** Next runs middleware / proxy through its web adapter, on the edge and on Node.js. */
@@ -218,7 +240,8 @@ function scoreSite(
 
   if (info.side !== 'any' && info.side !== capture.origin) return undefined
   const method = capture.request.method.toUpperCase()
-  if (site.method && site.method !== method) return undefined
+  // GraphQL clients send queries as GET or POST depending on setup (and persisted query retries).
+  if (site.method && site.method !== method && site.transport !== 'graphql') return undefined
 
   const browserAction = capture.origin === 'browser' ? capture.serverAction?.id : undefined
   if ((site.transport === 'server-action') !== Boolean(browserAction)) return undefined
@@ -285,6 +308,24 @@ function scoreSite(
     // Runs in a procedure's resolver: that procedure must be one the incoming request called.
     if (!scoring.trpcParent.includes(site.procedure.path)) return undefined
     add('trpc-procedure', scoring.trpcParent.length === 1 ? 30 : 15, `in ${site.procedure.path}`)
+  }
+
+  // GraphQL (M17): every operation goes to the same URL, so the operation decides.
+  const sent = capture.operation
+  if (site.transport === 'graphql') {
+    const op = site.operation
+    if (!sent) {
+      add('graphql-operation', -20, 'no GraphQL operation in the request')
+    } else if (op) {
+      if (sent.type && sent.type !== op.type) return undefined
+      const byHash = !!sent.hash && !!scoring.graphqlHashes.get(op.id)?.includes(sent.hash)
+      if (sent.name !== undefined && op.name && sent.name !== op.name && !byHash) return undefined
+      if (sent.name && sent.name === op.name) add('graphql-operation', 40, op.name)
+      else if (byHash) add('graphql-operation', 40, `${op.name} (persisted id)`)
+      else if (sent.hash && !sent.name && hashIsKnown(scoring.graphqlHashes, sent.hash)) return undefined
+    }
+  } else if (sent) {
+    add('graphql-operation', -20, `a GraphQL ${sent.type ?? 'operation'}, the site is not GraphQL`)
   }
 
   if (site.origin === 'server-action' && info.action) {
@@ -376,6 +417,12 @@ function scoreSite(
   return evidence
 }
 
+/** Whether some operation has this persisted id (then a site with another operation is ruled out). */
+function hashIsKnown(hashes: Map<string, string[]>, hash: string): boolean {
+  for (const list of hashes.values()) if (list.includes(hash)) return true
+  return false
+}
+
 /** Matched beats ambiguous beats unmatched; then the higher score. */
 function rank(match: CaptureMatch): number {
   const status = match.status === 'matched' ? 2 : match.status === 'ambiguous' ? 1 : 0
@@ -419,6 +466,8 @@ export function fingerprint(capture: Capture): string {
     capture.serverAction?.id ?? parent?.serverActionId ?? '',
     parent ? `${parent.method} ${generalizePath(pathOf(parent.url) ?? '')}` : '',
     capture.interaction?.componentChain[0] ?? '',
+    // Every GraphQL operation goes to the same URL (M17).
+    ...(capture.operation ? [`gql:${capture.operation.name ?? capture.operation.hash ?? ''}`] : []),
   ].join('|')
 }
 

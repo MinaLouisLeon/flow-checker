@@ -101,6 +101,7 @@
     "@hono/node-server": "catalog:",
     "@jridgewell/trace-mapping": "catalog:",
     "chokidar": "catalog:",
+    "graphql": "catalog:",
     "hono": "catalog:",
     "ts-morph": "catalog:",
     "yaml": "catalog:",

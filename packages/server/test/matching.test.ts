@@ -21,6 +21,10 @@ const FIXTURES = [
   'postman',
   'trpc-v10',
   'trpc',
+  'graphql-apollo',
+  'graphql-apollo-v3',
+  'graphql-urql',
+  'graphql-relay',
 ]
 const repo = join(import.meta.dirname, '..', '..', '..')
 
@@ -112,7 +116,9 @@ function describeCapture(c: Capture): string {
     ? ` [action]`
     : c.procedure?.batch
       ? ` [batch ${c.procedure.batch.index + 1}/${c.procedure.batch.size}]`
-      : ''
+      : c.operation
+        ? ` [${c.operation.name ?? `#${c.operation.hash?.slice(0, 8)}`}${c.operation.batch ? ` ${c.operation.batch.index + 1}/${c.operation.batch.size}` : ''}${c.operation.persisted ? ' persisted' : ''}]`
+        : ''
   const parent = c.parent ? ` (in ${c.parent.method} ${new URL(c.parent.url, url).pathname})` : ''
   return `${c.origin} ${c.request.method} ${url.host}${url.pathname}${action}${parent}`
 }

@@ -26,6 +26,8 @@ export function scanSettings(config: FlowCheckerConfig) {
     include: config.include,
     exclude: config.exclude,
     apiClients: config.apiClients,
+    // Without introspection: the commands that use it add it (graphqlForScan).
+    graphql: config.graphql && { ...config.graphql, introspection: undefined },
   }
 }
 

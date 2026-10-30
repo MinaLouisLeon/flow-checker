@@ -6,6 +6,7 @@ import { join, relative, resolve } from 'node:path'
 import { DEFAULT_PORTS, type FlowCheckerConfig, PACKAGE_NAME } from '@flow-checker/shared'
 import { ts } from 'ts-morph'
 import { ConfigError, findConfigFile, loadConfig } from './config'
+import { checkGraphql } from './graphql'
 import { EDGE_BODY } from './init'
 import { checkPostman } from './postman'
 import { createProgress } from './progress'
@@ -258,6 +259,9 @@ export async function runDoctor(
 
   const postman = await checkPostman(root, config)
   if (postman) add(postman)
+
+  const graphql = checkGraphql(root, config)
+  if (graphql) add(graphql)
 
   if (config.capture?.storeRaw) {
     add({

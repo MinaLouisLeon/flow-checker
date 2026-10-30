@@ -19,6 +19,7 @@ import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
+import { findGraphql, type GraphqlScanOptions } from './graphql-setup'
 import {
   MIDDLEWARE_FILE,
   type MiddlewareFile,
@@ -48,6 +49,8 @@ export interface ScanOptions {
   exclude?: readonly string[]
   /** Modules whose calls are requests (config `apiClients`). */
   apiClients?: readonly ApiClientConfig[]
+  /** GraphQL schema, persisted queries and endpoint (config `graphql`), and a live introspection result. */
+  graphql?: GraphqlScanOptions
   /** Called as the scan moves through its phases (CLI progress output). Must not throw. */
   onProgress?: (event: ScanProgress) => void
 }
@@ -81,6 +84,7 @@ export interface ScanSettings {
   /** Whether a file (absolute, forward slashes) is scanned. */
   scanned: (file: string) => boolean
   apiClients: readonly ApiClientConfig[]
+  graphql?: GraphqlScanOptions
 }
 
 /** Scans a Next.js App Router project into the model written to `.flow-checker/model.json`. */
@@ -128,6 +132,7 @@ export function createScanSession(options: ScanOptions): ScanSession {
     types: options.types,
     scanned: (file) => pathFilter(relativeTo(root, file)),
     apiClients: options.apiClients ?? [],
+    ...(options.graphql ? { graphql: options.graphql } : {}),
   }
 
   const report: Report = (event) => {
@@ -347,6 +352,9 @@ function analyze(
   // tRPC (M16): read the router first, so client calls get their procedure's types.
   const trpcFound = findTrpc(project, root, handlers, settings)
   if (trpcFound) requests.setTrpc(trpcFound.endpoint, trpcFound.defs)
+  // GraphQL (M17): documents, clients and schema, so calls get their operation and endpoint.
+  const graphqlFound = findGraphql(project, root, fs, handlers, settings.scanned, requests, settings.graphql)
+  requests.setGraphql(graphqlFound.state)
   const middlewareFile =
     discovery.middleware && settings.scanned(discovery.middleware)
       ? sourceFile(project, discovery.middleware)
@@ -372,6 +380,7 @@ function analyze(
   }
 
   const sites = requests.sites(routes)
+  const graphql = requests.graphqlInfo(sites, graphqlFound.base)
   const queryLinks = requests.queryLinks(sites, components)
   const trpc: Trpc | undefined = trpcFound && {
     endpoint: trpcFound.endpoint,
@@ -420,6 +429,7 @@ function analyze(
     queryLinks,
     ...(middleware ? { middleware } : {}),
     ...(trpc ? { trpc } : {}),
+    ...(graphql ? { graphql } : {}),
   }
 }
 

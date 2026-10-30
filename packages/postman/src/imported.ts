@@ -33,7 +33,12 @@ export const ImportedRequestSchema = z.object({
   url: z.string(),
   /** Variables set on the folders above it (v3 folder definitions), closest last. */
   variables: z.array(VariableSchema).optional(),
+  /** GraphQL requests (M17): the variables. Others: the JSON body. */
   body: JsonBodySchema.optional(),
+  /** GraphQL (M17): the operation the request sends. The query text itself is not kept. */
+  operation: z
+    .object({ name: z.string().optional(), type: z.enum(['query', 'mutation', 'subscription']) })
+    .optional(),
   examples: z.array(ImportedExampleSchema),
 })
 export type ImportedRequest = z.infer<typeof ImportedRequestSchema>

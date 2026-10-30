@@ -1,0 +1,688 @@
+{
+  "fixture": "graphql-relay",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvuu5isq9st22hkw",
+      "sessionId": "ses_mvuu5ijacog3ar6n",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:53.930Z",
+      "durationMs": 370,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "doc_id": "3f68cfe7f95fdfd770274ece724d3623c361f4a0c3a21e96fdfbf28d3d75153d",
+            "variables": {}
+          },
+          "size": 92
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:53 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "1",
+                  "title": "Write the schema",
+                  "done": true
+                },
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false
+                }
+              ]
+            }
+          },
+          "size": 180
+        }
+      },
+      "operation": {
+        "hash": "3f68cfe7f95fdfd770274ece724d3623c361f4a0c3a21e96fdfbf28d3d75153d",
+        "persisted": true,
+        "name": "TodoListQuery",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:1448:195)",
+        "at fetchQuery (http://localhost:3077/_next/static/chunks/fixtures_graphql-relay_src_0u-2l6hkzwcpi._.js:44:28)",
+        "at fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9582:22)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9619:16)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:10138:28)",
+        "at createSource (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:12915:44)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:13005:25",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)",
+        "at RelayObservable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9766:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9729:39",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "fetchQuery",
+          "file": "src/relay/environment.ts",
+          "line": 5,
+          "column": 26
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0ixcyoz99u0",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoListQuery$variables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoListQuery$data",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu5l7diukydjc2",
+      "sessionId": "ses_mvuu5ijacog3ar6n",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:57.049Z",
+      "durationMs": 33,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "doc_id": "7b287a25c92827de62ee76b0bdbdc3a1f06652f85ea710168f89cd568052bf8d",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            }
+          },
+          "size": 127
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:57 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "addTodo": {
+                "id": "4",
+                "title": "Record captures"
+              }
+            }
+          },
+          "size": 57
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "RelayContext",
+          "RelayEnvironmentProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:34:57.048Z"
+      },
+      "operation": {
+        "hash": "7b287a25c92827de62ee76b0bdbdc3a1f06652f85ea710168f89cd568052bf8d",
+        "persisted": true,
+        "name": "AddTodoFormMutation",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:1448:195)",
+        "at fetchQuery (http://localhost:3077/_next/static/chunks/fixtures_graphql-relay_src_0u-2l6hkzwcpi._.js:44:28)",
+        "at fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9582:22)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9619:16)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:10138:28)",
+        "at createSource (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:12951:44)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:13005:25",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)",
+        "at RelayObservable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9766:16)",
+        "at commitMutation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9080:8)",
+        "at useMutation.useCallback[commit] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:6245:30)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "fetchQuery",
+          "file": "src/relay/environment.ts",
+          "line": 5,
+          "column": 26
+        },
+        {
+          "fn": "onSubmit",
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 22,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_25b0dzm9av8",
+        "parts": [
+          {
+            "part": "request",
+            "type": "AddTodoFormMutation$variables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoFormMutation$data",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu5mfmfic1koyg",
+      "sessionId": "ses_mvuu5ijacog3ar6n",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:58.642Z",
+      "durationMs": 58,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "doc_id": "feffca234775cf9b6036b7f757110fbf6f4094f87f75b06bfefb31e31110034d",
+            "variables": {
+              "id": "4"
+            }
+          },
+          "size": 100
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "status": "OPEN",
+                "owner": {
+                  "name": "Ada Lovelace",
+                  "id": "u1"
+                }
+              }
+            }
+          },
+          "size": 125
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "RelayContext",
+          "RelayEnvironmentProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:34:57.048Z"
+      },
+      "operation": {
+        "hash": "feffca234775cf9b6036b7f757110fbf6f4094f87f75b06bfefb31e31110034d",
+        "persisted": true,
+        "name": "TodoDetailQuery",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:1448:195)",
+        "at fetchQuery (http://localhost:3077/_next/static/chunks/fixtures_graphql-relay_src_0u-2l6hkzwcpi._.js:44:28)",
+        "at fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9582:22)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9619:16)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:10138:28)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:4094:28",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:10366:13",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)",
+        "at RelayObservable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9766:16)",
+        "at makeNetworkRequest (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:4096:48)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:4142:41"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "fetchQuery",
+          "file": "src/relay/environment.ts",
+          "line": 5,
+          "column": 26
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0b9cucu4bbq",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoDetailQuery$variables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoDetailQuery$data",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "extra-field",
+                "path": "response.body.data.todo.owner.id",
+                "expected": "not declared",
+                "actual": "string \"u1\""
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu5nlrrusxmog2",
+      "sessionId": "ses_mvuu5ijacog3ar6n",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:35:00.159Z",
+      "durationMs": 24,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "doc_id": "ca3885e07dab7aa341848f8d0138896377bf5af08ce9e5106c59714b07e26adf",
+            "variables": {
+              "id": "4"
+            }
+          },
+          "size": 100
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:35:00 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "toggleTodo": {
+                "id": "4",
+                "done": true
+              }
+            }
+          },
+          "size": 46
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "TodoPage",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:35:00.159Z"
+      },
+      "operation": {
+        "hash": "ca3885e07dab7aa341848f8d0138896377bf5af08ce9e5106c59714b07e26adf",
+        "persisted": true,
+        "name": "TodoDetailToggleMutation",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:1448:195)",
+        "at fetchQuery (http://localhost:3077/_next/static/chunks/fixtures_graphql-relay_src_0u-2l6hkzwcpi._.js:44:28)",
+        "at fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9582:22)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9619:16)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:10138:28)",
+        "at createSource (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:12951:44)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:13005:25",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)",
+        "at RelayObservable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9766:16)",
+        "at commitMutation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9080:8)",
+        "at markDone (http://localhost:3077/_next/static/chunks/fixtures_graphql-relay_src_0kiu95x43brna._.js:254:252)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "fetchQuery",
+          "file": "src/relay/environment.ts",
+          "line": 5,
+          "column": 26
+        },
+        {
+          "fn": "markDone",
+          "file": "src/components/TodoDetail.tsx",
+          "line": 32,
+          "column": 19
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0manrbz632m",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoDetailToggleMutation$variables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoDetailToggleMutation$data",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu5qwj5ghy7zdg",
+      "sessionId": "ses_mvuu5ijacog3ar6n",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:35:04.435Z",
+      "durationMs": 72,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "doc_id": "fdcca2996f159e3306fc76535a22a6d4afcfa77d41c15bd60b6bd119a64dbe88",
+            "variables": {}
+          },
+          "size": 92
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:35:04 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "users": [
+                {
+                  "id": "u1",
+                  "name": "Ada Lovelace",
+                  "email": "ada@example.com"
+                },
+                {
+                  "id": "u2",
+                  "name": "Grace Hopper",
+                  "email": "grace@example.com"
+                },
+                {
+                  "id": "u3",
+                  "name": "Alan Turing",
+                  "email": "alan@example.com"
+                }
+              ]
+            }
+          },
+          "size": 202
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Load users\"",
+        "componentChain": [
+          "UserList",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:35:04.434Z"
+      },
+      "operation": {
+        "hash": "fdcca2996f159e3306fc76535a22a6d4afcfa77d41c15bd60b6bd119a64dbe88",
+        "persisted": true,
+        "name": "UserListQuery",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_112l95_4qal01._.js:1448:195)",
+        "at fetchQuery (http://localhost:3077/_next/static/chunks/fixtures_graphql-relay_src_0u-2l6hkzwcpi._.js:44:28)",
+        "at fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9582:22)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9619:16)",
+        "at Object.execute (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:10138:28)",
+        "at createSource (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:12915:44)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:13005:25",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)",
+        "at RelayObservable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9766:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9729:39",
+        "at _subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0qorm5szky8rd._.js:9981:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "fetchQuery",
+          "file": "src/relay/environment.ts",
+          "line": 5,
+          "column": 26
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_2dy1uuhut7o",
+        "parts": [
+          {
+            "part": "request",
+            "type": "UserListQuery$variables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "UserListQuery$data",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}
