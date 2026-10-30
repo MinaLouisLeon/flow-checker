@@ -390,7 +390,7 @@
         "file": "src/app/users/page.tsx",
         "loc": {
           "file": "src/app/users/page.tsx",
-          "line": 4,
+          "line": 8,
           "column": 25
         },
         "kind": "server",
@@ -402,7 +402,7 @@
             "module": "react",
             "loc": {
               "file": "src/app/users/page.tsx",
-              "line": 6,
+              "line": 10,
               "column": 5
             }
           },
@@ -413,7 +413,7 @@
             "module": "@/components/UserList",
             "loc": {
               "file": "src/app/users/page.tsx",
-              "line": 7,
+              "line": 11,
               "column": 7
             }
           }

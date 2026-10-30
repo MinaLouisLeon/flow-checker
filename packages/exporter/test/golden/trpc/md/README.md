@@ -74,7 +74,7 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [`HomePage`](components/HomePage.md) | server | `src/app/page.tsx:5` | 0 |
 | [`Providers`](components/Providers.md) | client | `src/app/providers.tsx:9` | 0 |
 | [`TodoPage`](components/TodoPage.md) | server | `src/app/todos/[id]/page.tsx:3` | 0 |
-| [`UsersPage`](components/UsersPage.md) | server | `src/app/users/page.tsx:4` | 0 |
+| [`UsersPage`](components/UsersPage.md) | server | `src/app/users/page.tsx:8` | 0 |
 | [`AddTodoForm`](components/AddTodoForm.md) | client | `src/components/AddTodoForm.tsx:8` | 1 |
 | [`HealthBadge`](components/HealthBadge.md) | client | `src/components/HealthBadge.tsx:6` | 1 |
 | [`TodoDetail`](components/TodoDetail.md) | client | `src/components/TodoDetail.tsx:6` | 3 |

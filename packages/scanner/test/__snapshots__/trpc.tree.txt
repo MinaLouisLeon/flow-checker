@@ -39,6 +39,6 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
-UsersPage  server  src/app/users/page.tsx:4
+UsersPage  server  src/app/users/page.tsx:8
 ├─ Suspense  external react
 └─ UserList  client (use client)  src/components/UserList.tsx:6
