@@ -250,6 +250,23 @@ const scripts = {
     await page.click('button:has-text("Load users")')
     await settle(page)
   },
+  // Event streams (M18): each stream ends on its own, so `networkidle` is reached.
+  sse: async (page) => {
+    await page.goto(`${app}/`)
+    await page.waitForSelector('text=Clock stopped after 3 ticks')
+    await settle(page)
+    await page.goto(`${app}/jobs/7`)
+    await settle(page)
+    await page.click('button:has-text("Start job")')
+    await page.waitForSelector('text=Job finished')
+    await settle(page)
+    await page.goto(`${app}/chat`)
+    await settle(page)
+    await page.fill('input[placeholder="Say something"]', 'hello there')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('text=tokens')
+    await settle(page)
+  },
 }
 
 /** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */

@@ -1,0 +1,42 @@
+# Requests
+
+## Chat  components/Chat.tsx:7
+POST /api/chat  sse  event onSubmit
+  body: ChatRequest
+  stream: fetch
+  event chunk: ChatChunk  (handler)
+  event done: ChatDone  (handler)
+  handled by: app/api/chat/route.ts
+  via: streamChat components/Chat.tsx:15 > fetch lib/chat.ts:6
+
+## Clock  components/Clock.tsx:7
+GET /api/clock?count=3  sse  effect
+  stream: event-source
+  event tick: Tick  (code)
+  event message: ClockStatus  (code)
+  event done: { ok: boolean; }  (handler)
+  handled by: app/api/clock/route.ts
+  via: new EventSource components/Clock.tsx:12
+
+## JobProgress  components/JobProgress.tsx:7
+GET /api/jobs/:id/progress  sse  event onClick
+  stream: event-source
+  event progress: Progress  (code)
+  event done: { id: string; token: string; }  (handler)
+  handled by: app/api/jobs/[id]/progress/route.ts
+  via: new EventSource components/JobProgress.tsx:17
+
+# Event streams
+
+POST /api/chat  1 caller(s)  app/api/chat/route.ts:7
+  event chunk: ChatChunk
+  event done: ChatDone
+
+GET /api/clock  1 caller(s)  app/api/clock/route.ts:9
+  event tick: Tick
+  event message: ClockStatus
+  event done: { ok: boolean; }
+
+GET /api/jobs/[id]/progress  1 caller(s)  app/api/jobs/[id]/progress/route.ts:7
+  event progress: { percent: string; step: string; }
+  event done: { id: string; token: string; }

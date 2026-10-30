@@ -18,6 +18,8 @@ export default defineConfig({
     redact: { headers: [], keys: [], patterns: [] },
     maxBodyBytes: 256_000,
     ignore: [],
+    maxMessages: 200,
+    maxMessageBytes: 64_000,
   },
   types: { maxDepth: 6 },
   export: { md: 'docs/flow', html: '.flow-checker/site' },
@@ -125,6 +127,8 @@ What the runtime records while you test.
 | `redact.patterns` | see below | Extra `RegExp`s. Matching parts of any string value are masked.                                                                  |
 | `maxBodyBytes`    | `256000`  | Larger bodies are cut off (and skipped by the type check).                                                                       |
 | `ignore`          | see below | Extra URL globs that are never captured. `*` matches anything. A glob is matched against the path and the full URL.              |
+| `maxMessages`     | `200`     | Event stream (SSE) messages kept per connection. Later ones are only counted, and the capture is marked truncated.               |
+| `maxMessageBytes` | `64000`   | Event stream messages larger than this are kept without their data (size and time only), and skipped by the type check.          |
 
 Your values are **added to** the defaults, never replace them:
 

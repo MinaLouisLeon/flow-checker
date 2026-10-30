@@ -328,6 +328,30 @@ function scoreSite(
     add('graphql-operation', -20, `a GraphQL ${sent.type ?? 'operation'}, the site is not GraphQL`)
   }
 
+  // Event streams (M18): `new EventSource()` only comes from an EventSource site, and the event
+  // names received tell sites on the same URL apart.
+  const streamed = !!capture.stream || capture.transport === 'eventsource'
+  if (site.transport === 'sse') {
+    const api = site.stream?.api
+    const eventSource = capture.transport === 'eventsource'
+    if (!streamed) {
+      add('stream', -15, 'not an event stream')
+    } else if (api && (api === 'event-source') !== eventSource) {
+      return undefined
+    } else {
+      add('stream', 10, eventSource ? 'EventSource' : 'streamed fetch')
+      const received = new Set((capture.messages ?? []).map((m) => m.event ?? 'message'))
+      const listened = new Set(site.stream?.events.filter((e) => e.listened).map((e) => e.name))
+      if (received.size > 0 && listened.size > 0) {
+        const hits = [...received].filter((name) => listened.has(name))
+        if (hits.length === received.size) add('stream', 10, `listens to ${hits.join(', ')}`)
+        else if (hits.length === 0) add('stream', -10, `doesn't listen to ${[...received].join(', ')}`)
+      }
+    }
+  } else if (capture.transport === 'eventsource') {
+    return undefined
+  }
+
   if (site.origin === 'server-action' && info.action) {
     const id = parent?.serverActionId
     const action = id ? context.resolveAction(id) : undefined

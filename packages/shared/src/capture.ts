@@ -32,6 +32,45 @@ export const CapturedBodySchema = z.discriminatedUnion('kind', [
 ])
 export type CapturedBody = z.infer<typeof CapturedBodySchema>
 
+/**
+ * One message on an event stream (M18). SSE messages always come in. `body` is the `data`
+ * (parsed as JSON when it is JSON), redacted like other bodies; it is left out when the message
+ * is larger than `capture.maxMessageBytes`.
+ */
+export const CapturedMessageSchema = z.object({
+  direction: z.enum(['in', 'out']),
+  /** SSE `event:` field. Absent for unnamed events (`message`). */
+  event: z.string().optional(),
+  /** SSE `id:` field. */
+  id: z.string().optional(),
+  /** ISO time it arrived. */
+  at: z.string(),
+  /** Size of the data in bytes. */
+  size: z.number().int().nonnegative(),
+  body: CapturedBodySchema.optional(),
+})
+export type CapturedMessage = z.infer<typeof CapturedMessageSchema>
+
+/** The state of an event stream connection (M18). */
+export const CapturedStreamSchema = z.object({
+  /** `open` while it is connected (the runtime sends updates), `closed` when it ended, `error` when it failed. */
+  state: z.enum(['open', 'closed', 'error']),
+  /** Messages received, including the ones not kept. */
+  count: z.number().int().nonnegative(),
+  /** Bytes of message data received. */
+  bytes: z.number().int().nonnegative(),
+  /** Messages were dropped (over `capture.maxMessages`) or kept without data (over `capture.maxMessageBytes`). */
+  truncated: z.boolean().optional(),
+  /** EventSource reconnects after the connection dropped. */
+  reconnects: z.number().int().positive().optional(),
+  /**
+   * Runtime updates of an open stream only carry the new messages: `from` is the index of the
+   * first one. The tool server appends them to what it has and removes the field.
+   */
+  from: z.number().int().nonnegative().optional(),
+})
+export type CapturedStream = z.infer<typeof CapturedStreamSchema>
+
 export const CapturedRequestSchema = z.object({
   method: z.string(),
   /** Absolute URL. */
@@ -81,8 +120,8 @@ export const CaptureSchema = z.object({
   sessionId: z.string(),
   /** Where the request was sent from. */
   origin: z.enum(['browser', 'server']),
-  /** `http` is Node's http/https module (axios on the server). */
-  transport: z.enum(['fetch', 'xhr', 'http']),
+  /** `http` is Node's http/https module (axios on the server). `eventsource`: `new EventSource()` (M18). */
+  transport: z.enum(['fetch', 'xhr', 'http', 'eventsource']),
   /** ISO time the request started. */
   timestamp: z.string(),
   durationMs: z.number(),
@@ -148,6 +187,12 @@ export const CaptureSchema = z.object({
         .optional(),
     })
     .optional(),
+  /**
+   * Event stream (M18): an `EventSource`, or a fetch answered with `text/event-stream`. The
+   * messages are here, not in `response.body`.
+   */
+  stream: CapturedStreamSchema.optional(),
+  messages: z.array(CapturedMessageSchema).optional(),
   parent: CaptureParentSchema.optional(),
   /** Stack frames where the request was sent, innermost first. */
   stack: z.array(z.string()),
@@ -225,6 +270,8 @@ export interface CaptureSummary {
   procedure?: string
   /** GraphQL operation name (M17), or its hash when only that was sent. */
   operation?: string
+  /** Event streams (M18): messages received and the connection state. */
+  stream?: { state: NonNullable<Capture['stream']>['state']; count: number }
   /** Nearest component from the interaction, if any. */
   component?: string
   redacted: boolean
@@ -254,6 +301,7 @@ export function summarizeCapture(c: Capture): CaptureSummary {
     ...(c.operation && (c.operation.name || c.operation.hash)
       ? { operation: c.operation.name || `#${c.operation.hash?.slice(0, 12)}` }
       : {}),
+    ...(c.stream ? { stream: { state: c.stream.state, count: c.stream.count } } : {}),
     component: c.interaction?.componentChain[0],
     redacted: c.redacted,
     match: c.match && {

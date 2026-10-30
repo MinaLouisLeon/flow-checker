@@ -2,7 +2,7 @@
 // TypeShape the scan found for its request site. The tool server runs it on every matched
 // capture and stores the result on the capture (`Capture.typeCheck`).
 import { z } from 'zod'
-import type { CapturedBody } from './capture'
+import type { CapturedBody, CapturedMessage } from './capture'
 import { formatTypeShape } from './format-types'
 import type { NamedType, RequestSite, TypeProperty, TypeRef, TypeShape } from './model'
 
@@ -44,7 +44,12 @@ export const TypeMismatchSchema = z.object({
 export type TypeMismatch = z.infer<typeof TypeMismatchSchema>
 
 export const TypeCheckPartSchema = z.object({
-  part: z.enum(['request', 'response']),
+  /** `message`: the event stream messages with one event name (M18), see `event`. */
+  part: z.enum(['request', 'response', 'message']),
+  /** Part `message`: the event name (`message` for unnamed events). */
+  event: z.string().optional(),
+  /** Part `message`: how many messages were compared. */
+  messages: z.number().int().nonnegative().optional(),
   /** The declared type as written, e.g. `User[]`. */
   type: z.string(),
   /** `skipped`: the data could not be checked (see `reason`), e.g. an error response. */
@@ -77,6 +82,7 @@ export function typeCheckStatus(check: TypeCheck): TypeCheckStatus {
 export interface CheckableCapture {
   request: { body: CapturedBody }
   response?: { status: number; body: CapturedBody }
+  messages?: readonly CapturedMessage[]
   redactedPaths: readonly string[]
 }
 
@@ -93,13 +99,77 @@ export function typeTable(types: readonly NamedType[]): TypeTable {
  */
 export function checkCapture(
   capture: CheckableCapture,
-  site: Pick<RequestSite, 'id' | 'transport' | 'bodyType' | 'responseType' | 'hook'>,
+  site: Pick<RequestSite, 'id' | 'transport' | 'bodyType' | 'responseType' | 'hook' | 'stream'>,
   types: TypeTable,
 ): TypeCheck | undefined {
   const parts: TypeCheckPart[] = []
   if (site.bodyType) parts.push(checkRequest(capture, site, site.bodyType, types))
-  if (site.responseType) parts.push(checkResponse(capture, site, site.responseType, types))
+  // An event stream's content is its messages, checked per event name (M18).
+  if (site.stream) parts.push(...checkMessages(capture, site.stream.events, types))
+  else if (site.responseType) parts.push(checkResponse(capture, site, site.responseType, types))
   return parts.length > 0 ? { siteId: site.id, parts } : undefined
+}
+
+/**
+ * One part per event name that has a type and arrived at least once. Every kept message with
+ * that name is compared; mismatches share a path per event: `messages[tick].body.count`.
+ */
+function checkMessages(
+  capture: CheckableCapture,
+  events: readonly { name: string; dataType?: TypeRef }[],
+  types: TypeTable,
+): TypeCheckPart[] {
+  const parts: TypeCheckPart[] = []
+  const seen = new Set<string>()
+  for (const event of events) {
+    const type = event.dataType
+    if (!type || seen.has(event.name)) continue
+    seen.add(event.name)
+    let compared = 0
+    let withoutData = 0
+    let truncated = false
+    const merged = new Map<string, TypeMismatch>()
+    ;(capture.messages ?? []).forEach((message, index) => {
+      if (message.direction !== 'in' || (message.event ?? 'message') !== event.name) return
+      const body = message.body
+      if (!body || (body.kind === 'text' && body.truncated)) {
+        withoutData++
+        return
+      }
+      const value =
+        body.kind === 'json' || body.kind === 'text' ? body.value : body.kind === 'none' ? '' : null
+      if (value === null) {
+        withoutData++
+        return
+      }
+      compared++
+      const at = `messages[${index}].body`
+      const result = checkValue(value, type.shape, { types, root: at, redactedPaths: capture.redactedPaths })
+      if (result.truncated) truncated = true
+      for (const m of result.mismatches) {
+        const path = `messages[${event.name}].body${m.path.slice('messages[].body'.length)}`
+        const key = `${m.kind}\u0000${path}`
+        const existing = merged.get(key)
+        if (existing) existing.count = (existing.count ?? 1) + (m.count ?? 1)
+        else merged.set(key, { ...m, path, ...(m.count ? { count: m.count } : {}) })
+      }
+    })
+    if (compared === 0 && withoutData === 0) continue
+    const mismatches = [...merged.values()].slice(0, MAX_MISMATCHES)
+    parts.push({
+      part: 'message',
+      event: event.name,
+      type: type.text,
+      status: mismatches.length > 0 ? 'mismatch' : compared > 0 ? 'ok' : 'skipped',
+      ...(compared === 0
+        ? { reason: 'Messages were kept without their data (capture.maxMessageBytes).' }
+        : {}),
+      messages: compared,
+      mismatches,
+      ...(truncated || merged.size > MAX_MISMATCHES ? { truncated: true } : {}),
+    })
+  }
+  return parts
 }
 
 function skipped(part: TypeCheckPart['part'], type: TypeRef, reason: string): TypeCheckPart {

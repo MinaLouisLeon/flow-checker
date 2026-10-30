@@ -25,6 +25,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M15 | Postman import        | Model version 4. `packages/postman`; applied after each scan in the CLI scan runner, never inside the scanner.           |
 | M16 | tRPC                  | Model version 5. Batches split in the runtime before redaction (`runtime/src/trpc.ts`); router read by syntax.           |
 | M17 | GraphQL               | Model version 6. graphql-js in the scanner only; runtime reads operations by regex; fragments are global by name.        |
+| M18 | SSE                   | Model version 7. Streams sent on open, then only new messages (`stream.from`), merged by the verifier.                   |
 
 ## Gotchas
 
@@ -115,3 +116,24 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `git add` on its own. Generated `src/gql`, `src/__generated__` and the manifest are excluded from biome.
 - Recordings were made on app port 3077 (`node scripts/record-captures.mjs graphql-apollo graphql-apollo-v3
   graphql-urql graphql-relay`).
+
+## M18 — SSE (done, branch `feat/sse`)
+
+- Open streams are sent as one capture id many times: the first send is the whole capture, later ones only carry
+  new messages with `stream.from`; `Verifier.mergeStream()` appends them. The store replaces by id, so each update
+  is matched and type-checked again. The session gets one `capture` event (first send only).
+- An EventSource only delivers named events to listeners for that name, so the runtime adds its own listener for
+  each name the app listens to (`addEventListener` patched on the subclass prototype; the DOM overloads don't allow
+  an `override`). `message` is always recorded.
+- Route handler events are read by syntax: SSE text (`data:` lines) in the handler's file, and calls to functions
+  that write it from their parameters. Fixed-text data (`data: {}`) has no type.
+- Stream sites have no `responseType`; `checkCapture()` checks messages per event instead. A plain fetch of an SSE
+  route handler is turned into a streamed fetch in `sites()` (`#linkStream`), after the walk.
+- React strict mode closes the first page-load EventSource at once: the `sse` recording has an extra empty clock
+  capture.
+- Timing scans in a git worktree needs the fixtures' `node_modules` linked in: without them library types don't
+  load and the scan looks ~3x faster (a false "regression" during M18). The trpc HTML export golden times out at 5 s
+  when run alone (cold scan), on `dev` too.
+- Bash heredocs with backticks fail here (`unexpected EOF`) but may still run part of the command: write patch
+  scripts with the Write tool.
+- Recordings were made on app port 3077 (`node scripts/record-captures.mjs sse`).

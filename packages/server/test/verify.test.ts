@@ -338,3 +338,123 @@ describe('type comparison', () => {
     expect((await json<CaptureSummary[]>('/api/captures'))[0]?.typeCheck).toBe('ok')
   })
 })
+
+describe('event streams (M18)', () => {
+  const shape = (n: 'number' | 'string') => ({
+    text: 'Tick',
+    shape: {
+      kind: 'object' as const,
+      properties: [{ name: 'n', type: { kind: 'primitive' as const, name: n } }],
+    },
+  })
+  const streamSite = (over: Partial<RequestSite> = {}) =>
+    site('req_clock', 'cmp_table', 'src/UsersTable.tsx', {
+      transport: 'sse',
+      url: { text: "'/api/clock'", confidence: 'exact', path: '/api/clock' },
+      stream: {
+        api: 'event-source',
+        events: [
+          { name: 'tick', dataType: shape('number'), typeFrom: 'code', listened: true },
+          { name: 'done', listened: true },
+        ],
+      },
+      ...over,
+    })
+  const clock = (over: Partial<Capture> = {}) =>
+    capture('cap_clock', {
+      transport: 'eventsource',
+      request: { method: 'GET', url: 'http://localhost:3000/api/clock', headers: {}, body: { kind: 'none' } },
+      response: { status: 200, headers: { 'content-type': 'text/event-stream' }, body: { kind: 'none' } },
+      ...over,
+    })
+  const tick = (n: unknown) => ({
+    direction: 'in' as const,
+    event: 'tick',
+    at: '2026-10-30T10:00:00.000Z',
+    size: 7,
+    body: { kind: 'json' as const, value: { n } },
+  })
+
+  it('appends stream updates, matches the EventSource site and checks each event', async () => {
+    const { json, ingest } = setup([
+      streamSite(),
+      site('req_plain', 'cmp_sidebar', 'src/UsersSidebar.tsx', {
+        url: { text: "'/api/clock'", confidence: 'exact', path: '/api/clock' },
+      }),
+    ])
+    await ingest(clock({ stream: { state: 'open', count: 0, bytes: 0 }, messages: [] }))
+    await ingest(
+      clock({ stream: { state: 'open', count: 2, bytes: 14, from: 0 }, messages: [tick(1), tick(2)] }),
+    )
+    await ingest(
+      clock({
+        stream: { state: 'closed', count: 3, bytes: 23, from: 2 },
+        messages: [tick('3'), { direction: 'in', event: 'done', at: '2026-10-30T10:00:01.000Z', size: 2 }],
+      }),
+    )
+
+    const { capture: stored } = await json<{ capture: Capture }>('/api/captures/cap_clock')
+    expect(stored.stream).toEqual({ state: 'closed', count: 3, bytes: 23 })
+    expect(stored.messages?.map((m) => m.event)).toEqual(['tick', 'tick', 'tick', 'done'])
+    expect(stored.match).toMatchObject({ status: 'matched', siteId: 'req_clock' })
+    expect(stored.match?.candidates[0]?.evidence).toContainEqual({
+      signal: 'stream',
+      points: 10,
+      detail: 'listens to tick, done',
+    })
+    // An EventSource can't come from a plain fetch site.
+    expect(stored.match?.candidates.map((c) => c.siteId)).toEqual(['req_clock'])
+    expect(stored.typeCheck?.parts).toEqual([
+      {
+        part: 'message',
+        event: 'tick',
+        type: 'Tick',
+        status: 'mismatch',
+        messages: 3,
+        mismatches: [
+          { kind: 'wrong-type', path: 'messages[tick].body.n', expected: 'number', actual: 'string "3"' },
+        ],
+      },
+    ])
+    const served = await json<AppModel>('/api/model')
+    expect(served.requests.find((s) => s.id === 'req_clock')).toMatchObject({
+      status: 'mismatch',
+      flags: [
+        {
+          kind: 'type-mismatch',
+          message: expect.stringContaining(
+            'Event "tick" doesn\'t match Tick: n is string "3" (expected number)',
+          ),
+        },
+      ],
+    })
+  })
+
+  it('rules out a streamed fetch on an EventSource site, and lowers a plain response on a stream site', async () => {
+    const { json, ingest } = setup([streamSite()])
+    await ingest(
+      clock({
+        id: 'cap_fetch',
+        transport: 'fetch',
+        stream: { state: 'closed', count: 0, bytes: 0 },
+        messages: [],
+      }),
+      capture('cap_json', {
+        request: {
+          method: 'GET',
+          url: 'http://localhost:3000/api/clock',
+          headers: {},
+          body: { kind: 'none' },
+        },
+      }),
+    )
+    const fetched = await json<{ capture: Capture }>('/api/captures/cap_fetch')
+    expect(fetched.capture.match?.status).toBe('unmatched')
+    const plain = await json<{ capture: Capture }>('/api/captures/cap_json')
+    expect(plain.capture.match?.candidates[0]?.evidence).toContainEqual({
+      signal: 'stream',
+      points: -15,
+      detail: 'not an event stream',
+    })
+  })
+})

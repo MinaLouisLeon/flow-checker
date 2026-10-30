@@ -15,6 +15,7 @@ import { GraphqlFact } from './GraphqlView'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
+import { StreamEvents } from './SseView'
 import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
@@ -242,13 +243,17 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           shape={site.bodyType?.shape}
           source={site.bodyType?.source}
         />
-        <TypeBlock
-          title="Response"
-          text={site.responseType?.text}
-          shape={site.responseType?.shape}
-          source={site.responseType?.source}
-          empty="Not found in the code. Live capture will fill it in."
-        />
+        {site.stream ? (
+          <StreamEvents site={site} />
+        ) : (
+          <TypeBlock
+            title="Response"
+            text={site.responseType?.text}
+            shape={site.responseType?.shape}
+            source={site.responseType?.source}
+            empty="Not found in the code. Live capture will fill it in."
+          />
+        )}
 
         {chain.length > 0 && (
           <div className="request-chain">

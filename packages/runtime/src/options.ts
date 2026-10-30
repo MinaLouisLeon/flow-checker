@@ -60,6 +60,9 @@ export const DEFAULT_IGNORE = [
 ]
 
 export const DEFAULT_MAX_BODY_BYTES = 256_000
+/** Event stream messages kept per connection (M18). */
+export const DEFAULT_MAX_MESSAGES = 200
+export const DEFAULT_MAX_MESSAGE_BYTES = 64_000
 
 export interface SerializedPattern {
   source: string
@@ -72,6 +75,8 @@ export interface RuntimeCaptureOptions {
   redact: { headers: string[]; keys: string[]; patterns: SerializedPattern[] }
   maxBodyBytes: number
   ignore: string[]
+  maxMessages: number
+  maxMessageBytes: number
 }
 
 export interface RuntimeConfig {
@@ -96,6 +101,8 @@ export function resolveCaptureOptions(config: CaptureConfig = {}): RuntimeCaptur
     },
     maxBodyBytes: config.maxBodyBytes ?? DEFAULT_MAX_BODY_BYTES,
     ignore: unique([...DEFAULT_IGNORE, ...(config.ignore ?? [])]),
+    maxMessages: config.maxMessages ?? DEFAULT_MAX_MESSAGES,
+    maxMessageBytes: config.maxMessageBytes ?? DEFAULT_MAX_MESSAGE_BYTES,
   }
 }
 
@@ -106,7 +113,9 @@ export function parseRuntimeConfig(value: unknown): RuntimeConfig | undefined {
     if (!parsed || typeof parsed !== 'object') return undefined
     const config = parsed as Partial<RuntimeConfig>
     if (typeof config.ingest !== 'string' || typeof config.token !== 'string') return undefined
-    return { ingest: config.ingest, token: config.token, capture: config.capture ?? resolveCaptureOptions() }
+    // Older hooks may pass options without the M18 stream limits.
+    const capture = { ...resolveCaptureOptions(), ...config.capture }
+    return { ingest: config.ingest, token: config.token, capture }
   } catch {
     return undefined
   }

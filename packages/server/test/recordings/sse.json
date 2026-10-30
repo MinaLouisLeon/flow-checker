@@ -1,0 +1,613 @@
+{
+  "fixture": "sse",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvuyzmgx0whrbvp6",
+      "sessionId": "ses_mvuyzm7t5w52trju",
+      "origin": "browser",
+      "transport": "eventsource",
+      "timestamp": "2026-10-30T12:50:16.833Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/clock?count=3",
+        "headers": {
+          "accept": "text/event-stream"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "stream": {
+        "state": "closed",
+        "count": 0,
+        "bytes": 0
+      },
+      "messages": [],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:873:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1689:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1855:29)",
+        "at Clock.useEffect (http://localhost:3077/_next/static/chunks/_07p7iw7mxduq4._.js:21:28)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "Clock.useEffect",
+          "file": "components/Clock.tsx",
+          "line": 12,
+          "column": 20
+        }
+      ]
+    },
+    {
+      "id": "cap_mvuyzmh8rast9wwz",
+      "sessionId": "ses_mvuyzm7t5w52trju",
+      "origin": "browser",
+      "transport": "eventsource",
+      "timestamp": "2026-10-30T12:50:16.844Z",
+      "durationMs": 1045,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/clock?count=3",
+        "headers": {
+          "accept": "text/event-stream"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/event-stream"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "stream": {
+        "state": "closed",
+        "count": 5,
+        "bytes": 157
+      },
+      "messages": [
+        {
+          "direction": "in",
+          "event": "tick",
+          "at": "2026-10-30T12:50:17.286Z",
+          "size": 39,
+          "body": {
+            "kind": "json",
+            "value": {
+              "n": 1,
+              "at": "2026-10-30T12:50:17.269Z"
+            },
+            "size": 39
+          }
+        },
+        {
+          "direction": "in",
+          "event": "tick",
+          "at": "2026-10-30T12:50:17.482Z",
+          "size": 39,
+          "body": {
+            "kind": "json",
+            "value": {
+              "n": 2,
+              "at": "2026-10-30T12:50:17.480Z"
+            },
+            "size": 39
+          }
+        },
+        {
+          "direction": "in",
+          "event": "tick",
+          "at": "2026-10-30T12:50:17.685Z",
+          "size": 39,
+          "body": {
+            "kind": "json",
+            "value": {
+              "n": 3,
+              "at": "2026-10-30T12:50:17.683Z"
+            },
+            "size": 39
+          }
+        },
+        {
+          "direction": "in",
+          "at": "2026-10-30T12:50:17.889Z",
+          "size": 29,
+          "body": {
+            "kind": "json",
+            "value": {
+              "state": "stopped",
+              "ticks": 3
+            },
+            "size": 29
+          }
+        },
+        {
+          "direction": "in",
+          "event": "done",
+          "at": "2026-10-30T12:50:17.889Z",
+          "size": 11,
+          "body": {
+            "kind": "json",
+            "value": {
+              "ok": true
+            },
+            "size": 11
+          }
+        }
+      ],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:873:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1689:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1855:29)",
+        "at Clock.useEffect (http://localhost:3077/_next/static/chunks/_07p7iw7mxduq4._.js:21:28)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "Clock.useEffect",
+          "file": "components/Clock.tsx",
+          "line": 12,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1iv9ud7bbfd",
+        "parts": [
+          {
+            "part": "message",
+            "event": "tick",
+            "type": "Tick",
+            "status": "ok",
+            "messages": 3,
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "message",
+            "type": "ClockStatus",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "done",
+            "type": "{ ok: boolean; }",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuyzs45erc5o7k0",
+      "sessionId": "ses_mvuyzm7t5w52trju",
+      "origin": "browser",
+      "transport": "eventsource",
+      "timestamp": "2026-10-30T12:50:24.149Z",
+      "durationMs": 2349,
+      "pageUrl": "http://localhost:3077/jobs/7",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/jobs/7/progress",
+        "headers": {
+          "accept": "text/event-stream"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/event-stream"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Start job\"",
+        "componentChain": [
+          "JobProgress",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T12:50:24.149Z"
+      },
+      "stream": {
+        "state": "closed",
+        "count": 5,
+        "bytes": 172
+      },
+      "messages": [
+        {
+          "direction": "in",
+          "event": "progress",
+          "at": "2026-10-30T12:50:25.866Z",
+          "size": 33,
+          "body": {
+            "kind": "json",
+            "value": {
+              "percent": "25%",
+              "step": "queued"
+            },
+            "size": 33
+          }
+        },
+        {
+          "direction": "in",
+          "event": "progress",
+          "at": "2026-10-30T12:50:26.021Z",
+          "size": 35,
+          "body": {
+            "kind": "json",
+            "value": {
+              "percent": "50%",
+              "step": "building"
+            },
+            "size": 35
+          }
+        },
+        {
+          "direction": "in",
+          "event": "progress",
+          "at": "2026-10-30T12:50:26.181Z",
+          "size": 34,
+          "body": {
+            "kind": "json",
+            "value": {
+              "percent": "75%",
+              "step": "testing"
+            },
+            "size": 34
+          }
+        },
+        {
+          "direction": "in",
+          "event": "progress",
+          "at": "2026-10-30T12:50:26.340Z",
+          "size": 37,
+          "body": {
+            "kind": "json",
+            "value": {
+              "percent": "100%",
+              "step": "deploying"
+            },
+            "size": 37
+          }
+        },
+        {
+          "direction": "in",
+          "event": "done",
+          "at": "2026-10-30T12:50:26.498Z",
+          "size": 33,
+          "body": {
+            "kind": "json",
+            "value": {
+              "id": "7",
+              "token": "[REDACTED:string]"
+            },
+            "size": 33
+          }
+        }
+      ],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:873:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1689:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1855:29)",
+        "at start (http://localhost:3077/_next/static/chunks/_0o481nvenhgk-._.js:24:24)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "messages[4].body.token"
+      ],
+      "sourceStack": [
+        {
+          "fn": "start",
+          "file": "components/JobProgress.tsx",
+          "line": 17,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_2efgv3zloxh",
+        "parts": [
+          {
+            "part": "message",
+            "event": "progress",
+            "type": "Progress",
+            "status": "mismatch",
+            "messages": 4,
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "messages[progress].body.percent",
+                "expected": "number",
+                "actual": "string \"25%\"",
+                "count": 4
+              }
+            ]
+          },
+          {
+            "part": "message",
+            "event": "done",
+            "type": "{ id: string; token: string; }",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuyzxraqaref6m4",
+      "sessionId": "ses_mvuyzm7t5w52trju",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T12:50:31.462Z",
+      "durationMs": 483,
+      "pageUrl": "http://localhost:3077/chat",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/chat",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "text/event-stream"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "prompt": "hello there"
+          },
+          "size": 24
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "cache-control": "no-cache, no-transform",
+          "connection": "keep-alive",
+          "content-type": "text/event-stream",
+          "date": "Fri, 30 Oct 2026 12:50:31 GMT",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Send\"",
+        "componentChain": [
+          "Chat",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T12:50:31.460Z"
+      },
+      "stream": {
+        "state": "closed",
+        "count": 5,
+        "bytes": 82
+      },
+      "messages": [
+        {
+          "direction": "in",
+          "event": "chunk",
+          "at": "2026-10-30T12:50:31.682Z",
+          "size": 16,
+          "body": {
+            "kind": "json",
+            "value": {
+              "delta": "You "
+            },
+            "size": 16
+          }
+        },
+        {
+          "direction": "in",
+          "event": "chunk",
+          "at": "2026-10-30T12:50:31.727Z",
+          "size": 18,
+          "body": {
+            "kind": "json",
+            "value": {
+              "delta": "said: "
+            },
+            "size": 18
+          }
+        },
+        {
+          "direction": "in",
+          "event": "chunk",
+          "at": "2026-10-30T12:50:31.785Z",
+          "size": 18,
+          "body": {
+            "kind": "json",
+            "value": {
+              "delta": "hello "
+            },
+            "size": 18
+          }
+        },
+        {
+          "direction": "in",
+          "event": "chunk",
+          "at": "2026-10-30T12:50:31.843Z",
+          "size": 18,
+          "body": {
+            "kind": "json",
+            "value": {
+              "delta": "there "
+            },
+            "size": 18
+          }
+        },
+        {
+          "direction": "in",
+          "event": "done",
+          "at": "2026-10-30T12:50:31.907Z",
+          "size": 12,
+          "body": {
+            "kind": "json",
+            "value": {
+              "tokens": 4
+            },
+            "size": 12
+          }
+        }
+      ],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:873:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1gtpl_t6_eay8._.js:1689:195)",
+        "at streamChat (http://localhost:3077/_next/static/chunks/_08e64ljiju2bj._.js:90:28)",
+        "at onSubmit (http://localhost:3077/_next/static/chunks/_08e64ljiju2bj._.js:25:173)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "streamChat",
+          "file": "lib/chat.ts",
+          "line": 6,
+          "column": 26
+        },
+        {
+          "fn": "onSubmit",
+          "file": "components/Chat.tsx",
+          "line": 15,
+          "column": 31
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_09bcv599usy",
+        "parts": [
+          {
+            "part": "request",
+            "type": "ChatRequest",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "chunk",
+            "type": "ChatChunk",
+            "status": "ok",
+            "messages": 4,
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "done",
+            "type": "ChatDone",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}
