@@ -28,6 +28,8 @@ export const MATCH_SIGNALS = [
   'query-key',
   /** Sent from middleware (stack), for a request its matcher selects (M14). */
   'middleware',
+  /** The tRPC procedure the capture called (or the incoming batch it ran in) is the site's (M16). */
+  'trpc-procedure',
   /** You assigned captures like this one to the site. */
   'manual',
 ] as const

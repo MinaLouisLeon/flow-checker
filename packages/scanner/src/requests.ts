@@ -14,12 +14,14 @@ import {
   type CallFrame,
   type Component,
   type Flag,
+  formatTypeShape,
   HTTP_METHODS,
   type HttpMethod,
   type MiddlewareRewrite,
   makeId,
   type Navigation,
   type PathCheck,
+  type ProcedureRef,
   type QueryKeyPart,
   type QueryLink,
   queryKeyHits,
@@ -29,6 +31,8 @@ import {
   type ServerActionRef,
   type SourceLoc,
   type Trigger,
+  type TrpcProcedure,
+  type TrpcProcedureType,
   type TypeRef,
 } from '@flow-checker/shared'
 import {
@@ -53,6 +57,17 @@ import { siteHash } from './code-hash'
 import { directives, importModuleOf, isConditional, unalias } from './components'
 import { linkApi, type NavApi, type NavKind, navigationCall, outcomeOf } from './navigation'
 import { compare, relativeTo } from './paths'
+import {
+  KEY_METHODS,
+  OPTIONS_METHODS,
+  type ProcedureCall,
+  type ProcedureDef,
+  procedureCall,
+  REACT_METHODS,
+  UTILS_FETCHES,
+  UTILS_OPS,
+  VANILLA_METHODS,
+} from './trpc'
 import type { TypeResolver } from './types'
 
 /** How deep wrapper calls are followed from an origin. */
@@ -206,6 +221,15 @@ interface Origin {
   routeId?: string
   handlerMethod?: HttpMethod
   serverAction?: ServerActionRef
+  /** A tRPC procedure's resolver (origin `route-handler`). */
+  procedure?: ProcedureRef
+}
+
+/** A procedure read from the router, with its types. */
+interface TrpcInfo {
+  def: ProcedureDef
+  inputType?: TypeRef
+  outputType?: TypeRef
 }
 
 interface Frame {
@@ -262,6 +286,7 @@ interface Found {
   responseType?: TypeRef
   serverAction?: ServerActionRef
   client?: { module: string; name: string }
+  procedure?: ProcedureRef
 }
 
 export interface RequestScannerOptions {
@@ -308,6 +333,8 @@ export class RequestScanner {
   readonly #siteKinds = new Map<string, { kind: HookDef['kind']; client: boolean }>()
   /** Nesting of `#evaluate`, so values that refer to each other end. */
   #evalDepth = 0
+  /** tRPC (M16): the endpoint and the router's procedures by path. */
+  #trpc: { endpoint: string; procedures: Map<string, TrpcInfo> } | undefined
 
   constructor(root: string, types: TypeResolver, options: RequestScannerOptions = {}) {
     this.#root = root
@@ -351,6 +378,79 @@ export class RequestScanner {
     this.#walk(fn, fn, EMPTY_ENV, { origin, frames: [], active: new Set([fn]) })
   }
 
+  /**
+   * The tRPC endpoint and router (M16). Call before walking components, so client calls get the
+   * URL and the procedure's input and output types.
+   */
+  setTrpc(endpoint: string, defs: ProcedureDef[]) {
+    const procedures = new Map<string, TrpcInfo>()
+    for (const def of defs) {
+      if (!procedures.has(def.path)) procedures.set(def.path, { def, ...this.#procedureTypes(def) })
+    }
+    this.#trpc = { endpoint, procedures }
+  }
+
+  /** Requests the procedures' resolvers send, run by the route handler that serves tRPC. */
+  addTrpcProcedures(route: Route) {
+    for (const [path, { def }] of this.#trpc?.procedures ?? []) {
+      const fn = def.resolver
+      if (!fn || !isProject(fn) || !this.#isScanned(fn)) continue
+      const origin: Origin = {
+        kind: 'route-handler',
+        key: `trpc:${route.file}#${path}`,
+        client: false,
+        routeId: route.id,
+        handlerMethod: def.type === 'mutation' ? 'POST' : 'GET',
+        procedure: { path, type: def.type },
+      }
+      this.#walk(fn, fn, EMPTY_ENV, { origin, frames: [], active: new Set([fn]) })
+    }
+  }
+
+  /** The router's procedures, with the client sites that call each. */
+  trpcProcedures(sites: RequestSite[]): TrpcProcedure[] {
+    const out: TrpcProcedure[] = []
+    for (const [path, info] of this.#trpc?.procedures ?? []) {
+      const callee = info.def.call.getExpression()
+      const anchor = N.isPropertyAccessExpression(callee) ? callee.getNameNode() : info.def.call
+      out.push({
+        id: makeId('trp', path),
+        path,
+        type: info.def.type,
+        loc: this.#loc(anchor),
+        ...(info.inputType ? { inputType: info.inputType } : {}),
+        ...(info.outputType ? { outputType: info.outputType } : {}),
+        siteIds: sites.filter((s) => s.transport === 'trpc' && s.procedure?.path === path).map((s) => s.id),
+      })
+    }
+    return out.sort((a, b) => compare(a.path, b.path))
+  }
+
+  /** `.input(schema)` (zod, else the resolver's `input`) and `.output(schema)` (else what the resolver returns). */
+  #procedureTypes(def: ProcedureDef): { inputType?: TypeRef; outputType?: TypeRef } {
+    const [onlyInput] = def.inputs
+    let inputType = def.inputs.length === 1 && onlyInput ? this.#schemaType(onlyInput, 'input') : undefined
+    const resolver = def.resolver && isFunctionLike(def.resolver) ? def.resolver : undefined
+    if (!inputType && def.inputs.length > 0 && resolver) {
+      const param = resolver.getParameters()[0]
+      const type = param?.getType().getProperty('input')?.getTypeAtLocation(param)
+      if (param && type && isMeaningful(type)) inputType = this.#types.fromType(type, param)
+    }
+    const outputType = def.output
+      ? this.#schemaType(def.output, 'output')
+      : resolver
+        ? this.#returnType(resolver)
+        : undefined
+    return { ...(inputType ? { inputType } : {}), ...(outputType ? { outputType } : {}) }
+  }
+
+  #schemaType(node: Node, which: 'input' | 'output'): TypeRef | undefined {
+    const ref = this.#types.fromZodSchema(node, which)
+    if (!ref) return undefined
+    // `z.input<typeof z.object({ ... })>` reads badly: show the shape instead.
+    return N.isIdentifier(skipWrappers(node)) ? ref : { ...ref, text: oneLine(formatTypeShape(ref.shape)) }
+  }
+
   /** Middleware rewrites, with the route that answers when the target resolves to one. */
   rewrites(routes: Route[]): MiddlewareRewrite[] {
     const pages = pageTargets(routes, true)
@@ -392,7 +492,9 @@ export class RequestScanner {
         (s) =>
           s.origin === 'route-handler' &&
           s.routeId === target.route.id &&
-          (!site.method || s.handlerMethod === site.method),
+          (!site.method || s.handlerMethod === site.method) &&
+          // The tRPC handler serves every procedure: only this procedure's requests follow.
+          (!site.procedure || s.procedure?.path === site.procedure.path),
       )
       if (chain.length > 0) site.chain = chain.map((s) => s.id)
     }
@@ -442,6 +544,11 @@ export class RequestScanner {
     if (nav) {
       const href = this.#href(call.getArguments()[0], env)
       this.#emitNav(w, this.#frame(call, scope), { ...nav, href }, call)
+      return true
+    }
+    const trpc = procedureCall(call)
+    if (trpc && trpc.proxy !== 'server') {
+      this.#trpcCall(call, trpc, scope, env, w)
       return true
     }
     if (this.#isFetch(call)) {
@@ -708,6 +815,147 @@ export class RequestScanner {
     return undefined
   }
 
+  // --- tRPC (M16) ----------------------------------------------------------------------------
+
+  /**
+   * A call on a tRPC proxy: React hooks (`trpc.a.b.useQuery()`), the vanilla client
+   * (`client.a.b.query()`), `utils.a.b.fetch()` / `.invalidate()`. v11 `queryOptions()` is
+   * handled where a React Query hook uses it (`#hook`), so it is skipped here.
+   */
+  #trpcCall(call: CallExpression, trpc: ProcedureCall, scope: Node, env: Env, w: Walk) {
+    const { path, method, proxy } = trpc
+    if (proxy === 'react') {
+      const type = REACT_METHODS[method] as TrpcProcedureType
+      const def: HookDef = { name: method, module: '@trpc/react-query', kind: queryKind(type) }
+      const frame: Frame = {
+        ...this.#frame(call, scope),
+        hook: { def },
+        ...(type === 'mutation' ? { trigger: this.#mutationTrigger(call, scope) } : {}),
+      }
+      this.#emitTrpc(w, frame, path, type)
+      const options = call.getArguments()[type === 'mutation' ? 0 : 1]
+      if (type === 'mutation' && options) this.#mutationCallbacks({ node: options, env }, frame, call, w)
+      return
+    }
+    if (proxy === 'vanilla') {
+      this.#emitTrpc(w, this.#frame(call, scope), path, VANILLA_METHODS[method] as TrpcProcedureType)
+      return
+    }
+    if (proxy === 'utils') {
+      if (UTILS_FETCHES.has(method)) {
+        const def: HookDef = { name: method, module: '@trpc/react-query', kind: 'query', client: true }
+        this.#emitTrpc(w, { ...this.#frame(call, scope), hook: { def } }, path, 'query')
+        return
+      }
+      const op = UTILS_OPS[method]
+      if (op) this.#emitLink(w, this.#frame(call, scope), op, method, call, env, path)
+    }
+    // Options proxy outside a hook (`const opts = trpc.a.b.queryOptions()`): sent where a hook uses it.
+  }
+
+  /** `useQuery(trpc.a.b.queryOptions(input))`, `useMutation(trpc.a.b.mutationOptions({ onSuccess }))`. */
+  #trpcHook(call: CallExpression, def: HookDef, scope: Node, env: Env, w: Walk): boolean {
+    const args = call.getArguments()
+    const entries: Resolved[] = def.multi ? this.#queriesList(args[0], env) : [{ node: args[0], env }]
+    let found = false
+    for (const entry of entries) {
+      const options = this.#trpcOptionsOf(entry)
+      if (!options) continue
+      found = true
+      const anchor = def.multi && entry.node ? entry.node : call
+      const type = OPTIONS_METHODS[options.trpc.method] as TrpcProcedureType
+      const frame: Frame = {
+        node: anchor,
+        callee: anchor === call ? oneLine(call.getExpression().getText()) : def.name,
+        scope,
+        hook: { def },
+        ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope) } : {}),
+      }
+      this.#emitTrpc(w, frame, options.trpc.path, type)
+      if (type !== 'mutation') continue
+      // Callbacks passed to `mutationOptions({...})` or next to its spread in `useMutation({...})`.
+      const inner = options.call.getArguments()[0]
+      if (inner) this.#mutationCallbacks({ node: inner, env: options.env }, frame, anchor, w)
+      if (options.outer) this.#mutationCallbacks(options.outer, frame, anchor, w)
+    }
+    return found
+  }
+
+  /** A v11 options call (`trpc.a.b.queryOptions()`), as the value itself or spread into an object. */
+  #trpcOptionsOf(
+    value: Resolved,
+  ): { call: CallExpression; trpc: ProcedureCall; env: Env; outer?: Resolved } | undefined {
+    const r = this.#evaluate(value.node, value.env)
+    const node = r.node ? skipWrappers(r.node) : undefined
+    if (!node) return undefined
+    if (N.isCallExpression(node)) {
+      const trpc = procedureCall(node)
+      return trpc?.proxy === 'options' && trpc.method in OPTIONS_METHODS
+        ? { call: node, trpc, env: r.env }
+        : undefined
+    }
+    if (N.isObjectLiteralExpression(node)) {
+      for (const p of node.getProperties()) {
+        if (!N.isSpreadAssignment(p)) continue
+        const inner = this.#trpcOptionsOf({ node: p.getExpression(), env: r.env })
+        if (inner) return { ...inner, outer: r }
+      }
+    }
+    return undefined
+  }
+
+  /** The procedure path a cache call targets: `trpc.a.b.pathFilter()`, `{ queryKey: trpc.a.b.queryKey() }`. */
+  #trpcKeyPath(expr: Node | undefined, env: Env): string | undefined {
+    const r = this.#evaluate(expr, env)
+    const node = r.node ? skipWrappers(r.node) : undefined
+    if (!node) return undefined
+    if (N.isCallExpression(node)) {
+      const trpc = procedureCall(node)
+      return trpc?.proxy === 'options' && KEY_METHODS.has(trpc.method) ? trpc.path : undefined
+    }
+    if (N.isObjectLiteralExpression(node)) {
+      const key = this.#propOf(r, 'queryKey')
+      if (key) return this.#trpcKeyPath(key.node, key.env)
+      for (const p of node.getProperties()) {
+        if (!N.isSpreadAssignment(p)) continue
+        const inner = this.#trpcKeyPath(p.getExpression(), r.env)
+        if (inner !== undefined) return inner
+      }
+    }
+    return undefined
+  }
+
+  #emitTrpc(w: Walk, frame: Frame, path: string, type: TrpcProcedureType) {
+    const info = this.#trpc?.procedures.get(path)
+    const endpoint = (this.#trpc?.endpoint ?? '/api/trpc').replace(/\/$/, '')
+    const full = `${endpoint}/${path}`
+    this.#emit(w, frame, {
+      transport: 'trpc',
+      method: type === 'mutation' ? 'POST' : 'GET',
+      url: { text: full, confidence: 'exact', path: full },
+      procedure: { path, type },
+      ...(info?.inputType ? { bodyType: info.inputType } : {}),
+      ...(info?.outputType ? { responseType: info.outputType } : {}),
+    })
+  }
+
+  /** Walks a mutation's `onSuccess` / `onError` / `onSettled`: what runs after it. */
+  #mutationCallbacks(options: Resolved, frame: Frame, anchor: Node, w: Walk) {
+    const { hook: _, ...plain } = frame
+    for (const name of ['onSuccess', 'onError', 'onSettled']) {
+      const prop = this.#propOf(options, name)
+      const callback = prop ? this.#functionValue(prop.node, prop.env) : undefined
+      if (!callback || w.active.has(callback)) continue
+      const outcome = name === 'onSuccess' ? 'success' : name === 'onError' ? 'error' : undefined
+      this.#enter(
+        callback,
+        prop?.env ?? EMPTY_ENV,
+        { ...plain, ...(outcome ? { outcome } : {}), after: anchor },
+        w,
+      )
+    }
+  }
+
   #enter(fn: Node, env: Env, frame: Frame, w: Walk) {
     w.frames.push(frame)
     w.active.add(fn)
@@ -718,6 +966,7 @@ export class RequestScanner {
 
   /** React Query / SWR / `queryClient.prefetchQuery()`: walk the query or mutation function. */
   #hook(call: CallExpression, def: HookDef, scope: Node, env: Env, w: Walk) {
+    if (def.rq && this.#trpcHook(call, def, scope, env, w)) return
     const args = call.getArguments()
     if (def.multi) {
       // One query per entry: each is anchored at its entry, so they get their own site ids.
@@ -765,21 +1014,7 @@ export class RequestScanner {
 
     // What runs after the mutation: navigation, cache updates (and requests) in its callbacks.
     const options = args.options
-    if (def.kind === 'mutation' && options) {
-      const { hook: _, ...plain } = frame
-      for (const name of ['onSuccess', 'onError', 'onSettled']) {
-        const prop = this.#propOf(options, name)
-        const callback = prop ? this.#functionValue(prop.node, prop.env) : undefined
-        if (!callback || w.active.has(callback)) continue
-        const outcome = name === 'onSuccess' ? 'success' : name === 'onError' ? 'error' : undefined
-        this.#enter(
-          callback,
-          prop?.env ?? EMPTY_ENV,
-          { ...plain, ...(outcome ? { outcome } : {}), after: anchor },
-          w,
-        )
-      }
-    }
+    if (def.kind === 'mutation' && options) this.#mutationCallbacks(options, frame, anchor, w)
   }
 
   /**
@@ -916,7 +1151,15 @@ export class RequestScanner {
    * `queryClient.invalidateQueries({ queryKey, exact })` (v5), `invalidateQueries(key, filters)`
    * (v4), `setQueryData(key, updater)`, ...: a link to the queries the key hits.
    */
-  #emitLink(w: Walk, last: Frame, kind: QueryLink['kind'], method: string, call: CallExpression, env: Env) {
+  #emitLink(
+    w: Walk,
+    last: Frame,
+    kind: QueryLink['kind'],
+    method: string,
+    call: CallExpression,
+    env: Env,
+    trpcPath?: string,
+  ) {
     if (w.origin.kind === 'route-handler') return
     const args = call.getArguments()
     let key: QueryKeyPart[] | undefined
@@ -927,7 +1170,10 @@ export class RequestScanner {
       return !!value && N.isTrueLiteral(skipWrappers(value))
     }
     const first = args[0]
-    if (first) {
+    // tRPC (M16): `utils.a.b.invalidate()`, or a key / filter from the v11 options proxy.
+    const procedure = trpcPath ?? this.#trpcKeyPath(first, env)
+    if (procedure !== undefined) exact = false
+    else if (first) {
       const r = this.#evaluate(first, env)
       if (r.node && N.isObjectLiteralExpression(skipWrappers(r.node)) && method !== 'setQueryData') {
         const k = this.#propOf(r, 'queryKey')
@@ -953,6 +1199,7 @@ export class RequestScanner {
         origin: w.origin.kind === 'server-action' ? 'server-action' : 'component',
         ...(w.origin.componentId ? { componentId: w.origin.componentId } : {}),
         ...(key ? { key } : {}),
+        ...(procedure !== undefined ? { procedure } : {}),
         ...(exact ? { exact } : {}),
         trigger: this.#trigger(frames, w.origin),
         ...(outcome ? { outcome } : {}),
@@ -972,12 +1219,23 @@ export class RequestScanner {
     const isQuery = (s: RequestSite) => this.#siteKinds.get(s.id)?.kind === 'query' && !!s.queryKey
     // A client-side cache call only reaches queries cached in the browser.
     const browserQueries = sites.filter((s) => isQuery(s) && s.trigger.kind !== 'server-render')
+    // tRPC queries are React Query queries too, keyed by procedure path (M16).
+    const trpcQueries = sites.filter(
+      (s) => s.transport === 'trpc' && s.procedure?.type === 'query' && s.trigger.kind !== 'server-render',
+    )
     const links: QueryLink[] = []
     for (const { link, after } of this.#links.values()) {
       const fromSiteIds = [...new Set(after.flatMap((node) => this.#hookSites.get(node) ?? []))]
-      const targetSiteIds = browserQueries
-        .filter((s) => !link.key || queryKeyHits(link.key, s.queryKey ?? [], link.exact))
-        .map((s) => s.id)
+      const prefix = link.procedure
+      const targets =
+        prefix !== undefined
+          ? trpcQueries.filter(
+              (s) => !prefix || s.procedure?.path === prefix || s.procedure?.path.startsWith(`${prefix}.`),
+            )
+          : link.key
+            ? browserQueries.filter((s) => queryKeyHits(link.key ?? [], s.queryKey ?? [], link.exact))
+            : [...browserQueries, ...trpcQueries]
+      const targetSiteIds = targets.map((s) => s.id)
       links.push({ ...link, fromSiteIds, targetSiteIds })
     }
 
@@ -1059,6 +1317,8 @@ export class RequestScanner {
           break
         }
         if (N.isCallExpression(node)) {
+          // `trpc.a.b.queryOptions(input)` is the options themselves, not its argument.
+          if (procedureCall(node)) break
           const fn = calleeFunction(node)
           if (fn && isFunctionLike(fn) && isProject(fn) && this.#isScanned(fn)) {
             const returned = returnedExpr(fn)
@@ -1372,7 +1632,8 @@ export class RequestScanner {
         queryClientMethod(d) ||
         isActionStateHook(d) ||
         navigationCall(d) ||
-        middlewareResponse(d)
+        middlewareResponse(d) ||
+        (procedureCall(d)?.proxy ?? 'server') !== 'server'
       ) {
         found = true
         return
@@ -1431,6 +1692,11 @@ export class RequestScanner {
           }
         : {}),
       ...(hookFrame?.hook?.parts ? { queryKey: hookFrame.hook.parts } : {}),
+      ...(found.procedure
+        ? { procedure: found.procedure }
+        : w.origin.procedure
+          ? { procedure: w.origin.procedure }
+          : {}),
       ...(found.method ? { method: found.method } : {}),
       ...(found.url ? { url: found.url } : {}),
       trigger,
@@ -2153,6 +2419,11 @@ function flagsOf(site: RequestSite): Flag[] {
     flags.push({ kind: 'unknown-trigger', message: 'Could not find what starts this request.' })
   }
   return flags
+}
+
+/** Subscriptions are long-running reads: React Query treats them like queries. */
+function queryKind(type: TrpcProcedureType): HookDef['kind'] {
+  return type === 'mutation' ? 'mutation' : 'query'
 }
 
 function actionKey(ref: ServerActionRef): string {

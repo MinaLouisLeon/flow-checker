@@ -1,6 +1,8 @@
 // Scores a capture against every scanned request site (docs/PLAN.md 8).
 // Each site first has to be possible at all (same side, method, URL, server action, route
 // handler). Then evidence adds points, and the best site wins if it is clearly ahead.
+
+import { parseTrpcUrl } from '@flow-checker/runtime/trpc'
 import {
   type AppModel,
   type Capture,
@@ -54,6 +56,10 @@ const GENERIC_CALLEES = new Set([
   'useLayoutEffect',
   'mutate',
   'mutateAsync',
+  'query',
+  'mutation',
+  'queryOptions',
+  'mutationOptions',
 ])
 
 /** DOM events that fit each trigger event prop. */
@@ -103,22 +109,45 @@ export class Matcher {
   private readonly sites: SiteInfo[]
   private readonly siteIds: Set<string>
   private readonly middleware: Middleware | undefined
+  private readonly trpcEndpoints: string[]
 
   constructor(model: AppModel) {
     this.sites = indexSites(model)
     this.siteIds = new Set(model.requests.map((s) => s.id))
     this.middleware = model.middleware
+    this.trpcEndpoints = model.trpc ? [model.trpc.endpoint] : []
   }
 
   hasSite(id: string): boolean {
     return this.siteIds.has(id)
   }
 
+  /**
+   * A server hop whose browser request was a tRPC batch split into pieces (M16): it belongs to
+   * the piece whose site leads to it, so each piece's match is tried as the parent and the best
+   * result kept.
+   */
+  matchWithParents(
+    capture: Capture,
+    context: MatchContext,
+    parents: (CaptureMatch | undefined)[],
+  ): CaptureMatch {
+    if (parents.length <= 1) return this.match(capture, { ...context, parentMatch: parents[0] })
+    let best: CaptureMatch | undefined
+    for (const parentMatch of parents) {
+      const match = this.match(capture, { ...context, parentMatch })
+      if (!best || rank(match) > rank(best)) best = match
+    }
+    return best as CaptureMatch
+  }
+
   match(capture: Capture, context: MatchContext): CaptureMatch {
     const candidates: MatchCandidate[] = []
+    const parentUrl = capture.origin === 'server' ? capture.parent?.url : undefined
     const scoring: Scoring = {
       middleware: this.middleware,
       fromMiddleware: capture.origin === 'server' && fromMiddleware(capture, context, this.middleware),
+      trpcParent: parentUrl ? parseTrpcUrl(parentUrl, { endpoints: this.trpcEndpoints })?.paths : undefined,
     }
     for (const info of this.sites) {
       const evidence = scoreSite(info, capture, context, scoring)
@@ -156,6 +185,8 @@ interface Scoring {
   middleware: Middleware | undefined
   /** The server capture was sent from middleware code (M14). */
   fromMiddleware: boolean
+  /** Server capture made while a tRPC request ran: the procedures that request called (M16). */
+  trpcParent: string[] | undefined
 }
 
 /** Next runs middleware / proxy through its web adapter, on the edge and on Node.js. */
@@ -242,6 +273,20 @@ function scoreSite(
     add('middleware', -30, 'sent from middleware, the site is not')
   }
 
+  // tRPC (M16): the procedure a call (or the batch a server hop ran in) was for.
+  const called = capture.procedure
+  if (called && site.transport === 'trpc') {
+    if (site.procedure && site.procedure.path !== called.path) return undefined
+    add('trpc-procedure', 20, called.path)
+  } else if (called) {
+    add('trpc-procedure', -20, `a call to ${called.path}, the site is not tRPC`)
+  }
+  if (site.origin === 'route-handler' && site.procedure && scoring.trpcParent) {
+    // Runs in a procedure's resolver: that procedure must be one the incoming request called.
+    if (!scoring.trpcParent.includes(site.procedure.path)) return undefined
+    add('trpc-procedure', scoring.trpcParent.length === 1 ? 30 : 15, `in ${site.procedure.path}`)
+  }
+
   if (site.origin === 'server-action' && info.action) {
     const id = parent?.serverActionId
     const action = id ? context.resolveAction(id) : undefined
@@ -315,6 +360,11 @@ function scoreSite(
       add('query-key', -10, `sent by a React Query ${query.kind}, not from a query hook here`)
     } else if (siteKind && siteKind !== query.kind) {
       add('query-key', -15, `sent by a ${query.kind}, the site is a ${siteKind}`)
+    } else if (site.procedure && query.key) {
+      // tRPC keys start with the procedure path: `[['todo', 'list'], { input, type }]`.
+      const first = query.key[0]
+      const path = Array.isArray(first) ? first.join('.') : undefined
+      if (path === site.procedure.path) add('query-key', 10, path)
     } else if (site.queryKey && query.key) {
       const text = formatQueryKey(site.queryKey)
       if (!queryKeyMatchesValue(site.queryKey, query.key)) add('query-key', -30, `key is not ${text}`)
@@ -324,6 +374,12 @@ function scoreSite(
   }
 
   return evidence
+}
+
+/** Matched beats ambiguous beats unmatched; then the higher score. */
+function rank(match: CaptureMatch): number {
+  const status = match.status === 'matched' ? 2 : match.status === 'ambiguous' ? 1 : 0
+  return status * 100_000 + match.score
 }
 
 function sameAction(action: ServerActionInfo, site: { name: string; file: string }): boolean {

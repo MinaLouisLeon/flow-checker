@@ -4,6 +4,7 @@ import { useData } from '../context'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
+import { TrpcSection } from '../TrpcView'
 import { Empty, Section, SourceLink } from '../ui'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
@@ -134,6 +135,8 @@ export function Overview() {
       </Section>
 
       <PostmanSection index={index} />
+
+      <TrpcSection index={index} />
 
       <Section title="Pages">
         <ul className="list">

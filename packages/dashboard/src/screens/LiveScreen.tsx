@@ -12,6 +12,7 @@ import {
 import { useData } from '../context'
 import { siteHref, siteLabel, siteOwner } from '../RequestView'
 import { href, type MatchFilter, replaceScreen } from '../router'
+import { TrpcCaptureFact } from '../TrpcView'
 import { CaptureTypeCheck, StaleBadge, TypeCheckBadge } from '../TypeCheckView'
 import { Badge, Empty, matches, SearchBox, Section } from '../ui'
 
@@ -34,6 +35,7 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   trigger: 'trigger',
   'query-key': 'query key',
   middleware: 'middleware',
+  'trpc-procedure': 'tRPC procedure',
   manual: 'manual',
 }
 
@@ -289,6 +291,7 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
               </dd>
             </>
           )}
+          <TrpcCaptureFact capture={c} q={q} />
           {c.serverAction && (
             <>
               <dt>Server action</dt>

@@ -189,3 +189,79 @@ browser GET localhost:4010/todos
   → matched TodoPanel · GET http://localhost:4010/todos
 server GET localhost:4010/users (in GET /)
   → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+
+## trpc-v10
+browser GET localhost:3077/api/trpc/ping [batch 1/3]
+  → matched HealthBadge · GET /api/trpc/ping
+browser GET localhost:3077/api/trpc/todo.list [batch 2/3]
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/ping,todo.list,user.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/user.list [batch 3/3]
+  → matched UserList · GET /api/trpc/user.list
+server GET localhost:4010/users (in GET /api/trpc/ping,todo.list,user.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users
+browser POST localhost:3077/api/trpc/todo.add
+  → matched AddTodoForm · POST /api/trpc/todo.add
+server POST localhost:4010/todos (in POST /api/trpc/todo.add)
+  → matched POST /api/trpc/[trpc] · POST {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.list
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/todo.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser POST localhost:3077/api/trpc/todo.toggle
+  → matched TodoDetail · POST /api/trpc/todo.toggle
+server PATCH localhost:4010/todos/3 (in POST /api/trpc/todo.toggle)
+  → matched POST /api/trpc/[trpc] · PATCH {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/todo.feed
+  → matched TodoFeed · GET /api/trpc/todo.feed
+server GET localhost:4010/todos (in GET /api/trpc/todo.feed)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.feed
+  → matched TodoFeed · GET /api/trpc/todo.feed
+server GET localhost:4010/todos (in GET /api/trpc/todo.feed)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+
+## trpc
+browser GET localhost:3077/api/trpc/health.ping [batch 1/2]
+  → matched HealthBadge · GET /api/trpc/health.ping
+browser GET localhost:3077/api/trpc/todo.list [batch 2/2]
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/health.ping,todo.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser POST localhost:3077/api/trpc/todo.add
+  → matched AddTodoForm · POST /api/trpc/todo.add
+server POST localhost:4010/todos (in POST /api/trpc/todo.add)
+  → matched POST /api/trpc/[trpc] · POST {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.list
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/todo.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/user.byId
+  → matched TodoDetail · GET /api/trpc/user.byId
+server GET localhost:4010/users/1 (in GET /api/trpc/user.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users/:id
+browser POST localhost:3077/api/trpc/todo.toggle
+  → matched TodoDetail · POST /api/trpc/todo.toggle
+server PATCH localhost:4010/todos/3 (in POST /api/trpc/todo.toggle)
+  → matched POST /api/trpc/[trpc] · PATCH {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/user.list
+  → matched UserList · GET /api/trpc/user.list
+server GET localhost:4010/users (in GET /api/trpc/user.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users

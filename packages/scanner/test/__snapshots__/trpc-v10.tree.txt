@@ -1,0 +1,44 @@
+# Route tree
+
+src/app [layout, page]
+├─ api
+│  └─ trpc
+│     └─ [trpc] (dynamic) [route]
+├─ feed [page]
+└─ todos
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/api/trpc/[trpc]  route GET,POST  src/app/api/trpc/[trpc]/route.ts
+/feed  page  src/app/feed/page.tsx
+/todos/[id]  page  src/app/todos/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:6
+└─ Providers  client (use client)  src/app/providers.tsx:8
+   ├─ trpc.Provider  external @/utils/trpc
+   └─ QueryClientProvider  external @tanstack/react-query
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+HomePage  server  src/app/page.tsx:6
+├─ HealthBadge  client (use client)  src/components/HealthBadge.tsx:5
+├─ TodoList  client (use client)  src/components/TodoList.tsx:6
+│  └─ Link  external next/link  [conditional]
+├─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:7
+└─ UserList  client (use client)  src/components/UserList.tsx:5
+
+## /feed  src/app/feed/page.tsx
+layouts: src/app/layout.tsx
+FeedPage  server  src/app/feed/page.tsx:3
+└─ TodoFeed  client (use client)  src/components/TodoFeed.tsx:5
+
+## /todos/[id]  src/app/todos/[id]/page.tsx
+layouts: src/app/layout.tsx
+TodoPage  server  src/app/todos/[id]/page.tsx:3
+└─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:5

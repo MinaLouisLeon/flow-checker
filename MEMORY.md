@@ -23,6 +23,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M13 | React Query           | Model version 2. Runtime patches `Query`/`Mutation` prototypes rather than cache events (those fire too late).           |
 | M14 | Middleware / proxy    | Model version 3. Matcher = path-to-regexp v6 port in `shared/src/middleware.ts`; edge hook `runtime/edge` for Next < 16. |
 | M15 | Postman import        | Model version 4. `packages/postman`; applied after each scan in the CLI scan runner, never inside the scanner.           |
+| M16 | tRPC                  | Model version 5. Batches split in the runtime before redaction (`runtime/src/trpc.ts`); router read by syntax.           |
 
 ## Gotchas
 
@@ -74,3 +75,21 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `appOrigins: ['http://localhost:3077']`.
 - Postman flags are filed as generic `request` notes in `buildIndex`; the dashboard overview filters them into its
   Postman section, and the Markdown `issues.md` doesn't list them (they're in `postman.md`).
+
+## M16 — tRPC (done, branch `feat/trpc`)
+
+- Batches are split by `splitTrpcCapture()` in the runtime, before redaction, so inputs from `?input=` end up
+  as JSON request bodies and get redacted. The tool server splits again on ingest (idempotent: captures with
+  `procedure` are left alone), using the scanned endpoint.
+- Split pieces get ids `<id>-<i>`; server hops still have the whole request's id as `parent.captureId`.
+  `Matcher.matchWithParents()` picks the piece; `Verifier.children()` filters a piece's hops by its site's chain.
+- tRPC v11 `httpBatchStreamLink` aborts the fetch once every result is read, which errors the runtime's cloned
+  stream: `readStream()` keeps the bytes read before an interruption (marked truncated). Without this the
+  bodies were lost (`binary`) and type checks skipped; only a live recording showed it.
+- v11 `queryOptions()` must not be followed by `#evaluate` (the `*Options` helper rule would resolve it to its
+  input): `procedureCall()` stops evaluation there.
+- Proxies are recognized by following the root identifier to the factory (no type checker needed), so the
+  in-memory test can stub `@trpc/*` as `any`.
+- Shorthand object entries (`router({ items })`) need `ShorthandPropertyAssignment.getValueSymbol()`; the
+  name's own symbol is the property.
+- Recordings were made on app port 3077 (`node scripts/record-captures.mjs trpc-v10 trpc`).

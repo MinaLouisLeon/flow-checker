@@ -424,6 +424,21 @@ export const QueryKeyPartSchema: z.ZodType<QueryKeyPart> = z.lazy(() =>
   ]),
 )
 
+// ---------------------------------------------------------------------------------------------
+// tRPC (M16).
+
+export const TRPC_PROCEDURE_TYPES = ['query', 'mutation', 'subscription'] as const
+export const TrpcProcedureTypeSchema = z.enum(TRPC_PROCEDURE_TYPES)
+export type TrpcProcedureType = z.infer<typeof TrpcProcedureTypeSchema>
+
+/** A tRPC procedure a request site calls (client) or runs in (server), by its dotted path. */
+export const ProcedureRefSchema = z.object({
+  /** e.g. `todo.byId`. */
+  path: z.string(),
+  type: TrpcProcedureTypeSchema,
+})
+export type ProcedureRef = z.infer<typeof ProcedureRefSchema>
+
 export const ServerActionRefSchema = z.object({
   name: z.string(),
   loc: SourceLocSchema,
@@ -441,8 +456,11 @@ export const RequestSiteSchema = z.object({
   handlerMethod: HttpMethodSchema.optional(),
   /** Transport `server-action`: the action called. Origin `server-action`: the action it runs in. */
   serverAction: ServerActionRefSchema.optional(),
-  /** `api-client`: a call to a function listed in the config's `apiClients` (see `client`). */
-  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action']),
+  /**
+   * `api-client`: a call to a function listed in the config's `apiClients` (see `client`).
+   * `trpc`: a tRPC procedure call (hooks, `queryOptions()`, the vanilla client), see `procedure`.
+   */
+  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc']),
   /** Transport `api-client`: the configured module and the function or method called. */
   client: z.object({ module: z.string(), name: z.string() }).optional(),
   /**
@@ -458,6 +476,11 @@ export const RequestSiteSchema = z.object({
     .optional(),
   /** React Query: the query or mutation key, parsed into segments (M13). */
   queryKey: z.array(QueryKeyPartSchema).optional(),
+  /**
+   * tRPC (M16). Transport `trpc`: the procedure called. Origin `route-handler`: the procedure
+   * whose resolver sends this request (the handler is the tRPC endpoint).
+   */
+  procedure: ProcedureRefSchema.optional(),
   /** Absent when it could not be resolved. Server actions are always `POST`. */
   method: HttpMethodSchema.optional(),
   /** Absent for server actions, which post to the current page. */
@@ -510,8 +533,13 @@ export const QueryLinkSchema = z.object({
   method: z.string(),
   origin: z.enum(['component', 'server-action']),
   componentId: z.string().optional(),
-  /** The key or key prefix it targets. Absent: every query. */
+  /** The key or key prefix it targets. Absent: every query (unless `procedure` is set). */
   key: z.array(QueryKeyPartSchema).optional(),
+  /**
+   * tRPC (M16): the procedure path or path prefix whose queries it hits, e.g. `todo.list` for
+   * `utils.todo.list.invalidate()` or `trpc.todo.list.pathFilter()`. `''`: every tRPC query.
+   */
+  procedure: z.string().optional(),
   /** Only queries with exactly this key (`exact: true`, `setQueryData`). */
   exact: z.boolean().optional(),
   /** Requests it runs after: the mutation whose callback calls it, or the server prefetch (`hydrate`). */
@@ -768,6 +796,36 @@ export const PostmanContractSchema = z.object({
 })
 export type PostmanContract = z.infer<typeof PostmanContractSchema>
 
+// ---------------------------------------------------------------------------------------------
+// tRPC (M16): the router read from the code and the endpoint that serves it.
+
+export const TrpcProcedureSchema = z.object({
+  id: z.string(),
+  /** Dotted path, e.g. `todo.byId`. Merged routers add theirs at the top level. */
+  path: z.string(),
+  type: TrpcProcedureTypeSchema,
+  /** The `.query()` / `.mutation()` / `.subscription()` call. */
+  loc: SourceLocSchema,
+  /** From `.input(schema)` (zod), else the resolver's `input` type. */
+  inputType: TypeRefSchema.optional(),
+  /** From `.output(schema)`, else the resolver's return type. */
+  outputType: TypeRefSchema.optional(),
+  /** Client request sites that call it. */
+  siteIds: z.array(z.string()),
+})
+export type TrpcProcedure = z.infer<typeof TrpcProcedureSchema>
+
+export const TrpcSchema = z.object({
+  /** Path the procedures are served under, e.g. `/api/trpc`. */
+  endpoint: z.string(),
+  /** The route handler that serves it (`fetchRequestHandler`), when found. */
+  routeId: z.string().optional(),
+  /** The root router: its variable name and where it is defined. */
+  router: z.object({ name: z.string(), loc: SourceLocSchema }).optional(),
+  procedures: z.array(TrpcProcedureSchema),
+})
+export type Trpc = z.infer<typeof TrpcSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -780,10 +838,11 @@ export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 export const AppModelSchema = z.object({
   /**
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
-   * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract.
+   * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
+   * (before M16) no tRPC.
    */
   version: z
-    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(MODEL_VERSION)])
+    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(MODEL_VERSION)])
     .transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
@@ -803,5 +862,7 @@ export const AppModelSchema = z.object({
   middleware: MiddlewareSchema.optional(),
   /** The imported Postman collection and how the code lines up with it (M15). */
   postman: PostmanContractSchema.optional(),
+  /** The tRPC router and endpoint, when the project uses tRPC (M16). */
+  trpc: TrpcSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

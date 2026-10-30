@@ -86,7 +86,7 @@ re-run them on their own before assuming a regression.
 | M13 | React Query APIs, keys and cache links            | Done    |
 | M14 | Middleware / proxy                                | Done    |
 | M15 | Postman collection import                         | Done    |
-| M16 | tRPC                                              | Planned |
+| M16 | tRPC                                              | Done    |
 | M17 | GraphQL                                           | Planned |
 | M18 | SSE                                               | Planned |
 | M19 | WebSockets                                        | Planned |

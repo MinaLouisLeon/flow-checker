@@ -1,7 +1,7 @@
 // Plain-text rendering of navigation and inferred flows: `flow-checker scan --flows` and snapshot tests.
 import { triggerText, urlText } from './format-requests'
 import type { AppModel, FlowStep, Navigation } from './model'
-import { formatQueryKey } from './query-keys'
+import { queryLinkTarget } from './query-keys'
 
 export function formatFlows(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -81,7 +81,7 @@ export function formatFlows(model: AppModel): string {
       case 'query-update': {
         const link = links.get(step.linkId)
         if (!link) return `${step.linkId}`
-        const key = link.key ? formatQueryKey(link.key) : 'all queries'
+        const key = queryLinkTarget(link)
         const hits = link.targetSiteIds
           .map((id) => sites.get(id))
           .map((s) => (s ? `${s.method ?? '?'} ${s.url ? urlText(s.url) : '?'}` : '?'))

@@ -20,6 +20,7 @@ import {
   randomId,
 } from './options'
 import { compileRules, redactCapture } from './redact'
+import { splitTrpcCapture } from './trpc'
 
 export type { RuntimeConfig } from './options'
 
@@ -96,7 +97,7 @@ function start(config: RuntimeConfig): ServerRuntime {
 
   const push = (capture: Capture) => {
     try {
-      queue.push(redactCapture(capture, rules, options.storeRaw))
+      for (const piece of splitTrpcCapture(capture)) queue.push(redactCapture(piece, rules, options.storeRaw))
       if (!timer) {
         timer = setTimeout(() => void flush(), FLUSH_MS)
         timer.unref?.()

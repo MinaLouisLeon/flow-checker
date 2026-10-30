@@ -13,6 +13,7 @@ import {
   type Navigation,
   type Route,
   servedPaths,
+  type Trpc,
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { ComponentGraph } from './components'
@@ -29,6 +30,7 @@ import { relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { RequestScanner } from './requests'
 import { walkRoutes } from './routes'
+import { findHandler, findLinkPath, findRouterFromClients, type ProcedureDef, readRouter } from './trpc'
 import { TypeResolver, type TypeResolverOptions } from './types'
 
 export interface ScanOptions {
@@ -342,6 +344,9 @@ function analyze(
   })
   const bodies = graph.bodies()
   const handlers = routes.filter((r) => r.kind === 'route-handler')
+  // tRPC (M16): read the router first, so client calls get their procedure's types.
+  const trpcFound = findTrpc(project, root, handlers, settings)
+  if (trpcFound) requests.setTrpc(trpcFound.endpoint, trpcFound.defs)
   const middlewareFile =
     discovery.middleware && settings.scanned(discovery.middleware)
       ? sourceFile(project, discovery.middleware)
@@ -359,6 +364,7 @@ function analyze(
     if (file) requests.addRouteHandler(route, file)
     requestDone(++done)
   }
+  if (trpcFound?.route) requests.addTrpcProcedures(trpcFound.route)
   const middlewareRead = middlewareFile ? readMiddleware(middlewareFile, root) : undefined
   if (middlewareRead) {
     for (const fn of middlewareRead.functions) requests.addMiddleware(middlewareRead.info.file, fn)
@@ -367,6 +373,12 @@ function analyze(
 
   const sites = requests.sites(routes)
   const queryLinks = requests.queryLinks(sites, components)
+  const trpc: Trpc | undefined = trpcFound && {
+    endpoint: trpcFound.endpoint,
+    ...(trpcFound.route ? { routeId: trpcFound.route.id } : {}),
+    ...(trpcFound.router ? { router: trpcFound.router } : {}),
+    procedures: requests.trpcProcedures(sites),
+  }
   report({
     phase: 'requests',
     done: requestTotal,
@@ -407,6 +419,67 @@ function analyze(
     flows,
     queryLinks,
     ...(middleware ? { middleware } : {}),
+    ...(trpc ? { trpc } : {}),
+  }
+}
+
+interface TrpcFound {
+  endpoint: string
+  /** The route handler that calls `fetchRequestHandler()`. */
+  route?: Route
+  router?: Trpc['router']
+  defs: ProcedureDef[]
+}
+
+/**
+ * The tRPC endpoint and router: from the route handler's `fetchRequestHandler({ endpoint, router })`,
+ * else from the clients (`createTRPCReact<AppRouter>()` -> `typeof appRouter`, `httpBatchLink({ url })`).
+ */
+function findTrpc(
+  project: Project,
+  root: string,
+  handlers: Route[],
+  settings: ScanSettings,
+): TrpcFound | undefined {
+  let route: Route | undefined
+  let handler: ReturnType<typeof findHandler>
+  for (const r of handlers) {
+    const file = sourceFile(project, resolveFrom(root, r.file))
+    handler = file ? findHandler(file) : undefined
+    if (handler) {
+      route = r
+      break
+    }
+  }
+  const files = project
+    .getSourceFiles()
+    .filter((f) => !f.isInNodeModules() && !f.isDeclarationFile() && settings.scanned(f.getFilePath()))
+  const routerNode = handler?.router ?? findRouterFromClients(files)
+  const linkPath = findLinkPath(files)
+  if (!route && !routerNode && linkPath === undefined) return undefined
+  // `/api/trpc/[trpc]` -> `/api/trpc`.
+  const fromRoute = route?.path.replace(/\/\[[^\]]+\]$/, '')
+  const endpoint = handler?.endpoint ?? linkPath ?? fromRoute ?? '/api/trpc'
+  const defs = routerNode ? readRouter(routerNode) : []
+  let router: Trpc['router']
+  if (routerNode) {
+    const symbol = routerNode.getSymbol()
+    const target = symbol?.isAlias() ? symbol.getAliasedSymbol() : symbol
+    const decl = target?.getDeclarations()[0]
+    if (decl) {
+      const anchor = decl.getSourceFile()
+      const { line, column } = anchor.getLineAndColumnAtPos(decl.getStart())
+      router = {
+        name: target?.getName() ?? routerNode.getText(),
+        loc: { file: relativeTo(root, anchor.getFilePath()), line, column },
+      }
+    }
+  }
+  return {
+    endpoint: endpoint.replace(/(.)\/$/, '$1'),
+    ...(route ? { route } : {}),
+    ...(router ? { router } : {}),
+    defs,
   }
 }
 

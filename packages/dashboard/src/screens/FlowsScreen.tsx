@@ -4,7 +4,7 @@ import {
   type Flow,
   type FlowStatus,
   type FlowStep,
-  formatQueryKey,
+  queryLinkTarget,
   queryLinkVerb,
   type RecordedFlow,
   urlText,
@@ -308,8 +308,7 @@ function StepView({ step }: { step: FlowStep }) {
       const targets = link.targetSiteIds.map((id) => index.requests.get(id)).filter((s) => !!s)
       return (
         <span className="flow-step-body">
-          <span className="muted">{link.method}</span>{' '}
-          <code>{link.key ? formatQueryKey(link.key) : 'all queries'}</code>
+          <span className="muted">{link.method}</span> <code>{queryLinkTarget(link)}</code>
           {targets.length > 0 && (
             <span className="muted">
               {' '}

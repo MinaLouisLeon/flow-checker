@@ -317,7 +317,12 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     if (batch.token !== token) return c.json({ error: 'Invalid token' }, 403)
 
     // Safety net: the runtime already redacted, unless it was misconfigured.
-    verifier.ingest(batch.captures.map((item) => redactCapture(item, rules, capture.options.storeRaw)))
+    // Batched tRPC requests are split here too when the runtime didn't (M16).
+    verifier.ingest(
+      batch.captures
+        .flatMap((item) => verifier.splitTrpc(item))
+        .map((item) => redactCapture(item, rules, capture.options.storeRaw)),
+    )
     if (batch.sessionId) store.addEvents(batch.sessionId, batch.events)
     return c.body(null, 204)
   })
@@ -346,7 +351,7 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     if (!found) return c.json({ error: 'Capture not found' }, 404)
     return c.json({
       capture: found,
-      children: store.children(found.id).map((child) => verifier.summarize(child)),
+      children: verifier.children(found).map((child) => verifier.summarize(child)),
     })
   })
 

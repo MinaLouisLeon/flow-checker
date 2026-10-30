@@ -20,6 +20,8 @@ const FIXTURES = [
   'mismatch',
   'middleware',
   'postman',
+  'trpc-v10',
+  'trpc',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 

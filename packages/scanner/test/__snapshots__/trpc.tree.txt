@@ -1,0 +1,44 @@
+# Route tree
+
+src/app [layout, page]
+├─ api
+│  └─ trpc
+│     └─ [trpc] (dynamic) [route]
+├─ todos
+│  └─ [id] (dynamic) [page]
+└─ users [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/api/trpc/[trpc]  route GET,POST  src/app/api/trpc/[trpc]/route.ts
+/todos/[id]  page  src/app/todos/[id]/page.tsx
+/users  page  src/app/users/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:6
+└─ Providers  client (use client)  src/app/providers.tsx:9
+   ├─ QueryClientProvider  external @tanstack/react-query
+   └─ TRPCProvider  external @/trpc/client (from @trpc/tanstack-react-query)
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+HomePage  server  src/app/page.tsx:5
+├─ HealthBadge  client (use client)  src/components/HealthBadge.tsx:6
+├─ TodoList  client (use client)  src/components/TodoList.tsx:7
+│  └─ Link  external next/link
+└─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:8
+
+## /todos/[id]  src/app/todos/[id]/page.tsx
+layouts: src/app/layout.tsx
+TodoPage  server  src/app/todos/[id]/page.tsx:3
+└─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:6
+
+## /users  src/app/users/page.tsx
+layouts: src/app/layout.tsx
+UsersPage  server  src/app/users/page.tsx:4
+├─ Suspense  external react
+└─ UserList  client (use client)  src/components/UserList.tsx:6
