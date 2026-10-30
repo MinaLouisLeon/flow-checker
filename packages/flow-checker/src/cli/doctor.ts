@@ -6,6 +6,7 @@ import { join, relative, resolve } from 'node:path'
 import { DEFAULT_PORTS, type FlowCheckerConfig, PACKAGE_NAME } from '@flow-checker/shared'
 import { ts } from 'ts-morph'
 import { ConfigError, findConfigFile, loadConfig } from './config'
+import { createProgress } from './progress'
 import {
   defaultDevCommand,
   findHook,
@@ -42,17 +43,25 @@ const NEXT_CONFIGS = [
   'next.config.cjs',
 ]
 const ICONS: Record<CheckStatus, string> = { ok: '✓', warn: '!', fail: '✗' }
+/** Checks in a typical run: the bar's total (a project can get a few more or fewer). */
+const TYPICAL_CHECKS = 13
 
 export async function doctorCommand(options: DoctorCommandOptions, io: CliIO): Promise<number> {
   const root = resolve(options.root ?? process.cwd())
-  const checks = await runDoctor({ ...options, root })
   io.out(`flow-checker doctor: ${root}\n`)
-  for (const check of checks) {
+  const progress = createProgress(io, [{ id: 'checks', weight: 1 }])
+  progress.start('checks', 'Running checks…', TYPICAL_CHECKS)
+  let done = 0
+  // Each check's line is printed as soon as it runs; the live line shows how far along it is.
+  const checks = await runDoctor({ ...options, root }, (check) => {
     io.out(`  ${ICONS[check.status]} ${check.name}: ${check.message}`)
     if (check.hint && check.status !== 'ok') {
       for (const line of check.hint.split('\n')) io.out(`      ${line}`)
     }
-  }
+    done++
+    progress.update(done, Math.max(done, TYPICAL_CHECKS))
+  })
+  progress.finish()
   const failed = checks.filter((c) => c.status === 'fail').length
   const warned = checks.filter((c) => c.status === 'warn').length
   io.out('')
@@ -67,10 +76,16 @@ export async function doctorCommand(options: DoctorCommandOptions, io: CliIO): P
 }
 
 /** Runs every check. Later checks are skipped when the project itself can't be found. */
-export async function runDoctor(options: DoctorCommandOptions & { root: string }): Promise<Check[]> {
+export async function runDoctor(
+  options: DoctorCommandOptions & { root: string },
+  onCheck?: (check: Check) => void,
+): Promise<Check[]> {
   let root = options.root
   const checks: Check[] = []
-  const add = (check: Check) => checks.push(check)
+  const add = (check: Check) => {
+    checks.push(check)
+    onCheck?.(check)
+  }
 
   add(checkNode())
 

@@ -36,7 +36,32 @@ export interface ScanOptions {
   exclude?: readonly string[]
   /** Modules whose calls are requests (config `apiClients`). */
   apiClients?: readonly ApiClientConfig[]
+  /** Called as the scan moves through its phases (CLI progress output). Must not throw. */
+  onProgress?: (event: ScanProgress) => void
 }
+
+/** Scan phases, in the order they run. */
+export const SCAN_PHASES = ['discover', 'load', 'routes', 'components', 'requests', 'flows'] as const
+
+export type ScanPhase = (typeof SCAN_PHASES)[number]
+
+/**
+ * Progress of one phase. Each phase sends one event with `done: 0` when it starts, may send
+ * more as items finish, and ends with `finished: true`.
+ */
+export interface ScanProgress {
+  phase: ScanPhase
+  /** Items finished so far in this phase. */
+  done: number
+  /** Items in this phase, when known up front. */
+  total?: number
+  /** Set on the last event of the phase. */
+  finished?: boolean
+  /** What the phase found, on the last event (e.g. `Next 16.0.1, src/app`). */
+  detail?: string
+}
+
+type Report = (event: ScanProgress) => void
 
 /** Settings every stage gets. */
 export interface ScanSettings {
@@ -93,9 +118,17 @@ export function createScanSession(options: ScanOptions): ScanSession {
     apiClients: options.apiClients ?? [],
   }
 
-  let discovery = discoverProject(fs, root, options.appDir)
-  let project = createProject(discovery, fs, settings.scanned)
-  let model = analyze(root, fs, discovery, project, settings)
+  const report: Report = (event) => {
+    try {
+      options.onProgress?.(event)
+    } catch {
+      // Progress output must never break a scan.
+    }
+  }
+
+  let discovery = discover(fs, root, options.appDir, report)
+  let project = load(discovery, fs, settings, report)
+  let model = analyze(root, fs, discovery, project, settings, report)
 
   return {
     get model() {
@@ -122,9 +155,10 @@ export function createScanSession(options: ScanOptions): ScanSession {
         // The app directory appeared or went away (e.g. `src/app` created next to `app`).
         removed.some((f) => f === discovery.appDir || discovery.appDir.startsWith(`${f}/`))
       if (restart) {
-        discovery = discoverProject(fs, root, options.appDir)
-        project = createProject(discovery, fs, settings.scanned)
+        discovery = discover(fs, root, options.appDir, report)
+        project = load(discovery, fs, settings, report)
       } else {
+        report({ phase: 'load', done: 0, total: all.length })
         for (const file of removed) {
           // A removed directory removes every file below it.
           for (const sf of project.getSourceFiles()) {
@@ -155,8 +189,15 @@ export function createScanSession(options: ScanOptions): ScanSession {
             project.addSourceFileAtPathIfExists(file)
         }
         if (resolveImports) project.resolveSourceFileDependencies()
+        report({
+          phase: 'load',
+          done: all.length,
+          total: all.length,
+          finished: true,
+          detail: plural(all.length, 'changed file'),
+        })
       }
-      model = analyze(root, fs, discovery, project, settings)
+      model = analyze(root, fs, discovery, project, settings, report)
       return model
     },
   }
@@ -177,17 +218,62 @@ function importsOf(file: SourceFile): string {
 }
 
 /** Runs every stage on the project as it is now. */
+function discover(fs: FileSystemHost, root: string, appDir: string | undefined, report: Report): Discovery {
+  report({ phase: 'discover', done: 0 })
+  const discovery = discoverProject(fs, root, appDir)
+  const next = discovery.nextVersion ? `Next ${discovery.nextVersion}, ` : ''
+  report({
+    phase: 'discover',
+    done: 1,
+    total: 1,
+    finished: true,
+    detail: `${next}${relativeTo(root, discovery.appDir)}`,
+  })
+  return discovery
+}
+
+function load(discovery: Discovery, fs: FileSystemHost, settings: ScanSettings, report: Report): Project {
+  report({ phase: 'load', done: 0 })
+  const project = createProject(discovery, fs, settings.scanned)
+  const files = project.getSourceFiles().filter((f) => !f.isInNodeModules()).length
+  report({ phase: 'load', done: files, total: files, finished: true, detail: plural(files, 'file') })
+  return project
+}
+
+function plural(n: number, word: string): string {
+  return `${n.toLocaleString('en-US')} ${word}${n === 1 ? '' : 's'}`
+}
+
+/** Starts a counted phase. The returned function reports progress about 100 times at most. */
+function counter(report: Report, phase: ScanPhase, total: number) {
+  const step = Math.max(1, Math.floor(total / 100))
+  report({ phase, done: 0, total })
+  return (done: number) => {
+    if (done === total || done % step === 0) report({ phase, done, total })
+  }
+}
+
 function analyze(
   root: string,
   fs: FileSystemHost,
   discovery: Discovery,
   project: Project,
   settings: ScanSettings,
+  report: Report,
 ): AppModel {
+  report({ phase: 'routes', done: 0 })
   const walked = walkRoutes(fs, root, discovery.appDir)
   const tree = walked.tree
   // Excluded pages and route handlers are left out (their folders stay in the route tree).
   const found = walked.routes.filter((r) => settings.scanned(resolveFrom(root, r.file)))
+  const pageCount = found.filter((r) => r.kind === 'page').length
+  report({
+    phase: 'routes',
+    done: found.length,
+    total: found.length,
+    finished: true,
+    detail: `${plural(pageCount, 'page')}, ${plural(found.length - pageCount, 'route handler')}`,
+  })
 
   const types = new TypeResolver(root, settings.types)
   const graph = new ComponentGraph(root, types, settings.scanned)
@@ -201,7 +287,9 @@ function analyze(
     return fileComponents.get(relFile)
   }
 
-  const routes: Route[] = found.map((r) => {
+  // Walking each page and layout finds the components below it.
+  const routeDone = counter(report, 'components', found.length)
+  const routes: Route[] = found.map((r, index) => {
     const route: Route = {
       id: makeId('rt', r.file),
       path: r.path,
@@ -219,11 +307,19 @@ function analyze(
       const file = sourceFile(project, resolveFrom(root, r.file))
       route.methods = file ? exportedMethods(file) : []
     }
+    routeDone(index + 1)
     return route
   })
 
   const roots = [...fileComponents.values()].filter((id): id is string => !!id)
   const components = graph.components(roots)
+  report({
+    phase: 'components',
+    done: found.length,
+    total: found.length,
+    finished: true,
+    detail: plural(components.length, 'component'),
+  })
 
   // Requests come after components (client/server kinds decide what a server action call is)
   // and before types are collected (request body and response types join the type table).
@@ -233,19 +329,41 @@ function analyze(
     resolveModule: (specifier) => resolveModule(project, root, specifier),
   })
   const bodies = graph.bodies()
+  const handlers = routes.filter((r) => r.kind === 'route-handler')
+  const requestTotal = components.length + handlers.length
+  const requestDone = counter(report, 'requests', requestTotal)
+  let done = 0
   for (const component of components) {
     const body = bodies.get(component.id)
     if (body) requests.addComponent(component, body)
+    requestDone(++done)
   }
-  for (const route of routes) {
-    if (route.kind !== 'route-handler') continue
+  for (const route of handlers) {
     const file = sourceFile(project, resolveFrom(root, route.file))
     if (file) requests.addRouteHandler(route, file)
+    requestDone(++done)
   }
 
   const sites = requests.sites(routes)
+  report({
+    phase: 'requests',
+    done: requestTotal,
+    total: requestTotal,
+    finished: true,
+    detail: plural(sites.length, 'request'),
+  })
+
+  report({ phase: 'flows', done: 0 })
   const navigations = requests.navigations(routes)
   const flows = inferFlows({ routes, components, requests: sites, navigations })
+  const modelTypes = types.types()
+  report({
+    phase: 'flows',
+    done: 1,
+    total: 1,
+    finished: true,
+    detail: `${plural(flows.length, 'flow')}, ${plural(modelTypes.length, 'type')}`,
+  })
 
   return {
     version: MODEL_VERSION,
@@ -258,7 +376,7 @@ function analyze(
     routeTree: tree,
     routes,
     components,
-    types: types.types(),
+    types: modelTypes,
     requests: sites,
     navigations,
     flows,

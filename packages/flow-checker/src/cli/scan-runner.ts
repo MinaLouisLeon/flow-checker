@@ -9,6 +9,7 @@ import {
   type FileChanges,
   ScanError,
   type ScanOptions as ScannerOptions,
+  type ScanProgress,
   type ScanSession,
 } from '@flow-checker/scanner'
 import type { AppModel } from '@flow-checker/shared'
@@ -17,20 +18,26 @@ import { writeModel } from './scan'
 export type ScanOptions = Pick<
   ScannerOptions,
   'root' | 'appDir' | 'types' | 'include' | 'exclude' | 'apiClients'
->
+> & {
+  /** Write `.flow-checker/model.json` after each scan. Default: true (`export` turns it off). */
+  writeModel?: boolean
+}
 
 export interface ScanResult {
   model: AppModel
   durationMs: number
 }
 
+/** Gets the scan's phase events (CLI progress output). */
+export type OnScanProgress = (event: ScanProgress) => void
+
 export interface ScanRunner {
   /** Whether scans run in a worker thread. */
   readonly inWorker: boolean
   /** Scans from scratch and writes model.json. */
-  scan(): Promise<ScanResult>
+  scan(onProgress?: OnScanProgress): Promise<ScanResult>
   /** Re-scans after file changes (a full scan when the last one failed) and writes model.json. */
-  update(changes: FileChanges): Promise<ScanResult>
+  update(changes: FileChanges, onProgress?: OnScanProgress): Promise<ScanResult>
   /** Prepares the first re-scan while nothing waits for it. */
   warm(): Promise<void>
   close(): Promise<void>
@@ -43,6 +50,7 @@ export type WorkerRequest = WorkerTask & { id: number }
 export type WorkerResponse =
   | { id: number; ok: true; result?: ScanResult }
   | { id: number; ok: false; error: { name: string; message: string } }
+  | { id: number; progress: ScanProgress }
 
 /** Next to the bundled CLI: dist/scan-worker.js. */
 const WORKER_FILE = new URL('./scan-worker.js', import.meta.url)
@@ -58,22 +66,30 @@ export function createScanRunner(options: ScanOptions): ScanRunner {
 /** The session logic, shared by the worker and the in-thread runner. */
 export function createScanHandler(options: ScanOptions) {
   let session: ScanSession | undefined
-  const run = (scan: () => AppModel): ScanResult => {
-    const started = performance.now()
-    const model = scan()
-    const durationMs = performance.now() - started
-    writeModel(options.root, model)
-    return { model, durationMs }
+  // The session keeps its options, so progress goes to whoever runs the current scan.
+  let report: OnScanProgress | undefined
+  const run = (onProgress: OnScanProgress | undefined, scan: () => AppModel): ScanResult => {
+    report = onProgress
+    try {
+      const started = performance.now()
+      const model = scan()
+      const durationMs = performance.now() - started
+      if (options.writeModel !== false) writeModel(options.root, model)
+      return { model, durationMs }
+    } finally {
+      report = undefined
+    }
   }
   const fresh = () => {
     session = undefined
-    session = createScanSession(options)
+    const { writeModel: _, ...scanOptions } = options
+    session = createScanSession({ ...scanOptions, onProgress: (event) => report?.(event) })
     return session.model
   }
   return {
-    scan: () => run(fresh),
-    update: (changes: FileChanges) =>
-      run(() => {
+    scan: (onProgress?: OnScanProgress) => run(onProgress, fresh),
+    update: (changes: FileChanges, onProgress?: OnScanProgress) =>
+      run(onProgress, () => {
         // A failed scan leaves no session: start over.
         if (!session) return fresh()
         try {
@@ -91,8 +107,8 @@ function localRunner(options: ScanOptions): ScanRunner {
   const handler = createScanHandler(options)
   return {
     inWorker: false,
-    scan: async () => handler.scan(),
-    update: async (changes) => handler.update(changes),
+    scan: async (onProgress) => handler.scan(onProgress),
+    update: async (changes, onProgress) => handler.update(changes, onProgress),
     warm: async () => handler.warm(),
     close: async () => {},
   }
@@ -103,10 +119,18 @@ function workerRunner(options: ScanOptions): ScanRunner {
   // The worker shouldn't keep the process alive on its own.
   worker.unref()
   let nextId = 0
-  const pending = new Map<number, { resolve: (r: WorkerResponse) => void; reject: (e: Error) => void }>()
+  type Done = Exclude<WorkerResponse, { progress: ScanProgress }>
+  const pending = new Map<
+    number,
+    { resolve: (r: Done) => void; reject: (e: Error) => void; onProgress?: OnScanProgress }
+  >()
   let failed: Error | undefined
 
   worker.on('message', (response: WorkerResponse) => {
+    if ('progress' in response) {
+      pending.get(response.id)?.onProgress?.(response.progress)
+      return
+    }
     pending.get(response.id)?.resolve(response)
     pending.delete(response.id)
   })
@@ -118,11 +142,11 @@ function workerRunner(options: ScanOptions): ScanRunner {
   worker.on('error', failAll)
   worker.on('exit', (code) => failAll(new Error(`The scan worker stopped (exit code ${code}).`)))
 
-  const send = async (request: WorkerTask): Promise<ScanResult | undefined> => {
+  const send = async (request: WorkerTask, onProgress?: OnScanProgress): Promise<ScanResult | undefined> => {
     if (failed) throw failed
     const id = ++nextId
-    const response = await new Promise<WorkerResponse>((resolve, reject) => {
-      pending.set(id, { resolve, reject })
+    const response = await new Promise<Done>((resolve, reject) => {
+      pending.set(id, { resolve, reject, onProgress })
       worker.postMessage({ ...request, id })
     })
     if (response.ok) return response.result
@@ -131,8 +155,9 @@ function workerRunner(options: ScanOptions): ScanRunner {
 
   return {
     inWorker: true,
-    scan: async () => (await send({ type: 'scan' })) as ScanResult,
-    update: async (changes) => (await send({ type: 'update', changes })) as ScanResult,
+    scan: async (onProgress) => (await send({ type: 'scan' }, onProgress)) as ScanResult,
+    update: async (changes, onProgress) =>
+      (await send({ type: 'update', changes }, onProgress)) as ScanResult,
     warm: async () => {
       await send({ type: 'warm' })
     },

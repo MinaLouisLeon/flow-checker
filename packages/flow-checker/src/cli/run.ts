@@ -6,6 +6,7 @@ import { devCommand } from './dev'
 import { doctorCommand } from './doctor'
 import { exportCommand } from './export'
 import { initCommand } from './init'
+import { isLiveTerminal, type ProgressDisplay, terminalDisplay } from './progress'
 import { scanCommand } from './scan'
 
 const COMMANDS = {
@@ -47,6 +48,8 @@ Options:
                           (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
   --raw                   export: keep captures as saved, without redacting them again
   --force                 export: write into a folder that has other files
+  --verbose               Show more detail: timings, the resolved config, the scan worker
+  -q, --quiet             No progress output, only results, warnings and errors
   -h, --help              Show help
   -v, --version           Show version
 `
@@ -56,25 +59,35 @@ export interface CliIO {
   err: (text: string) => void
   /** Asks a yes/no question. Absent when there is no terminal to ask in. */
   confirm?: (question: string) => Promise<boolean>
+  /** Where progress is shown (see progress.ts). Absent: no progress output (tests, --quiet). */
+  display?: ProgressDisplay
+  /** --verbose: timings, the resolved config and other details. */
+  verbose?: boolean
 }
 
-const defaultIO: CliIO = {
-  out: (text) => process.stdout.write(`${text}\n`),
-  err: (text) => process.stderr.write(`${text}\n`),
-  confirm: process.stdin.isTTY
-    ? async (question) => {
-        const rl = createInterface({ input: process.stdin, output: process.stdout })
-        try {
-          return /^y(es)?$/i.test((await rl.question(`${question} [y/N] `)).trim())
-        } finally {
-          rl.close()
+/** stdout / stderr, with progress on stderr: a live line in a terminal, plain lines otherwise. */
+function terminalIO(): CliIO {
+  const { display, around } = terminalDisplay(process.stderr, isLiveTerminal(process.stderr))
+  return {
+    out: (text) => around(() => process.stdout.write(`${text}\n`)),
+    err: (text) => around(() => process.stderr.write(`${text}\n`)),
+    confirm: process.stdin.isTTY
+      ? async (question) => {
+          const rl = createInterface({ input: process.stdin, output: process.stdout })
+          try {
+            return /^y(es)?$/i.test((await rl.question(`${question} [y/N] `)).trim())
+          } finally {
+            rl.close()
+          }
         }
-      }
-    : undefined,
+      : undefined,
+    display,
+  }
 }
 
 /** Runs the CLI and returns the exit code. */
-export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<number> {
+export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
+  let io = baseIO ?? terminalIO()
   let parsed: ReturnType<typeof parse>
   try {
     parsed = parse(argv)
@@ -85,6 +98,8 @@ export async function runCli(argv: string[], io: CliIO = defaultIO): Promise<num
   }
 
   const { values, positionals } = parsed
+  if (values.quiet) io = { ...io, display: undefined, verbose: false }
+  else if (values.verbose) io = { ...io, verbose: true }
   if (values.version) {
     io.out(version)
     return 0
@@ -191,6 +206,8 @@ function parse(argv: string[]) {
       html: { type: 'string' },
       raw: { type: 'boolean' },
       force: { type: 'boolean' },
+      verbose: { type: 'boolean' },
+      quiet: { type: 'boolean', short: 'q' },
     },
   })
 }

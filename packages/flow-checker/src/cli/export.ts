@@ -8,13 +8,15 @@ import {
   writeExport,
 } from '@flow-checker/exporter'
 import { resolveCaptureOptions } from '@flow-checker/runtime/options'
-import { ScanError, scanProject } from '@flow-checker/scanner'
+import { ScanError } from '@flow-checker/scanner'
 import { collectSnapshot, type ExportFormat } from '@flow-checker/server'
 import type { AppModel, ExportData, FlowCheckerConfig } from '@flow-checker/shared'
 import { version } from '../../package.json'
-import { ConfigError, loadConfig, scanSettings } from './config'
+import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
+import { createProgress, type Progress, scanReporter, scanSteps } from './progress'
 import { findDashboardDir } from './project'
 import type { CliIO } from './run'
+import { createScanRunner } from './scan-runner'
 
 /** Where exports go when neither the command line nor the config says (docs/PLAN.md 12). */
 export const DEFAULT_EXPORT_DIRS = { md: 'docs/flow', html: '.flow-checker/site' }
@@ -44,13 +46,27 @@ export interface ExportCommandOptions {
  */
 export async function exportCommand(options: ExportCommandOptions, io: CliIO): Promise<number> {
   let root = resolve(options.root ?? process.cwd())
+  // Both formats unless one is picked: their steps are planned before the config is read.
+  const formats = options.md || options.html ? Number(!!options.md) + Number(!!options.html) : 2
+  const progress = createProgress(io, [
+    { id: 'config', weight: 2 },
+    ...scanSteps(68),
+    { id: 'captures', weight: 10 },
+    ...(['md', 'html'] as const)
+      .slice(0, formats)
+      .map((_, i) => ({ id: `write:${i}`, weight: 20 / formats })),
+  ])
 
   let config: FlowCheckerConfig
+  progress.start('config', 'Loading config…')
   try {
     const loaded = await loadConfig(root, options.config)
     config = loaded.config
     root = loaded.root
+    progress.done()
+    for (const line of configDetails(root, loaded.file, config)) progress.detail(line)
   } catch (error) {
+    progress.finish()
     if (error instanceof ConfigError) {
       io.err(error.message)
       return 1
@@ -60,17 +76,30 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
 
   const targets = exportTargets(root, options, config)
 
+  // In the worker thread (from the build), so the progress line keeps moving during the scan.
+  // The export reads .flow-checker/ but writes nothing there.
+  const runner = createScanRunner({
+    root,
+    appDir: options.appDir ?? config.appDir,
+    ...scanSettings(config),
+    writeModel: false,
+  })
+  progress.detail(`scan runs ${runner.inWorker ? 'in a worker thread' : 'in this thread'}`)
   let model: AppModel
   try {
-    model = scanProject({ root, appDir: options.appDir ?? config.appDir, ...scanSettings(config) })
+    model = (await runner.scan(scanReporter(progress))).model
   } catch (error) {
+    progress.finish()
     if (error instanceof ScanError) {
       io.err(error.message)
       return 1
     }
     throw error
+  } finally {
+    await runner.close()
   }
 
+  progress.start('captures', 'Matching captures…')
   const capture = resolveCaptureOptions(config.capture)
   const data = collectSnapshot({
     root,
@@ -80,6 +109,7 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
     raw: options.raw,
     ...(options.now ? { now: options.now } : {}),
   })
+  progress.done(`Captures: ${data.captureCounts.total.toLocaleString('en-US')}`)
   if (!data.redacted) {
     io.err(
       'Warning: this export has captured requests that are NOT redacted (--raw with capture.storeRaw). Do not share it.',
@@ -90,9 +120,12 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
   io.out(describe(data))
 
   let failed = false
-  for (const target of targets) {
+  for (const [index, target] of targets.entries()) {
+    const name = target.format === 'md' ? 'Markdown docs' : 'static site'
     try {
-      const written = writeFormat(target.format, data, target.dir, options)
+      progress.start(`write:${index}`, `Rendering the ${name}…`)
+      const written = writeFormat(target.format, data, target.dir, { ...options, progress })
+      progress.done()
       // Relative to the current folder when inside it, absolute otherwise.
       const rel = relative(process.cwd(), target.dir)
       const where = rel === '' ? '.' : rel.startsWith('..') || isAbsolute(rel) ? target.dir : rel
@@ -102,6 +135,7 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
           : `Wrote the static site to ${where} (${written.length} files). Open ${join(where, 'index.html')}, or host the folder anywhere.`,
       )
     } catch (error) {
+      progress.done()
       if (error instanceof ExportWriteError || error instanceof HtmlExportError) {
         io.err(error.message)
         failed = true
@@ -110,6 +144,7 @@ export async function exportCommand(options: ExportCommandOptions, io: CliIO): P
       throw error
     }
   }
+  progress.finish()
   return failed ? 1 : 0
 }
 
@@ -121,13 +156,19 @@ export function writeFormat(
   format: ExportFormat,
   data: ExportData,
   dir: string,
-  options: { force?: boolean; dashboardDir?: string } = {},
+  options: { force?: boolean; dashboardDir?: string; progress?: Progress } = {},
 ): string[] {
   const files: OutputFiles =
     format === 'md'
       ? renderMarkdown(data)
       : renderHtmlSite(data, options.dashboardDir ?? findDashboardDir() ?? '')
-  return writeExport(dir, files, { format, generatedAt: data.generatedAt, force: options.force })
+  const label = `Writing the ${format === 'md' ? 'Markdown docs' : 'static site'}… file`
+  return writeExport(dir, files, {
+    format,
+    generatedAt: data.generatedAt,
+    force: options.force,
+    onFile: options.progress ? (done, total) => options.progress?.update(done, total, label) : undefined,
+  })
 }
 
 /** The export folders from the config, or the defaults, as absolute paths. */
