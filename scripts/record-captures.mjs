@@ -106,6 +106,33 @@ const scripts = {
     await page.waitForURL(/\/dashboard/)
     await settle(page, 2500)
   },
+  middleware: async (page) => {
+    // Signed out: the proxy sends the dashboard to the login page.
+    await page.goto(`${app}/dashboard`)
+    await page.waitForURL(`${app}/login`)
+    await settle(page)
+    // A rewrite (the products page answers /shop) and a permanent redirect.
+    await page.goto(`${app}/shop`)
+    await settle(page)
+    await page.goto(`${app}/old-home`)
+    await page.waitForURL(`${app}/`)
+    await settle(page)
+    // A session the API doesn't know: the proxy's session check fails.
+    await page.context().addCookies([{ name: 'session', value: 'expired', url: app }])
+    await page.goto(`${app}/dashboard`)
+    await page.waitForURL(/\/login\?expired=1/)
+    await settle(page)
+    // Signed in: the dashboard loads, and the login page sends you back to it.
+    await page.context().addCookies([{ name: 'session', value: await signIn(), url: app }])
+    await page.goto(`${app}/dashboard`)
+    await settle(page)
+    await page.click('a:has-text("Settings")')
+    await page.waitForURL(`${app}/dashboard/settings`)
+    await settle(page)
+    await page.goto(`${app}/login`)
+    await page.waitForURL(`${app}/dashboard`)
+    await settle(page)
+  },
   mismatch: async (page) => {
     await page.goto(`${app}/`)
     await settle(page)
@@ -114,6 +141,19 @@ const scripts = {
     await page.waitForSelector('li:has-text("Check types")')
     await settle(page)
   },
+}
+
+/** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */
+async function signIn() {
+  const post = (path, body) =>
+    fetch(`http://127.0.0.1:${PORTS.mockApi}${path}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then((res) => res.json())
+  const { challengeId } = await post('/auth/login', { email: 'ada@example.com', password: 'password' })
+  const { token } = await post('/auth/verify-otp', { challengeId, code: '123456' })
+  return token
 }
 
 function start(command, args, label) {

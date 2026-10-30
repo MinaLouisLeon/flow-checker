@@ -1181,3 +1181,11 @@ a.stat:hover {
   align-items: center;
   gap: 6px;
 }
+
+/* Middleware (M14) */
+.middleware-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+}

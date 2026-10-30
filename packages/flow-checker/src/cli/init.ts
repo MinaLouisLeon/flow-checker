@@ -9,7 +9,9 @@ import {
   detectPackageManager,
   ensureGitignore,
   findHook,
+  findMiddlewareFile,
   hookDir,
+  middlewareOnEdge,
   missingGitignoreEntries,
   nextVersion,
   readPackageJson,
@@ -36,11 +38,21 @@ import { installClientRuntime } from '${PACKAGE_NAME}/runtime/client'
 installClientRuntime(process.env.NEXT_PUBLIC_FLOW_CHECKER)
 `
 
-const REGISTER_BODY = `  // flow-checker: captures server-side requests while you test. It does nothing unless FLOW_CHECKER=1.
+const NODE_BODY = `  // flow-checker: captures server-side requests while you test. It does nothing unless FLOW_CHECKER=1.
   if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'nodejs') {
     const { registerServerRuntime } = await import('${PACKAGE_NAME}/runtime/server')
     registerServerRuntime()
   }`
+
+/** For middleware on the edge runtime (`middleware.ts` before Next.js 16): fetch only. */
+export const EDGE_BODY = `  // flow-checker: requests sent from middleware on the edge runtime (fetch only, best effort).
+  if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'edge') {
+    const { registerEdgeRuntime } = await import('${PACKAGE_NAME}/runtime/edge')
+    registerEdgeRuntime(process.env.FLOW_CHECKER_RUNTIME)
+  }`
+
+const REGISTER_BODY = `${NODE_BODY}
+${EDGE_BODY}`
 
 const SERVER_SNIPPET = `export async function register() {
 ${REGISTER_BODY}
@@ -138,6 +150,14 @@ async function init(options: InitCommandOptions, io: CliIO, progress: Progress):
         )
       } else {
         changes.push({ file: server, action: 'append', content: `\n${SERVER_SNIPPET}` })
+      }
+    } else if (!text.includes(`${PACKAGE_NAME}/runtime/edge`)) {
+      // Hooks from v0.1 don't capture middleware on the edge runtime.
+      const middleware = findMiddlewareFile(root, appDir)
+      if (middleware && middlewareOnEdge(middleware, nextVersion(root))) {
+        manual.push(
+          `${rel(middleware)} runs on the edge runtime. To capture the requests it sends, add this to register() in ${rel(server)}:\n\n${EDGE_BODY}\n`,
+        )
       }
     }
   }

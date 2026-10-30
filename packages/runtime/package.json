@@ -8,6 +8,7 @@
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
     "./server": "./src/server.ts",
+    "./edge": "./src/edge.ts",
     "./options": "./src/options.ts",
     "./redact": "./src/redact.ts",
     "./next": "./src/next.ts"

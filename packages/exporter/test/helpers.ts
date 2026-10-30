@@ -8,7 +8,15 @@ import { collectSnapshot, type ServerActionInfo } from '@flow-checker/server'
 import type { Capture, ExportData } from '@flow-checker/shared'
 
 export const repo = join(import.meta.dirname, '..', '..', '..')
-export const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl', 'mismatch']
+export const FIXTURES = [
+  'basic',
+  'react-query',
+  'server-actions',
+  'bff',
+  'next-intl',
+  'mismatch',
+  'middleware',
+]
 export const NOW = new Date('2026-10-29T12:00:00.000Z')
 
 interface Recording {

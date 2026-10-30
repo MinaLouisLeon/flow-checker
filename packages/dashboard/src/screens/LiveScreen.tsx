@@ -33,6 +33,7 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   parent: 'parent request',
   trigger: 'trigger',
   'query-key': 'query key',
+  middleware: 'middleware',
   manual: 'manual',
 }
 

@@ -3,9 +3,11 @@
 // docs say (`flow-checker init`, plus withFlowChecker() before 15.3), and checks:
 //
 //   doctor  → no failed check
-//   scan    → the page, route handler and its three requests are found
+//   scan    → the page, route handler and its three requests are found, plus the middleware
+//             (`middleware.ts` before 16, `proxy.ts` from 16): its matcher, redirect and fetch
 //   dev     → a page-load server fetch, a click-triggered browser fetch and the route handler's
-//             upstream fetch are captured, matched to their sites and linked (two-hop chain)
+//             upstream fetch are captured, matched to their sites and linked (two-hop chain); the
+//             middleware's fetch is captured and matched (edge runtime before 16, Node.js on 16)
 //
 // Run after `pnpm build` (needs network for npm and Playwright's Chromium):
 //   node scripts/next-matrix.mjs                 # every version below
@@ -94,7 +96,7 @@ if (results.some((r) => !r.ok)) process.exitCode = 1
 async function checkVersion(key, { next, react }, { tarball, upstream, browser, log }) {
   console.log(`\n▶ Next ${next}`)
   const app = join(work, `next-${key}`)
-  writeApp(app)
+  writeApp(app, atLeast(next, 16, 0))
   const legacy = !atLeast(next, 15, 3)
   const reactTypes = react.startsWith('18') ? '18' : '19'
   run(
@@ -137,11 +139,20 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   if (doctor.status !== 0) throw new Error(`doctor failed:\n${doctor.stdout}${doctor.stderr}`)
   console.log('  doctor ok')
 
-  const scan = fc('scan', '--requests')
-  for (const expected of ['GET /api/hello', 'GET :UPSTREAM/greeting', 'GET :UPSTREAM/page']) {
-    if (!scan.includes(expected.split(' ')[1].replace(':UPSTREAM', ''))) {
-      throw new Error(`scan is missing ${expected}:\n${scan}`)
-    }
+  const scan = fc('scan', '--requests', '--tree', '--flows')
+  const middlewareFile = atLeast(next, 16, 0) ? 'proxy.ts' : 'middleware.ts'
+  const expectations = [
+    '/api/hello',
+    '/greeting',
+    '/page',
+    // Middleware (M14): the file, the routes its matcher selects, its redirect and its fetch.
+    `${middlewareFile}  ${atLeast(next, 16, 0) ? 'proxy' : 'middleware'}`,
+    'matcher: /, /old',
+    'redirect / -> /  middleware',
+    '/flags  fetch  middleware',
+  ]
+  for (const expected of expectations) {
+    if (!scan.includes(expected)) throw new Error(`scan is missing "${expected}":\n${scan}`)
   }
   console.log('  scan ok')
 
@@ -178,7 +189,11 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
       await page.getByRole('button', { name: 'Say hello' }).click()
       await page.getByText('Hello from upstream').waitFor({ timeout: 60_000 })
       const captures = await waitForCaptures(dashboard, ingests)
-      console.log(`  dev ok (${captures.length} captures matched, chain linked)`)
+      // The middleware redirects /old to the home page.
+      await page.goto(`${appUrl}/old`)
+      await page.waitForURL(`${appUrl}/`)
+      const flags = await waitForMiddleware(dashboard)
+      console.log(`  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches)`)
     } finally {
       await page.close()
     }
@@ -209,9 +224,26 @@ function waitForCaptures(dashboard, ingests) {
   })
 }
 
+/** The middleware's upstream fetch, captured and matched to the middleware's site. */
+function waitForMiddleware(dashboard) {
+  return waitFor(
+    async () => {
+      const list = await (await fetch(`${dashboard}/api/captures`)).json()
+      const flags = list.filter((c) => c.origin === 'server' && c.url.endsWith('/flags'))
+      return flags.length > 0 && flags.every((c) => c.match?.status === 'matched') ? flags.length : undefined
+    },
+    'the middleware fetch, matched',
+    30_000,
+  ).catch(async (error) => {
+    const list = await (await fetch(`${dashboard}/api/captures`)).json().catch(() => [])
+    error.message += `\nCaptured:\n${list.map((c) => `  ${c.origin} ${c.method} ${c.url.slice(0, 120)} match=${c.match?.status ?? '-'}`).join('\n') || '  nothing'}`
+    throw error
+  })
+}
+
 // --- The app ----------------------------------------------------------------------------------
 
-function writeApp(dir) {
+function writeApp(dir, proxy) {
   const files = {
     'package.json': JSON.stringify(
       { name: 'matrix-app', private: true, scripts: { dev: 'next dev' } },
@@ -307,6 +339,17 @@ export async function GET() {
 }
 `,
     'next.config.js': 'module.exports = {}\n',
+    // Middleware: Next 16 calls it proxy.ts (Node.js runtime); before that middleware.ts (edge).
+    [proxy ? 'proxy.ts' : 'middleware.ts']: `import { NextResponse, type NextRequest } from 'next/server'
+
+export async function ${proxy ? 'proxy' : 'middleware'}(request: NextRequest) {
+  await fetch(\`\${process.env.UPSTREAM_URL}/flags\`, { cache: 'no-store' })
+  if (request.nextUrl.pathname === '/old') return NextResponse.redirect(new URL('/', request.url))
+  return NextResponse.next()
+}
+
+export const config = { matcher: ['/', '/old'] }
+`,
   }
   for (const [path, text] of Object.entries(files)) {
     mkdirSync(dirname(join(dir, path)), { recursive: true })
@@ -325,6 +368,7 @@ function startUpstream() {
     const server = createServer((req, res) => {
       res.setHeader('content-type', 'application/json')
       if (req.url === '/greeting') res.end(JSON.stringify({ message: 'Hello from upstream' }))
+      else if (req.url === '/flags') res.end(JSON.stringify({ beta: true }))
       else if (req.url === '/page') res.end(JSON.stringify({ title: 'Matrix app' }))
       else {
         res.statusCode = 404

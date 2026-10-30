@@ -11,10 +11,13 @@ import {
   isOpenKey,
   type MatchCandidate,
   type MatchEvidence,
+  type Middleware,
   matchRequestUrl,
+  middlewareRunsOn,
   queryKeyMatchesValue,
   type RequestSite,
   routePathRegex,
+  servedPaths,
 } from '@flow-checker/shared'
 import { type ServerActionInfo, sameSourceFile } from './actions'
 import { type SourceFrame, shortName } from './stack'
@@ -99,10 +102,12 @@ export interface MatchContext {
 export class Matcher {
   private readonly sites: SiteInfo[]
   private readonly siteIds: Set<string>
+  private readonly middleware: Middleware | undefined
 
   constructor(model: AppModel) {
     this.sites = indexSites(model)
     this.siteIds = new Set(model.requests.map((s) => s.id))
+    this.middleware = model.middleware
   }
 
   hasSite(id: string): boolean {
@@ -111,8 +116,12 @@ export class Matcher {
 
   match(capture: Capture, context: MatchContext): CaptureMatch {
     const candidates: MatchCandidate[] = []
+    const scoring: Scoring = {
+      middleware: this.middleware,
+      fromMiddleware: capture.origin === 'server' && fromMiddleware(capture, context, this.middleware),
+    }
     for (const info of this.sites) {
-      const evidence = scoreSite(info, capture, context)
+      const evidence = scoreSite(info, capture, context, scoring)
       if (!evidence) continue
       const score = evidence.reduce((sum, e) => sum + e.points, 0)
       candidates.push({ siteId: info.site.id, score, evidence })
@@ -142,8 +151,33 @@ export class Matcher {
   }
 }
 
+/** Facts about the capture that every site's score uses. */
+interface Scoring {
+  middleware: Middleware | undefined
+  /** The server capture was sent from middleware code (M14). */
+  fromMiddleware: boolean
+}
+
+/** Next runs middleware / proxy through its web adapter, on the edge and on Node.js. */
+const MIDDLEWARE_FRAME = /[\\/]next[\\/]dist[\\/](esm[\\/])?server[\\/]web[\\/](adapter|sandbox)/
+
+/** A source-mapped frame in the middleware file, or Next's middleware adapter on the stack. */
+function fromMiddleware(
+  capture: Capture,
+  context: MatchContext,
+  middleware: Middleware | undefined,
+): boolean {
+  if (middleware && context.frames.some((f) => f.file === middleware.file)) return true
+  return capture.stack.some((line) => MIDDLEWARE_FRAME.test(line))
+}
+
 /** Evidence for one site, or `undefined` when the site cannot have sent this capture. */
-function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): MatchEvidence[] | undefined {
+function scoreSite(
+  info: SiteInfo,
+  capture: Capture,
+  context: MatchContext,
+  scoring: Scoring,
+): MatchEvidence[] | undefined {
   const { site } = info
   const evidence: MatchEvidence[] = []
   const add = (signal: MatchEvidence['signal'], points: number, detail?: string) =>
@@ -188,8 +222,24 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
     if (!parent) return undefined
     if (info.handler.method && parent.method.toUpperCase() !== info.handler.method) return undefined
     const handled = pathOf(parent.url)
-    if (handled === undefined || !info.handler.path.test(handled)) return undefined
+    const served = handled === undefined ? [] : servedPaths(scoring.middleware, handled)
+    if (!served.some((p) => info.handler?.path.test(p))) return undefined
     add('route', 40, `in ${parent.method} ${handled}`)
+  }
+
+  // Middleware (M14): it only runs on requests its matcher selects.
+  if (site.origin === 'middleware') {
+    const requested = pathOf(parent?.url)
+    const runs =
+      scoring.middleware && requested !== undefined
+        ? middlewareRunsOn(scoring.middleware, requested)
+        : undefined
+    if (runs === 'no' && !scoring.fromMiddleware) return undefined
+    if (runs === 'yes' || runs === 'conditional')
+      add('middleware', runs === 'yes' ? 20 : 10, `runs on ${requested}`)
+    if (scoring.fromMiddleware) add('middleware', 30, 'sent from middleware')
+  } else if (scoring.fromMiddleware) {
+    add('middleware', -30, 'sent from middleware, the site is not')
   }
 
   if (site.origin === 'server-action' && info.action) {
@@ -234,7 +284,9 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
   }
 
   const routePath = capture.origin === 'browser' ? pathOf(capture.pageUrl) : parent && pathOf(parent.url)
-  if (routePath !== undefined && info.routes.some((r) => r.test(routePath))) {
+  // A rewritten path is answered by another route (M14).
+  const served = routePath === undefined ? [] : servedPaths(scoring.middleware, routePath)
+  if (routePath !== undefined && info.routes.some((r) => served.some((p) => r.test(p)))) {
     add('route', site.trigger.kind === 'server-render' ? 25 : 15, routePath)
   }
 
@@ -339,7 +391,10 @@ function indexSites(model: AppModel): SiteInfo[] {
     const component = site.componentId ? components.get(site.componentId) : undefined
     const kind = site.trigger.kind
     const side =
-      kind === 'server-render' || kind === 'route-handler' || kind === 'server-action'
+      kind === 'server-render' ||
+      kind === 'route-handler' ||
+      kind === 'server-action' ||
+      kind === 'middleware'
         ? 'server'
         : kind === 'unknown'
           ? 'any'

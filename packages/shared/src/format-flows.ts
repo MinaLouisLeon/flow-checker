@@ -18,13 +18,20 @@ export function formatFlows(model: AppModel): string {
     const owner =
       nav.origin === 'server-action'
         ? `server action ${nav.serverAction?.name ?? '?'}`
-        : (components.get(nav.componentId ?? '')?.name ?? 'component')
+        : nav.origin === 'middleware'
+          ? 'middleware'
+          : (components.get(nav.componentId ?? '')?.name ?? 'component')
     const label = `${owner}  ${nav.loc.file}`
     if (label !== group) {
       out.push('', `## ${label}`)
       group = label
     }
     out.push(navLine(nav))
+    if (nav.sourceRouteIds) {
+      const check = nav.from ? `  path ${nav.from.path}${nav.from.kind === 'prefix' ? '/*' : ''}` : ''
+      out.push(`  from: ${nav.sourceRouteIds.map(routePath).join(', ') || '(no page)'}${check}`)
+    }
+    if (nav.condition) out.push(`  if: ${nav.condition}`)
   }
 
   out.push('', '# Flows')

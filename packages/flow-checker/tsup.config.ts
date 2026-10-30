@@ -31,6 +31,7 @@ export default defineConfig([
       config: 'src/config.ts',
       'runtime-client': 'src/runtime-client.ts',
       'runtime-server': 'src/runtime-server.ts',
+      'runtime-edge': 'src/runtime-edge.ts',
     },
     format: 'esm',
     target: 'node22',

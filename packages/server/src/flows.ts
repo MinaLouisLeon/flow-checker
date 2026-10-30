@@ -19,6 +19,7 @@ import {
   type Route,
   routePathRegex,
   type Session,
+  servedPaths,
 } from '@flow-checker/shared'
 import type { OverridesFile } from './overrides'
 import type { CaptureStore } from './store'
@@ -444,8 +445,12 @@ export class FlowTracker {
         .sort((a, b) => a.dynamic - b.dynamic)
       this.#pages = { model: this.#model, list }
     }
-    const path = pathOf(url)
-    return this.#pages.list.find((p) => p.re.test(path))?.route.id
+    // Middleware rewrites and next-intl's default locale: the route that really answers (M14).
+    for (const path of servedPaths(this.#model.middleware, pathOf(url))) {
+      const found = this.#pages.list.find((p) => p.re.test(path))
+      if (found) return found.route.id
+    }
+    return undefined
   }
 }
 

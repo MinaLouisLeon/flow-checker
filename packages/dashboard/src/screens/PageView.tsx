@@ -1,6 +1,7 @@
 import type { ComponentRef, QueryLink, RequestSite, Route } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
+import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
 import { QueryLinkList, RequestList } from '../RequestView'
 import { href } from '../router'
@@ -90,6 +91,8 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
             </ol>
           )}
         </Section>
+
+        <MiddlewareSection index={index} routeId={routeId} />
 
         <Section title="Page-load requests" aside={<span className="count">{onLoad.length}</span>}>
           <RequestList sites={onLoad} empty="Nothing is fetched when this page loads." open={false} />
@@ -186,6 +189,8 @@ function RouteHandlerView({ route, index }: { route: Route; index: ModelIndex })
       <div className="page-file">
         <SourceLink file={route.file} />
       </div>
+
+      <MiddlewareSection index={index} routeId={route.id} />
 
       <Section title="Called from" aside={<span className="count">{callers.length}</span>}>
         {callers.length === 0 ? (

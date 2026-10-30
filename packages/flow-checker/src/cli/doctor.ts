@@ -6,11 +6,14 @@ import { join, relative, resolve } from 'node:path'
 import { DEFAULT_PORTS, type FlowCheckerConfig, PACKAGE_NAME } from '@flow-checker/shared'
 import { ts } from 'ts-morph'
 import { ConfigError, findConfigFile, loadConfig } from './config'
+import { EDGE_BODY } from './init'
 import { createProgress } from './progress'
 import {
   defaultDevCommand,
   findHook,
+  findMiddlewareFile,
   hookDir,
+  middlewareOnEdge,
   missingGitignoreEntries,
   nextVersion,
   readPackageJson,
@@ -332,6 +335,8 @@ function checkHooks(root: string, appDir: string, next: ReturnType<typeof nextVe
   }
   hook('instrumentation', 'Server hook', 'server')
   hook('instrumentation-client', 'Browser hook', 'client')
+  const middleware = checkMiddleware(root, appDir, next)
+  if (middleware) checks.push(middleware)
 
   // Before 15.3 the browser hook only runs through withFlowChecker() (and before 15, the server
   // hook needs experimental.instrumentationHook, which the wrapper sets).
@@ -352,6 +357,48 @@ function checkHooks(root: string, appDir: string, next: ReturnType<typeof nextVe
     })
   }
   return checks
+}
+
+/**
+ * Middleware (M14): the file name Next expects, and whether its requests are captured. On
+ * Node.js the server hook covers it; on the edge runtime it needs the edge hook.
+ */
+function checkMiddleware(
+  root: string,
+  appDir: string,
+  next: ReturnType<typeof nextVersion>,
+): Check | undefined {
+  const file = findMiddlewareFile(root, appDir)
+  if (!file) return undefined
+  const name = rel(root, file)
+  const proxy = /(^|\/)proxy\.[^/]+$/.test(name)
+  if (proxy && next && next.major < 16) {
+    return {
+      name: 'Middleware',
+      status: 'warn',
+      message: `Next.js ${next.text} doesn't run ${name}`,
+      hint: 'proxy.ts is the Next.js 16 name. Before 16 the file is middleware.ts.',
+    }
+  }
+  if (!middlewareOnEdge(file, next)) {
+    return {
+      name: 'Middleware',
+      status: 'ok',
+      message: `${name} runs on Node.js: the server hook captures its requests`,
+    }
+  }
+  const hook = findHook(hookDir(root, appDir), 'instrumentation')
+  const wired = hook ? readFileSync(hook, 'utf8').includes(`${PACKAGE_NAME}/runtime/edge`) : false
+  return {
+    name: 'Middleware',
+    status: wired ? 'ok' : 'warn',
+    message: wired
+      ? `${name} runs on the edge runtime: its fetch calls are captured (best effort)`
+      : `${name} runs on the edge runtime, and the requests it sends won't be captured`,
+    hint: wired
+      ? undefined
+      : `Add this to register() in ${hook ? rel(root, hook) : 'instrumentation.ts'}:\n\n${EDGE_BODY}`,
+  }
 }
 
 /** Whether `name` can be found in node_modules from the root up (monorepos hoist packages). */

@@ -1,4 +1,5 @@
 import type { FileSystemHost } from 'ts-morph'
+import { findMiddleware } from './middleware'
 import { resolveFrom } from './paths'
 
 export class ScanError extends Error {
@@ -12,6 +13,8 @@ export interface Discovery {
   tsconfig?: string
   nextConfig?: string
   nextVersion?: string
+  /** `middleware.*` or `proxy.*` next to the app directory (M14). */
+  middleware?: string
 }
 
 const NEXT_CONFIGS = [
@@ -40,7 +43,15 @@ export function discoverProject(fs: FileSystemHost, root: string, appDir?: strin
   const tsconfig = [`${root}/tsconfig.json`, `${root}/jsconfig.json`].find((f) => fs.fileExistsSync(f))
   const nextConfig = NEXT_CONFIGS.map((f) => `${root}/${f}`).find((f) => fs.fileExistsSync(f))
 
-  return { root, appDir: app, tsconfig, nextConfig, nextVersion: nextVersion(fs, root) }
+  const middleware = findMiddleware(fs, root, app)
+  return {
+    root,
+    appDir: app,
+    tsconfig,
+    nextConfig,
+    nextVersion: nextVersion(fs, root),
+    ...(middleware ? { middleware } : {}),
+  }
 }
 
 /** Installed version if available, otherwise the declared range from package.json. */

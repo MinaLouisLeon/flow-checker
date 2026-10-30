@@ -23,6 +23,7 @@ const TRIGGER_LABEL: Record<Trigger['kind'], string> = {
   event: 'event',
   'route-handler': 'route handler',
   'server-action': 'server action',
+  middleware: 'middleware',
   unknown: 'unknown trigger',
 }
 
@@ -33,6 +34,7 @@ const TRIGGER_TITLE: Record<Trigger['kind'], string> = {
   event: 'Sent when the user interacts',
   'route-handler': 'Sent by a route handler when it is called',
   'server-action': 'Sent by a server action when it is called',
+  middleware: 'Sent by middleware (middleware.ts / proxy.ts) before a matching request is handled',
   unknown: 'The scan could not tell what starts this request',
 }
 
@@ -54,6 +56,7 @@ export function siteOwner(site: RequestSite, index: ModelIndex): string {
     return `${site.handlerMethod ?? ''} ${index.routes.get(site.routeId)?.path ?? 'route handler'}`.trim()
   }
   if (site.origin === 'server-action') return `action ${site.serverAction?.name ?? '?'}`
+  if (site.origin === 'middleware') return `middleware ${index.model.middleware?.file ?? ''}`.trim()
   return site.origin
 }
 

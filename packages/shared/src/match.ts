@@ -26,6 +26,8 @@ export const MATCH_SIGNALS = [
   'trigger',
   /** The React Query key the request was sent for is the site's key (M13). */
   'query-key',
+  /** Sent from middleware (stack), for a request its matcher selects (M14). */
+  'middleware',
   /** You assigned captures like this one to the site. */
   'manual',
 ] as const
