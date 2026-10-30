@@ -8,6 +8,8 @@ NewTodo  type-alias  src/types/todo.ts:8
   { title: string }
 TodoPatch  type-alias  src/types/todo.ts:10
   { title?: string; done?: boolean }
+User  interface  src/types/user.ts:1
+  { id: number; name: string; email: string; role: "admin" | "member" }
 
 # Component types
 

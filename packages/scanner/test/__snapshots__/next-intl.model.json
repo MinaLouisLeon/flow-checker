@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -1134,5 +1134,6 @@
         "rt_0nr7aw4u4g0"
       ]
     }
-  ]
+  ],
+  "queryLinks": []
 }

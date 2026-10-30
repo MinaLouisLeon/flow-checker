@@ -43,6 +43,30 @@ const scripts = {
     await page.click('button[type=submit]')
     await page.waitForURL(/\/todos\/\d+/)
     await settle(page)
+    // Server prefetch + HydrationBoundary, useQueries, then queryClient methods.
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.hover('li button >> nth=0')
+    await settle(page)
+    // A click without hovering first, so ensureQueryData has nothing cached for this user.
+    await page.dispatchEvent('li >> nth=1 >> button >> nth=0', 'click')
+    await settle(page)
+    await page.click('button:has-text("Refresh")')
+    await settle(page)
+  },
+  'react-query-v4': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.click('input[type=checkbox] >> nth=1')
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.click('button:has-text("Delete") >> nth=1')
+    await settle(page)
   },
   'server-actions': async (page) => {
     await page.goto(`${app}/products`)

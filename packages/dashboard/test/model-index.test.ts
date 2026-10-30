@@ -129,6 +129,7 @@ describe('scan notes', () => {
       ],
       navigations: [],
       flows: [],
+      queryLinks: [],
     })
     expect(index.notes.map((n) => n.kind)).toEqual([
       'missing-page-component',

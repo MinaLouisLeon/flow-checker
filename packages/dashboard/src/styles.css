@@ -804,6 +804,11 @@ a.stat:hover {
 .request-stack ol {
   counter-reset: frame;
 }
+.query-links li {
+  align-items: baseline;
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
 .request-stack li::before {
   counter-increment: frame;
   content: counter(frame);

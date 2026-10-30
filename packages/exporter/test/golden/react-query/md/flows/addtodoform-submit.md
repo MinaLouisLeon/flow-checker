@@ -19,6 +19,7 @@ sequenceDiagram
   U->>P0: onSubmit (AddTodoForm)
   P0->>P1: POST /todos
   P1-->>P0: 201 Todo
+  Note over P0: invalidateQueries ['todos']
   P0->>P2: push
   P2->>P1: on load: GET /todos/:id
   P1-->>P2: 200 Todo
@@ -29,13 +30,14 @@ sequenceDiagram
 | # | Step | Detail |
 | ---: | --- | --- |
 | 1 | User `onSubmit` in [`AddTodoForm`](../components/AddTodoForm.md) on [`/`](../pages/index.md) | `src/components/AddTodoForm.tsx:28` |
-| 2 | [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_21j0fo1p54x) | body `NewTodo` · response `Todo` · ✓ verified (1 capture) |
-| 3 | push → [`/todos/[id]`](../pages/todos.%5Bid%5D.md) | on success · `src/components/AddTodoForm.tsx:18` |
-| 4 | Page loads: [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](#req_0euad6xi67r) | response `Todo` · ✓ verified (1 capture) |
+| 2 | [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_1ybk9xw63lt) | body `NewTodo` · response `Todo` · ✓ verified (1 capture) |
+| 3 | `invalidateQueries` `['todos']` | refetches `GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`, `GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId` · `src/components/AddTodoForm.tsx:17` |
+| 4 | push → [`/todos/[id]`](../pages/todos.%5Bid%5D.md) | on success · `src/components/AddTodoForm.tsx:18` |
+| 5 | Page loads: [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](#req_27sy7hb0xsq) | response `Todo` · ✓ verified (1 capture) |
 
 ## Requests
 
-### <a id="req_21j0fo1p54x"></a>`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
+### <a id="req_1ybk9xw63lt"></a>`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
 
 |  |  |
 | --- | --- |
@@ -58,7 +60,7 @@ sequenceDiagram
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `POST http://localhost:4010/todos` → 201 Created · 10 ms · 2026-10-28 10:56 UTC · page `/`
+**Captured** `POST http://localhost:4010/todos` → 201 Created · 9 ms · 2026-10-30 01:38 UTC · page `/`
 
 Request body:
 
@@ -79,7 +81,7 @@ Response body:
 }
 ```
 
-### <a id="req_0euad6xi67r"></a>`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`
+### <a id="req_27sy7hb0xsq"></a>`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`
 
 |  |  |
 | --- | --- |
@@ -96,7 +98,7 @@ Response body:
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `GET http://localhost:4010/todos/3` → 200 OK · 16 ms · 2026-10-28 10:56 UTC · page `/todos/3`
+**Captured** `GET http://localhost:4010/todos/3` → 200 OK · 13 ms · 2026-10-30 01:38 UTC · page `/todos/3`
 
 Response body:
 

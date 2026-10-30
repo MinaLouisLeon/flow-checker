@@ -65,6 +65,7 @@ const model = (requests: RequestSite[]): AppModel => ({
   requests,
   navigations: [],
   flows: [],
+  queryLinks: [],
 })
 
 const minutesAgo = (n: number) => new Date(Date.now() - n * 60_000).toISOString()

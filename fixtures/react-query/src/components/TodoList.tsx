@@ -2,17 +2,20 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
-import { fetchTodos, todoKeys, updateTodo } from '@/services/todos'
+import { todoKeys, todoQueries, updateTodo } from '@/services/todos'
 import type { Todo } from '@/types/todo'
 
-// Page-load request (useQuery) plus an event-triggered mutation per row.
+// Page-load request (useQuery with queryOptions) plus an event-triggered mutation per row.
 export function TodoList() {
   const queryClient = useQueryClient()
-  const { data, isPending, error } = useQuery({ queryKey: todoKeys.all, queryFn: fetchTodos })
+  const { data, isPending, error } = useQuery(todoQueries.list())
 
   const toggle = useMutation({
     mutationFn: (todo: Todo) => updateTodo(todo.id, { done: !todo.done }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: todoKeys.all }),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(todoKeys.detail(updated.id), updated)
+      return queryClient.invalidateQueries({ queryKey: todoKeys.lists() })
+    },
   })
 
   if (isPending) return <p>Loading…</p>

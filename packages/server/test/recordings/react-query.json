@@ -3,12 +3,12 @@
   "actions": {},
   "captures": [
     {
-      "id": "cap_mvs01iod2mwenmmj",
-      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "id": "cap_mvuazl2m75xt451v",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
       "origin": "browser",
       "transport": "fetch",
-      "timestamp": "2026-10-28T10:56:26.318Z",
-      "durationMs": 13,
+      "timestamp": "2026-10-30T01:38:24.238Z",
+      "durationMs": 14,
       "pageUrl": "http://localhost:3077/",
       "request": {
         "method": "GET",
@@ -45,19 +45,27 @@
           "size": 123
         }
       },
+      "query": {
+        "kind": "query",
+        "key": [
+          "todos",
+          "list",
+          {}
+        ]
+      },
       "stack": [
-        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
-        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
-        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
-        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:231:24)",
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:217:23)",
+        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:248:24)",
         "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
         "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
         "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
         "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
-        "at #executeFetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1sj869w7n8_pj._.js:480:42)",
-        "at QueryObserver.onSubscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1sj869w7n8_pj._.js:276:89)",
+        "at #executeFetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1cyehqg80s_rl._.js:480:42)",
+        "at QueryObserver.onSubscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1cyehqg80s_rl._.js:276:89)",
         "at QueryObserver.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2917:14)",
-        "at useBaseQuery.useSyncExternalStore.useCallback (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1sj869w7n8_pj._.js:1041:60)"
+        "at useBaseQuery.useSyncExternalStore.useCallback (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1cyehqg80s_rl._.js:1054:60)"
       ],
       "redacted": true,
       "redactedPaths": [],
@@ -65,24 +73,35 @@
         {
           "fn": "http",
           "file": "src/services/todos.ts",
-          "line": 7,
+          "line": 8,
           "column": 21
         },
         {
           "fn": "fetchTodos",
           "file": "src/services/todos.ts",
-          "line": 20,
+          "line": 25,
           "column": 33
         }
-      ]
+      ],
+      "typeCheck": {
+        "siteId": "req_1di2bq7b96m",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
     },
     {
-      "id": "cap_mvs01kke660fx99e",
-      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "id": "cap_mvuazmxcuotcrsnc",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
       "origin": "browser",
       "transport": "fetch",
-      "timestamp": "2026-10-28T10:56:28.766Z",
-      "durationMs": 8,
+      "timestamp": "2026-10-30T01:38:26.640Z",
+      "durationMs": 7,
       "pageUrl": "http://localhost:3077/",
       "request": {
         "method": "PATCH",
@@ -150,14 +169,17 @@
           "AppRouterContext",
           "GlobalLayoutRouterContext"
         ],
-        "at": "2026-10-28T10:56:28.763Z"
+        "at": "2026-10-30T01:38:26.638Z"
+      },
+      "query": {
+        "kind": "mutation"
       },
       "stack": [
-        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
-        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
-        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
-        "at updateTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:237:33)",
-        "at TodoList.useMutation[toggle] [as mutationFn] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:122:225)",
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:217:23)",
+        "at updateTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:254:33)",
+        "at TodoList.useMutation[toggle] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:119:225)",
         "at Object.fn (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:458:37)",
         "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
         "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
@@ -169,30 +191,47 @@
         {
           "fn": "http",
           "file": "src/services/todos.ts",
-          "line": 7,
+          "line": 8,
           "column": 21
         },
         {
           "fn": "updateTodo",
           "file": "src/services/todos.ts",
-          "line": 28,
+          "line": 33,
           "column": 3
         },
         {
-          "fn": "TodoList.useMutation[toggle] [as mutationFn]",
+          "fn": "TodoList.useMutation[toggle]",
           "file": "src/components/TodoList.tsx",
           "line": 14,
           "column": 43
         }
-      ]
+      ],
+      "typeCheck": {
+        "siteId": "req_2bvpz71hbm1",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoPatch",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
     },
     {
-      "id": "cap_mvs01kkobctmxzst",
-      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "id": "cap_mvuazmxl0gwttn21",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
       "origin": "browser",
       "transport": "fetch",
-      "timestamp": "2026-10-28T10:56:28.776Z",
-      "durationMs": 5,
+      "timestamp": "2026-10-30T01:38:26.649Z",
+      "durationMs": 4,
       "pageUrl": "http://localhost:3077/",
       "request": {
         "method": "GET",
@@ -264,13 +303,21 @@
           "AppRouterContext",
           "GlobalLayoutRouterContext"
         ],
-        "at": "2026-10-28T10:56:28.767Z"
+        "at": "2026-10-30T01:38:26.641Z"
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "todos",
+          "list",
+          {}
+        ]
       },
       "stack": [
-        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
-        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
-        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
-        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:231:24)",
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:217:23)",
+        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:248:24)",
         "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
         "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
         "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
@@ -286,24 +333,35 @@
         {
           "fn": "http",
           "file": "src/services/todos.ts",
-          "line": 7,
+          "line": 8,
           "column": 21
         },
         {
           "fn": "fetchTodos",
           "file": "src/services/todos.ts",
-          "line": 20,
+          "line": 25,
           "column": 33
         }
-      ]
+      ],
+      "typeCheck": {
+        "siteId": "req_1di2bq7b96m",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
     },
     {
-      "id": "cap_mvs01lsk4qczq26p",
-      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "id": "cap_mvuazo5itiingn9q",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
       "origin": "browser",
       "transport": "fetch",
-      "timestamp": "2026-10-28T10:56:30.356Z",
-      "durationMs": 10,
+      "timestamp": "2026-10-30T01:38:28.230Z",
+      "durationMs": 9,
       "pageUrl": "http://localhost:3077/",
       "request": {
         "method": "POST",
@@ -371,13 +429,16 @@
           "AppRouterContext",
           "GlobalLayoutRouterContext"
         ],
-        "at": "2026-10-28T10:56:30.355Z"
+        "at": "2026-10-30T01:38:28.229Z"
+      },
+      "query": {
+        "kind": "mutation"
       },
       "stack": [
-        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
-        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
-        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
-        "at Object.createTodo [as mutationFn] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:233:29)",
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:217:23)",
+        "at Object.createTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:250:29)",
         "at Object.fn (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:458:37)",
         "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
         "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
@@ -389,24 +450,41 @@
         {
           "fn": "http",
           "file": "src/services/todos.ts",
-          "line": 7,
+          "line": 8,
           "column": 21
         },
         {
-          "fn": "Object.createTodo [as mutationFn]",
+          "fn": "Object.createTodo",
           "file": "src/services/todos.ts",
-          "line": 25,
+          "line": 30,
           "column": 3
         }
-      ]
+      ],
+      "typeCheck": {
+        "siteId": "req_1ybk9xw63lt",
+        "parts": [
+          {
+            "part": "request",
+            "type": "NewTodo",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
     },
     {
-      "id": "cap_mvs01lswj5s1v8pz",
-      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "id": "cap_mvuazo5sg6csfwib",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
       "origin": "browser",
       "transport": "fetch",
-      "timestamp": "2026-10-28T10:56:30.368Z",
-      "durationMs": 10,
+      "timestamp": "2026-10-30T01:38:28.240Z",
+      "durationMs": 8,
       "pageUrl": "http://localhost:3077/",
       "request": {
         "method": "GET",
@@ -484,13 +562,21 @@
           "AppRouterContext",
           "GlobalLayoutRouterContext"
         ],
-        "at": "2026-10-28T10:56:30.355Z"
+        "at": "2026-10-30T01:38:28.229Z"
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "todos",
+          "list",
+          {}
+        ]
       },
       "stack": [
-        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
-        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
-        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
-        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:231:24)",
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:217:23)",
+        "at fetchTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:248:24)",
         "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
         "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
         "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
@@ -506,24 +592,35 @@
         {
           "fn": "http",
           "file": "src/services/todos.ts",
-          "line": 7,
+          "line": 8,
           "column": 21
         },
         {
           "fn": "fetchTodos",
           "file": "src/services/todos.ts",
-          "line": 20,
+          "line": 25,
           "column": 33
         }
-      ]
+      ],
+      "typeCheck": {
+        "siteId": "req_1di2bq7b96m",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
     },
     {
-      "id": "cap_mvs01njzw18gsqu6",
-      "sessionId": "ses_mvs01ig93nvyd2n4",
+      "id": "cap_mvuazp7gvpozu2e2",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
       "origin": "browser",
       "transport": "fetch",
-      "timestamp": "2026-10-28T10:56:32.639Z",
-      "durationMs": 16,
+      "timestamp": "2026-10-30T01:38:29.596Z",
+      "durationMs": 13,
       "pageUrl": "http://localhost:3077/todos/3",
       "request": {
         "method": "GET",
@@ -587,17 +684,17 @@
           "AppRouterContext",
           "GlobalLayoutRouterContext"
         ],
-        "at": "2026-10-28T10:56:30.355Z"
+        "at": "2026-10-30T01:38:28.229Z"
       },
       "stack": [
-        "at callerStack (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:241:19)",
-        "at baseCapture (http://localhost:3077/_next/static/chunks/_0afd3jt26ojl3._.js:763:195)",
-        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:212:23)",
-        "at fetchTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:232:25)",
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:217:23)",
+        "at fetchTodo (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0xq7baxvvvgx2._.js:249:25)",
         "at TodoDetail.useSWR (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_0su-qqec0edwi._.js:25:205)",
-        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1nu4pi8s3ayk1._.js:953:271",
-        "at useSWRHandler.useCallback[revalidate] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1nu4pi8s3ayk1._.js:2141:63)",
-        "at useSWRHandler.useIsomorphicLayoutEffect (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1nu4pi8s3ayk1._.js:2380:25)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ic0i1n3qbt5h._.js:966:271",
+        "at useSWRHandler.useCallback[revalidate] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ic0i1n3qbt5h._.js:2154:63)",
+        "at useSWRHandler.useIsomorphicLayoutEffect (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ic0i1n3qbt5h._.js:2393:25)",
         "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
         "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
         "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
@@ -609,13 +706,13 @@
         {
           "fn": "http",
           "file": "src/services/todos.ts",
-          "line": 7,
+          "line": 8,
           "column": 21
         },
         {
           "fn": "fetchTodo",
           "file": "src/services/todos.ts",
-          "line": 22,
+          "line": 27,
           "column": 42
         },
         {
@@ -623,6 +720,978 @@
           "file": "src/components/TodoDetail.tsx",
           "line": 14,
           "column": 80
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_27sy7hb0xsq",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuazqglkxo8l33z",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:31.221Z",
+      "durationMs": 33,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 01:38:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\react-query\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\react-query\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\react-query\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\react-query\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\react-query\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async http (<repo>\\fixtures\\react-query\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__141r2bjp2jjq3._.js:96:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_2a0uqvzh6dw",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuazqmt7u822ovi",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:31.445Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "users"
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUsers (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:236:190)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at #executeFetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:774:42)",
+        "at QueryObserver.onSubscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:570:89)",
+        "at QueryObserver.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2917:14)",
+        "at useBaseQuery.useSyncExternalStore.useCallback (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:1449:60)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUsers",
+          "file": "src/services/users.ts",
+          "line": 12,
+          "column": 37
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0m4arr015hb",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuazqmyibyplcf3",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:31.450Z",
+      "durationMs": 10,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=1",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Record captures"
+            }
+          ],
+          "size": 126
+        }
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "todos",
+          "list",
+          {
+            "userId": 1
+          }
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUserTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:238:200)",
+        "at UserList.useQueries[todoCounts] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:28:240)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at #executeFetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:774:42)",
+        "at QueryObserver.onSubscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:570:89)",
+        "at QueryObserver.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2917:14)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUserTodos",
+          "file": "src/services/users.ts",
+          "line": 16,
+          "column": 55
+        },
+        {
+          "fn": "UserList.useQueries[todoCounts]",
+          "file": "src/components/UserList.tsx",
+          "line": 13,
+          "column": 36
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0ht2fssv0ja",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuazqn1l3kcrtl8",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:31.453Z",
+      "durationMs": 8,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=2",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": true
+            }
+          ],
+          "size": 56
+        }
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "todos",
+          "list",
+          {
+            "userId": 2
+          }
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUserTodos (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:238:200)",
+        "at UserList.useQueries[todoCounts] (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:28:240)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at #executeFetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:774:42)",
+        "at QueryObserver.onSubscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_17ersdru6-s9o._.js:570:89)",
+        "at QueryObserver.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2917:14)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUserTodos",
+          "file": "src/services/users.ts",
+          "line": 16,
+          "column": 55
+        },
+        {
+          "fn": "UserList.useQueries[todoCounts]",
+          "file": "src/components/UserList.tsx",
+          "line": 13,
+          "column": 36
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0ht2fssv0ja",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuazsiolnehbtul",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:33.888Z",
+      "durationMs": 5,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "users",
+          1
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUser (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:237:191)",
+        "at queryFn (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:247:22)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at QueryClient.fetchQuery (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2370:351)",
+        "at QueryClient.prefetchQuery (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2380:21)",
+        "at onMouseEnter (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:44:63)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUser",
+          "file": "src/services/users.ts",
+          "line": 14,
+          "column": 46
+        },
+        {
+          "fn": "queryFn",
+          "file": "src/services/users.ts",
+          "line": 23,
+          "column": 64
+        },
+        {
+          "fn": "onMouseEnter",
+          "file": "src/components/UserList.tsx",
+          "line": 29,
+          "column": 47
+        }
+      ]
+    },
+    {
+      "id": "cap_mvuaztq1qvojz6fn",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:35.449Z",
+      "durationMs": 4,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Alan Turing\"",
+        "componentChain": [
+          "UserList",
+          "HydrationBoundary",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider"
+        ],
+        "at": "2026-10-30T01:38:35.448Z"
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "users",
+          2
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUser (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:237:191)",
+        "at queryFn (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:247:22)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at QueryClient.fetchQuery (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2370:351)",
+        "at QueryClient.ensureQueryData (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2086:48)",
+        "at showEmail (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:34:40)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUser",
+          "file": "src/services/users.ts",
+          "line": 14,
+          "column": 46
+        },
+        {
+          "fn": "queryFn",
+          "file": "src/services/users.ts",
+          "line": 23,
+          "column": 64
+        },
+        {
+          "fn": "showEmail",
+          "file": "src/components/UserList.tsx",
+          "line": 18,
+          "column": 36
+        },
+        {
+          "fn": "onClick",
+          "file": "src/components/UserList.tsx",
+          "line": 30,
+          "column": 30
+        }
+      ]
+    },
+    {
+      "id": "cap_mvuazuwy8rw8tk7u",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:36.994Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Refresh\"",
+        "componentChain": [
+          "UserList",
+          "HydrationBoundary",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider"
+        ],
+        "at": "2026-10-30T01:38:36.992Z"
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "users",
+          1
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUser (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:237:191)",
+        "at queryFn (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:247:22)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2310:37",
+        "at Array.map (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2309:398"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUser",
+          "file": "src/services/users.ts",
+          "line": 14,
+          "column": 46
+        },
+        {
+          "fn": "queryFn",
+          "file": "src/services/users.ts",
+          "line": 23,
+          "column": 64
+        },
+        {
+          "fn": "onClick",
+          "file": "src/components/UserList.tsx",
+          "line": 44,
+          "column": 56
+        }
+      ]
+    },
+    {
+      "id": "cap_mvuazuwxew5rbbjm",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:36.993Z",
+      "durationMs": 10,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Refresh\"",
+        "componentChain": [
+          "UserList",
+          "HydrationBoundary",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider"
+        ],
+        "at": "2026-10-30T01:38:36.992Z"
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "users"
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUsers (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:236:190)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2310:37",
+        "at Array.map (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2309:398",
+        "at Object.batch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:912:26)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUsers",
+          "file": "src/services/users.ts",
+          "line": 12,
+          "column": 37
+        },
+        {
+          "fn": "onClick",
+          "file": "src/components/UserList.tsx",
+          "line": 44,
+          "column": 56
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0m4arr015hb",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuazuwyuyt1w1yt",
+      "sessionId": "ses_mvuazkuc1c9v89nk",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T01:38:36.994Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Refresh\"",
+        "componentChain": [
+          "UserList",
+          "HydrationBoundary",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider"
+        ],
+        "at": "2026-10-30T01:38:36.992Z"
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          "users",
+          2
+        ]
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0q89p5q1_qfl2._.js:1017:195)",
+        "at http (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:144:23)",
+        "at fetchUser (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:237:191)",
+        "at queryFn (http://localhost:3077/_next/static/chunks/fixtures_react-query_src_1i7wig2jhbnem._.js:247:22)",
+        "at Object.fetchFn [as fn] (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1480:20)",
+        "at run (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2840:55)",
+        "at Object.start (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2876:29)",
+        "at Query.fetch (http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:1534:40)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2310:37",
+        "at Array.map (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_0ldbqq5ew_zb6._.js:2309:398"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "http",
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21
+        },
+        {
+          "fn": "fetchUser",
+          "file": "src/services/users.ts",
+          "line": 14,
+          "column": 46
+        },
+        {
+          "fn": "queryFn",
+          "file": "src/services/users.ts",
+          "line": 23,
+          "column": 64
+        },
+        {
+          "fn": "onClick",
+          "file": "src/components/UserList.tsx",
+          "line": 44,
+          "column": 56
         }
       ]
     }

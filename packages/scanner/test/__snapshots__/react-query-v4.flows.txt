@@ -1,0 +1,31 @@
+# Navigation
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+push /todos/:id -> /todos/[id]  event onSubmit  success
+
+## TodoDetail  src/components/TodoDetail.tsx
+link / -> /  event onClick  conditional
+
+## TodoList  src/components/TodoList.tsx
+link /todos/:id -> /todos/[id]  event onClick  conditional
+
+# Flows
+
+## AddTodoForm submit  (/ -> /todos/[id])
+1. AddTodoForm onSubmit on /
+2. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+3. invalidateQueries ['todos'] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id, GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos, GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+4. push -> /todos/[id]
+5. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+
+## TodoList change  (/)
+1. TodoList onChange on /
+2. PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+3. setQueryData ['todos', 'detail', :id] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+4. invalidateQueries ['todos', 'list'] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+
+## UserList click  (/users)
+1. UserList onClick on /users
+2. DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+3. removeQueries ['users', :id]
+4. invalidateQueries ['users'] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users

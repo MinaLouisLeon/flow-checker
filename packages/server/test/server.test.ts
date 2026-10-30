@@ -17,6 +17,7 @@ const model = (appDir = 'app'): AppModel => ({
   requests: [],
   navigations: [],
   flows: [],
+  queryLinks: [],
 })
 
 const get = (app: ReturnType<typeof createApp>, path: string, init?: RequestInit) =>

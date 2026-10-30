@@ -7,6 +7,7 @@ import type {
   Flow,
   NamedType,
   Navigation,
+  QueryLink,
   RequestSite,
   Route,
   TypeShape,
@@ -74,6 +75,14 @@ export interface ModelIndex {
   flowsByRoute: Map<string, Flow[]>
   /** Page-to-page navigation edges (from the page whose own tree has the link or call). */
   navEdges: { source: string; target: string; kinds: Navigation['kind'][] }[]
+  /** React Query cache links (M13). */
+  queryLinks: Map<string, QueryLink>
+  /** Site id -> cache links that run after it (its mutation callbacks, or a server prefetch). */
+  linksFrom: Map<string, QueryLink[]>
+  /** Site id -> cache links that hit it (invalidations of its key, hydration). */
+  linksTo: Map<string, QueryLink[]>
+  /** Component id -> cache links called in it. */
+  linksByComponent: Map<string, QueryLink[]>
 }
 
 export function buildIndex(model: AppModel): ModelIndex {
@@ -174,6 +183,15 @@ export function buildIndex(model: AppModel): ModelIndex {
     }
   }
 
+  const linksFrom = new Map<string, QueryLink[]>()
+  const linksTo = new Map<string, QueryLink[]>()
+  const linksByComponent = new Map<string, QueryLink[]>()
+  for (const link of model.queryLinks) {
+    for (const id of link.fromSiteIds) push(linksFrom, id, link)
+    for (const id of link.targetSiteIds) push(linksTo, id, link)
+    if (link.componentId) push(linksByComponent, link.componentId, link)
+  }
+
   return {
     model,
     routes,
@@ -191,6 +209,10 @@ export function buildIndex(model: AppModel): ModelIndex {
     flows: new Map(model.flows.map((f) => [f.id, f])),
     flowsByRoute,
     navEdges: [...edges.values()],
+    queryLinks: new Map(model.queryLinks.map((l) => [l.id, l])),
+    linksFrom,
+    linksTo,
+    linksByComponent,
   }
 }
 

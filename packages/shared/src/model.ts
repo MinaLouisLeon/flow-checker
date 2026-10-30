@@ -384,6 +384,35 @@ export const FlagSchema = z.object({
 })
 export type Flag = z.infer<typeof FlagSchema>
 
+// ---------------------------------------------------------------------------------------------
+// React Query keys and cache links (M13).
+
+/**
+ * One segment of a query key. `static`: a literal or constant. `param`: a value only known at
+ * runtime (`:id`), matches any one segment. `object`: `{ status: 'open', page: :page }`.
+ * `rest`: a spread the scanner could not resolve, matches any number of segments.
+ */
+export type QueryKeyPart =
+  | { kind: 'static'; value: string | number | boolean | null }
+  | { kind: 'param'; name: string }
+  | { kind: 'object'; entries: { key: string; value: QueryKeyPart }[] }
+  | { kind: 'rest'; text: string }
+
+export const QueryKeyPartSchema: z.ZodType<QueryKeyPart> = z.lazy(() =>
+  z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('static'),
+      value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    }),
+    z.object({ kind: z.literal('param'), name: z.string() }),
+    z.object({
+      kind: z.literal('object'),
+      entries: z.array(z.object({ key: z.string(), value: QueryKeyPartSchema })),
+    }),
+    z.object({ kind: z.literal('rest'), text: z.string() }),
+  ]),
+)
+
 export const ServerActionRefSchema = z.object({
   name: z.string(),
   loc: SourceLocSchema,
@@ -405,7 +434,10 @@ export const RequestSiteSchema = z.object({
   transport: z.enum(['fetch', 'axios', 'api-client', 'server-action']),
   /** Transport `api-client`: the configured module and the function or method called. */
   client: z.object({ module: z.string(), name: z.string() }).optional(),
-  /** Set when a data-fetching hook runs the request. `key` is the query/SWR key as written. */
+  /**
+   * Set when a data-fetching hook (or a `queryClient` method such as `prefetchQuery`) runs the
+   * request. `key` is the query/SWR key as written.
+   */
   hook: z
     .object({
       name: z.string(),
@@ -413,6 +445,8 @@ export const RequestSiteSchema = z.object({
       key: z.string().optional(),
     })
     .optional(),
+  /** React Query: the query or mutation key, parsed into segments (M13). */
+  queryKey: z.array(QueryKeyPartSchema).optional(),
   /** Absent when it could not be resolved. Server actions are always `POST`. */
   method: HttpMethodSchema.optional(),
   /** Absent for server actions, which post to the current page. */
@@ -440,6 +474,36 @@ export const RequestSiteSchema = z.object({
   flags: z.array(FlagSchema),
 })
 export type RequestSite = z.infer<typeof RequestSiteSchema>
+
+export const QUERY_LINK_KINDS = ['invalidate', 'refetch', 'reset', 'remove', 'set-data', 'hydrate'] as const
+
+/**
+ * A React Query cache call and the queries it hits (M13): `invalidateQueries`, `refetchQueries`,
+ * `resetQueries`, `removeQueries`, `setQueryData`, or a server-side prefetch that a
+ * `HydrationBoundary` hands to the client queries with the same key (`hydrate`).
+ */
+export const QueryLinkSchema = z.object({
+  id: z.string(),
+  kind: z.enum(QUERY_LINK_KINDS),
+  /** The method as called, e.g. `invalidateQueries`, or `prefetchQuery` for `hydrate`. */
+  method: z.string(),
+  origin: z.enum(['component', 'server-action']),
+  componentId: z.string().optional(),
+  /** The key or key prefix it targets. Absent: every query. */
+  key: z.array(QueryKeyPartSchema).optional(),
+  /** Only queries with exactly this key (`exact: true`, `setQueryData`). */
+  exact: z.boolean().optional(),
+  /** Requests it runs after: the mutation whose callback calls it, or the server prefetch (`hydrate`). */
+  fromSiteIds: z.array(z.string()),
+  /** Query request sites whose key it hits. */
+  targetSiteIds: z.array(z.string()),
+  trigger: TriggerSchema,
+  /** Runs only after the mutation succeeded (`onSuccess`) or failed (`onError`). */
+  outcome: z.enum(['success', 'error']).optional(),
+  loc: SourceLocSchema,
+  callStack: z.array(CallFrameSchema),
+})
+export type QueryLink = z.infer<typeof QueryLinkSchema>
 
 // ---------------------------------------------------------------------------------------------
 // Navigation and flows (M7, docs/PLAN.md 6.6): where the app moves between pages, and the user
@@ -501,6 +565,11 @@ export const FlowStepSchema = z.discriminatedUnion('kind', [
     navigationId: z.string(),
     routeId: z.string().optional(),
   }),
+  /** A React Query cache update after the previous request, e.g. invalidating the list it changed (M13). */
+  z.object({
+    kind: z.literal('query-update'),
+    linkId: z.string(),
+  }),
 ])
 export type FlowStep = z.infer<typeof FlowStepSchema>
 
@@ -538,7 +607,8 @@ export const ProjectInfoSchema = z.object({
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 
 export const AppModelSchema = z.object({
-  version: z.literal(MODEL_VERSION),
+  /** Version 1 files (before M13) have no query keys or links and read as the current version. */
+  version: z.union([z.literal(1), z.literal(MODEL_VERSION)]).transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
   routes: z.array(RouteSchema),
@@ -551,5 +621,7 @@ export const AppModelSchema = z.object({
   navigations: z.array(NavigationSchema).default([]),
   /** User flows inferred from the code (M7). Recording confirms them at runtime. */
   flows: z.array(FlowSchema).default([]),
+  /** React Query cache calls and the queries they hit (M13). */
+  queryLinks: z.array(QueryLinkSchema).default([]),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

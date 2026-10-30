@@ -72,6 +72,7 @@ const model = (requests: RequestSite[]): AppModel => ({
   requests,
   navigations: [],
   flows: [],
+  queryLinks: [],
 })
 
 const SITES = [

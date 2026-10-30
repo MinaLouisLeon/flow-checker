@@ -95,6 +95,16 @@ export const CaptureSchema = z.object({
   /** Server action called by this request (from the `Next-Action` header). */
   serverAction: z.object({ id: z.string() }).optional(),
   interaction: InteractionSchema.optional(),
+  /**
+   * React Query run the request was sent from (M13): the query or mutation whose function was
+   * running, and its key as JSON (redacted like bodies). Browser only.
+   */
+  query: z
+    .object({
+      kind: z.enum(['query', 'mutation']),
+      key: z.array(z.unknown()).optional(),
+    })
+    .optional(),
   parent: CaptureParentSchema.optional(),
   /** Stack frames where the request was sent, innermost first. */
   stack: z.array(z.string()),

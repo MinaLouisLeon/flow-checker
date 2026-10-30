@@ -13,6 +13,7 @@ import {
   type FlowStep,
   makeId,
   type Navigation,
+  type QueryLink,
   type RequestSite,
   type Route,
   type SourceLoc,
@@ -24,6 +25,8 @@ export interface FlowInput {
   components: Component[]
   requests: RequestSite[]
   navigations: Navigation[]
+  /** React Query cache links (M13). Updates after a request show as steps. */
+  queryLinks?: QueryLink[]
 }
 
 /** Pages a flow passes through before it stops, so cycles end. */
@@ -40,6 +43,8 @@ interface Handler {
   next: Navigation[]
   /** Navigations only taken when a request failed. */
   onError: Navigation[]
+  /** Cache updates the handler makes itself, not in a mutation callback. */
+  links: QueryLink[]
 }
 
 const LOAD_TRIGGERS = new Set(['server-render', 'page-load', 'effect'])
@@ -63,7 +68,7 @@ export function inferFlows(input: FlowInput): Flow[] {
     const key = `${componentId}|${loc.file}:${loc.line}:${loc.column}`
     let found = handlers.get(key)
     if (!found) {
-      found = { key, componentId, event, loc, requests: [], next: [], onError: [] }
+      found = { key, componentId, event, loc, requests: [], next: [], onError: [], links: [] }
       handlers.set(key, found)
     }
     return found
@@ -82,6 +87,16 @@ export function inferFlows(input: FlowInput): Flow[] {
     if (nav.origin !== 'component' || !nav.componentId || t.kind !== 'event' || !t.loc) continue
     // A link is a handler of its own (a click on it), with no requests: never a flow start.
     addNav(handler(nav.componentId, t.event ?? 'event', t.loc), nav)
+  }
+  // Cache updates: after the mutation they follow, or as part of the handler that calls them.
+  const linksAfter = new Map<string, QueryLink[]>()
+  for (const link of input.queryLinks ?? []) {
+    if (link.kind === 'hydrate' || link.outcome === 'error') continue
+    for (const id of link.fromSiteIds) push(linksAfter, id, link)
+    const t = link.trigger
+    if (link.fromSiteIds.length === 0 && link.componentId && t.kind === 'event' && t.loc) {
+      handlers.get(`${link.componentId}|${t.loc.file}:${t.loc.line}:${t.loc.column}`)?.links.push(link)
+    }
   }
   for (const h of handlers.values()) h.requests.sort(bySite)
 
@@ -127,8 +142,14 @@ export function inferFlows(input: FlowInput): Flow[] {
         event: current.event,
         loc: current.loc,
       })
-      for (const site of current.requests) steps.push({ kind: 'request', siteId: site.id })
+      const updates = new Set<string>()
+      for (const site of current.requests) {
+        steps.push({ kind: 'request', siteId: site.id })
+        for (const link of linksAfter.get(site.id) ?? []) updates.add(link.id)
+      }
       const lastRequest = steps.length - 1
+      for (const link of current.links) updates.add(link.id)
+      for (const linkId of updates) steps.push({ kind: 'query-update', linkId })
       if (current.onError.length > 0 && current.requests.length > 0) {
         branches.push({
           after: lastRequest,

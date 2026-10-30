@@ -17,5 +17,9 @@
   },
   "dependencies": {
     "@flow-checker/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@tanstack/query-core": "^5.105.0",
+    "query-core-v4": "npm:@tanstack/query-core@^4.36.1"
   }
 }

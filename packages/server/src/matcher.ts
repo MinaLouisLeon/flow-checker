@@ -6,10 +6,13 @@ import {
   type Capture,
   type CaptureMatch,
   type Component,
+  formatQueryKey,
   generalizePath,
+  isOpenKey,
   type MatchCandidate,
   type MatchEvidence,
   matchRequestUrl,
+  queryKeyMatchesValue,
   type RequestSite,
   routePathRegex,
 } from '@flow-checker/shared'
@@ -241,10 +244,31 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
   const trigger = site.trigger
   if (trigger.kind === 'event') {
     const types = trigger.event ? EVENT_TYPES[trigger.event] : undefined
-    if (!interaction) add('trigger', -10, `no interaction for ${trigger.event ?? 'event'}`)
+    // The runtime records clicks, submits, changes and Enter: hover or focus leaves no interaction.
+    const untracked =
+      !!trigger.event && !types && /^on(Mouse|Pointer|Focus|Blur|Scroll|Touch)/.test(trigger.event)
+    if (untracked) {
+      if (!interaction) add('trigger', 5, `${trigger.event} is not recorded`)
+    } else if (!interaction) add('trigger', -10, `no interaction for ${trigger.event ?? 'event'}`)
     else if (!types || types.includes(interaction.type)) add('trigger', 10, `${interaction.type} event`)
   } else if ((trigger.kind === 'page-load' || trigger.kind === 'effect') && !interaction) {
     add('trigger', 5, trigger.kind)
+  }
+
+  // React Query (M13): the key the browser request was sent for.
+  const query = capture.origin === 'browser' ? capture.query : undefined
+  if (query) {
+    const siteKind = site.hook?.name === 'useMutation' ? 'mutation' : site.queryKey ? 'query' : undefined
+    if (!site.hook) {
+      add('query-key', -10, `sent by a React Query ${query.kind}, not from a query hook here`)
+    } else if (siteKind && siteKind !== query.kind) {
+      add('query-key', -15, `sent by a ${query.kind}, the site is a ${siteKind}`)
+    } else if (site.queryKey && query.key) {
+      const text = formatQueryKey(site.queryKey)
+      if (!queryKeyMatchesValue(site.queryKey, query.key)) add('query-key', -30, `key is not ${text}`)
+      // A key with no fixed part fits any query, so it tells little.
+      else add('query-key', isOpenKey(site.queryKey) ? 10 : 45, text)
+    }
   }
 
   return evidence

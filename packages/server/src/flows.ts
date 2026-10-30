@@ -471,6 +471,9 @@ function segmentsOf(flow: Flow, model: AppModel): Segment[] {
       const site = sites.get(step.siteId)
       const checkable = Boolean(site) && site?.trigger.kind !== 'server-render'
       segment.expects.push({ stepIndex, kind: 'request', siteId: step.siteId, checkable })
+    } else if (step.kind === 'query-update') {
+      // A cache update leaves no trace of its own; the refetches it causes show up as captures.
+      segment.expects.push({ stepIndex, kind: 'request', siteId: '', checkable: false })
     } else {
       segment.expects.push({
         stepIndex,

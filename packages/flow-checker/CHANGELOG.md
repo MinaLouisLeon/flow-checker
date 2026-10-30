@@ -5,6 +5,10 @@
 - **Progress output for every command.** `dev`, `scan`, `export`, `init` and `doctor` no longer look stuck on large projects: in a terminal a live line shows a spinner, a progress bar for the whole command, the current step with its count and time, and each scan phase leaves a `✓` line (files loaded, routes, components, requests, flows). `dev` also shows starting the dashboard and waiting for your app's port until it is ready, and re-scans show a short progress line. `doctor` prints each check as it runs. Plain lines in CI and piped output.
 - **`--verbose`** prints the resolved config and where the scan runs; **`-q, --quiet`** turns progress output off.
 - `scan` and `export` scan in a worker thread, like `dev`.
+- **React Query, in depth (v4 and v5).** Query keys are read into segments (`['todos', 'detail', :id]`) through key factories, `queryOptions()` and functions that return options. New: `useQueries` / `useSuspenseQueries` (one request per entry), `usePrefetchQuery`, `queryClient.fetchQuery` / `prefetchQuery` / `ensureQueryData` / infinite variants, and v4's positional `useQuery(key, fn)` / `useMutation(fn, options)`.
+- **Query cache links.** `invalidateQueries`, `refetchQueries`, `resetQueries`, `removeQueries` and `setQueryData` are linked to the queries their key hits (by prefix or `exact`), and to the mutation whose callback calls them. A server-side `prefetchQuery` handed over with `HydrationBoundary` (or v4 `Hydrate`) is linked to the client query it fills. Shown on request and page views, in flows (as steps after the mutation), in `scan --requests` and in the Markdown export.
+- **Captures know their query.** In the browser, each request sent by a React Query query or mutation carries its key (redacted like bodies), and the matcher uses it (`query key` evidence).
+- `.flow-checker/model.json` is now version 2. Version 1 files still load.
 
 ## 0.1.0
 

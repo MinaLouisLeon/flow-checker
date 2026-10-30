@@ -1,0 +1,25 @@
+# Types
+
+Todo  interface  src/types/todo.ts:1
+  { id: number; userId: number; title: string; done: boolean }
+NewTodo  type-alias  src/types/todo.ts:8
+  { title: string }
+TodoPatch  type-alias  src/types/todo.ts:10
+  { title?: string; done?: boolean }
+User  interface  src/types/user.ts:1
+  { id: number; name: string; email: string; role: "admin" | "member" }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:6
+  props: { children: ReactNode }
+TodoPage  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+HydrateClient  src/components/HydrateClient.tsx:6
+  props: HydrateProps
+TodoDetail  src/components/TodoDetail.tsx:8
+  props: { id: number }
+TodoList  src/components/TodoList.tsx:9
+  uses: Todo

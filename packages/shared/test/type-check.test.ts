@@ -230,6 +230,7 @@ describe('applyVerification', () => {
     requests,
     navigations: [],
     flows: [],
+    queryLinks: [],
   })
 
   it('marks mismatched sites with a type-mismatch flag, and clears it again', () => {
