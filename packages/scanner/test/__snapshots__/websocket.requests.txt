@@ -1,0 +1,23 @@
+# Requests
+
+## Chat  components/Chat.tsx:9
+GET http://localhost:4011/socket.io/  websocket  effect
+  socket: socket.io
+  receives joined: Joined
+  receives chat: ChatMessage
+  sends chat: Draft
+  via: io components/Chat.tsx:16
+
+## Ping  components/Ping.tsx:7
+GET ws://localhost:4011/echo  websocket  event onClick
+  socket: websocket
+  sends message: "ping"
+  receives message
+  via: new WebSocket components/Ping.tsx:11
+
+## Ticker  components/Ticker.tsx:10
+GET ws://localhost:4011/live  websocket  effect
+  socket: websocket (protocols ticker.v1)
+  sends message: Subscribe
+  receives message: Quote
+  via: new WebSocket components/Ticker.tsx:15

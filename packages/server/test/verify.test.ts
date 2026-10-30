@@ -458,3 +458,94 @@ describe('event streams (M18)', () => {
     })
   })
 })
+
+describe('WebSockets (M19)', () => {
+  const chat = {
+    text: 'Chat',
+    shape: {
+      kind: 'object' as const,
+      properties: [{ name: 'text', type: { kind: 'primitive' as const, name: 'string' as const } }],
+    },
+  }
+  const socketIoSite = (id: string, file: string, names: string[]) =>
+    site(id, 'cmp_table', file, {
+      transport: 'websocket',
+      url: {
+        text: "'http://localhost:4011'",
+        confidence: 'exact',
+        base: 'http://localhost:4011',
+        path: '/socket.io/',
+      },
+      socket: {
+        api: 'socket.io',
+        messages: names.map((n) => ({
+          direction: n.startsWith('>') ? ('out' as const) : ('in' as const),
+          name: n.replace('>', ''),
+          dataType: chat,
+        })),
+      },
+    })
+  const message = (direction: 'in' | 'out', event: string, text: unknown) => ({
+    direction,
+    event,
+    at: '2026-10-30T10:00:00.000Z',
+    size: 20,
+    body: { kind: 'json' as const, value: { text } },
+  })
+  const socket = (over: Partial<Capture> = {}) =>
+    capture('cap_ws', {
+      transport: 'websocket',
+      request: {
+        method: 'GET',
+        url: 'ws://localhost:4011/socket.io/?EIO=4&transport=websocket',
+        headers: {},
+        body: { kind: 'none' },
+      },
+      response: { status: 101, headers: {}, body: { kind: 'none' } },
+      ...over,
+    })
+
+  it('matches socket.io captures by their event names over ws, merges updates and checks both ways', async () => {
+    const { json, ingest } = setup([
+      socketIoSite('req_chat', 'src/UsersTable.tsx', ['chat', '>chat']),
+      socketIoSite('req_feed', 'src/UsersTable.tsx', ['joined']),
+    ])
+    await ingest(socket({ stream: { state: 'open', count: 0, bytes: 0, socketIo: true }, messages: [] }))
+    await ingest(
+      socket({
+        stream: { state: 'closed', count: 2, bytes: 40, socketIo: true, closeCode: 1000, from: 0 },
+        messages: [message('out', 'chat', 5), message('in', 'chat', 'hi')],
+      }),
+    )
+    const { capture: stored } = await json<{ capture: Capture }>('/api/captures/cap_ws')
+    expect(stored.messages).toHaveLength(2)
+    expect(stored.match).toMatchObject({ status: 'matched', siteId: 'req_chat' })
+    expect(stored.match?.candidates[0]?.evidence).toContainEqual({
+      signal: 'socket',
+      points: 10,
+      detail: 'sends chat, receives chat',
+    })
+    expect(stored.typeCheck?.parts.map((p) => [p.direction ?? 'in', p.event, p.status])).toEqual([
+      ['in', 'chat', 'ok'],
+      ['out', 'chat', 'mismatch'],
+    ])
+  })
+
+  it('keeps WebSocket captures and sites apart from other requests and APIs', async () => {
+    const { json, ingest } = setup([
+      site('req_native', 'cmp_table', 'src/UsersTable.tsx', {
+        transport: 'websocket',
+        url: { text: "'/socket.io/'", confidence: 'exact', path: '/socket.io/' },
+        socket: { api: 'websocket', messages: [] },
+      }),
+      site('req_http', 'cmp_sidebar', 'src/UsersSidebar.tsx', {
+        url: { text: "'/socket.io/'", confidence: 'exact', path: '/socket.io/' },
+      }),
+    ])
+    await ingest(socket({ stream: { state: 'closed', count: 0, bytes: 0, socketIo: true } }))
+    const { capture: stored } = await json<{ capture: Capture }>('/api/captures/cap_ws')
+    // A socket.io capture fits neither the native WebSocket site nor the HTTP one.
+    expect(stored.match?.status).toBe('unmatched')
+    expect(stored.match?.candidates).toEqual([])
+  })
+})

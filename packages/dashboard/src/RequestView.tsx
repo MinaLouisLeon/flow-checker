@@ -15,6 +15,7 @@ import { GraphqlFact } from './GraphqlView'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
+import { SocketMessages } from './SocketView'
 import { StreamEvents } from './SseView'
 import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
@@ -245,6 +246,8 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         />
         {site.stream ? (
           <StreamEvents site={site} />
+        ) : site.socket ? (
+          <SocketMessages site={site} />
         ) : (
           <TypeBlock
             title="Response"

@@ -40,6 +40,7 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   'trpc-procedure': 'tRPC procedure',
   'graphql-operation': 'GraphQL operation',
   stream: 'event stream',
+  socket: 'WebSocket',
   manual: 'manual',
 }
 

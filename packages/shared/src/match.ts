@@ -34,6 +34,8 @@ export const MATCH_SIGNALS = [
   'graphql-operation',
   /** An event stream capture on an event stream site, and the event names it received (M18). */
   'stream',
+  /** A WebSocket capture on a WebSocket site, and the message names it sent and received (M19). */
+  'socket',
   /** You assigned captures like this one to the site. */
   'manual',
 ] as const
@@ -173,7 +175,7 @@ export function matchRequestUrl(site: RequestUrl, captured: URL): UrlMatch | und
   let path = site.path
   // A base with a path (`http://api/v1`) puts that path in front.
   if (base && base.pathname !== '/') path = `${base.pathname.replace(/\/$/, '')}${path}`
-  const sameBase = base ? base.origin === captured.origin : false
+  const sameBase = base ? httpOrigin(base) === httpOrigin(captured) : false
   if (base && !site.baseEnv && !sameBase) return undefined
   if (!pathPatternRegex(path).test(decodeSafe(captured.pathname))) return undefined
   let queryKeys = 0
@@ -185,6 +187,15 @@ export function matchRequestUrl(site: RequestUrl, captured: URL): UrlMatch | und
   }
   const kind = /:[A-Za-z_$]/.test(path) || site.confidence === 'pattern' ? 'pattern' : 'exact'
   return { kind, sameBase, queryKeys }
+}
+
+/**
+ * The origin with `ws:` / `wss:` read as `http:` / `https:` (M19): socket.io is set up with an
+ * http URL but connects over ws. `URL.origin` is `null` for ws URLs in some runtimes.
+ */
+function httpOrigin(url: URL): string {
+  const protocol = url.protocol === 'ws:' ? 'http:' : url.protocol === 'wss:' ? 'https:' : url.protocol
+  return `${protocol}//${url.host}`
 }
 
 function decodeSafe(path: string): string {

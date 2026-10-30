@@ -81,10 +81,10 @@ export function CaptureTypeCheck({ check }: { check: TypeCheck }) {
   return (
     <div className="type-check">
       {check.parts.map((part) => (
-        <div key={`${part.part}:${part.event ?? ''}`} className="type-check-part">
+        <div key={`${part.part}:${part.direction ?? ''}:${part.event ?? ''}`} className="type-check-part">
           <h4>
-            {PART_LABEL[part.part]} {part.event && <code>{part.event}</code>}{' '}
-            <code className="muted">{part.type}</code>{' '}
+            {part.direction === 'out' ? 'Sent' : PART_LABEL[part.part]}{' '}
+            {part.event && <code>{part.event}</code>} <code className="muted">{part.type}</code>{' '}
             {part.messages !== undefined && (
               <span className="muted">
                 {part.messages} message{part.messages === 1 ? '' : 's'}{' '}
@@ -113,20 +113,30 @@ export function SiteTypeCheckView({ mismatches, checked }: { mismatches: SiteMis
   return (
     <div className="type-check">
       {[
-        ...(['response', 'request'] as const).map((part) => ({ part, event: undefined })),
-        // Event stream messages, one group per event name (M18).
-        ...[...new Set(mismatches.filter((m) => m.part === 'message').map((m) => m.event ?? 'message'))].map(
-          (event) => ({ part: 'message' as const, event }),
-        ),
-      ].map(({ part, event }) => {
+        ...(['response', 'request'] as const).map((part) => ({ part, event: undefined, out: false })),
+        // Event stream and WebSocket messages, one group per direction and name (M18, M19).
+        ...[
+          ...new Set(
+            mismatches
+              .filter((m) => m.part === 'message')
+              .map((m) => `${m.direction ?? 'in'}:${m.event ?? 'message'}`),
+          ),
+        ].map((key) => ({
+          part: 'message' as const,
+          event: key.slice(key.indexOf(':') + 1),
+          out: key.startsWith('out:'),
+        })),
+      ].map(({ part, event, out }) => {
         const list = mismatches.filter(
-          (m) => m.part === part && (event === undefined || (m.event ?? 'message') === event),
+          (m) =>
+            m.part === part &&
+            (event === undefined || ((m.event ?? 'message') === event && (m.direction === 'out') === out)),
         )
         if (list.length === 0) return null
         return (
-          <div key={`${part}:${event ?? ''}`} className="type-check-part">
+          <div key={`${part}:${out ? 'out' : ''}:${event ?? ''}`} className="type-check-part">
             <h4>
-              {PART_LABEL[part]} {event && <code>{event}</code>}
+              {out ? 'Sent' : PART_LABEL[part]} {event && <code>{event}</code>}
             </h4>
             <MismatchTable mismatches={list} checked={checked} />
           </div>

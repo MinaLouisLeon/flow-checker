@@ -57,6 +57,8 @@ export const DEFAULT_IGNORE = [
   '*://registry.npmjs.org/*',
   // Next 13.4–13.5 dev server talking to its own render workers over local HTTP.
   '*/?key=*&method=*',
+  // socket.io's HTTP long-polling, before it moves to a WebSocket (M19).
+  '*/socket.io/?*transport=polling*',
 ]
 
 export const DEFAULT_MAX_BODY_BYTES = 256_000

@@ -4,6 +4,7 @@ import type { Capture, CapturedMessage, RequestSite } from '@flow-checker/shared
 import type { ModelIndex } from './model-index'
 import { siteHref, siteLabel } from './RequestView'
 import { href } from './router'
+import { DirectionBadge } from './SocketView'
 import { TypeShapeView } from './TypeShapeView'
 import { Badge, Empty, Section, SourceLink } from './ui'
 
@@ -104,19 +105,30 @@ export function StreamsSection({ index }: { index: ModelIndex }) {
 
 const STATE_TONE = { open: 'neutral', closed: 'muted', error: 'warn' } as const
 
-/** Capture view: the connection state and every message kept, in order. */
+/**
+ * Capture view: the connection state and every message kept, in order. WebSocket messages (M19)
+ * go both ways: each shows its direction, and the aside the close code.
+ */
 export function MessageTimeline({ capture }: { capture: Capture }) {
   const stream = capture.stream
   if (!stream) return null
   const messages = capture.messages ?? []
   const start = Date.parse(capture.timestamp)
+  const socket = capture.transport === 'websocket'
+  const sent = messages.filter((m) => m.direction === 'out').length
   return (
     <Section
       title="Messages"
       aside={
         <span className="muted">
-          <Badge tone={STATE_TONE[stream.state]}>{stream.state}</Badge> {stream.count} received ·{' '}
-          {stream.bytes} bytes
+          <Badge tone={STATE_TONE[stream.state]}>{stream.state}</Badge>{' '}
+          {socket ? `${stream.count} messages (${sent} sent)` : `${stream.count} received`} · {stream.bytes}{' '}
+          bytes
+          {stream.socketIo ? ' · socket.io' : ''}
+          {stream.protocol ? ` · protocol ${stream.protocol}` : ''}
+          {stream.closeCode !== undefined
+            ? ` · close ${stream.closeCode}${stream.closeReason ? ` (${stream.closeReason})` : ''}`
+            : ''}
           {stream.reconnects ? ` · ${stream.reconnects} reconnect${stream.reconnects === 1 ? '' : 's'}` : ''}
         </span>
       }
@@ -128,13 +140,14 @@ export function MessageTimeline({ capture }: { capture: Capture }) {
         </p>
       )}
       {messages.length === 0 ? (
-        <Empty>No messages arrived.</Empty>
+        <Empty>{socket ? 'No messages were sent or received.' : 'No messages arrived.'}</Empty>
       ) : (
         <ol className="message-timeline">
           {messages.map((m, i) => (
             // Messages have no id of their own, and the list only grows: the position is stable.
             <li key={`${i}:${m.at}`}>
               <span className="muted message-time">+{Math.max(0, Date.parse(m.at) - start)} ms</span>
+              {socket && <DirectionBadge direction={m.direction} />}
               <code className="message-event">{m.event ?? 'message'}</code>
               {m.id && <span className="muted">id {m.id}</span>}
               <span className="muted">{m.size} B</span>
@@ -152,5 +165,6 @@ function MessageData({ message }: { message: CapturedMessage }) {
   if (!body) return <span className="muted">data not kept</span>
   if (body.kind === 'json') return <code className="message-data">{JSON.stringify(body.value)}</code>
   if (body.kind === 'text') return <code className="message-data">{body.value}</code>
+  if (body.kind === 'binary') return <span className="muted">binary data</span>
   return <span className="muted">no data</span>
 }

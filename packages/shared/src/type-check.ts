@@ -48,6 +48,8 @@ export const TypeCheckPartSchema = z.object({
   part: z.enum(['request', 'response', 'message']),
   /** Part `message`: the event name (`message` for unnamed events). */
   event: z.string().optional(),
+  /** Part `message`: `out` for messages the app sent on a WebSocket (M19). Absent: received. */
+  direction: z.literal('out').optional(),
   /** Part `message`: how many messages were compared. */
   messages: z.number().int().nonnegative().optional(),
   /** The declared type as written, e.g. `User[]`. */
@@ -99,38 +101,46 @@ export function typeTable(types: readonly NamedType[]): TypeTable {
  */
 export function checkCapture(
   capture: CheckableCapture,
-  site: Pick<RequestSite, 'id' | 'transport' | 'bodyType' | 'responseType' | 'hook' | 'stream'>,
+  site: Pick<RequestSite, 'id' | 'transport' | 'bodyType' | 'responseType' | 'hook' | 'stream' | 'socket'>,
   types: TypeTable,
 ): TypeCheck | undefined {
   const parts: TypeCheckPart[] = []
   if (site.bodyType) parts.push(checkRequest(capture, site, site.bodyType, types))
   // An event stream's content is its messages, checked per event name (M18).
-  if (site.stream) parts.push(...checkMessages(capture, site.stream.events, types))
-  else if (site.responseType) parts.push(checkResponse(capture, site, site.responseType, types))
+  if (site.stream) {
+    const events = site.stream.events.map((e) => ({ ...e, direction: 'in' as const }))
+    parts.push(...checkMessages(capture, events, types))
+  } else if (site.socket) {
+    // WebSocket messages (M19), both ways, per name.
+    parts.push(...checkMessages(capture, site.socket.messages, types))
+  } else if (site.responseType) parts.push(checkResponse(capture, site, site.responseType, types))
   return parts.length > 0 ? { siteId: site.id, parts } : undefined
 }
 
 /**
- * One part per event name that has a type and arrived at least once. Every kept message with
- * that name is compared; mismatches share a path per event: `messages[tick].body.count`.
+ * One part per direction and event name that has a type and was seen at least once. Every kept
+ * message with that name is compared; mismatches share a path per event: `messages[tick].body.count`
+ * for received messages, `sent[chat].body.text` for sent ones (M19).
  */
 function checkMessages(
   capture: CheckableCapture,
-  events: readonly { name: string; dataType?: TypeRef }[],
+  events: readonly { name: string; direction: 'in' | 'out'; dataType?: TypeRef }[],
   types: TypeTable,
 ): TypeCheckPart[] {
   const parts: TypeCheckPart[] = []
   const seen = new Set<string>()
   for (const event of events) {
     const type = event.dataType
-    if (!type || seen.has(event.name)) continue
-    seen.add(event.name)
+    const key = `${event.direction}:${event.name}`
+    if (!type || seen.has(key)) continue
+    seen.add(key)
+    const prefix = event.direction === 'out' ? 'sent' : 'messages'
     let compared = 0
     let withoutData = 0
     let truncated = false
     const merged = new Map<string, TypeMismatch>()
     ;(capture.messages ?? []).forEach((message, index) => {
-      if (message.direction !== 'in' || (message.event ?? 'message') !== event.name) return
+      if (message.direction !== event.direction || (message.event ?? 'message') !== event.name) return
       const body = message.body
       if (!body || (body.kind === 'text' && body.truncated)) {
         withoutData++
@@ -147,7 +157,7 @@ function checkMessages(
       const result = checkValue(value, type.shape, { types, root: at, redactedPaths: capture.redactedPaths })
       if (result.truncated) truncated = true
       for (const m of result.mismatches) {
-        const path = `messages[${event.name}].body${m.path.slice('messages[].body'.length)}`
+        const path = `${prefix}[${event.name}].body${m.path.slice('messages[].body'.length)}`
         const key = `${m.kind}\u0000${path}`
         const existing = merged.get(key)
         if (existing) existing.count = (existing.count ?? 1) + (m.count ?? 1)
@@ -159,6 +169,7 @@ function checkMessages(
     parts.push({
       part: 'message',
       event: event.name,
+      ...(event.direction === 'out' ? { direction: 'out' as const } : {}),
       type: type.text,
       status: mismatches.length > 0 ? 'mismatch' : compared > 0 ? 'ok' : 'skipped',
       ...(compared === 0

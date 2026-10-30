@@ -353,3 +353,15 @@ browser GET localhost:3077/api/jobs/7/progress
   → matched JobProgress · GET /api/jobs/:id/progress
 browser POST localhost:3077/api/chat
   → matched Chat · POST /api/chat
+
+## websocket
+browser GET localhost:4011/live
+  → matched Ticker · GET ws://localhost:4011/live
+browser GET localhost:4011/live
+  → matched Ticker · GET ws://localhost:4011/live
+browser GET localhost:4011/echo
+  → matched Ping · GET ws://localhost:4011/echo
+browser GET localhost:4011/socket.io/
+  → matched Chat · GET http://localhost:4011/socket.io/
+browser GET localhost:4011/socket.io/
+  → matched Chat · GET http://localhost:4011/socket.io/

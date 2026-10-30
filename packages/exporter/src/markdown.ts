@@ -240,6 +240,20 @@ function readme(ctx: Ctx): string {
       ),
     )
   }
+  const sockets = model.requests.filter((s) => s.socket)
+  if (sockets.length > 0) {
+    sections.push(
+      '## WebSockets',
+      table(
+        ['Socket', 'API', 'Messages'],
+        sockets.map((s) => [
+          siteLink(ctx, s, from),
+          s.socket?.api === 'socket.io' ? 'socket.io' : 'WebSocket',
+          socketMessageNames(s),
+        ]),
+      ),
+    )
+  }
   if (model.flows.length > 0) {
     sections.push(
       '## Flows',
@@ -1044,6 +1058,18 @@ function requestSection(
           : undefined,
       ],
       [
+        'Socket',
+        site.socket
+          ? [
+              site.socket.api === 'socket.io' ? 'socket.io' : 'WebSocket',
+              site.socket.namespace ? `namespace ${code(site.socket.namespace)}` : '',
+              site.socket.protocols ? `protocols ${site.socket.protocols.map(code).join(', ')}` : '',
+            ]
+              .filter(Boolean)
+              .join(' · ')
+          : undefined,
+      ],
+      [
         'Call path',
         site.callStack.length > 1 ? site.callStack.map((f) => code(f.callee)).join(' → ') : undefined,
       ],
@@ -1053,7 +1079,8 @@ function requestSection(
     site.responseType &&
       `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,
     ...(site.stream ? siteEvents(ctx, site.stream, from) : []),
-    check && check.mismatches.length > 0 && typeCheckTable(check),
+    ...(site.socket ? siteSocketMessages(ctx, site.socket, from) : []),
+    check && check.mismatches.length > 0 && typeCheckTable(check, !!site.socket),
     examples(ctx, site),
     next.length > 0 && `**Leads to** ${next.map((s) => code(requestLabel(s))).join(', ')}:`,
     ...next.filter((s) => !inner.has(s.id)).map((s) => requestSection(ctx, s, from, level + 1, inner)),
@@ -1071,12 +1098,12 @@ function typeSource(ref: TypeRef): string {
   return ref.source === 'postman' ? ' (from Postman examples)' : ''
 }
 
-function typeCheckTable(check: SiteTypeCheck): string {
+function typeCheckTable(check: SiteTypeCheck, socket = false): string {
   return `**Type check**: ${check.mismatched} of ${plural(check.checked, 'checked capture')} didn't match.\n\n${table(
     ['Part', 'Field', 'Problem', 'Expected', 'Captured', 'Captures'],
     check.mismatches.map((m) => [
       m.part === 'message'
-        ? `event ${code(m.event ?? 'message')}`
+        ? `${m.direction === 'out' ? 'sent' : socket ? 'received' : 'event'} ${code(m.event ?? 'message')}`
         : m.part === 'response'
           ? 'response'
           : 'request body',
@@ -1142,6 +1169,23 @@ function siteEvents(ctx: Ctx, stream: NonNullable<RequestSite['stream']>, from: 
   })
 }
 
+// --- WebSockets (M19) ------------------------------------------------------------------------
+
+function socketMessageNames(site: RequestSite): string {
+  const messages = site.socket?.messages ?? []
+  if (messages.length === 0) return 'not found'
+  return messages.map((m) => `${m.direction === 'out' ? '↑' : '↓'} ${code(m.name)}`).join(', ')
+}
+
+/** The messages a socket sends and receives, each with its data type. */
+function siteSocketMessages(ctx: Ctx, socket: NonNullable<RequestSite['socket']>, from: string): string[] {
+  if (socket.messages.length === 0) return ['**Messages**: none found in the code.']
+  return socket.messages.map((m) => {
+    const head = `**${m.direction === 'out' ? 'Sends' : 'Receives'} ${code(m.name)}**`
+    return m.dataType ? `${head} ${typeBlock(ctx, m.dataType, from)}` : `${head}: no data type.`
+  })
+}
+
 /** A route handler that answers with an event stream: the events it sends. */
 function handlerStreams(ctx: Ctx, route: Route, from: string): (string | false)[] {
   const streams = (ctx.model.streams ?? []).filter((s) => s.routeId === route.id)
@@ -1164,10 +1208,14 @@ function handlerStreams(ctx: Ctx, route: Route, from: string): (string | false)[
   ])
 }
 
-/** The connection state and the first messages of a captured stream. */
+/**
+ * The connection state and the first messages of a captured stream. WebSocket messages (M19)
+ * are marked `↑` (sent) or `↓` (received).
+ */
 function messagesText(c: ExportCapture): string {
   const stream = c.stream
   if (!stream) return ''
+  const socket = c.transport === 'websocket'
   const messages = c.messages ?? []
   const shown = messages.slice(0, MAX_MESSAGES).map((m) => {
     const data =
@@ -1175,13 +1223,17 @@ function messagesText(c: ExportCapture): string {
         ? JSON.stringify(m.body.value)
         : m.body?.kind === 'text'
           ? m.body.value
-          : m.body
-            ? ''
-            : '(data not kept)'
-    return `${m.event ?? 'message'}: ${data}`
+          : m.body?.kind === 'binary'
+            ? `(binary, ${m.size} bytes)`
+            : m.body
+              ? ''
+              : '(data not kept)'
+    const arrow = socket ? (m.direction === 'out' ? '↑ ' : '↓ ') : ''
+    return `${arrow}${m.event ?? 'message'}: ${data}`
   })
   const more = stream.count > shown.length ? `\n… ${stream.count - shown.length} more` : ''
-  const head = `Messages: ${stream.count} received, ${stream.state}${stream.truncated ? ' (some not kept)' : ''}`
+  const close = stream.closeCode !== undefined ? `, close code ${stream.closeCode}` : ''
+  const head = `Messages: ${stream.count} ${socket ? 'sent and received' : 'received'}, ${stream.state}${close}${stream.truncated ? ' (some not kept)' : ''}`
   return shown.length > 0 ? `${head}\n\n${block('text', cut(shown.join('\n')) + more)}` : `${head}.`
 }
 

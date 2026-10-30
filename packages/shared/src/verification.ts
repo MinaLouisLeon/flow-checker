@@ -9,6 +9,8 @@ export interface SiteMismatch extends TypeMismatch {
   part: TypeCheckPart['part']
   /** Part `message`: the event name (M18). */
   event?: string
+  /** Part `message`: `out` for messages sent on a WebSocket (M19). */
+  direction?: 'out'
   /** Captures that had it. */
   captures: number
   /** The newest of them. */
@@ -51,6 +53,7 @@ export function summarizeTypeChecks(
             ...rest,
             part: part.part,
             ...(part.event ? { event: part.event } : {}),
+            ...(part.direction ? { direction: part.direction } : {}),
             captures: 1,
             captureId,
           })
@@ -64,8 +67,8 @@ export function summarizeTypeChecks(
 
 /** Path inside the body, e.g. `user.email`, `[].id`, or `the body` for the root. */
 export function mismatchField(path: string): string {
-  // Event stream messages (M18): `messages[tick].body.count`.
-  const message = /^messages\[[^\]]*\]\.body\.?/.exec(path)
+  // Event stream and WebSocket messages (M18, M19): `messages[tick].body.count`, `sent[chat].body`.
+  const message = /^(messages|sent)\[[^\]]*\]\.body\.?/.exec(path)
   if (message) return path.slice(message[0].length) || 'the data'
   const inner = path.replace(/^(request|response)\.body\.?/, '')
   return inner === '' ? 'the body' : inner
@@ -98,18 +101,23 @@ function typeMismatchFlag(site: RequestSite, check: SiteTypeCheck): Flag {
       `${part === 'response' ? 'Response' : 'Request body'} doesn't match ${type ?? 'its type'}: ${shown}${more}`,
     )
   }
-  // Event stream messages (M18), per event name.
+  // Event stream (M18) and WebSocket (M19) messages, per direction and name.
   const events = new Map<string, SiteMismatch[]>()
   for (const m of check.mismatches) {
     if (m.part !== 'message') continue
-    const name = m.event ?? 'message'
-    events.set(name, [...(events.get(name) ?? []), m])
+    const key = `${m.direction ?? 'in'}:${m.event ?? 'message'}`
+    events.set(key, [...(events.get(key) ?? []), m])
   }
-  for (const [name, list] of events) {
-    const type = site.stream?.events.find((e) => e.name === name)?.dataType?.text
+  for (const [key, list] of events) {
+    const direction = key.startsWith('out:') ? 'out' : 'in'
+    const name = key.slice(key.indexOf(':') + 1)
+    const type = site.socket
+      ? site.socket.messages.find((e) => e.name === name && e.direction === direction)?.dataType?.text
+      : site.stream?.events.find((e) => e.name === name)?.dataType?.text
+    const label = site.socket ? (direction === 'out' ? 'Sent' : 'Received') : 'Event'
     const shown = list.slice(0, 3).map(describeMismatch).join('; ')
     const more = list.length > 3 ? ` (+${list.length - 3} more)` : ''
-    parts.push(`Event "${name}" doesn't match ${type ?? 'its type'}: ${shown}${more}`)
+    parts.push(`${label} "${name}" doesn't match ${type ?? 'its type'}: ${shown}${more}`)
   }
   const of = `${check.mismatched} of ${check.checked} capture${check.checked === 1 ? '' : 's'}`
   return { kind: 'type-mismatch', message: `${parts.join('. ')} (${of}).` }

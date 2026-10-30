@@ -35,7 +35,9 @@ import {
   type RequestUrl,
   type Route,
   type ServerActionRef,
+  type SiteSocket,
   type SiteStream,
+  type SocketMessage,
   type SourceLoc,
   type SseEndpoint,
   type SseEvent,
@@ -97,6 +99,7 @@ import {
   VANILLA_METHODS,
 } from './trpc'
 import type { TypeResolver } from './types'
+import { isSocketIoCall, isWebSocketNew, protocolList, type SocketUse, socketUses } from './websocket'
 
 /** How deep wrapper calls are followed from an origin. */
 const MAX_DEPTH = 10
@@ -338,6 +341,7 @@ interface Found {
   procedure?: ProcedureRef
   operation?: OperationRef
   stream?: SiteStream
+  socket?: SiteSocket
 }
 
 export interface RequestScannerOptions {
@@ -869,7 +873,8 @@ export class RequestScanner {
         return
       }
       if (N.isCallExpression(d) && this.#call(d, scope, env, w)) traversal.skip()
-      if (N.isNewExpression(d) && this.#eventSource(d, scope, env, w)) traversal.skip()
+      if (N.isNewExpression(d) && (this.#eventSource(d, scope, env, w) || this.#webSocket(d, scope, env, w)))
+        traversal.skip()
     })
   }
 
@@ -943,6 +948,112 @@ export class RequestScanner {
     return undefined
   }
 
+  /** `new WebSocket(url, protocols)` (M19), with the messages the code sends and listens to. */
+  #webSocket(expr: NewExpression, scope: Node, env: Env, w: Walk): boolean {
+    if (!isWebSocketNew(expr)) return false
+    const [input, protocols] = expr.getArguments()
+    const list = protocolList(this.#resolve(protocols, env).node ?? protocols)
+    this.#emit(
+      w,
+      { node: expr, callee: oneLine(`new ${expr.getExpression().getText()}`), scope },
+      {
+        transport: 'websocket',
+        method: 'GET',
+        url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+        socket: {
+          api: 'websocket',
+          messages: this.#socketMessages(expr, scope, 'websocket', env),
+          ...(list ? { protocols: list } : {}),
+        },
+      },
+    )
+    return true
+  }
+
+  /**
+   * socket.io's `io(url, options)` (M19). It connects to `<origin>/socket.io/` (or `options.path`);
+   * a path in the URL is the namespace. Without a URL it connects to the page's origin.
+   */
+  #socketIo(call: CallExpression, scope: Node, env: Env, w: Walk) {
+    const args = call.getArguments()
+    const first = this.#resolve(args[0], env).node
+    const urlArg = first && N.isObjectLiteralExpression(first) ? undefined : args[0]
+    const options = urlArg ? args[1] : args[0]
+    const custom = literalOf(this.#str(propValue(this.#prop(options, env, 'path')), env))
+    const path = custom ? `/${custom.replace(/^\/+|\/+$/g, '')}/` : '/socket.io/'
+    const text = urlArg ? oneLine(urlArg.getText()) : ''
+    const written = urlArg ? toUrl(this.#str(urlArg, env), text) : undefined
+    let url: RequestUrl
+    let namespace: string | undefined
+    if (!written) url = { text, confidence: 'exact', path }
+    else if (written.confidence === 'unknown') url = { text, confidence: 'pattern', path }
+    else {
+      if (written.path && written.path !== '/') namespace = written.path
+      const { query: _, ...rest } = written
+      url = { ...rest, path, confidence: written.base?.includes('{') ? 'pattern' : 'exact' }
+    }
+    this.#emit(w, this.#frame(call, scope), {
+      transport: 'websocket',
+      method: 'GET',
+      url,
+      socket: {
+        api: 'socket.io',
+        messages: this.#socketMessages(call, scope, 'socket.io', env),
+        ...(namespace ? { namespace } : {}),
+      },
+    })
+  }
+
+  /**
+   * One entry per direction and name, in the order the code has them. The first use that gives
+   * a type wins. Uses are looked for in the outermost function around the socket, so a socket
+   * kept in a ref and used in event handlers is followed.
+   */
+  #socketMessages(expr: Node, scope: Node, api: SiteSocket['api'], env: Env): SocketMessage[] {
+    let outer = expr.getFirstAncestor((a) => isFunctionLike(a))
+    for (let next = outer; next; next = next.getFirstAncestor((a) => isFunctionLike(a))) outer = next
+    const uses = socketUses(expr, outer ?? scope, api, (arg) => literalOf(this.#str(arg, env)))
+    const messages: SocketMessage[] = []
+    for (const use of uses) {
+      const dataType = this.#socketDataType(use, api, env)
+      const existing = messages.find((m) => m.direction === use.direction && m.name === use.name)
+      if (existing) {
+        if (!existing.dataType && dataType) existing.dataType = dataType
+        continue
+      }
+      messages.push({
+        direction: use.direction,
+        name: use.name,
+        ...(dataType ? { dataType } : {}),
+        loc: this.#loc(use.at),
+      })
+    }
+    return messages
+  }
+
+  /**
+   * Native sockets: a listener reads its data like an EventSource's (`JSON.parse(e.data) as T`,
+   * `MessageEvent<T>`); a send's type is the value given to `JSON.stringify()`. socket.io: the
+   * listener's one parameter, and the one argument emitted (typed events give both).
+   */
+  #socketDataType(use: SocketUse, api: SiteSocket['api'], env: Env): TypeRef | undefined {
+    if (use.direction === 'in') {
+      if (!use.handler) return undefined
+      if (api === 'websocket') return this.#listenerType(use.handler, env)
+      const fn = this.#functionValue(use.handler, env)
+      if (!fn || !isFunctionLike(fn)) return undefined
+      const params = fn.getParameters()
+      return params.length === 1 && params[0] ? this.#declaredType(params[0]) : undefined
+    }
+    const args = use.args ?? []
+    if (args.length !== 1 || !args[0]) return undefined
+    if (api === 'websocket') return this.#bodyOf(args[0], env)
+    const arg = args[0]
+    const contextual = N.isExpression(arg) ? arg.getContextualType() : undefined
+    if (contextual && isMeaningful(contextual)) return this.#types.fromType(contextual, arg)
+    return this.#valueType(arg, env, 0)
+  }
+
   /** Handles one call. Returns true when its arguments were handled too and should be skipped. */
   #call(call: CallExpression, scope: Node, env: Env, w: Walk): boolean {
     if (w.origin.kind === 'middleware') {
@@ -972,6 +1083,10 @@ export class RequestScanner {
       const options = call.getArguments()[0]
       const include = options ? this.#propOf({ node: options, env }, 'include') : undefined
       if (include) this.#refetchLinks(include, this.#frame(call, scope), call, w)
+      return true
+    }
+    if (isSocketIoCall(call)) {
+      this.#socketIo(call, scope, env, w)
       return true
     }
     if (this.#isFetch(call)) {
@@ -2264,6 +2379,10 @@ export class RequestScanner {
         traversal.stop()
         return
       }
+      if (N.isNewExpression(d) && isWebSocketNew(d)) {
+        found = true
+        return
+      }
       if (!N.isCallExpression(d)) return
       if (
         this.#isFetch(d) ||
@@ -2275,7 +2394,8 @@ export class RequestScanner {
         navigationCall(d) ||
         middlewareResponse(d) ||
         (procedureCall(d)?.proxy ?? 'server') !== 'server' ||
-        isGraphqlRequest(d)
+        isGraphqlRequest(d) ||
+        isSocketIoCall(d)
       ) {
         found = true
         return
@@ -2311,7 +2431,9 @@ export class RequestScanner {
     const trigger = this.#trigger(frames, w.origin)
     const hookFrame = frames.findLast((f) => f.hook)
     // An event stream's data is in its events, not a response body (M18).
-    const responseType = found.stream ? undefined : (found.responseType ?? this.#response(frames))
+    // WebSocket data is in its messages too (M19).
+    const responseType =
+      found.stream || found.socket ? undefined : (found.responseType ?? this.#response(frames))
     const site: RequestSite = {
       id,
       origin: w.origin.kind,
@@ -2342,6 +2464,7 @@ export class RequestScanner {
           : {}),
       ...(found.operation ? { operation: found.operation } : {}),
       ...(found.stream ? { stream: found.stream } : {}),
+      ...(found.socket ? { socket: found.socket } : {}),
       ...(found.method ? { method: found.method } : {}),
       ...(found.url ? { url: found.url } : {}),
       trigger,
@@ -3067,7 +3190,14 @@ function flagsOf(site: RequestSite): Flag[] {
     })
   }
   if (!site.method) flags.push({ kind: 'unknown-method', message: 'The HTTP method could not be resolved.' })
-  if (site.stream) {
+  if (site.socket) {
+    if (!site.socket.messages.some((m) => m.dataType)) {
+      flags.push({
+        kind: 'unknown-response',
+        message: 'No message data types were found (listener parameter or cast, or the sent value).',
+      })
+    }
+  } else if (site.stream) {
     if (!site.stream.events.some((e) => e.dataType)) {
       flags.push({
         kind: 'unknown-response',

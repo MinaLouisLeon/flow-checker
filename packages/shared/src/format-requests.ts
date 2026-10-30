@@ -32,6 +32,17 @@ export function formatRequests(model: AppModel): string {
         out.push(`  stream: ${site.stream.api}${credentials}`)
         for (const e of site.stream.events) out.push(`  ${streamEventText(e)}`)
       }
+      if (site.socket) {
+        const extra = [
+          site.socket.namespace ? `namespace ${site.socket.namespace}` : '',
+          site.socket.protocols ? `protocols ${site.socket.protocols.join(', ')}` : '',
+        ].filter(Boolean)
+        out.push(`  socket: ${site.socket.api}${extra.length > 0 ? ` (${extra.join('; ')})` : ''}`)
+        for (const m of site.socket.messages) {
+          const type = m.dataType ? `: ${m.dataType.text}` : ''
+          out.push(`  ${m.direction === 'out' ? 'sends' : 'receives'} ${m.name}${type}`)
+        }
+      }
       if (site.targetRouteId)
         out.push(`  handled by: ${routes.get(site.targetRouteId)?.file ?? site.targetRouteId}`)
       for (const id of site.chain ?? []) {

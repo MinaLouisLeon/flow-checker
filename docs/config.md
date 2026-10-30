@@ -119,23 +119,23 @@ These requests show the transport `api-client` with the module and name. Capture
 
 What the runtime records while you test.
 
-| Field             | Default   | Meaning                                                                                                                          |
-| ----------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `storeRaw`        | `false`   | `true` saves captures **unmasked**. For local debugging only: the CLI warns at startup, and exports still redact unless `--raw`. |
-| `redact.headers`  | see below | Extra header names to mask (case-insensitive).                                                                                   |
-| `redact.keys`     | see below | Extra body keys to mask at any depth (case-insensitive), in JSON bodies, form data and query strings.                            |
-| `redact.patterns` | see below | Extra `RegExp`s. Matching parts of any string value are masked.                                                                  |
-| `maxBodyBytes`    | `256000`  | Larger bodies are cut off (and skipped by the type check).                                                                       |
-| `ignore`          | see below | Extra URL globs that are never captured. `*` matches anything. A glob is matched against the path and the full URL.              |
-| `maxMessages`     | `200`     | Event stream (SSE) messages kept per connection. Later ones are only counted, and the capture is marked truncated.               |
-| `maxMessageBytes` | `64000`   | Event stream messages larger than this are kept without their data (size and time only), and skipped by the type check.          |
+| Field             | Default   | Meaning                                                                                                                               |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `storeRaw`        | `false`   | `true` saves captures **unmasked**. For local debugging only: the CLI warns at startup, and exports still redact unless `--raw`.      |
+| `redact.headers`  | see below | Extra header names to mask (case-insensitive).                                                                                        |
+| `redact.keys`     | see below | Extra body keys to mask at any depth (case-insensitive), in JSON bodies, form data and query strings.                                 |
+| `redact.patterns` | see below | Extra `RegExp`s. Matching parts of any string value are masked.                                                                       |
+| `maxBodyBytes`    | `256000`  | Larger bodies are cut off (and skipped by the type check).                                                                            |
+| `ignore`          | see below | Extra URL globs that are never captured. `*` matches anything. A glob is matched against the path and the full URL.                   |
+| `maxMessages`     | `200`     | Event stream (SSE) and WebSocket messages kept per connection. Later ones are only counted, and the capture is marked truncated.      |
+| `maxMessageBytes` | `64000`   | Event stream and WebSocket messages larger than this are kept without their data (size and time only), and skipped by the type check. |
 
 Your values are **added to** the defaults, never replace them:
 
 - headers: `authorization`, `cookie`, `set-cookie`, `x-api-key`, `proxy-authorization`
 - keys: `password`, `pass`, `token`, `accessToken`, `refreshToken`, `secret`, `otp`, `code`, `cvv`, `cardNumber`, `ssn`
 - patterns: JWTs, `Bearer …` tokens, and 13–19 digit card numbers that pass the Luhn check
-- ignore: Next.js internals (`/_next/*`, `/__nextjs*`, `/__webpack*`), `/favicon.ico`, images, fonts, CSS, source maps, Next telemetry and the npm registry
+- ignore: Next.js internals (`/_next/*`, `/__nextjs*`, `/__webpack*`), `/favicon.ico`, images, fonts, CSS, source maps, Next telemetry, the npm registry and socket.io's HTTP long-polling (`*/socket.io/?*transport=polling*`)
 
 Masked strings become `"[REDACTED:string]"`, numbers `0` and booleans `false`, so captures keep their shape and the type check still works. Each capture lists what was masked in `redactedPaths`.
 

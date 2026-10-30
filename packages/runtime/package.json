@@ -14,6 +14,7 @@
     "./trpc": "./src/trpc.ts",
     "./graphql": "./src/graphql.ts",
     "./stream": "./src/stream.ts",
+    "./socket": "./src/socket.ts",
     "./next": "./src/next.ts"
   },
   "scripts": {

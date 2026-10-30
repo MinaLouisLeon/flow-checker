@@ -26,6 +26,7 @@ const FIXTURES = [
   'graphql-urql',
   'graphql-relay',
   'sse',
+  'websocket',
 ]
 const repo = join(import.meta.dirname, '..', '..', '..')
 

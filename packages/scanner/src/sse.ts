@@ -100,7 +100,7 @@ export function eventSourceListeners(
 }
 
 /** The name or property the new object is assigned to. */
-function holderText(expr: Node): string | undefined {
+export function holderText(expr: Node): string | undefined {
   let current = expr
   let parent = current.getParent()
   while (parent && (N.isParenthesizedExpression(parent) || N.isAsExpression(parent))) {
