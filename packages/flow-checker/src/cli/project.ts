@@ -102,6 +102,8 @@ export const GITIGNORE_ENTRIES = [
   '.flow-checker/captures/',
   '.flow-checker/sessions/',
   '.flow-checker/cache/',
+  // The imported Postman collection (M15): a copy of something kept elsewhere, maybe private.
+  '.flow-checker/postman/',
 ]
 
 /**

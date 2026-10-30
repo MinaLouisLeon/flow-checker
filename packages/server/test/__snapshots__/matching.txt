@@ -159,3 +159,33 @@ server GET localhost:4010/me (in GET /dashboard)
   → matched middleware · GET {API_URL ?? http://localhost:4010}/me
 server GET localhost:4010/users (in GET /dashboard)
   → matched DashboardPage · GET {API_URL ?? http://localhost:4010}/users
+
+## postman
+server GET localhost:4010/users
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+browser POST localhost:4010/todos
+  → matched TodoPanel · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+server GET localhost:4010/users/2 (in GET /users/2)
+  → matched UserPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser DELETE localhost:4010/users/2
+  → matched DeleteUserButton · DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users

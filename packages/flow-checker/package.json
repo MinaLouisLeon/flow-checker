@@ -90,6 +90,7 @@
   "devDependencies": {
     "@flow-checker/dashboard": "workspace:*",
     "@flow-checker/exporter": "workspace:*",
+    "@flow-checker/postman": "workspace:*",
     "@flow-checker/runtime": "workspace:*",
     "@flow-checker/scanner": "workspace:*",
     "@flow-checker/server": "workspace:*",
@@ -102,6 +103,7 @@
     "chokidar": "catalog:",
     "hono": "catalog:",
     "ts-morph": "catalog:",
+    "yaml": "catalog:",
     "zod": "catalog:"
   }
 }

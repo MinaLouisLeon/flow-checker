@@ -1,0 +1,31 @@
+# Requests
+
+## HomePage  app/page.tsx:9
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch  server-render
+  response: User[]
+  via: getUsers app/page.tsx:10 > fetch lib/api.ts:5
+
+## UserPage  app/users/[id]/page.tsx:7
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch  server-render
+  via: getUser app/users/[id]/page.tsx:9 > fetch lib/api.ts:12
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## DeleteUserButton  components/DeleteUserButton.tsx:7
+DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch  event onClick
+  response: void
+  via: deleteUser components/DeleteUserButton.tsx:13 > fetch lib/api.ts:18
+
+## ProductPanel  components/ProductPanel.tsx:7
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products  fetch  effect
+  response: Product[]
+  via: getProducts components/ProductPanel.tsx:11 > fetch lib/api.ts:23
+
+## TodoPanel  components/TodoPanel.tsx:8
+GET ? todosUrl()  fetch  effect
+  response: Todo[]
+  via: listTodos components/TodoPanel.tsx:12 > fetch lib/todos.ts:10
+  ⚠ dynamic-url: The URL could not be resolved: todosUrl()
+POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch  event onSubmit
+  body: NewTodo
+  response: Todo
+  via: createTodo components/TodoPanel.tsx:18 > fetch lib/api.ts:28

@@ -1,5 +1,12 @@
 export * from './capture'
-export type { ApiClientConfig, CaptureConfig, FlowCheckerConfig, RedactConfig } from './config'
+export type {
+  ApiClientConfig,
+  CaptureConfig,
+  FlowCheckerConfig,
+  PostmanCloudSource,
+  PostmanConfig,
+  RedactConfig,
+} from './config'
 export { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, defineConfig } from './config'
 export { CLI_NAME, DEFAULT_PORTS, MODEL_VERSION, PACKAGE_NAME } from './constants'
 export * from './diff'

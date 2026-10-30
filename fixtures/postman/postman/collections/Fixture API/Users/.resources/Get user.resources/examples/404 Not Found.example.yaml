@@ -1,0 +1,12 @@
+$kind: http-example
+order: 2000
+request:
+  url: "{{baseUrl}}/users/99"
+  method: GET
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: json
+    content: |-
+      { "error": "Not found" }

@@ -1,0 +1,11 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/todos"
+  method: POST
+response:
+  statusCode: 201
+  statusText: Created
+  body:
+    type: json
+    content: |-
+      { "id": 3, "userId": 1, "title": "Buy milk", "done": false }

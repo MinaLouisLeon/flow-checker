@@ -2,6 +2,7 @@ import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import type { NoteKind, ScanNote } from '../model-index'
+import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
 import { Empty, Section, SourceLink } from '../ui'
 
@@ -33,6 +34,8 @@ export function Overview() {
   const serverHops = model.requests.length - clientRequests.length
   const verified = model.requests.filter(isVerified).length
   const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
+  // Postman flags get their own section below, not the generic "could not resolve" group.
+  const notes = index.notes.filter((n) => !isPostmanNote(n, index))
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
@@ -122,13 +125,15 @@ export function Overview() {
         )}
       </Section>
 
-      <Section title="To check" aside={<span className="count">{index.notes.length}</span>}>
-        {index.notes.length === 0 ? (
+      <Section title="To check" aside={<span className="count">{notes.length}</span>}>
+        {notes.length === 0 ? (
           <Empty>The scan resolved every page, component, type and request.</Empty>
         ) : (
-          <NoteGroups notes={index.notes} />
+          <NoteGroups notes={notes} />
         )}
       </Section>
+
+      <PostmanSection index={index} />
 
       <Section title="Pages">
         <ul className="list">

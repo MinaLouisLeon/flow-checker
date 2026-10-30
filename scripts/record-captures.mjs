@@ -141,6 +141,20 @@ const scripts = {
     await page.waitForSelector('li:has-text("Check types")')
     await settle(page)
   },
+  // M15: every site of the Postman fixture, including the delete that isn't in the collection.
+  postman: async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[name=title]', 'Check the contract')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('li:has-text("Check the contract")')
+    await settle(page)
+    await page.goto(`${app}/users/2`)
+    await settle(page)
+    await page.click('button:has-text("Delete")')
+    await page.waitForURL(`${app}/`)
+    await settle(page)
+  },
 }
 
 /** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */

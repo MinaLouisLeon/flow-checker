@@ -1,0 +1,3 @@
+$kind: collection
+name: Fixture API
+description: The mock API the fixture apps call (fixtures/mock-api).

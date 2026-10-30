@@ -34,6 +34,26 @@ export interface ApiClientConfig {
   methods: string[]
 }
 
+/** A Postman collection or environment in Postman's cloud, fetched with an API key (M15). */
+export interface PostmanCloudSource {
+  /** Collection or environment id (or uid). */
+  id: string
+  /** Env variable that holds the Postman API key. Default: `POSTMAN_API_KEY`. Never stored. */
+  apiKeyEnv?: string
+}
+
+/** A Postman collection used as the API contract, a types source and for URL resolution (M15). */
+export interface PostmanConfig {
+  /**
+   * A v2.1 JSON export (`api.postman_collection.json`), a git-native v3 YAML folder
+   * (`postman/collections/my-api`), or a cloud collection (`{ id, apiKeyEnv }`). Paths are
+   * relative to the project root.
+   */
+  collection: string | PostmanCloudSource
+  /** Environment for `{{variables}}`: a JSON export, a v3 YAML file, or a cloud environment. */
+  environment?: string | PostmanCloudSource
+}
+
 /** Default `include`: every file under the project root. */
 export const DEFAULT_INCLUDE: readonly string[] = ['**']
 
@@ -66,6 +86,8 @@ export interface FlowCheckerConfig {
     /** Nesting depth of anonymous types before expansion stops. Default: 6. */
     maxDepth?: number
   }
+  /** Postman collection to check the code against (`flow-checker postman import`). */
+  postman?: PostmanConfig
   /** Default export folders: Markdown (default `docs/flow`) and the static site (`.flow-checker/site`). */
   export?: { md?: string; html?: string }
 }

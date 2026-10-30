@@ -261,6 +261,8 @@ export const TypeRefSchema = z.object({
   /** Source text of the annotation, or the checker's rendering when the type was inferred. */
   text: z.string(),
   shape: TypeShapeSchema,
+  /** `postman`: not in the code, taken from the Postman collection's saved examples (M15). */
+  source: z.literal('postman').optional(),
 })
 export type TypeRef = z.infer<typeof TypeRefSchema>
 
@@ -329,9 +331,10 @@ export const RequestUrlSchema = z.object({
   text: z.string(),
   /**
    * `exact`: fully resolved. `pattern`: resolved with `:param` placeholders for values only
-   * known at runtime. `unknown`: the path could not be resolved.
+   * known at runtime. `unknown`: the path could not be resolved. `postman`: the code didn't say,
+   * the path comes from the matching Postman collection request (M15).
    */
-  confidence: z.enum(['exact', 'pattern', 'unknown']),
+  confidence: z.enum(['exact', 'pattern', 'unknown', 'postman']),
   /** Origin or base URL, e.g. `http://localhost:4010`. Absent for same-origin paths like `/api/x`. */
   base: z.string().optional(),
   /** Environment variable the base comes from, e.g. `NEXT_PUBLIC_API_URL`. `base` is then its fallback. */
@@ -373,6 +376,9 @@ export const FlagSchema = z.object({
   /**
    * Added by the tool server: `type-mismatch` when captured data doesn't fit the declared types
    * (M8), `stale` when the code changed after the last capture (M9).
+   * From a Postman collection (M15): `not-in-collection` (a site the collection has no request
+   * for), `contract-mismatch` (the code's type doesn't fit the saved examples) and, on collection
+   * requests, `unused-endpoint` (no site calls it).
    */
   kind: z.enum([
     'dynamic-url',
@@ -381,6 +387,9 @@ export const FlagSchema = z.object({
     'unknown-trigger',
     'type-mismatch',
     'stale',
+    'not-in-collection',
+    'contract-mismatch',
+    'unused-endpoint',
   ]),
   message: z.string(),
 })
@@ -458,6 +467,16 @@ export const RequestSiteSchema = z.object({
   responseType: TypeRefSchema.optional(),
   /** From the call in the origin (outermost) down to the network call. */
   callStack: z.array(CallFrameSchema),
+  /** The Postman collection request it calls (M15), see `AppModel.postman`. */
+  contract: z
+    .object({
+      requestId: z.string(),
+      /** The request's name in the collection. */
+      name: z.string(),
+      /** `url`: matched by method and URL. `code`: the URL was unknown and the call's names and method pointed to it. */
+      by: z.enum(['url', 'code']),
+    })
+    .optional(),
   /** For a request to one of the app's route handlers: that route. */
   targetRouteId: z.string().optional(),
   /** Requests this one leads to on the server: route handler (BFF) hops or fetches in the server action. */
@@ -696,6 +715,59 @@ export const MiddlewareSchema = z.object({
 })
 export type Middleware = z.infer<typeof MiddlewareSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Postman collection (M15, docs/PLAN.md): an imported collection used as the API contract.
+
+export const PostmanSourceSchema = z.object({
+  /** `file`: v2.1 JSON export. `folder`: git-native v3 YAML folder. `cloud`: fetched by id. */
+  kind: z.enum(['file', 'folder', 'cloud']),
+  /** Project-relative path (`file`, `folder`). */
+  path: z.string().optional(),
+  /** Collection or environment id (`cloud`). */
+  id: z.string().optional(),
+})
+export type PostmanSource = z.infer<typeof PostmanSourceSchema>
+
+export const PostmanExampleSchema = z.object({
+  name: z.string(),
+  /** HTTP status of the saved response. */
+  status: z.number().int().optional(),
+})
+export type PostmanExample = z.infer<typeof PostmanExampleSchema>
+
+export const PostmanRequestSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** Folder names from the collection root down. */
+  folder: z.array(z.string()),
+  method: HttpMethodSchema,
+  /**
+   * The URL with collection and environment variables filled in. `text` is the URL as written
+   * (`{{baseUrl}}/users/:id`). Unresolved variables in the path become `:name`.
+   */
+  url: RequestUrlSchema,
+  /** Variables the URL uses that neither the collection nor the environment sets. */
+  unresolved: z.array(z.string()).optional(),
+  /** From the saved examples with a 2xx JSON body (`source: 'postman'`). */
+  responseType: TypeRefSchema.optional(),
+  /** From the request's JSON body. */
+  bodyType: TypeRefSchema.optional(),
+  examples: z.array(PostmanExampleSchema),
+  /** Request sites that call it. */
+  siteIds: z.array(z.string()),
+  flags: z.array(FlagSchema),
+})
+export type PostmanRequest = z.infer<typeof PostmanRequestSchema>
+
+export const PostmanContractSchema = z.object({
+  collection: z.object({ name: z.string(), source: PostmanSourceSchema }),
+  environment: z.object({ name: z.string(), source: PostmanSourceSchema }).optional(),
+  /** When it was imported (ISO time). */
+  importedAt: z.string(),
+  requests: z.array(PostmanRequestSchema),
+})
+export type PostmanContract = z.infer<typeof PostmanContractSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -708,9 +780,11 @@ export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 export const AppModelSchema = z.object({
   /**
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
-   * version 2 (before M14) no middleware.
+   * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract.
    */
-  version: z.union([z.literal(1), z.literal(2), z.literal(MODEL_VERSION)]).transform(() => MODEL_VERSION),
+  version: z
+    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(MODEL_VERSION)])
+    .transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
   routes: z.array(RouteSchema),
@@ -727,5 +801,7 @@ export const AppModelSchema = z.object({
   queryLinks: z.array(QueryLinkSchema).default([]),
   /** `middleware.ts` / `proxy.ts`, when the project has one (M14). */
   middleware: MiddlewareSchema.optional(),
+  /** The imported Postman collection and how the code lines up with it (M15). */
+  postman: PostmanContractSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

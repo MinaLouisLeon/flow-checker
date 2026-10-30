@@ -2,6 +2,7 @@
 // The captures are real: recorded from each fixture app with scripts/record-captures.mjs.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { applyPostman, importLocalPostman } from '@flow-checker/postman'
 import { scanProject } from '@flow-checker/scanner'
 import { type AppModel, type Capture, type CaptureMatch, urlText } from '@flow-checker/shared'
 import { describe, expect, it } from 'vitest'
@@ -17,6 +18,7 @@ const FIXTURES = [
   'next-intl',
   'mismatch',
   'middleware',
+  'postman',
 ]
 const repo = join(import.meta.dirname, '..', '..', '..')
 
@@ -30,7 +32,23 @@ function load(fixture: string) {
   const recording = JSON.parse(
     readFileSync(join(import.meta.dirname, 'recordings', `${fixture}.json`), 'utf8'),
   ) as Recording
-  const model = scanProject({ root: join(repo, 'fixtures', fixture) })
+  const root = join(repo, 'fixtures', fixture)
+  const scanned = scanProject({ root })
+  // The CLI checks each scan against the configured Postman collection (M15). Recorded on port 3077.
+  const model =
+    fixture === 'postman'
+      ? applyPostman(
+          scanned,
+          importLocalPostman({
+            root,
+            config: {
+              collection: 'postman/collections/Fixture API',
+              environment: 'postman/environments/local.yaml',
+            },
+          }),
+          { appOrigins: ['http://localhost:3077'] },
+        )
+      : scanned
   return { recording, model }
 }
 

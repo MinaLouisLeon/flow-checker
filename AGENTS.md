@@ -13,17 +13,18 @@ has a "Built" note there describing what was actually built.
 
 pnpm monorepo, published as one package (`packages/flow-checker`, bundled with tsup).
 
-| Package                 | Role                                                                                   |
-| ----------------------- | -------------------------------------------------------------------------------------- |
-| `packages/shared`       | Data model + zod schemas (`model.ts`, `capture.ts`), URL/key helpers, text formatters  |
-| `packages/scanner`      | ts-morph static analysis: routes, components, requests, types, navigation, flows       |
-| `packages/runtime`      | Injected dev-only capture code (browser `client.ts`, Node `server.ts`), redaction      |
-| `packages/server`       | Hono tool server: ingest, store, matcher, verifier, flows, watcher, export snapshot    |
-| `packages/dashboard`    | React + Vite SPA                                                                       |
-| `packages/exporter`     | Markdown + static HTML export                                                          |
-| `packages/flow-checker` | CLI (`dev`, `scan`, `init`, `export`, `doctor`) and the published entry points         |
-| `fixtures/*`            | Small Next.js 16 apps, one per pattern group, used by snapshot, matching and e2e tests |
-| `scripts/`              | `record-captures.mjs`, `next-matrix.mjs`, `perf/`, package/config verification         |
+| Package                 | Role                                                                                      |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| `packages/shared`       | Data model + zod schemas (`model.ts`, `capture.ts`), URL/key helpers, text formatters     |
+| `packages/scanner`      | ts-morph static analysis: routes, components, requests, types, navigation, flows          |
+| `packages/runtime`      | Injected dev-only capture code (browser `client.ts`, Node `server.ts`), redaction         |
+| `packages/server`       | Hono tool server: ingest, store, matcher, verifier, flows, watcher, export snapshot       |
+| `packages/dashboard`    | React + Vite SPA                                                                          |
+| `packages/exporter`     | Markdown + static HTML export                                                             |
+| `packages/postman`      | Postman collection import (v2.1 JSON, v3 YAML, cloud) and the contract check (M15)        |
+| `packages/flow-checker` | CLI (`dev`, `scan`, `init`, `export`, `doctor`, `postman`) and the published entry points |
+| `fixtures/*`            | Small Next.js 16 apps, one per pattern group, used by snapshot, matching and e2e tests    |
+| `scripts/`              | `record-captures.mjs`, `next-matrix.mjs`, `perf/`, package/config verification            |
 
 ## Commands
 
@@ -84,7 +85,7 @@ re-run them on their own before assuming a regression.
 | M12 | CLI progress output                               | Done    |
 | M13 | React Query APIs, keys and cache links            | Done    |
 | M14 | Middleware / proxy                                | Done    |
-| M15 | Postman collection import                         | Planned |
+| M15 | Postman collection import                         | Done    |
 | M16 | tRPC                                              | Planned |
 | M17 | GraphQL                                           | Planned |
 | M18 | SSE                                               | Planned |

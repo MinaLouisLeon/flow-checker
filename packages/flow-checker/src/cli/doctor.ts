@@ -7,6 +7,7 @@ import { DEFAULT_PORTS, type FlowCheckerConfig, PACKAGE_NAME } from '@flow-check
 import { ts } from 'ts-morph'
 import { ConfigError, findConfigFile, loadConfig } from './config'
 import { EDGE_BODY } from './init'
+import { checkPostman } from './postman'
 import { createProgress } from './progress'
 import {
   defaultDevCommand,
@@ -254,6 +255,9 @@ export async function runDoctor(
       ? 'They are added on the next "flow-checker" or "flow-checker init" run.'
       : undefined,
   })
+
+  const postman = await checkPostman(root, config)
+  if (postman) add(postman)
 
   if (config.capture?.storeRaw) {
     add({
