@@ -1,21 +1,82 @@
 # Requests
 
+## UsersPage  src/app/users/page.tsx:6
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch prefetchQuery(userKeys.all)  server-render
+  key: ['users']
+  response: User[]
+  via: queryClient.prefetchQuery src/app/users/page.tsx:8 > http src/services/users.ts:12 > fetch src/services/todos.ts:8
+
 ## AddTodoForm  src/components/AddTodoForm.tsx:9
 POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useMutation  event onSubmit
   body: NewTodo
   response: Todo
-  via: useMutation src/components/AddTodoForm.tsx:14 > http src/services/todos.ts:25 > fetch src/services/todos.ts:7
+  via: useMutation src/components/AddTodoForm.tsx:14 > http src/services/todos.ts:30 > fetch src/services/todos.ts:8
 
 ## TodoDetail  src/components/TodoDetail.tsx:13
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useSWR(['todo', id])  page-load
   response: Todo
-  via: useSWR src/components/TodoDetail.tsx:14 > fetchTodo src/components/TodoDetail.tsx:14 > http src/services/todos.ts:22 > fetch src/services/todos.ts:7
+  via: useSWR src/components/TodoDetail.tsx:14 > fetchTodo src/components/TodoDetail.tsx:14 > http src/services/todos.ts:27 > fetch src/services/todos.ts:8
 
 ## TodoList  src/components/TodoList.tsx:9
-GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useQuery(todoKeys.all)  page-load
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useQuery(todoKeys.list(filters))  page-load
+  key: ['todos', 'list', {}]
   response: Todo[]
-  via: useQuery src/components/TodoList.tsx:11 > http src/services/todos.ts:20 > fetch src/services/todos.ts:7
+  via: useQuery src/components/TodoList.tsx:11 > http src/services/todos.ts:25 > fetch src/services/todos.ts:8
 PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useMutation  event onChange
   body: TodoPatch
   response: Todo
-  via: useMutation src/components/TodoList.tsx:13 > updateTodo src/components/TodoList.tsx:14 > http src/services/todos.ts:28 > fetch src/services/todos.ts:7
+  via: useMutation src/components/TodoList.tsx:13 > updateTodo src/components/TodoList.tsx:14 > http src/services/todos.ts:33 > fetch src/services/todos.ts:8
+
+## UserList  src/components/UserList.tsx:7
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch useQuery(userKeys.all)  page-load
+  key: ['users']
+  response: User[]
+  via: useQuery src/components/UserList.tsx:9 > http src/services/users.ts:12 > fetch src/services/todos.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  fetch useQueries(userKeys.todos(user.id))  page-load
+  key: ['todos', 'list', { userId: :userId }]
+  response: Todo[]
+  via: useQueries src/components/UserList.tsx:11 > fetchUserTodos src/components/UserList.tsx:13 > http src/services/users.ts:16 > fetch src/services/todos.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch ensureQueryData(userKeys.detail(id))  event onClick
+  key: ['users', :id]
+  response: User
+  via: queryClient.ensureQueryData src/components/UserList.tsx:18 > fetchUser src/services/users.ts:23 > http src/services/users.ts:14 > fetch src/services/todos.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch prefetchQuery(userKeys.detail(id))  event onMouseEnter
+  key: ['users', :id]
+  response: User
+  via: queryClient.prefetchQuery src/components/UserList.tsx:29 > fetchUser src/services/users.ts:23 > http src/services/users.ts:14 > fetch src/services/todos.ts:8
+
+# Query cache links
+
+hydrate ['users']  prefetchQuery  UsersPage  server-render  exact  src/app/users/page.tsx:8
+  after: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (UserList)
+
+invalidate ['todos']  invalidateQueries  AddTodoForm  event onSubmit  success  src/components/AddTodoForm.tsx:17
+  after: POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (TodoList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (UserList)
+
+set-data ['todos', 'detail', :id]  setQueryData  TodoList  event onChange  exact success  src/components/TodoList.tsx:16
+  after: PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+  hits: (no scanned query)
+
+invalidate ['todos', 'list']  invalidateQueries  TodoList  event onChange  success  src/components/TodoList.tsx:17
+  after: PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (TodoList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (UserList)
+
+remove ['users', :id]  removeQueries  UserList  event onClick  exact  src/components/UserList.tsx:37
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
+
+refetch ['users']  refetchQueries  UserList  event onClick  src/components/UserList.tsx:44
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (UserList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
+
+reset (all queries)  resetQueries  UserList  event onClick  src/components/UserList.tsx:47
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (TodoList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (UserList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (UserList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)

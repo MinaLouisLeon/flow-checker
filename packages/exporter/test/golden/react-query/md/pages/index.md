@@ -29,11 +29,11 @@
 
 | Request | Trigger | From | Status |
 | --- | --- | --- | --- |
-| [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_21j0fo1p54x) | event onSubmit | [`AddTodoForm`](../components/AddTodoForm.md) | ✓ verified (1 capture) |
-| [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_0s4qt6a0r0d) | page-load | [`TodoList`](../components/TodoList.md) | ✓ verified (3 captures) |
-| [`PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](#req_0edpknxxbhl) | event onChange | [`TodoList`](../components/TodoList.md) | ✓ verified (1 capture) |
+| [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_1ybk9xw63lt) | event onSubmit | [`AddTodoForm`](../components/AddTodoForm.md) | ✓ verified (1 capture) |
+| [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_1di2bq7b96m) | page-load | [`TodoList`](../components/TodoList.md) | ✓ verified (3 captures) |
+| [`PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](#req_2bvpz71hbm1) | event onChange | [`TodoList`](../components/TodoList.md) | ✓ verified (1 capture) |
 
-### <a id="req_21j0fo1p54x"></a>`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
+### <a id="req_1ybk9xw63lt"></a>`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
 
 |  |  |
 | --- | --- |
@@ -56,7 +56,7 @@
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `POST http://localhost:4010/todos` → 201 Created · 10 ms · 2026-10-28 10:56 UTC · page `/`
+**Captured** `POST http://localhost:4010/todos` → 201 Created · 9 ms · 2026-10-30 01:38 UTC · page `/`
 
 Request body:
 
@@ -77,20 +77,20 @@ Response body:
 }
 ```
 
-### <a id="req_0s4qt6a0r0d"></a>`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
+### <a id="req_1di2bq7b96m"></a>`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
 
 |  |  |
 | --- | --- |
 | Status | ✓ verified (3 captures) |
 | From | [`TodoList`](../components/TodoList.md) · `src/components/TodoList.tsx:11` |
 | Trigger | page-load |
-| Transport | fetch · `useQuery(todoKeys.all)` |
+| Transport | fetch · `useQuery(todoKeys.list(filters))` · key `['todos', 'list', {}]` |
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos` |
 | Call path | `useQuery` → `http` → `fetch` |
 
 **Response** `Todo[]` (see [`Todo`](../types.md#typ_0fc96ucq8sd))
 
-**Captured** `GET http://localhost:4010/todos` → 200 OK · 10 ms · 2026-10-28 10:56 UTC · page `/` (newest of 3)
+**Captured** `GET http://localhost:4010/todos` → 200 OK · 8 ms · 2026-10-30 01:38 UTC · page `/` (newest of 3)
 
 Response body:
 
@@ -117,7 +117,7 @@ Response body:
 ]
 ```
 
-### <a id="req_0edpknxxbhl"></a>`PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`
+### <a id="req_2bvpz71hbm1"></a>`PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`
 
 |  |  |
 | --- | --- |
@@ -140,7 +140,7 @@ Response body:
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `PATCH http://localhost:4010/todos/2` → 200 OK · 8 ms · 2026-10-28 10:56 UTC · page `/`
+**Captured** `PATCH http://localhost:4010/todos/2` → 200 OK · 7 ms · 2026-10-30 01:38 UTC · page `/`
 
 Request body:
 

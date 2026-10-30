@@ -1,13 +1,15 @@
 # Route tree
 
 src/app [layout, page]
-└─ todos
-   └─ [id] (dynamic) [page]
+├─ todos
+│  └─ [id] (dynamic) [page]
+└─ users [page]
 
 # Routes
 
 /  page  src/app/page.tsx
 /todos/[id]  page  src/app/todos/[id]/page.tsx
+/users  page  src/app/users/page.tsx
 
 # Layouts
 
@@ -29,3 +31,9 @@ layouts: src/app/layout.tsx
 TodoPage  server  src/app/todos/[id]/page.tsx:3
 └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:13
    └─ Link  external next/link  [conditional]
+
+## /users  src/app/users/page.tsx
+layouts: src/app/layout.tsx
+UsersPage  server  src/app/users/page.tsx:6
+├─ HydrationBoundary  external @tanstack/react-query
+└─ UserList  client (use client)  src/components/UserList.tsx:7

@@ -345,6 +345,7 @@ function analyze(
   }
 
   const sites = requests.sites(routes)
+  const queryLinks = requests.queryLinks(sites, components)
   report({
     phase: 'requests',
     done: requestTotal,
@@ -355,7 +356,7 @@ function analyze(
 
   report({ phase: 'flows', done: 0 })
   const navigations = requests.navigations(routes)
-  const flows = inferFlows({ routes, components, requests: sites, navigations })
+  const flows = inferFlows({ routes, components, requests: sites, navigations, queryLinks })
   const modelTypes = types.types()
   report({
     phase: 'flows',
@@ -380,6 +381,7 @@ function analyze(
     requests: sites,
     navigations,
     flows,
+    queryLinks,
   }
 }
 

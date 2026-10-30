@@ -1,5 +1,6 @@
 // Plain-text rendering of request sites: used by `flow-checker scan --requests` and snapshot tests.
-import type { AppModel, RequestSite, RequestUrl, Trigger } from './model'
+import type { AppModel, QueryLink, RequestSite, RequestUrl, Trigger } from './model'
+import { formatQueryKey } from './query-keys'
 
 export function formatRequests(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -20,6 +21,7 @@ export function formatRequests(model: AppModel): string {
     out.push('', `## ${origin}`)
     for (const site of list) {
       out.push(siteLine(site))
+      if (site.queryKey) out.push(`  key: ${formatQueryKey(site.queryKey)}`)
       if (site.bodyType) out.push(`  body: ${site.bodyType.text}`)
       if (site.responseType) out.push(`  response: ${site.responseType.text}`)
       if (site.targetRouteId)
@@ -32,7 +34,31 @@ export function formatRequests(model: AppModel): string {
       for (const flag of site.flags) out.push(`  ⚠ ${flag.kind}: ${flag.message}`)
     }
   }
+
+  if (model.queryLinks.length > 0) {
+    out.push('', '# Query cache links')
+    for (const link of model.queryLinks) {
+      out.push('', linkLine(link))
+      for (const id of link.fromSiteIds) {
+        const from = sites.get(id)
+        out.push(`  after: ${from ? requestText(from) : id}`)
+      }
+      for (const id of link.targetSiteIds) {
+        const target = sites.get(id)
+        const owner = target?.componentId ? components.get(target.componentId)?.name : undefined
+        out.push(`  hits: ${target ? requestText(target) : id}${owner ? `  (${owner})` : ''}`)
+      }
+      if (link.targetSiteIds.length === 0) out.push('  hits: (no scanned query)')
+    }
+  }
   return `${out.join('\n')}\n`
+
+  function linkLine(link: QueryLink): string {
+    const owner = link.componentId ? (components.get(link.componentId)?.name ?? '?') : link.origin
+    const key = link.key ? formatQueryKey(link.key) : '(all queries)'
+    const extra = [link.exact ? 'exact' : '', link.outcome ?? ''].filter(Boolean).join(' ')
+    return `${link.kind} ${key}  ${link.method}  ${owner}  ${triggerText(link.trigger)}${extra ? `  ${extra}` : ''}  ${link.loc.file}:${link.loc.line}`
+  }
 
   function originLabel(site: RequestSite): string {
     if (site.origin === 'component') {

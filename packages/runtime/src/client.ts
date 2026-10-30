@@ -6,12 +6,16 @@
 import type { Capture, CapturedBody, Interaction, SessionEvent } from '@flow-checker/shared'
 import { callerStack, headersToObject, readStream, requestBody, textBody } from './body'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
+import { createQueryTracker, findQueryClient } from './query'
 import { compileRules, redactCapture } from './redact'
 
 export type { RuntimeConfig } from './options'
 
 const INSTALLED = Symbol.for('flow-checker.client')
 const SESSION_KEY = 'flow-checker:session'
+/** How often to look for the app's QueryClient until it shows up, and for how long. */
+const QUERY_CLIENT_POLL_MS = 300
+const QUERY_CLIENT_POLLS = 100
 /** Interactions older than this are not linked to a request. */
 const INTERACTION_WINDOW_MS = 5000
 const FLUSH_MS = 400
@@ -153,6 +157,37 @@ function start(config: RuntimeConfig) {
   }
   window.addEventListener('popstate', () => onNavigation('pop'))
 
+  // --- React Query --------------------------------------------------------------------------
+
+  // The QueryClient lives in React state, so it can only be found once React has rendered.
+  const queries = createQueryTracker()
+  let lastLookup = 0
+  const lookForQueryClient = () => {
+    try {
+      if (queries.ready) return
+      lastLookup = Date.now()
+      const client = findQueryClient([
+        document,
+        document.documentElement,
+        document.body,
+        document.getElementById('__next'),
+      ])
+      if (client) queries.instrument(client)
+    } catch {}
+  }
+  let polls = 0
+  const poll = setInterval(() => {
+    lookForQueryClient()
+    if (queries.ready || ++polls >= QUERY_CLIENT_POLLS) clearInterval(poll)
+  }, QUERY_CLIENT_POLL_MS)
+  /** The query or mutation sending the current request. Looks for the client first, at most every 50 ms. */
+  const currentQuery = () => {
+    if (queries.ready) return queries.current()
+    if (Date.now() - lastLookup > 50) lookForQueryClient()
+    // Found just now: the query that sends this request started before it could be wrapped.
+    return queries.ready ? (queries.current() ?? queries.guess()) : undefined
+  }
+
   // --- Request filtering --------------------------------------------------------------------
 
   const shouldCapture = (url: URL, headers: Record<string, string>): boolean => {
@@ -181,6 +216,8 @@ function start(config: RuntimeConfig) {
       redactedPaths: [],
     }
     if (action) capture.serverAction = { id: action }
+    const query = currentQuery()
+    if (query) capture.query = query
     const interaction = currentInteraction()
     if (interaction) capture.interaction = interaction
     return capture

@@ -24,6 +24,8 @@ export const MATCH_SIGNALS = [
   'parent',
   /** What started the request fits the site's trigger, e.g. a submit for `onSubmit`. */
   'trigger',
+  /** The React Query key the request was sent for is the site's key (M13). */
+  'query-key',
   /** You assigned captures like this one to the site. */
   'manual',
 ] as const

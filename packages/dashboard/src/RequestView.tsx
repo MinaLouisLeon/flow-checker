@@ -1,6 +1,13 @@
 // One request site: method + URL, how and when it is sent, body and response types,
 // the server hops it leads to, and the call stack from the component down to the network call.
-import { hasCaptures, type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
+import {
+  formatQueryKey,
+  hasCaptures,
+  type QueryLink,
+  type RequestSite,
+  type Trigger,
+  urlText,
+} from '@flow-checker/shared'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import type { ModelIndex } from './model-index'
@@ -163,11 +170,17 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
               </dd>
             </>
           )}
-          {site.hook?.key && (
+          {(site.queryKey || site.hook?.key) && (
             <>
               <dt>Key</dt>
               <dd>
-                <code>{site.hook.key}</code>
+                <code>{site.queryKey ? formatQueryKey(site.queryKey) : site.hook?.key}</code>
+                {site.queryKey && site.hook?.key && (
+                  <span className="muted">
+                    {' '}
+                    from <code>{site.hook.key}</code>
+                  </span>
+                )}
               </dd>
             </>
           )}
@@ -232,6 +245,19 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           </div>
         )}
 
+        {(index.linksFrom.get(site.id) ?? []).length > 0 && (
+          <div className="request-links">
+            <h4>Then in the query cache</h4>
+            <QueryLinkList links={index.linksFrom.get(site.id) ?? []} />
+          </div>
+        )}
+        {(index.linksTo.get(site.id) ?? []).length > 0 && (
+          <div className="request-links">
+            <h4>Refreshed by</h4>
+            <QueryLinkList links={index.linksTo.get(site.id) ?? []} showTargets={false} />
+          </div>
+        )}
+
         {site.status === 'mismatch' && <SiteMismatches site={site} />}
         {hasCaptures(site) && <SiteCaptures site={site} />}
 
@@ -249,6 +275,63 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         </div>
       </div>
     </details>
+  )
+}
+
+const LINK_LABEL: Record<QueryLink['kind'], string> = {
+  invalidate: 'invalidates',
+  refetch: 'refetches',
+  reset: 'resets',
+  remove: 'removes',
+  'set-data': 'sets data of',
+  hydrate: 'hydrates',
+}
+
+/** React Query cache calls: what they do, the key they target, and the queries they hit (M13). */
+export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[]; showTargets?: boolean }) {
+  const { index } = useData()
+  return (
+    <ul className="list query-links">
+      {links.map((link) => {
+        const owner = link.componentId ? index.components.get(link.componentId) : undefined
+        const targets = link.targetSiteIds
+          .map((id) => index.requests.get(id))
+          .filter((s): s is RequestSite => !!s)
+        return (
+          <li key={link.id}>
+            <span>
+              <Badge tone="muted" title={link.method}>
+                {LINK_LABEL[link.kind]}
+              </Badge>{' '}
+              <code>{link.key ? formatQueryKey(link.key) : 'all queries'}</code>
+              {link.exact && <span className="muted"> exact</span>}
+              {link.outcome && <span className="muted"> on {link.outcome}</span>}
+              {owner && (
+                <span className="muted">
+                  {' '}
+                  in <a href={href({ name: 'component', componentId: owner.id })}>{owner.name}</a>
+                </span>
+              )}
+              {showTargets && (
+                <span className="muted">
+                  {' → '}
+                  {targets.length === 0
+                    ? 'no scanned query'
+                    : targets.map((t, i) => (
+                        <span key={t.id}>
+                          {i > 0 && ', '}
+                          <code>{siteLabel(t, index)}</code>
+                        </span>
+                      ))}
+                </span>
+              )}
+            </span>
+            <span className="spacer" />
+            <SourceLink file={link.loc.file} line={link.loc.line} column={link.loc.column} />
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 

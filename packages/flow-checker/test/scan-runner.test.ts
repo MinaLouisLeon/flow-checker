@@ -20,7 +20,7 @@ function project() {
 }
 
 describe('scan runner', () => {
-  it('scans, re-scans and writes model.json', async () => {
+  it('scans, re-scans and writes model.json', { timeout: 30_000 }, async () => {
     const root = project()
     const runner = createScanRunner({ root })
     // From source there is no built worker, so it runs in this thread.

@@ -1,8 +1,8 @@
-import type { ComponentRef, RequestSite, Route } from '@flow-checker/shared'
+import type { ComponentRef, QueryLink, RequestSite, Route } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
 import { appUrl, type ModelIndex } from '../model-index'
-import { RequestList } from '../RequestView'
+import { QueryLinkList, RequestList } from '../RequestView'
 import { href } from '../router'
 import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 import { ComponentPanel } from './ComponentPanel'
@@ -26,6 +26,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
   const requests = pageRequests(index, routeId)
   const onLoad = requests.filter((s) => LOAD_TRIGGERS.has(s.trigger.kind))
   const onEvent = requests.filter((s) => !LOAD_TRIGGERS.has(s.trigger.kind))
+  const links = pageLinks(index, routeId)
 
   return (
     <div className="screen screen-split">
@@ -100,6 +101,12 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
           </Section>
         )}
 
+        {links.length > 0 && (
+          <Section title="Query cache" aside={<span className="count">{links.length}</span>}>
+            <QueryLinkList links={links} />
+          </Section>
+        )}
+
         {(index.flowsByRoute.get(routeId) ?? []).length > 0 && (
           <Section
             title="Flows"
@@ -150,6 +157,13 @@ const LOAD_TRIGGERS = new Set<RequestSite['trigger']['kind']>(['server-render', 
 function pageRequests(index: ModelIndex, routeId: string): RequestSite[] {
   return index.model.requests.filter(
     (s) => s.componentId && (index.routesOf.get(s.componentId) ?? []).includes(routeId),
+  )
+}
+
+/** React Query cache calls made by the page's components (M13). */
+function pageLinks(index: ModelIndex, routeId: string): QueryLink[] {
+  return index.model.queryLinks.filter(
+    (l) => l.componentId && (index.routesOf.get(l.componentId) ?? []).includes(routeId),
   )
 }
 

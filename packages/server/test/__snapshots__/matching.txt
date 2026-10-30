@@ -27,6 +27,52 @@ browser GET localhost:4010/todos
   → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
 browser GET localhost:4010/todos/3
   → matched TodoDetail · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+server GET localhost:4010/users (in GET /users)
+  → matched UsersPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/users
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/todos
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/users/1
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/users/2
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/users/1
+  → ambiguous -
+browser GET localhost:4010/users
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/users/2
+  → ambiguous -
+
+## react-query-v4
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser PATCH localhost:4010/todos/2
+  → matched TodoList · PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser POST localhost:4010/todos
+  → matched AddTodoForm · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos/3
+  → matched TodoDetail · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+server GET localhost:4010/users (in GET /users)
+  → matched UsersPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/users
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser DELETE localhost:4010/users/2
+  → matched UserList · DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
 
 ## server-actions
 server GET localhost:4010/products (in GET /products)

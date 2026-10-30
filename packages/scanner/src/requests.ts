@@ -18,6 +18,9 @@ import {
   type HttpMethod,
   makeId,
   type Navigation,
+  type QueryKeyPart,
+  type QueryLink,
+  queryKeyHits,
   type RequestSite,
   type RequestUrl,
   type Route,
@@ -57,7 +60,7 @@ const EFFECT_HOOKS = new Set(['useEffect', 'useLayoutEffect', 'useInsertionEffec
 const CALLBACK_HOOKS = new Set(['useCallback', 'useMemo', 'useEffectEvent'])
 
 interface HookDef {
-  /** Canonical name, e.g. `useQuery`, `useSWR`. */
+  /** Canonical name, e.g. `useQuery`, `useSWR`, `prefetchQuery`. */
   name: string
   module: string
   kind: 'query' | 'mutation'
@@ -67,14 +70,22 @@ interface HookDef {
   /** SWR: the argument index of the fetcher / key. */
   fnArg?: number
   keyArg?: number
+  /** React Query: the key is parsed into segments, and v4's positional form is accepted. */
+  rq?: boolean
+  /** `useQueries` / `useSuspenseQueries`: one query per entry of `queries`. */
+  multi?: boolean
+  /** A `queryClient` method (`prefetchQuery`, ...), not a hook. */
+  client?: boolean
 }
 
-const RQ = (name: string, kind: HookDef['kind'], module: string): HookDef => ({
+const RQ = (name: string, kind: HookDef['kind'], module: string, extra: Partial<HookDef> = {}): HookDef => ({
   name,
   module,
   kind,
   fnProp: kind === 'query' ? 'queryFn' : 'mutationFn',
   keyProp: kind === 'query' ? 'queryKey' : 'mutationKey',
+  rq: true,
+  ...extra,
 })
 const SWR = (name: string, kind: HookDef['kind'], module: string): HookDef => ({
   name,
@@ -87,11 +98,47 @@ const SWR = (name: string, kind: HookDef['kind'], module: string): HookDef => ({
 /** Data-fetching hooks by `module#importedName` (`default` for default imports). */
 const HOOKS = new Map<string, HookDef>()
 for (const module of ['@tanstack/react-query', 'react-query']) {
-  for (const name of ['useQuery', 'useSuspenseQuery', 'useInfiniteQuery', 'useSuspenseInfiniteQuery']) {
+  for (const name of [
+    'useQuery',
+    'useSuspenseQuery',
+    'useInfiniteQuery',
+    'useSuspenseInfiniteQuery',
+    'usePrefetchQuery',
+    'usePrefetchInfiniteQuery',
+  ]) {
     HOOKS.set(`${module}#${name}`, RQ(name, 'query', module))
+  }
+  for (const name of ['useQueries', 'useSuspenseQueries']) {
+    HOOKS.set(`${module}#${name}`, RQ(name, 'query', module, { multi: true }))
   }
   HOOKS.set(`${module}#useMutation`, RQ('useMutation', 'mutation', module))
 }
+
+/** `queryClient` methods that run a query function. */
+const QUERY_CLIENT_FETCHES = new Set([
+  'fetchQuery',
+  'prefetchQuery',
+  'ensureQueryData',
+  'fetchInfiniteQuery',
+  'prefetchInfiniteQuery',
+  'ensureInfiniteQueryData',
+])
+
+/** `queryClient` methods that change cached queries, and the link kind they make. */
+const QUERY_CACHE_OPS: Record<string, QueryLink['kind']> = {
+  invalidateQueries: 'invalidate',
+  refetchQueries: 'refetch',
+  resetQueries: 'reset',
+  removeQueries: 'remove',
+  setQueryData: 'set-data',
+  setQueriesData: 'set-data',
+}
+
+/** Calls whose first argument is query options: `queryOptions({...})`, and library helpers like it. */
+const OPTIONS_HELPER = /Options$/
+
+/** Components that hand server-prefetched queries to the client. */
+const HYDRATION_COMPONENTS = new Set(['HydrationBoundary', 'Hydrate'])
 HOOKS.set('swr#default', SWR('useSWR', 'query', 'swr'))
 HOOKS.set('swr/immutable#default', SWR('useSWRImmutable', 'query', 'swr/immutable'))
 HOOKS.set('swr/infinite#default', SWR('useSWRInfinite', 'query', 'swr/infinite'))
@@ -168,9 +215,25 @@ interface Frame {
   /** Set when this frame decides the trigger (mutation `.mutate()`, JSX attribute). */
   trigger?: Trigger
   /** Set for a data-fetching hook frame. */
-  hook?: { def: HookDef; key?: string; typeArg?: TypeNode }
+  hook?: { def: HookDef; key?: string; typeArg?: TypeNode; parts?: QueryKeyPart[] }
   /** Set when entering a mutation's `onSuccess` / `onError` callback. */
   outcome?: 'success' | 'error'
+  /** Set when entering a mutation's callback: the mutation hook call it runs after. */
+  after?: Node
+}
+
+/** A query cache call found in the code, before its targets are resolved. */
+interface LinkFound {
+  link: Omit<QueryLink, 'fromSiteIds' | 'targetSiteIds'>
+  /** Mutation hook calls whose callbacks run it. */
+  after: Node[]
+}
+
+/** The values a React Query hook or `queryClient` method was called with. */
+interface HookArgs {
+  options?: Resolved
+  fn?: Resolved
+  key?: Resolved
 }
 
 interface NavFound {
@@ -230,6 +293,13 @@ export class RequestScanner {
   readonly #clients: readonly ApiClientConfig[]
   readonly #resolveModule: (specifier: string) => string | undefined
   readonly #clientFiles = new Map<string, string | undefined>()
+  readonly #links = new Map<string, LinkFound>()
+  /** Hook call (or `useQueries` entry) -> ids of the sites it runs. */
+  readonly #hookSites = new Map<Node, string[]>()
+  /** Site id -> what its hook does, for React Query sites. */
+  readonly #siteKinds = new Map<string, { kind: HookDef['kind']; client: boolean }>()
+  /** Nesting of `#evaluate`, so values that refer to each other end. */
+  #evalDepth = 0
 
   constructor(root: string, types: TypeResolver, options: RequestScannerOptions = {}) {
     this.#root = root
@@ -373,6 +443,13 @@ export class RequestScanner {
       this.#hook(call, hook, scope, env, w)
       return true
     }
+    const method = queryClientMethod(call)
+    if (method) {
+      const op = QUERY_CACHE_OPS[method.name]
+      if (op) this.#emitLink(w, this.#frame(call, scope), op, method.name, call, env)
+      else this.#hook(call, RQ(method.name, 'query', method.module, { client: true }), scope, env, w)
+      return true
+    }
     if (isActionStateHook(call)) {
       const fn = this.#functionValue(call.getArguments()[0], env)
       if (fn && this.#isServerAction(fn) && w.origin.client) {
@@ -475,60 +552,367 @@ export class RequestScanner {
     w.frames.pop()
   }
 
-  /** React Query / SWR: walk the query or mutation function. */
+  /** React Query / SWR / `queryClient.prefetchQuery()`: walk the query or mutation function. */
   #hook(call: CallExpression, def: HookDef, scope: Node, env: Env, w: Walk) {
-    let fnExpr: Node | undefined
-    let keyExpr: Node | undefined
-    let options: Node | undefined
-    if (def.fnProp) {
-      options = this.#queryOptions(call.getArguments()[0], env)
-      fnExpr = propValue(this.#prop(options, env, def.fnProp))
-      keyExpr = propValue(this.#prop(options, env, def.keyProp ?? ''))
-    } else {
-      fnExpr = call.getArguments()[def.fnArg ?? 1]
-      keyExpr = call.getArguments()[def.keyArg ?? 0]
+    const args = call.getArguments()
+    if (def.multi) {
+      // One query per entry: each is anchored at its entry, so they get their own site ids.
+      for (const entry of this.#queriesList(args[0], env)) {
+        if (entry.node) this.#runHook(call, entry.node, def, this.#rqArgs([entry], def), scope, w)
+      }
+      return
     }
-    const fn = this.#functionValue(fnExpr, env)
+    const hookArgs: HookArgs =
+      def.fnArg !== undefined
+        ? { fn: { node: args[def.fnArg], env }, key: { node: args[def.keyArg ?? 0], env } }
+        : this.#rqArgs(
+            args.map((node) => ({ node, env })),
+            def,
+          )
+    this.#runHook(call, call, def, hookArgs, scope, w)
+  }
+
+  #runHook(call: CallExpression, anchor: Node, def: HookDef, args: HookArgs, scope: Node, w: Walk) {
+    const fn = args.fn ? this.#functionValue(args.fn.node, args.fn.env) : undefined
     if (!fn || w.active.has(fn) || w.frames.length >= MAX_DEPTH) return
 
+    const keyNode = args.key?.node
+    const parts = def.rq && args.key ? this.#queryKey(args.key.node, args.key.env) : undefined
+    const typeArg = call.getTypeArguments()[0]
     const frame: Frame = {
-      node: call,
-      callee: call.getExpression().getText(),
+      node: anchor,
+      callee: anchor === call ? oneLine(call.getExpression().getText()) : def.name,
       scope,
       hook: {
         def,
-        ...(keyExpr ? { key: oneLine(keyExpr.getText()) } : {}),
-        ...(call.getTypeArguments()[0] ? { typeArg: call.getTypeArguments()[0] } : {}),
+        ...(keyNode ? { key: oneLine(keyNode.getText()) } : {}),
+        ...(typeArg && !def.multi ? { typeArg } : {}),
+        ...(parts ? { parts } : {}),
       },
       ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope) } : {}),
     }
-    // SWR passes the key to the fetcher.
+    // SWR passes the key to the fetcher. An inline function written in a factory
+    // (`(id) => queryOptions({ queryFn: () => getItem(id) })`) sees the factory's arguments.
     const fnEnv =
-      def.fnArg !== undefined && keyExpr && isFunctionLike(fn)
-        ? bindParams(fn, [{ expr: keyExpr, env }])
-        : EMPTY_ENV
+      def.fnArg !== undefined && keyNode && isFunctionLike(fn)
+        ? bindParams(fn, [{ expr: keyNode, env: args.key?.env ?? EMPTY_ENV }])
+        : (args.fn?.env ?? EMPTY_ENV)
     this.#enter(fn, fnEnv, frame, w)
 
-    // What runs after the mutation: navigation (and requests) in its callbacks.
+    // What runs after the mutation: navigation, cache updates (and requests) in its callbacks.
+    const options = args.options
     if (def.kind === 'mutation' && options) {
       const { hook: _, ...plain } = frame
       for (const name of ['onSuccess', 'onError', 'onSettled']) {
-        const callback = this.#functionValue(propValue(this.#prop(options, env, name)), env)
+        const prop = this.#propOf(options, name)
+        const callback = prop ? this.#functionValue(prop.node, prop.env) : undefined
         if (!callback || w.active.has(callback)) continue
         const outcome = name === 'onSuccess' ? 'success' : name === 'onError' ? 'error' : undefined
-        this.#enter(callback, EMPTY_ENV, outcome ? { ...plain, outcome } : plain, w)
+        this.#enter(
+          callback,
+          prop?.env ?? EMPTY_ENV,
+          { ...plain, ...(outcome ? { outcome } : {}), after: anchor },
+          w,
+        )
       }
     }
   }
 
-  /** `useQuery(options)`, `useQuery(todoQuery)` or `useQuery(queryOptions({...}))`. */
-  #queryOptions(arg: Node | undefined, env: Env): Node | undefined {
-    const r = this.#resolve(arg, env)
-    let node = r.node
-    if (node && N.isCallExpression(node) && /Options$/.test(calleeName(node) ?? '')) {
-      node = node.getArguments()[0]
+  /**
+   * React Query's arguments: an options object (`useQuery({ queryKey, queryFn })`, through
+   * `queryOptions()` and factories that return options), or v4's positional forms
+   * `useQuery(key, fn, options?)`, `useQuery(key, options)`, `useMutation(fn, options?)` and
+   * `useMutation(key, fn?, options?)`.
+   */
+  #rqArgs(values: Resolved[], def: HookDef): HookArgs {
+    const [first, second, third] = values
+    if (!first) return {}
+    const options = this.#evaluate(first.node, first.env)
+    if (options.node && N.isObjectLiteralExpression(skipWrappers(options.node))) {
+      return this.#fromOptions(options, def)
     }
-    return node
+    const isFn = (v: Resolved | undefined) => !!v && !!this.#functionValue(v.node, v.env)
+    if (def.kind === 'mutation' && isFn(first)) {
+      const rest = second ? this.#fromOptions(this.#evaluate(second.node, second.env), def) : {}
+      return { ...rest, fn: first }
+    }
+    // The key comes first.
+    if (isFn(second)) {
+      const rest = third ? this.#fromOptions(this.#evaluate(third.node, third.env), def) : {}
+      return { ...rest, key: first, fn: second as Resolved }
+    }
+    const rest = second ? this.#fromOptions(this.#evaluate(second.node, second.env), def) : {}
+    return { ...rest, key: first }
+  }
+
+  #fromOptions(options: Resolved, def: HookDef): HookArgs {
+    const fn = this.#propOf(options, def.fnProp ?? '')
+    const key = this.#propOf(options, def.keyProp ?? '')
+    return { options, ...(fn ? { fn } : {}), ...(key ? { key } : {}) }
+  }
+
+  /** `useQueries({ queries: [a, b] })`, `useQueries([a, b])` (v3) or `{ queries: ids.map((id) => ...) }`. */
+  #queriesList(arg: Node | undefined, env: Env): Resolved[] {
+    let list = this.#evaluate(arg, env)
+    if (list.node && N.isObjectLiteralExpression(skipWrappers(list.node))) {
+      const queries = this.#propOf(list, 'queries')
+      if (!queries) return []
+      list = this.#evaluate(queries.node, queries.env)
+    }
+    const node = list.node ? skipWrappers(list.node) : undefined
+    if (!node) return []
+    if (N.isArrayLiteralExpression(node)) {
+      return node
+        .getElements()
+        .filter((e) => !N.isSpreadElement(e))
+        .map((e) => ({ node: e, env: list.env }))
+    }
+    // `ids.map((id) => todoQuery(id))`: the callback's result stands for every entry.
+    if (N.isCallExpression(node) && calleeName(node) === 'map') {
+      const callback = this.#functionValue(node.getArguments()[0], list.env)
+      const returned = callback && isFunctionLike(callback) ? returnedExpr(callback) : undefined
+      if (returned) return [{ node: returned, env: list.env }]
+    }
+    return []
+  }
+
+  /** A property of an object value, or undefined when it is missing or not knowable. */
+  #propOf(obj: Resolved, name: string): Resolved | undefined {
+    const prop = this.#prop(obj.node, obj.env, name)
+    return prop === 'absent' || prop === 'unknown' ? undefined : prop
+  }
+
+  // --- Query keys and cache links ------------------------------------------------------------
+
+  /** A query key: an array literal, through constants, key factories and spreads. */
+  #queryKey(expr: Node | undefined, env: Env, depth = 0): QueryKeyPart[] | undefined {
+    if (!expr || depth > 8) return undefined
+    const r = this.#evaluate(expr, env)
+    const node = r.node ? skipWrappers(r.node) : undefined
+    if (!node || !N.isArrayLiteralExpression(node)) return undefined
+    const parts: QueryKeyPart[] = []
+    for (const element of node.getElements()) {
+      if (N.isSpreadElement(element)) {
+        const inner = this.#queryKey(element.getExpression(), r.env, depth + 1)
+        parts.push(...(inner ?? [{ kind: 'rest', text: oneLine(element.getExpression().getText()) }]))
+      } else {
+        parts.push(this.#keyPart(element, r.env, depth))
+      }
+    }
+    return parts
+  }
+
+  #keyPart(expr: Node, env: Env, depth: number): QueryKeyPart {
+    const r = this.#evaluate(expr, env)
+    if (!r.node) return { kind: 'static', value: null }
+    const node = skipWrappers(r.node)
+    if (N.isStringLiteral(node) || N.isNoSubstitutionTemplateLiteral(node)) {
+      return { kind: 'static', value: node.getLiteralValue() }
+    }
+    if (N.isNumericLiteral(node)) return { kind: 'static', value: node.getLiteralValue() }
+    if (
+      N.isPrefixUnaryExpression(node) &&
+      node.getOperatorToken() === ts.SyntaxKind.MinusToken &&
+      N.isNumericLiteral(node.getOperand())
+    ) {
+      return { kind: 'static', value: -Number(node.getOperand().getText()) }
+    }
+    if (N.isTrueLiteral(node) || N.isFalseLiteral(node))
+      return { kind: 'static', value: N.isTrueLiteral(node) }
+    if (N.isNullLiteral(node)) return { kind: 'static', value: null }
+    if (N.isTemplateExpression(node)) {
+      const str = this.#str(node, r.env)
+      if (str?.parts.every((p) => 'text' in p)) {
+        return { kind: 'static', value: str.parts.map((p) => ('text' in p ? p.text : '')).join('') }
+      }
+      const name = str?.parts.map((p) => ('text' in p ? p.text : `:${p.hole}`)).join('')
+      return { kind: 'param', name: name?.replace(/^:/, '') || holeName(expr) }
+    }
+    if (N.isObjectLiteralExpression(node) && depth < 8) {
+      const entries: { key: string; value: QueryKeyPart }[] = []
+      for (const p of node.getProperties()) {
+        if (N.isPropertyAssignment(p)) {
+          const init = p.getInitializer()
+          if (init)
+            entries.push({ key: propertyName(p.getNameNode()), value: this.#keyPart(init, r.env, depth + 1) })
+        } else if (N.isShorthandPropertyAssignment(p)) {
+          entries.push({ key: p.getName(), value: this.#keyPart(p.getNameNode(), r.env, depth + 1) })
+        }
+      }
+      return { kind: 'object', entries }
+    }
+    // Only known at runtime: named after the value as written where it is passed in.
+    return {
+      kind: 'param',
+      name: holeName(N.isIdentifier(node) || N.isPropertyAccessExpression(node) ? node : expr),
+    }
+  }
+
+  /**
+   * `queryClient.invalidateQueries({ queryKey, exact })` (v5), `invalidateQueries(key, filters)`
+   * (v4), `setQueryData(key, updater)`, ...: a link to the queries the key hits.
+   */
+  #emitLink(w: Walk, last: Frame, kind: QueryLink['kind'], method: string, call: CallExpression, env: Env) {
+    if (w.origin.kind === 'route-handler') return
+    const args = call.getArguments()
+    let key: QueryKeyPart[] | undefined
+    let exact = method === 'setQueryData'
+    const unknownKey = (node: Node): QueryKeyPart[] => [{ kind: 'rest', text: oneLine(node.getText()) }]
+    const isExact = (filters: Resolved) => {
+      const value = this.#propOf(filters, 'exact')?.node
+      return !!value && N.isTrueLiteral(skipWrappers(value))
+    }
+    const first = args[0]
+    if (first) {
+      const r = this.#evaluate(first, env)
+      if (r.node && N.isObjectLiteralExpression(skipWrappers(r.node)) && method !== 'setQueryData') {
+        const k = this.#propOf(r, 'queryKey')
+        if (k?.node) key = this.#queryKey(k.node, k.env) ?? unknownKey(k.node)
+        if (isExact(r)) exact = true
+      } else {
+        key = this.#queryKey(first, env) ?? unknownKey(first)
+        const filters = args[1]
+        if (filters && method !== 'setQueryData' && isExact({ node: filters, env })) exact = true
+      }
+    }
+
+    const frames = [...w.frames, last]
+    const callStack: CallFrame[] = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
+    const id = makeId('qlk', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#links.has(id)) return
+    const outcome = navOutcome(frames)
+    this.#links.set(id, {
+      link: {
+        id,
+        kind,
+        method,
+        origin: w.origin.kind === 'server-action' ? 'server-action' : 'component',
+        ...(w.origin.componentId ? { componentId: w.origin.componentId } : {}),
+        ...(key ? { key } : {}),
+        ...(exact ? { exact } : {}),
+        trigger: this.#trigger(frames, w.origin),
+        ...(outcome ? { outcome } : {}),
+        loc: this.#loc(call),
+        callStack,
+      },
+      after: frames.flatMap((f) => (f.after ? [f.after] : [])),
+    })
+  }
+
+  /**
+   * Every query cache link with the sites it runs after and the query sites it hits, plus
+   * `hydrate` links from server prefetches to the client queries a `HydrationBoundary` hands
+   * them to.
+   */
+  queryLinks(sites: RequestSite[], components: Component[]): QueryLink[] {
+    const isQuery = (s: RequestSite) => this.#siteKinds.get(s.id)?.kind === 'query' && !!s.queryKey
+    // A client-side cache call only reaches queries cached in the browser.
+    const browserQueries = sites.filter((s) => isQuery(s) && s.trigger.kind !== 'server-render')
+    const links: QueryLink[] = []
+    for (const { link, after } of this.#links.values()) {
+      const fromSiteIds = [...new Set(after.flatMap((node) => this.#hookSites.get(node) ?? []))]
+      const targetSiteIds = browserQueries
+        .filter((s) => !link.key || queryKeyHits(link.key, s.queryKey ?? [], link.exact))
+        .map((s) => s.id)
+      links.push({ ...link, fromSiteIds, targetSiteIds })
+    }
+
+    const byId = new Map(components.map((c) => [c.id, c]))
+    for (const site of sites) {
+      const kind = this.#siteKinds.get(site.id)
+      if (!kind?.client || kind.kind !== 'query' || site.trigger.kind !== 'server-render') continue
+      if (!site.queryKey || !site.componentId) continue
+      const below = subtree(site.componentId, byId)
+      const hydrates = [...below].some((id) =>
+        byId.get(id)?.children.some((c) => c.resolution === 'external' && HYDRATION_COMPONENTS.has(c.name)),
+      )
+      if (!hydrates) continue
+      const key = site.queryKey
+      const targets = browserQueries.filter(
+        (s) =>
+          s.componentId &&
+          s.componentId !== site.componentId &&
+          below.has(s.componentId) &&
+          (queryKeyHits(key, s.queryKey ?? [], true) || queryKeyHits(s.queryKey ?? [], key, true)),
+      )
+      if (targets.length === 0) continue
+      const frame = site.callStack[0] as CallFrame
+      links.push({
+        id: makeId('qlk', 'hydrate', site.id),
+        kind: 'hydrate',
+        method: site.hook?.name ?? 'prefetchQuery',
+        origin: 'component',
+        componentId: site.componentId,
+        key,
+        exact: true,
+        fromSiteIds: [site.id],
+        targetSiteIds: targets.map((s) => s.id),
+        trigger: site.trigger,
+        loc: { file: frame.file, line: frame.line, column: frame.column },
+        callStack: site.callStack,
+      })
+    }
+    return links.sort((a, b) => compareLoc(a.loc, b.loc) || compare(a.id, b.id))
+  }
+
+  /**
+   * Follows a value to where it is written: parameters, constants, object properties
+   * (`todoKeys.all`), project functions to what they return (`todoKeys.detail(id)`,
+   * `todoQuery(id)`) and `queryOptions({...})` to its argument.
+   */
+  #evaluate(expr: Node | undefined, env: Env): Resolved {
+    if (this.#evalDepth > 30) return { node: expr, env }
+    this.#evalDepth++
+    try {
+      let r = this.#resolve(expr, env)
+      for (let i = 0; i < 10 && r.node; i++) {
+        const node: Node = r.node
+        if (N.isPropertyAccessExpression(node)) {
+          const prop = this.#prop(node.getExpression(), r.env, node.getName())
+          if (prop === 'absent' || prop === 'unknown' || !prop.node) break
+          r = this.#resolve(prop.node, prop.env)
+          continue
+        }
+        // `keys.all[0]`, `config['key']`
+        if (N.isElementAccessExpression(node)) {
+          const arg = node.getArgumentExpression()
+          const index = arg ? skipWrappers(arg) : undefined
+          if (index && N.isNumericLiteral(index)) {
+            const array = this.#evaluate(node.getExpression(), r.env)
+            const list = array.node ? skipWrappers(array.node) : undefined
+            if (!list || !N.isArrayLiteralExpression(list)) break
+            const element = list.getElements()[index.getLiteralValue()]
+            if (!element || list.getElements().some((e) => N.isSpreadElement(e))) break
+            r = this.#resolve(element, array.env)
+            continue
+          }
+          if (index && (N.isStringLiteral(index) || N.isNoSubstitutionTemplateLiteral(index))) {
+            const prop = this.#prop(node.getExpression(), r.env, index.getLiteralValue())
+            if (prop === 'absent' || prop === 'unknown' || !prop.node) break
+            r = this.#resolve(prop.node, prop.env)
+            continue
+          }
+          break
+        }
+        if (N.isCallExpression(node)) {
+          const fn = calleeFunction(node)
+          if (fn && isFunctionLike(fn) && isProject(fn) && this.#isScanned(fn)) {
+            const returned = returnedExpr(fn)
+            if (!returned) break
+            r = this.#resolve(returned, bind(fn, node.getArguments(), r.env))
+            continue
+          }
+          if (OPTIONS_HELPER.test(calleeName(node) ?? '') && node.getArguments()[0]) {
+            r = this.#resolve(node.getArguments()[0], r.env)
+            continue
+          }
+        }
+        break
+      }
+      return r
+    } finally {
+      this.#evalDepth--
+    }
   }
 
   // --- Network calls -------------------------------------------------------------------------
@@ -821,6 +1205,7 @@ export class RequestScanner {
         this.#axiosSite(d, EMPTY_ENV) ||
         this.#clientSite(d, EMPTY_ENV) ||
         hookOf(d) ||
+        queryClientMethod(d) ||
         isActionStateHook(d) ||
         navigationCall(d)
       ) {
@@ -847,6 +1232,12 @@ export class RequestScanner {
     const frames = [...w.frames, last]
     const callStack: CallFrame[] = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
     const id = makeId('req', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    for (const f of frames) {
+      if (!f.hook) continue
+      const ids = this.#hookSites.get(f.node) ?? []
+      if (!ids.includes(id)) ids.push(id)
+      this.#hookSites.set(f.node, ids)
+    }
     if (this.#sites.has(id)) return
 
     const trigger = this.#trigger(frames, w.origin)
@@ -874,6 +1265,7 @@ export class RequestScanner {
             },
           }
         : {}),
+      ...(hookFrame?.hook?.parts ? { queryKey: hookFrame.hook.parts } : {}),
       ...(found.method ? { method: found.method } : {}),
       ...(found.url ? { url: found.url } : {}),
       trigger,
@@ -886,6 +1278,9 @@ export class RequestScanner {
     site.flags = flagsOf(site)
     site.hash = siteHash(frames, site, (node) => this.#loc(node).file)
     this.#sites.set(id, site)
+    if (hookFrame?.hook?.def.rq) {
+      this.#siteKinds.set(id, { kind: hookFrame.hook.def.kind, client: !!hookFrame.hook.def.client })
+    }
   }
 
   #emitNav(w: Walk, last: Frame, found: NavFound, node: Node, conditional = false) {
@@ -1215,7 +1610,7 @@ export class RequestScanner {
   #prop(obj: Node | undefined, env: Env, name: string, depth = 0): Prop {
     if (!obj) return 'absent'
     if (depth > MAX_DEPTH) return 'unknown'
-    const r = this.#resolve(obj, env)
+    const r = this.#evaluate(obj, env)
     if (!r.node) return 'absent'
     if (!N.isObjectLiteralExpression(r.node)) return 'unknown'
     const properties = r.node.getProperties()
@@ -1586,6 +1981,47 @@ function calleeName(call: CallExpression): string | undefined {
   if (N.isIdentifier(expr)) return expr.getText()
   if (N.isPropertyAccessExpression(expr)) return expr.getName()
   return undefined
+}
+
+/**
+ * A `queryClient` method React Query defines (fetch, prefetch, or cache update), with the
+ * package it comes from. The receiver's type must be React Query's `QueryClient`.
+ */
+function queryClientMethod(call: CallExpression): { name: string; module: string } | undefined {
+  const expr = call.getExpression()
+  if (!N.isPropertyAccessExpression(expr)) return undefined
+  const name = expr.getName()
+  if (!QUERY_CLIENT_FETCHES.has(name) && !(name in QUERY_CACHE_OPS)) return undefined
+  const type = expr.getExpression().getType()
+  const symbol = type.getSymbol() ?? type.getAliasSymbol()
+  if (symbol?.getName() !== 'QueryClient') return undefined
+  for (const decl of symbol.getDeclarations()) {
+    const m = /\/node_modules\/(@tanstack\/[a-z-]*query[a-z-]*|react-query)\//.exec(
+      decl.getSourceFile().getFilePath(),
+    )
+    if (m?.[1]) return { name, module: m[1] }
+  }
+  return undefined
+}
+
+/** What a function returns: its expression body, or its only `return` statement's value. */
+function returnedExpr(fn: FunctionLike): Node | undefined {
+  const body = fn.getBody()
+  if (!body) return undefined
+  if (!N.isBlock(body)) return body
+  const returns = body.getStatements().filter((s) => N.isReturnStatement(s))
+  const only = returns.length === 1 ? returns[0] : undefined
+  return only && N.isReturnStatement(only) ? only.getExpression() : undefined
+}
+
+/** A component and every component rendered below it. */
+function subtree(id: string, components: Map<string, Component>, seen = new Set<string>()): Set<string> {
+  if (seen.has(id)) return seen
+  seen.add(id)
+  for (const child of components.get(id)?.children ?? []) {
+    if (child.componentId) subtree(child.componentId, components, seen)
+  }
+  return seen
 }
 
 function hookOf(call: CallExpression): HookDef | undefined {

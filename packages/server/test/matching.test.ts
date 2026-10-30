@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import type { ServerActionInfo } from '../src/actions'
 import { Matcher } from '../src/matcher'
 
-const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl', 'mismatch']
+const FIXTURES = ['basic', 'react-query', 'react-query-v4', 'server-actions', 'bff', 'next-intl', 'mismatch']
 const repo = join(import.meta.dirname, '..', '..', '..')
 
 interface Recording {

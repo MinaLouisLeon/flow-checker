@@ -16,10 +16,12 @@ import {
   type Flow,
   type FlowStatus,
   type FlowStep,
+  formatQueryKey,
   isVerified,
   type ModelIndex,
   mismatchField,
   type Navigation,
+  queryLinkVerb,
   type RecordedFlow,
   type RecordedStep,
   type RequestSite,
@@ -497,6 +499,7 @@ function requestSection(
   const first = site.callStack[0]
   const target = site.targetRouteId ? ctx.index.routes.get(site.targetRouteId) : undefined
   const hook = site.hook ? ` · ${code(`${site.hook.name}${site.hook.key ? `(${site.hook.key})` : ''}`)}` : ''
+  const queryKey = site.queryKey ? ` · key ${code(formatQueryKey(site.queryKey))}` : ''
   const url =
     site.url && site.transport !== 'server-action'
       ? `${code(urlText(site.url))}${site.url.confidence === 'exact' ? '' : ` (${site.url.confidence})`}`
@@ -515,7 +518,7 @@ function requestSection(
       ['Trigger', triggerText(site.trigger)],
       [
         'Transport',
-        `${site.transport}${site.client ? ` (${code(`${site.client.module}#${site.client.name}`)})` : ''}${hook}`,
+        `${site.transport}${site.client ? ` (${code(`${site.client.module}#${site.client.name}`)})` : ''}${hook}${queryKey}`,
       ],
       ['URL', url],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
@@ -709,6 +712,11 @@ function stepText(ctx: Ctx, step: FlowStep, from: string): string {
       const where = route ? routeLink(ctx, route, from) : nav ? code(urlText(nav.href)) : '?'
       return `${nav?.kind ?? 'navigate'} → ${where}`
     }
+    case 'query-update': {
+      const link = ctx.index.queryLinks.get(step.linkId)
+      if (!link) return `Cache update ${code(step.linkId)}`
+      return `${code(link.method)} ${code(link.key ? formatQueryKey(link.key) : 'all queries')}`
+    }
   }
 }
 
@@ -731,6 +739,16 @@ function stepDetail(ctx: Ctx, step: FlowStep): string {
       return nav
         ? `${nav.outcome ? `on ${nav.outcome} · ` : ''}${code(`${nav.loc.file}:${nav.loc.line}`)}`
         : ''
+    }
+    case 'query-update': {
+      const link = ctx.index.queryLinks.get(step.linkId)
+      if (!link) return ''
+      const hits = link.targetSiteIds.map((id) => ctx.index.requests.get(id)).filter((s) => !!s)
+      const refetch =
+        hits.length > 0
+          ? `${queryLinkVerb(link.kind)} ${hits.map((s) => code(requestLabel(s))).join(', ')} · `
+          : ''
+      return `${refetch}${code(`${link.loc.file}:${link.loc.line}`)}`
     }
   }
 }
@@ -787,6 +805,12 @@ function sequence(ctx: Ctx, flow: Flow): string {
           const to = step.routeId ? pageOf(step.routeId) : participant('nav:?', nav ? urlText(nav.href) : '?')
           lines.push(`${indent}${current}->>${to}: ${mermaid(nav?.kind ?? 'navigate')}`)
           current = to
+          break
+        }
+        case 'query-update': {
+          const link = ctx.index.queryLinks.get(step.linkId)
+          const key = link?.key ? formatQueryKey(link.key) : 'all queries'
+          lines.push(`${indent}Note over ${current}: ${mermaid(`${link?.method ?? 'cache update'} ${key}`)}`)
           break
         }
       }

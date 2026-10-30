@@ -1,6 +1,14 @@
 // Flows (M7): user flows inferred from the code, confirmed when a session walks them, plus
 // recorded variants (a walk that went elsewhere) and flows you recorded by name.
-import { type Flow, type FlowStatus, type FlowStep, type RecordedFlow, urlText } from '@flow-checker/shared'
+import {
+  type Flow,
+  type FlowStatus,
+  type FlowStep,
+  formatQueryKey,
+  queryLinkVerb,
+  type RecordedFlow,
+  urlText,
+} from '@flow-checker/shared'
 import { useState } from 'react'
 import { useDeleteRecording, useFlows, useRenameFlow } from '../api'
 import { useData } from '../context'
@@ -290,6 +298,26 @@ function StepView({ step }: { step: FlowStep }) {
             </a>
           ) : (
             <code>{nav ? urlText(nav.href) : '?'}</code>
+          )}
+        </span>
+      )
+    }
+    case 'query-update': {
+      const link = index.queryLinks.get(step.linkId)
+      if (!link) return <span className="flow-step-body muted">cache update {step.linkId}</span>
+      const targets = link.targetSiteIds.map((id) => index.requests.get(id)).filter((s) => !!s)
+      return (
+        <span className="flow-step-body">
+          <span className="muted">{link.method}</span>{' '}
+          <code>{link.key ? formatQueryKey(link.key) : 'all queries'}</code>
+          {targets.length > 0 && (
+            <span className="muted">
+              {' '}
+              → {queryLinkVerb(link.kind)}{' '}
+              {[...new Set(targets.map((t) => `${t.method ?? '?'} ${t.url ? urlText(t.url) : '?'}`))].join(
+                ', ',
+              )}
+            </span>
           )}
         </span>
       )

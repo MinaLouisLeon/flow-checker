@@ -32,6 +32,7 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   route: 'route',
   parent: 'parent request',
   trigger: 'trigger',
+  'query-key': 'query key',
   manual: 'manual',
 }
 
@@ -276,6 +277,15 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
                   </dd>
                 </>
               )}
+            </>
+          )}
+          {c.query && (
+            <>
+              <dt>React Query</dt>
+              <dd>
+                {c.query.kind}{' '}
+                {c.query.key ? <code className="break">{JSON.stringify(c.query.key)}</code> : null}
+              </dd>
             </>
           )}
           {c.serverAction && (
