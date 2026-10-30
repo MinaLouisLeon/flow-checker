@@ -10,6 +10,11 @@ export interface WatchBatch {
   changed: string[]
   added: string[]
   removed: string[]
+  /**
+   * When the last change in the batch happened. Code from this batch dates from then, not from
+   * when its re-scan finishes: requests sent while a slow re-scan runs already ran the new code.
+   */
+  at: Date
 }
 
 export interface WatchOptions {
@@ -58,6 +63,7 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
   const { root } = options
   const debounceMs = options.debounceMs ?? 40
   const pending = new Map<string, 'add' | 'change' | 'unlink'>()
+  let lastEvent = new Date()
   // Content hash of each file as last reported. Some file systems (macOS FSEvents) send a second
   // `change` for a file that was just added or saved, after its batch went out; a change whose
   // content is the same as last reported can't change the scan, so it is dropped.
@@ -66,7 +72,7 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
 
   const flush = () => {
     timer = undefined
-    const batch: WatchBatch = { changed: [], added: [], removed: [] }
+    const batch: WatchBatch = { changed: [], added: [], removed: [], at: lastEvent }
     for (const [path, kind] of pending) {
       if (!existsSync(path)) {
         reported.delete(path)
@@ -87,6 +93,7 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
     // A file added and changed in the same burst is still new.
     const previous = pending.get(path)
     pending.set(path, previous === 'add' && kind === 'change' ? 'add' : kind)
+    lastEvent = new Date()
     if (timer) clearTimeout(timer)
     timer = setTimeout(flush, debounceMs)
   }

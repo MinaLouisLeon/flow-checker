@@ -37,6 +37,9 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `runtime: 'nodejs'` (15.5+).
 - Edge code only gets env variables Next sees written out (`process.env.FLOW_CHECKER_RUNTIME`, not
   `process.env[name]`), so the edge hook passes the variable explicitly.
+- New code is dated from when its file changed (`WatchBatch.at` → `ScanUpdate.changedAt` → `CodeHistory.update`),
+  not when the re-scan finishes: on slow CI (Windows) a re-scan can take >1 s, and captures sent meanwhile were
+  wrongly marked stale (failed `e2e/watch.spec.ts` on PR #18).
 - `scripts/next-matrix.mjs` packs the package at start; it needs network (npm) and takes ~1 min per version.
 - Tooling on this Windows machine: Python writes CRLF unless files are opened with `newline=''`; bash heredocs that
   contain backticks or `\n` inside Python strings get mangled, so write patch scripts with the Write tool instead.

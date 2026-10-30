@@ -8,6 +8,8 @@ export interface ScanUpdate {
   durationMs?: number
   /** Project-relative files that changed, for the dashboard notice. */
   files?: string[]
+  /** When the files changed. New code dates from then (default: when the update is applied). */
+  changedAt?: Date
 }
 
 export type ScanListener = (update: ScanUpdate) => void

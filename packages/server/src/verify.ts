@@ -72,9 +72,10 @@ export class Verifier {
 
   /**
    * A new scan result. Every capture is matched again. Site ids include line numbers, so a site
-   * whose lines moved gets a new id: its captures and manual matches move with it.
+   * whose lines moved gets a new id: its captures and manual matches move with it. `changedAt`:
+   * when the files changed, so captures taken while the re-scan ran count as the new code's.
    */
-  setModel(model: AppModel): void {
+  setModel(model: AppModel, changedAt?: Date): void {
     const renamed = pairRenamedSites(this.model.requests, model.requests)
     if (this.overrides.get().matches.some((m) => m.siteId && renamed[m.siteId])) {
       this.overrides.update((current) => ({
@@ -85,7 +86,7 @@ export class Verifier {
         }),
       }))
     }
-    this.history.update(model)
+    this.history.update(model, changedAt)
     this.model = model
     this.matcher = new Matcher(model)
     this.sites = new Map(model.requests.map((s) => [s.id, s]))
