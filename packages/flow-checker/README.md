@@ -12,7 +12,7 @@ Then use your app as usual. Each request the app sends shows up in the dashboard
 
 ## What it does
 
-- **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, tRPC (v10 and v11: hooks, the vanilla client and v11 `queryOptions()`, typed from the router's procedures), GraphQL (Apollo Client 3 and 4, urql and Relay: operations by name, typed from codegen, the Relay compiler or your schema), Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Middleware (`middleware.ts`, or `proxy.ts` on Next.js 16) is read too: which routes its `config.matcher` selects, its redirects (with the condition around each one), its rewrites (used to tell which page answered a URL) and the requests it sends. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
+- **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, tRPC (v10 and v11: hooks, the vanilla client and v11 `queryOptions()`, typed from the router's procedures), GraphQL (Apollo Client 3 and 4, urql and Relay: operations by name, typed from codegen, the Relay compiler or your schema), server-sent events (`new EventSource()` and streamed `fetch`, with the events each listens to and their data types), Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Middleware (`middleware.ts`, or `proxy.ts` on Next.js 16) is read too: which routes its `config.matcher` selects, its redirects (with the condition around each one), its rewrites (used to tell which page answered a URL) and the requests it sends. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
 - **Captures real traffic** while you test, in the browser and on the server, with passwords, tokens and auth headers **masked before anything is saved**.
 - **Verifies the map.** Each capture is matched to the request site that sent it, which marks that site `✓ verified`. The captured data is compared with the declared types (missing fields, extra fields, wrong types, unexpected `null`), and flows are confirmed when you walk them.
 - **Keeps up with your edits.** Files are watched and re-scanned incrementally. Requests whose code changed since they were captured are marked `↻ needs re-check`.
@@ -109,6 +109,12 @@ Apollo Client (3 and 4), urql and Relay calls are request sites, one per operati
 
 Types come from type arguments at the call, codegen's typed documents or the Relay compiler first. Without those, set `graphql.schema` (or let flow-checker find `schema.graphql` / the schema in your Relay or codegen config), or `graphql.introspection` to ask a running endpoint (see [config](../../docs/config.md#graphql)). The dashboard overview lists every operation with its types and callers, and fragments with the components that read them.
 
+### Server-sent events
+
+`new EventSource(url)` and a `fetch` read as an event stream (`Accept: text/event-stream`, or any fetch of a route handler that answers with `text/event-stream`) are request sites. The scan lists the events each one listens to (`onmessage`, `addEventListener('tick', ...)`) with the type its data is read as (`JSON.parse(e.data) as Tick`, `const t: Tick = JSON.parse(e.data)`, `MessageEvent<Tick>`), and reads the events a route handler writes (`event: tick` / `data: ${JSON.stringify(tick)}`, also through a helper like `send('tick', tick)`). Events the code has no type for take the handler's.
+
+While you test, each stream is captured message by message: the dashboard shows the capture as soon as it opens, then every message with its time, event name and data (redacted like bodies), and each message is checked against its event's type. `capture.maxMessages` (200) and `capture.maxMessageBytes` (64 kB) limit what is kept per connection.
+
 ## Setup in detail
 
 `flow-checker init` shows what it will change and asks first:
@@ -175,7 +181,8 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 
 ## Limits
 
-- App Router only. WebSockets and SSE streams are captured as plain requests only.
+- App Router only. WebSockets are captured as plain requests only.
+- Server-sent events: an EventSource only reports named events someone listens to, so events the app has no listener for aren't recorded. Event streams read by libraries such as `@microsoft/fetch-event-source` are captured (they use `fetch`), but their listeners aren't read by the scan. Streams on the edge runtime are captured as plain requests.
 - GraphQL: subscriptions over WebSockets aren't captured yet. Operations sent through your own `fetch` wrapper (not Apollo, urql or Relay) are plain requests. Server resolvers aren't linked to the operations that run them.
 - Edge runtime (middleware before Next.js 16): capture is best effort, `fetch` only and without the incoming request. Middleware on Node.js (`proxy.ts`, or `runtime: 'nodejs'`) is captured like the rest of the server.
 - Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.

@@ -32,6 +32,8 @@ export const MATCH_SIGNALS = [
   'trpc-procedure',
   /** The GraphQL operation the capture sent (by name or persisted hash) is the site's (M17). */
   'graphql-operation',
+  /** An event stream capture on an event stream site, and the event names it received (M18). */
+  'stream',
   /** You assigned captures like this one to the site. */
   'manual',
 ] as const

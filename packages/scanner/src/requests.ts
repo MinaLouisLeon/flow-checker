@@ -35,7 +35,10 @@ import {
   type RequestUrl,
   type Route,
   type ServerActionRef,
+  type SiteStream,
   type SourceLoc,
+  type SseEndpoint,
+  type SseEvent,
   type Trigger,
   type TrpcProcedure,
   type TrpcProcedureType,
@@ -51,6 +54,7 @@ import {
   type JsxSelfClosingElement,
   type MethodDeclaration,
   Node as N,
+  type NewExpression,
   type Node,
   type ParameterDeclaration,
   type SourceFile,
@@ -74,6 +78,13 @@ import { type GraphQLSchema, operationShapes, usedFragments } from './graphql-sc
 import { unmask } from './graphql-types'
 import { linkApi, type NavApi, type NavKind, navigationCall, outcomeOf } from './navigation'
 import { compare, relativeTo } from './paths'
+import {
+  eventSourceListeners,
+  mentionsEventStream,
+  mergeHandlerEvents,
+  parameterIndex,
+  sseTemplate,
+} from './sse'
 import {
   KEY_METHODS,
   OPTIONS_METHODS,
@@ -326,6 +337,7 @@ interface Found {
   client?: { module: string; name: string }
   procedure?: ProcedureRef
   operation?: OperationRef
+  stream?: SiteStream
 }
 
 export interface RequestScannerOptions {
@@ -382,6 +394,10 @@ export class RequestScanner {
   readonly #callTypes = new Map<string, OperationTypes>()
   /** Operation id -> document values used at calls, for codegen's typed documents. */
   readonly #docExprs = new Map<string, Node[]>()
+  /** Route handlers that answer with an event stream (M18). */
+  readonly #streams: SseEndpoint[] = []
+  /** Functions that write SSE text from their parameters, by function. */
+  readonly #sseHelpers = new Map<Node, SseHelper[]>()
 
   constructor(root: string, types: TypeResolver, options: RequestScannerOptions = {}) {
     this.#root = root
@@ -416,7 +432,93 @@ export class RequestScanner {
         handlerMethod: method,
       }
       this.#walk(fn, fn, EMPTY_ENV, { origin, frames: [], active: new Set([fn]) })
+      this.#eventStream(route, method, fn, file)
     }
+  }
+
+  /** Route handlers that answer with an event stream, with the sites that open each (M18). */
+  streams(): SseEndpoint[] {
+    return [...this.#streams].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /**
+   * A handler that answers with `text/event-stream` (written in it or in a function it calls),
+   * and the events it writes: SSE text in its file, and calls to helpers that write it
+   * (`send('tick', data)`, imported or not), whose event name and data come from the call.
+   */
+  #eventStream(route: Route, method: HttpMethod, fn: Node, file: SourceFile) {
+    const helperMentions = fn.getDescendantsOfKind(ts.SyntaxKind.CallExpression).some((call) => {
+      const callee = calleeFunction(call)
+      return !!callee && isProject(callee) && mentionsEventStream(callee)
+    })
+    if (!mentionsEventStream(fn) && !helperMentions) return
+    const events: SseEvent[] = []
+    const add = (name: string | undefined, data: Node | undefined, at: Node) => {
+      if (!name) return
+      const index = events.findIndex((e) => e.name === name)
+      // The first place that gives the event a type wins.
+      if (index >= 0 && (events[index]?.dataType || !data)) return
+      const dataType = data ? this.#valueType(data, EMPTY_ENV, 0) : undefined
+      const event: SseEvent = { name, ...(dataType ? { dataType } : {}), loc: this.#loc(at) }
+      if (index >= 0) events[index] = event
+      else events.push(event)
+    }
+    const nameOf = (value: string | Node | undefined): string | undefined => {
+      if (value === undefined) return 'message'
+      if (typeof value === 'string') return value
+      return literalOf(this.#str(value, EMPTY_ENV))
+    }
+    for (const node of file.getDescendants()) {
+      if (N.isCallExpression(node)) {
+        const callee = calleeFunction(node)
+        if (!callee || !isProject(callee) || isInside(node, callee)) continue
+        const args = node.getArguments()
+        for (const helper of this.#sseHelper(callee)) {
+          const name =
+            helper.eventIndex !== undefined ? nameOf(args[helper.eventIndex]) : (helper.event ?? 'message')
+          add(name, helper.dataIndex !== undefined ? args[helper.dataIndex] : undefined, node)
+        }
+        continue
+      }
+      const t = sseTemplate(node)
+      if (!t) continue
+      // Text built from a helper's parameters is read at the helper's calls.
+      const owner = node.getFirstAncestor((a) => isFunctionLike(a))
+      const fromParams =
+        !!owner &&
+        ((typeof t.event === 'object' && parameterIndex(t.event, owner) !== undefined) ||
+          (!!t.data && parameterIndex(t.data, owner) !== undefined))
+      if (!fromParams) add(nameOf(t.event), t.data, node)
+    }
+    this.#streams.push({
+      id: makeId('sse', route.file, method),
+      routeId: route.id,
+      method,
+      events,
+      loc: this.#loc(functionAnchor(fn)),
+      siteIds: [],
+    })
+  }
+
+  /** SSE text in a function whose event name or data are its parameters. */
+  #sseHelper(fn: Node): SseHelper[] {
+    const cached = this.#sseHelpers.get(fn)
+    if (cached) return cached
+    const out: SseHelper[] = []
+    for (const node of fn.getDescendants()) {
+      const t = sseTemplate(node)
+      if (!t) continue
+      const eventIndex = typeof t.event === 'object' ? parameterIndex(t.event, fn) : undefined
+      const dataIndex = t.data ? parameterIndex(t.data, fn) : undefined
+      if (eventIndex === undefined && dataIndex === undefined) continue
+      out.push({
+        ...(typeof t.event === 'string' ? { event: t.event } : {}),
+        ...(eventIndex !== undefined ? { eventIndex } : {}),
+        ...(dataIndex !== undefined ? { dataIndex } : {}),
+      })
+    }
+    this.#sseHelpers.set(fn, out)
+    return out
   }
 
   /** Requests, redirects and rewrites in `middleware.ts` / `proxy.ts` (M14). */
@@ -706,6 +808,7 @@ export class RequestScanner {
       const target = handlers.find((h) => h.re.test(sample))
       if (!target) continue
       site.targetRouteId = target.route.id
+      this.#linkStream(site, target.route)
       const chain = sites.filter(
         (s) =>
           s.origin === 'route-handler' &&
@@ -717,6 +820,26 @@ export class RequestScanner {
       if (chain.length > 0) site.chain = chain.map((s) => s.id)
     }
     return sites.sort(bySite)
+  }
+
+  /**
+   * A request to a route handler that answers with an event stream (M18): a plain fetch becomes
+   * a streamed one, and the events the handler sends join the site's.
+   */
+  #linkStream(site: RequestSite, route: Route) {
+    const endpoint = this.#streams.find(
+      (e) => e.routeId === route.id && (!site.method || e.method === site.method),
+    )
+    if (!endpoint) return
+    if (site.transport === 'fetch') {
+      site.transport = 'sse'
+      site.stream = { api: 'fetch', events: [] }
+      delete site.responseType
+    }
+    if (!site.stream) return
+    site.stream = mergeHandlerEvents(site.stream, endpoint.events)
+    site.flags = flagsOf(site)
+    if (!endpoint.siteIds.includes(site.id)) endpoint.siteIds.push(site.id)
   }
 
   /** Every navigation, sorted by where it is, with the page it goes to when that resolves. */
@@ -746,7 +869,78 @@ export class RequestScanner {
         return
       }
       if (N.isCallExpression(d) && this.#call(d, scope, env, w)) traversal.skip()
+      if (N.isNewExpression(d) && this.#eventSource(d, scope, env, w)) traversal.skip()
     })
+  }
+
+  /** `new EventSource(url)` (M18), with the events its listeners read and their types. */
+  #eventSource(expr: NewExpression, scope: Node, env: Env, w: Walk): boolean {
+    const callee = expr.getExpression()
+    const name = N.isPropertyAccessExpression(callee) ? callee.getName() : callee.getText()
+    if (name !== 'EventSource') return false
+    const symbol = callee.getSymbol()
+    if (
+      symbol &&
+      unalias(symbol)
+        .getDeclarations()
+        .some((d) => isProject(d))
+    )
+      return false
+    const [input, init] = expr.getArguments()
+    const credentials = propValue(this.#prop(init, env, 'withCredentials'))
+    const owner = expr.getFirstAncestor((a) => isFunctionLike(a)) ?? scope
+    const events: SiteStream['events'] = []
+    const listeners = eventSourceListeners(expr, owner, (arg) => literalOf(this.#str(arg, env)))
+    for (const listener of listeners) {
+      const dataType = this.#listenerType(listener.handler, env)
+      const existing = events.find((e) => e.name === listener.name)
+      if (existing) {
+        if (!existing.dataType && dataType) Object.assign(existing, { dataType, typeFrom: 'code' })
+        continue
+      }
+      events.push({
+        name: listener.name,
+        ...(dataType ? { dataType, typeFrom: 'code' as const } : {}),
+        loc: this.#loc(listener.handler),
+        listened: true,
+      })
+    }
+    this.#emit(
+      w,
+      { node: expr, callee: oneLine(`new ${callee.getText()}`), scope },
+      {
+        transport: 'sse',
+        method: 'GET',
+        url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+        stream: {
+          api: 'event-source',
+          events,
+          ...(credentials?.getKind() === ts.SyntaxKind.TrueKeyword ? { withCredentials: true } : {}),
+        },
+      },
+    )
+    return true
+  }
+
+  /**
+   * The type a listener reads its data as: `(e: MessageEvent<Tick>)`, `JSON.parse(e.data) as
+   * Tick`, `const t: Tick = JSON.parse(e.data)` or `Schema.parse(JSON.parse(e.data))`.
+   */
+  #listenerType(handler: Node, env: Env): TypeRef | undefined {
+    const fn = this.#functionValue(handler, env)
+    if (!fn || !isFunctionLike(fn)) return undefined
+    const typeNode = fn.getParameters()[0]?.getTypeNode()
+    if (typeNode && N.isTypeReference(typeNode) && typeNode.getTypeName().getText() === 'MessageEvent') {
+      const arg = typeNode.getTypeArguments()[0]
+      const type = arg?.getType()
+      if (arg && type && !type.isString() && isMeaningful(type)) return this.#types.fromTypeNode(arg)
+    }
+    for (const call of fn.getDescendantsOfKind(ts.SyntaxKind.CallExpression)) {
+      if (call.getExpression().getText() !== 'JSON.parse') continue
+      const found = this.#typedUse(call)
+      if (found) return found
+    }
+    return undefined
   }
 
   /** Handles one call. Returns true when its arguments were handled too and should be skipped. */
@@ -1798,6 +1992,17 @@ export class RequestScanner {
     const methodProp = this.#prop(init, env, 'method')
     const method = methodProp === 'absent' ? 'GET' : this.#method(methodProp)
     const body = this.#bodyOf(propValue(this.#prop(init, env, 'body')), env)
+    // `Accept: text/event-stream`: the response is read as an event stream (M18).
+    const headers = propValue(this.#prop(init, env, 'headers'))
+    if (headers && mentionsEventStream(headers)) {
+      return {
+        transport: 'sse',
+        ...(method ? { method } : {}),
+        url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+        ...(body ? { bodyType: body } : {}),
+        stream: { api: 'fetch', events: [] },
+      }
+    }
     return {
       transport: 'fetch',
       ...(method ? { method } : {}),
@@ -2105,7 +2310,8 @@ export class RequestScanner {
 
     const trigger = this.#trigger(frames, w.origin)
     const hookFrame = frames.findLast((f) => f.hook)
-    const responseType = found.responseType ?? this.#response(frames)
+    // An event stream's data is in its events, not a response body (M18).
+    const responseType = found.stream ? undefined : (found.responseType ?? this.#response(frames))
     const site: RequestSite = {
       id,
       origin: w.origin.kind,
@@ -2135,6 +2341,7 @@ export class RequestScanner {
           ? { procedure: w.origin.procedure }
           : {}),
       ...(found.operation ? { operation: found.operation } : {}),
+      ...(found.stream ? { stream: found.stream } : {}),
       ...(found.method ? { method: found.method } : {}),
       ...(found.url ? { url: found.url } : {}),
       trigger,
@@ -2838,6 +3045,19 @@ function negate(expr: Node): string {
   return simple ? `!${text}` : `!(${text})`
 }
 
+/** The text of a string with no runtime parts. */
+function literalOf(value: Str | undefined): string | undefined {
+  if (!value || value.parts.length === 0 || value.parts.some((p) => 'hole' in p)) return undefined
+  return value.parts.map((p) => ('text' in p ? p.text : '')).join('')
+}
+
+/** A function that writes SSE text: a fixed event name or the parameter that gives it, and the data's parameter. */
+interface SseHelper {
+  event?: string
+  eventIndex?: number
+  dataIndex?: number
+}
+
 function flagsOf(site: RequestSite): Flag[] {
   const flags: Flag[] = []
   if (site.url && site.url.confidence === 'unknown') {
@@ -2847,7 +3067,14 @@ function flagsOf(site: RequestSite): Flag[] {
     })
   }
   if (!site.method) flags.push({ kind: 'unknown-method', message: 'The HTTP method could not be resolved.' })
-  if (!site.responseType) {
+  if (site.stream) {
+    if (!site.stream.events.some((e) => e.dataType)) {
+      flags.push({
+        kind: 'unknown-response',
+        message: 'No event data types were found (listener annotation or cast, or the route handler).',
+      })
+    }
+  } else if (!site.responseType) {
     flags.push({
       kind: 'unknown-response',
       message: 'No response type was found (annotation, generic or cast).',

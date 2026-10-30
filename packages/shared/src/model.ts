@@ -460,6 +460,52 @@ export const OperationRefSchema = z.object({
 })
 export type OperationRef = z.infer<typeof OperationRefSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Server-sent events (M18).
+
+/** One kind of event on an event stream: the name and the type of its parsed `data`. */
+export const SseEventSchema = z.object({
+  /** The `event:` field. `message` for events without one (what `onmessage` gets). */
+  name: z.string(),
+  /** The type of `data` parsed as JSON, when the code declares one. */
+  dataType: TypeRefSchema.optional(),
+  /** Where it is listened to (client) or sent (route handler). */
+  loc: SourceLocSchema.optional(),
+})
+export type SseEvent = z.infer<typeof SseEventSchema>
+
+/** A request site that opens an event stream. */
+export const SiteStreamSchema = z.object({
+  /** `event-source`: `new EventSource(url)`. `fetch`: a fetch whose response is read as an event stream. */
+  api: z.enum(['event-source', 'fetch']),
+  /**
+   * Events the code listens to (`onmessage`, `addEventListener('x')`), then the ones the route
+   * handler sends that it doesn't (`listened: false`). `typeFrom` says where the type came from.
+   */
+  events: z.array(
+    SseEventSchema.extend({
+      listened: z.boolean(),
+      typeFrom: z.enum(['code', 'handler']).optional(),
+    }),
+  ),
+  /** `new EventSource(url, { withCredentials: true })`. */
+  withCredentials: z.boolean().optional(),
+})
+export type SiteStream = z.infer<typeof SiteStreamSchema>
+
+/** A route handler that answers with `text/event-stream` (M18). */
+export const SseEndpointSchema = z.object({
+  id: z.string(),
+  routeId: z.string(),
+  method: HttpMethodSchema,
+  /** Events it writes (`event: x` / `data: ...` text). An empty list when none could be read. */
+  events: z.array(SseEventSchema),
+  loc: SourceLocSchema,
+  /** Request sites that open this stream. */
+  siteIds: z.array(z.string()),
+})
+export type SseEndpoint = z.infer<typeof SseEndpointSchema>
+
 export const ServerActionRefSchema = z.object({
   name: z.string(),
   loc: SourceLocSchema,
@@ -481,8 +527,9 @@ export const RequestSiteSchema = z.object({
    * `api-client`: a call to a function listed in the config's `apiClients` (see `client`).
    * `trpc`: a tRPC procedure call (hooks, `queryOptions()`, the vanilla client), see `procedure`.
    * `graphql`: a GraphQL operation sent by Apollo, urql or Relay, see `operation`.
+   * `sse`: an event stream, `new EventSource()` or a streamed `fetch` (M18), see `stream`.
    */
-  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc', 'graphql']),
+  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc', 'graphql', 'sse']),
   /** Transport `api-client`: the configured module and the function or method called. */
   client: z.object({ module: z.string(), name: z.string() }).optional(),
   /**
@@ -505,6 +552,8 @@ export const RequestSiteSchema = z.object({
   procedure: ProcedureRefSchema.optional(),
   /** Transport `graphql` (M17): the operation sent. `bodyType` is its variables, `responseType` its `data`. */
   operation: OperationRefSchema.optional(),
+  /** Transport `sse` (M18): the events it listens to and their types. Checked per message. */
+  stream: SiteStreamSchema.optional(),
   /** Absent when it could not be resolved. Server actions are always `POST`. */
   method: HttpMethodSchema.optional(),
   /** Absent for server actions, which post to the current page. */
@@ -964,10 +1013,18 @@ export const AppModelSchema = z.object({
   /**
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
    * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
-   * (before M16) no tRPC, version 5 (before M17) no GraphQL.
+   * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams.
    */
   version: z
-    .union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.literal(MODEL_VERSION)])
+    .union([
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
+      z.literal(MODEL_VERSION),
+    ])
     .transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
@@ -991,5 +1048,7 @@ export const AppModelSchema = z.object({
   trpc: TrpcSchema.optional(),
   /** GraphQL operations, fragments, clients and schema, when the project uses GraphQL (M17). */
   graphql: GraphqlInfoSchema.optional(),
+  /** Route handlers that answer with an event stream (M18). */
+  streams: z.array(SseEndpointSchema).optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

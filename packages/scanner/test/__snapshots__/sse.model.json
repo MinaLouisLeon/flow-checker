@@ -1,0 +1,1242 @@
+{
+  "version": 7,
+  "project": {
+    "appDir": "app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "app",
+    "files": {
+      "layout": "app/layout.tsx",
+      "page": "app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        "dir": "app/api",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "chat",
+              "kind": "static",
+              "name": "chat"
+            },
+            "dir": "app/api/chat",
+            "files": {
+              "route": "app/api/chat/route.ts"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "clock",
+              "kind": "static",
+              "name": "clock"
+            },
+            "dir": "app/api/clock",
+            "files": {
+              "route": "app/api/clock/route.ts"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "jobs",
+              "kind": "static",
+              "name": "jobs"
+            },
+            "dir": "app/api/jobs",
+            "files": {},
+            "children": [
+              {
+                "segment": {
+                  "raw": "[id]",
+                  "kind": "dynamic",
+                  "name": "id"
+                },
+                "dir": "app/api/jobs/[id]",
+                "files": {},
+                "children": [
+                  {
+                    "segment": {
+                      "raw": "progress",
+                      "kind": "static",
+                      "name": "progress"
+                    },
+                    "dir": "app/api/jobs/[id]/progress",
+                    "files": {
+                      "route": "app/api/jobs/[id]/progress/route.ts"
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "chat",
+          "kind": "static",
+          "name": "chat"
+        },
+        "dir": "app/chat",
+        "files": {
+          "page": "app/chat/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "jobs",
+          "kind": "static",
+          "name": "jobs"
+        },
+        "dir": "app/jobs",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "app/jobs/[id]",
+            "files": {
+              "page": "app/jobs/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_12v7saiyoj2",
+      "path": "/",
+      "kind": "page",
+      "file": "app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_0ku4o3jpe9o"
+    },
+    {
+      "id": "rt_1fha06qip71",
+      "path": "/api/chat",
+      "kind": "route-handler",
+      "file": "app/api/chat/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "chat",
+          "kind": "static",
+          "name": "chat"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "id": "rt_1zq5o8dk7zk",
+      "path": "/api/clock",
+      "kind": "route-handler",
+      "file": "app/api/clock/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "clock",
+          "kind": "static",
+          "name": "clock"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "rt_2bpibf741v2",
+      "path": "/api/jobs/[id]/progress",
+      "kind": "route-handler",
+      "file": "app/api/jobs/[id]/progress/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "jobs",
+          "kind": "static",
+          "name": "jobs"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        },
+        {
+          "raw": "progress",
+          "kind": "static",
+          "name": "progress"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "rt_034pyllgtar",
+      "path": "/chat",
+      "kind": "page",
+      "file": "app/chat/page.tsx",
+      "segments": [
+        {
+          "raw": "chat",
+          "kind": "static",
+          "name": "chat"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_071fu3pg2y0"
+    },
+    {
+      "id": "rt_1kar2b8hpep",
+      "path": "/jobs/[id]",
+      "kind": "page",
+      "file": "app/jobs/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "jobs",
+          "kind": "static",
+          "name": "jobs"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_015g2q10jn5"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_071fu3pg2y0",
+      "name": "ChatPage",
+      "file": "app/chat/page.tsx",
+      "loc": {
+        "file": "app/chat/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Chat",
+          "resolution": "project",
+          "componentId": "cmp_25ygt4ib9ws",
+          "module": "@/components/Chat",
+          "loc": {
+            "file": "app/chat/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_015g2q10jn5",
+      "name": "JobPage",
+      "file": "app/jobs/[id]/page.tsx",
+      "loc": {
+        "file": "app/jobs/[id]/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "JobProgress",
+          "resolution": "project",
+          "componentId": "cmp_0nezx9p8ogb",
+          "module": "@/components/JobProgress",
+          "loc": {
+            "file": "app/jobs/[id]/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_2dznycb4aq7",
+      "name": "RootLayout",
+      "file": "app/layout.tsx",
+      "loc": {
+        "file": "app/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0ku4o3jpe9o",
+      "name": "HomePage",
+      "file": "app/page.tsx",
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Clock",
+          "resolution": "project",
+          "componentId": "cmp_0r500uzdcnu",
+          "module": "@/components/Clock",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        },
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_25ygt4ib9ws",
+      "name": "Chat",
+      "file": "components/Chat.tsx",
+      "loc": {
+        "file": "components/Chat.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0r500uzdcnu",
+      "name": "Clock",
+      "file": "components/Clock.tsx",
+      "loc": {
+        "file": "components/Clock.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_1e0lnxsqglq",
+        "typ_0hmmneuxlns"
+      ]
+    },
+    {
+      "id": "cmp_0nezx9p8ogb",
+      "name": "JobProgress",
+      "file": "components/JobProgress.tsx",
+      "loc": {
+        "file": "components/JobProgress.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_17hog64q8p8"
+      ],
+      "propsType": {
+        "text": "{ id: string }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1e0lnxsqglq",
+      "name": "Tick",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "n",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "at",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0hmmneuxlns",
+      "name": "ClockStatus",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 6,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "state",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "running"
+                },
+                {
+                  "kind": "literal",
+                  "value": "stopped"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ticks",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_17hog64q8p8",
+      "name": "Progress",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 11,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "percent",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "step",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_04sa5nuyyt9",
+      "name": "ChatRequest",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 16,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "prompt",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0xbzrh9hnrs",
+      "name": "ChatChunk",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 20,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "delta",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_18qlraimf3z",
+      "name": "ChatDone",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 24,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "tokens",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_09bcv599usy",
+      "origin": "component",
+      "componentId": "cmp_25ygt4ib9ws",
+      "transport": "sse",
+      "stream": {
+        "api": "fetch",
+        "events": [
+          {
+            "name": "chunk",
+            "dataType": {
+              "text": "ChatChunk",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_0xbzrh9hnrs",
+                "name": "ChatChunk"
+              }
+            },
+            "typeFrom": "handler",
+            "loc": {
+              "file": "app/api/chat/route.ts",
+              "line": 14,
+              "column": 28
+            },
+            "listened": true
+          },
+          {
+            "name": "done",
+            "dataType": {
+              "text": "ChatDone",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_18qlraimf3z",
+                "name": "ChatDone"
+              }
+            },
+            "typeFrom": "handler",
+            "loc": {
+              "file": "app/api/chat/route.ts",
+              "line": 18,
+              "column": 26
+            },
+            "listened": true
+          }
+        ]
+      },
+      "method": "POST",
+      "url": {
+        "text": "'/api/chat'",
+        "confidence": "exact",
+        "path": "/api/chat"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "components/Chat.tsx",
+          "line": 19,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "ChatRequest",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_04sa5nuyyt9",
+          "name": "ChatRequest"
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/Chat.tsx",
+          "line": 15,
+          "column": 21,
+          "callee": "streamChat"
+        },
+        {
+          "file": "lib/chat.ts",
+          "line": 6,
+          "column": 26,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "26kcxeg27ab",
+      "targetRouteId": "rt_1fha06qip71"
+    },
+    {
+      "id": "req_1iv9ud7bbfd",
+      "origin": "component",
+      "componentId": "cmp_0r500uzdcnu",
+      "transport": "sse",
+      "stream": {
+        "api": "event-source",
+        "events": [
+          {
+            "name": "tick",
+            "dataType": {
+              "text": "Tick",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_1e0lnxsqglq",
+                "name": "Tick"
+              }
+            },
+            "typeFrom": "code",
+            "loc": {
+              "file": "components/Clock.tsx",
+              "line": 13,
+              "column": 37
+            },
+            "listened": true
+          },
+          {
+            "name": "message",
+            "dataType": {
+              "text": "ClockStatus",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_0hmmneuxlns",
+                "name": "ClockStatus"
+              }
+            },
+            "typeFrom": "code",
+            "loc": {
+              "file": "components/Clock.tsx",
+              "line": 17,
+              "column": 24
+            },
+            "listened": true
+          },
+          {
+            "name": "done",
+            "loc": {
+              "file": "components/Clock.tsx",
+              "line": 22,
+              "column": 37
+            },
+            "listened": true,
+            "dataType": {
+              "text": "{ ok: boolean; }",
+              "shape": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "ok",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "boolean"
+                    }
+                  }
+                ]
+              }
+            },
+            "typeFrom": "handler"
+          }
+        ]
+      },
+      "method": "GET",
+      "url": {
+        "text": "'/api/clock?count=3'",
+        "confidence": "exact",
+        "path": "/api/clock",
+        "query": "count=3"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "components/Clock.tsx",
+          "line": 11,
+          "column": 3
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/Clock.tsx",
+          "line": 12,
+          "column": 20,
+          "callee": "new EventSource"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "00s3s49a484",
+      "targetRouteId": "rt_1zq5o8dk7zk"
+    },
+    {
+      "id": "req_2efgv3zloxh",
+      "origin": "component",
+      "componentId": "cmp_0nezx9p8ogb",
+      "transport": "sse",
+      "stream": {
+        "api": "event-source",
+        "events": [
+          {
+            "name": "progress",
+            "dataType": {
+              "text": "Progress",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_17hog64q8p8",
+                "name": "Progress"
+              }
+            },
+            "typeFrom": "code",
+            "loc": {
+              "file": "components/JobProgress.tsx",
+              "line": 18,
+              "column": 41
+            },
+            "listened": true
+          },
+          {
+            "name": "done",
+            "loc": {
+              "file": "components/JobProgress.tsx",
+              "line": 19,
+              "column": 37
+            },
+            "listened": true,
+            "dataType": {
+              "text": "{ id: string; token: string; }",
+              "shape": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "token",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "typeFrom": "handler"
+          }
+        ]
+      },
+      "method": "GET",
+      "url": {
+        "text": "`/api/jobs/${id}/progress`",
+        "confidence": "pattern",
+        "path": "/api/jobs/:id/progress"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/JobProgress.tsx",
+          "line": 27,
+          "column": 29
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/JobProgress.tsx",
+          "line": 17,
+          "column": 20,
+          "callee": "new EventSource"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1ed36mf4v4a",
+      "targetRouteId": "rt_2bpibf741v2"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_05iju8wdmvy",
+      "origin": "component",
+      "componentId": "cmp_0ku4o3jpe9o",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/jobs/7\"",
+        "confidence": "exact",
+        "path": "/jobs/7"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 9,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1kar2b8hpep"
+    },
+    {
+      "id": "nav_0jw6ywsfsts",
+      "origin": "component",
+      "componentId": "cmp_0ku4o3jpe9o",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/chat\"",
+        "confidence": "exact",
+        "path": "/chat"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 41
+        }
+      },
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 9,
+        "column": 41
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 41,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_034pyllgtar"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_2ery8l2cvwj",
+      "name": "Chat submit",
+      "routeId": "rt_034pyllgtar",
+      "componentId": "cmp_25ygt4ib9ws",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_034pyllgtar",
+          "componentId": "cmp_25ygt4ib9ws",
+          "event": "onSubmit",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 19,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_09bcv599usy"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_034pyllgtar"
+      ]
+    },
+    {
+      "id": "flw_1qphd907dik",
+      "name": "JobProgress click",
+      "routeId": "rt_1kar2b8hpep",
+      "componentId": "cmp_0nezx9p8ogb",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1kar2b8hpep",
+          "componentId": "cmp_0nezx9p8ogb",
+          "event": "onClick",
+          "loc": {
+            "file": "components/JobProgress.tsx",
+            "line": 27,
+            "column": 29
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2efgv3zloxh"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1kar2b8hpep"
+      ]
+    }
+  ],
+  "queryLinks": [],
+  "streams": [
+    {
+      "id": "sse_0xrs0qk3aqc",
+      "routeId": "rt_1fha06qip71",
+      "method": "POST",
+      "events": [
+        {
+          "name": "chunk",
+          "dataType": {
+            "text": "ChatChunk",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_0xbzrh9hnrs",
+              "name": "ChatChunk"
+            }
+          },
+          "loc": {
+            "file": "app/api/chat/route.ts",
+            "line": 14,
+            "column": 28
+          }
+        },
+        {
+          "name": "done",
+          "dataType": {
+            "text": "ChatDone",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_18qlraimf3z",
+              "name": "ChatDone"
+            }
+          },
+          "loc": {
+            "file": "app/api/chat/route.ts",
+            "line": 18,
+            "column": 26
+          }
+        }
+      ],
+      "loc": {
+        "file": "app/api/chat/route.ts",
+        "line": 7,
+        "column": 23
+      },
+      "siteIds": [
+        "req_09bcv599usy"
+      ]
+    },
+    {
+      "id": "sse_1th5h8nd7uo",
+      "routeId": "rt_1zq5o8dk7zk",
+      "method": "GET",
+      "events": [
+        {
+          "name": "tick",
+          "dataType": {
+            "text": "Tick",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1e0lnxsqglq",
+              "name": "Tick"
+            }
+          },
+          "loc": {
+            "file": "app/api/clock/route.ts",
+            "line": 18,
+            "column": 9
+          }
+        },
+        {
+          "name": "message",
+          "dataType": {
+            "text": "ClockStatus",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_0hmmneuxlns",
+              "name": "ClockStatus"
+            }
+          },
+          "loc": {
+            "file": "app/api/clock/route.ts",
+            "line": 23,
+            "column": 41
+          }
+        },
+        {
+          "name": "done",
+          "dataType": {
+            "text": "{ ok: boolean; }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "ok",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "boolean"
+                  }
+                }
+              ]
+            }
+          },
+          "loc": {
+            "file": "app/api/clock/route.ts",
+            "line": 24,
+            "column": 7
+          }
+        }
+      ],
+      "loc": {
+        "file": "app/api/clock/route.ts",
+        "line": 9,
+        "column": 23
+      },
+      "siteIds": [
+        "req_1iv9ud7bbfd"
+      ]
+    },
+    {
+      "id": "sse_137v05vuz3x",
+      "routeId": "rt_2bpibf741v2",
+      "method": "GET",
+      "events": [
+        {
+          "name": "progress",
+          "dataType": {
+            "text": "{ percent: string; step: string; }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "percent",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "step",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "loc": {
+            "file": "app/api/jobs/[id]/progress/route.ts",
+            "line": 14,
+            "column": 28
+          }
+        },
+        {
+          "name": "done",
+          "dataType": {
+            "text": "{ id: string; token: string; }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "token",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "loc": {
+            "file": "app/api/jobs/[id]/progress/route.ts",
+            "line": 17,
+            "column": 26
+          }
+        }
+      ],
+      "loc": {
+        "file": "app/api/jobs/[id]/progress/route.ts",
+        "line": 7,
+        "column": 23
+      },
+      "siteIds": [
+        "req_2efgv3zloxh"
+      ]
+    }
+  ]
+}

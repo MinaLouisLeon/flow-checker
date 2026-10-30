@@ -17,6 +17,10 @@ export interface CaptureConfig {
   maxBodyBytes?: number
   /** URL globs never captured. */
   ignore?: string[]
+  /** Event stream (SSE) messages kept per connection. Later ones are only counted. Default: 200. */
+  maxMessages?: number
+  /** Messages larger than this are kept without their data. Default: 64_000. */
+  maxMessageBytes?: number
 }
 
 /**

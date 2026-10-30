@@ -5,6 +5,7 @@ import { GraphqlSection } from '../GraphqlView'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
+import { StreamsSection } from '../SseView'
 import { TrpcSection } from '../TrpcView'
 import { Empty, Section, SourceLink } from '../ui'
 
@@ -140,6 +141,7 @@ export function Overview() {
       <TrpcSection index={index} />
 
       <GraphqlSection index={index} />
+      <StreamsSection index={index} />
 
       <Section title="Pages">
         <ul className="list">

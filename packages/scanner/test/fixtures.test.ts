@@ -26,6 +26,7 @@ const FIXTURES = [
   'graphql-apollo-v3',
   'graphql-urql',
   'graphql-relay',
+  'sse',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 

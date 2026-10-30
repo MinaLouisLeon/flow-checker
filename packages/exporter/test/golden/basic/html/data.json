@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "basic",
   "model": {
-    "version": 6,
+    "version": 7,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",

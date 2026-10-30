@@ -7,6 +7,8 @@ import type { TypeCheck, TypeCheckPart, TypeMismatch } from './type-check'
 /** One distinct mismatch across a site's captures. */
 export interface SiteMismatch extends TypeMismatch {
   part: TypeCheckPart['part']
+  /** Part `message`: the event name (M18). */
+  event?: string
   /** Captures that had it. */
   captures: number
   /** The newest of them. */
@@ -45,7 +47,13 @@ export function summarizeTypeChecks(
           existing.actual = m.actual
         } else {
           const { count: _, ...rest } = m
-          byKey.set(key, { ...rest, part: part.part, captures: 1, captureId })
+          byKey.set(key, {
+            ...rest,
+            part: part.part,
+            ...(part.event ? { event: part.event } : {}),
+            captures: 1,
+            captureId,
+          })
         }
       }
     }
@@ -56,6 +64,9 @@ export function summarizeTypeChecks(
 
 /** Path inside the body, e.g. `user.email`, `[].id`, or `the body` for the root. */
 export function mismatchField(path: string): string {
+  // Event stream messages (M18): `messages[tick].body.count`.
+  const message = /^messages\[[^\]]*\]\.body\.?/.exec(path)
+  if (message) return path.slice(message[0].length) || 'the data'
   const inner = path.replace(/^(request|response)\.body\.?/, '')
   return inner === '' ? 'the body' : inner
 }
@@ -86,6 +97,19 @@ function typeMismatchFlag(site: RequestSite, check: SiteTypeCheck): Flag {
     parts.push(
       `${part === 'response' ? 'Response' : 'Request body'} doesn't match ${type ?? 'its type'}: ${shown}${more}`,
     )
+  }
+  // Event stream messages (M18), per event name.
+  const events = new Map<string, SiteMismatch[]>()
+  for (const m of check.mismatches) {
+    if (m.part !== 'message') continue
+    const name = m.event ?? 'message'
+    events.set(name, [...(events.get(name) ?? []), m])
+  }
+  for (const [name, list] of events) {
+    const type = site.stream?.events.find((e) => e.name === name)?.dataType?.text
+    const shown = list.slice(0, 3).map(describeMismatch).join('; ')
+    const more = list.length > 3 ? ` (+${list.length - 3} more)` : ''
+    parts.push(`Event "${name}" doesn't match ${type ?? 'its type'}: ${shown}${more}`)
   }
   const of = `${check.mismatched} of ${check.checked} capture${check.checked === 1 ? '' : 's'}`
   return { kind: 'type-mismatch', message: `${parts.join('. ')} (${of}).` }

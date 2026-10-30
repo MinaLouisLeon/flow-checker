@@ -21,6 +21,7 @@ import {
   randomId,
 } from './options'
 import { compileRules, redactCapture } from './redact'
+import { isEventStream, readEventStream, recordStream } from './stream'
 import { splitTrpcCapture } from './trpc'
 
 export type { RuntimeConfig } from './options'
@@ -100,6 +101,17 @@ function start(config: RuntimeConfig): ServerRuntime {
     try {
       for (const piece of splitTrpcCapture(capture).flatMap(splitGraphqlCapture))
         queue.push(redactCapture(piece, rules, options.storeRaw))
+      if (!timer) {
+        timer = setTimeout(() => void flush(), FLUSH_MS)
+        timer.unref?.()
+      }
+    } catch {}
+  }
+
+  /** A later update of an event stream capture: not split again. */
+  const pushUpdate = (capture: Capture) => {
+    try {
+      queue.push(redactCapture(capture, rules, options.storeRaw))
       if (!timer) {
         timer = setTimeout(() => void flush(), FLUSH_MS)
         timer.unref?.()
@@ -208,12 +220,12 @@ function start(config: RuntimeConfig): ServerRuntime {
       try {
         const response = await pending
         current.durationMs = Math.round(performance.now() - started)
-        void finish(current, response.clone(), bodyPromise)
+        void finish(current, response.clone(), bodyPromise, started)
         return response
       } catch (error) {
         current.durationMs = Math.round(performance.now() - started)
         current.error = error instanceof Error ? `${error.name}: ${error.message}` : String(error)
-        void finish(current, undefined, bodyPromise)
+        void finish(current, undefined, bodyPromise, started)
         throw error
       }
     } as Fetch & { [WRAPPED]?: Fetch }
@@ -225,11 +237,33 @@ function start(config: RuntimeConfig): ServerRuntime {
     return wrapped
   }
 
-  const finish = async (capture: Capture, response?: Response, bodyPromise?: Promise<CapturedBody>) => {
+  const finish = async (
+    capture: Capture,
+    response: Response | undefined,
+    bodyPromise: Promise<CapturedBody> | undefined,
+    started: number,
+  ) => {
     try {
       if (bodyPromise) capture.request.body = await bodyPromise.catch(() => ({ kind: 'binary' }) as const)
       if (response) {
         const headers = headersToObject(response.headers)
+        if (isEventStream(headers['content-type']) && response.ok) {
+          // An upstream event stream (M18): recorded message by message, sent while it is open.
+          capture.response = { status: response.status, headers, body: { kind: 'none' } }
+          if (response.statusText) capture.response.statusText = response.statusText
+          const recorder = recordStream(
+            capture,
+            options,
+            (update, first) => {
+              if (first) push(update)
+              else pushUpdate(update)
+            },
+            () => performance.now() - started,
+          )
+          recorder.open()
+          await readEventStream(response.body, recorder)
+          return
+        }
         const length = Number(headers['content-length'])
         capture.response = {
           status: response.status,

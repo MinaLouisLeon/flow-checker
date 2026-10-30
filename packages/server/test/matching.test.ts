@@ -25,6 +25,7 @@ const FIXTURES = [
   'graphql-apollo-v3',
   'graphql-urql',
   'graphql-relay',
+  'sse',
 ]
 const repo = join(import.meta.dirname, '..', '..', '..')
 

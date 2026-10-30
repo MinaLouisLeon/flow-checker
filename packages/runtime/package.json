@@ -13,6 +13,7 @@
     "./redact": "./src/redact.ts",
     "./trpc": "./src/trpc.ts",
     "./graphql": "./src/graphql.ts",
+    "./stream": "./src/stream.ts",
     "./next": "./src/next.ts"
   },
   "scripts": {

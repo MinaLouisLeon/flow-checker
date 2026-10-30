@@ -202,6 +202,13 @@ export function redactCapture(capture: Capture, rules: RedactRules, storeRaw = f
       ...(capture.query.key ? { key: redactedKey(r, capture.query.key) } : {}),
     },
   }
+  // Event stream messages (M18). An update only carries the messages from `stream.from` on.
+  if (capture.messages) {
+    const from = capture.stream?.from ?? 0
+    out.messages = capture.messages.map((m, i) =>
+      m.body ? { ...m, body: r.body(m.body, `messages[${from + i}].body`) } : m,
+    )
+  }
   if (out.pageUrl === undefined) delete out.pageUrl
   if (out.response === undefined) delete out.response
   if (out.parent === undefined) delete out.parent

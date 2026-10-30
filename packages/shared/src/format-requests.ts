@@ -27,6 +27,11 @@ export function formatRequests(model: AppModel): string {
       if (site.queryKey) out.push(`  key: ${formatQueryKey(site.queryKey)}`)
       if (site.bodyType) out.push(`  body: ${site.bodyType.text}`)
       if (site.responseType) out.push(`  response: ${site.responseType.text}`)
+      if (site.stream) {
+        const credentials = site.stream.withCredentials ? ' (with credentials)' : ''
+        out.push(`  stream: ${site.stream.api}${credentials}`)
+        for (const e of site.stream.events) out.push(`  ${streamEventText(e)}`)
+      }
       if (site.targetRouteId)
         out.push(`  handled by: ${routes.get(site.targetRouteId)?.file ?? site.targetRouteId}`)
       for (const id of site.chain ?? []) {
@@ -49,6 +54,21 @@ export function formatRequests(model: AppModel): string {
       out.push('', `${p.type} ${p.path}  ${callers}  ${p.loc.file}:${p.loc.line}`)
       if (p.inputType) out.push(`  input: ${p.inputType.text}`)
       if (p.outputType) out.push(`  output: ${p.outputType.text}`)
+    }
+  }
+
+  const streams = model.streams ?? []
+  if (streams.length > 0) {
+    out.push('', '# Event streams')
+    for (const stream of streams) {
+      const route = routes.get(stream.routeId)
+      const callers = stream.siteIds.length === 0 ? 'not opened' : `${stream.siteIds.length} caller(s)`
+      out.push(
+        '',
+        `${stream.method} ${route?.path ?? '?'}  ${callers}  ${stream.loc.file}:${stream.loc.line}`,
+      )
+      if (stream.events.length === 0) out.push('  events: (none found)')
+      for (const e of stream.events) out.push(`  event ${e.name}${e.dataType ? `: ${e.dataType.text}` : ''}`)
     }
   }
 
@@ -135,6 +155,12 @@ export function formatRequests(model: AppModel): string {
     const a = site.serverAction
     return `server action ${a?.name ?? '?'}  ${a ? `${a.loc.file}:${a.loc.line}` : ''}`.trimEnd()
   }
+}
+
+/** `event tick: Tick  (code)`, `event done  not listened to`. */
+function streamEventText(e: NonNullable<RequestSite['stream']>['events'][number]): string {
+  const type = e.dataType ? `: ${e.dataType.text}  (${e.typeFrom ?? 'code'})` : ''
+  return `event ${e.name}${type}${e.listened ? '' : '  not listened to'}`
 }
 
 function siteLine(site: RequestSite): string {

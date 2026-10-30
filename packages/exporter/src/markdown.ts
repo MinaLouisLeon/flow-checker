@@ -39,6 +39,7 @@ import {
   requestLabel,
   type ScanNote,
   type SiteTypeCheck,
+  type SseEndpoint,
   type Trpc,
   type TypeRef,
   triggerText,
@@ -220,6 +221,24 @@ function readme(ctx: Ctx): string {
   if (model.graphql) {
     const endpoint = model.graphql.endpoint ? urlText(model.graphql.endpoint) : 'GraphQL'
     sections.push('## GraphQL', `${link(code(endpoint), from, GRAPHQL)}: ${graphqlCounts(model.graphql)}.`)
+  }
+  const streams = model.streams ?? []
+  if (streams.length > 0) {
+    sections.push(
+      '## Event streams',
+      table(
+        ['Route handler', 'Events', 'Opened by'],
+        streams.map((s) => {
+          const route = ctx.index.routes.get(s.routeId)
+          return [
+            route ? `${s.method} ${routeLink(ctx, route, from)}` : code(s.routeId),
+            streamEventNames(s),
+            String(s.siteIds.length),
+          ]
+        }),
+        ['left', 'left', 'right'],
+      ),
+    )
   }
   if (model.flows.length > 0) {
     sections.push(
@@ -419,6 +438,7 @@ function handlerDoc(ctx: Ctx, route: Route, from: string): string {
       ['Methods', (route.methods ?? []).join(', ') || undefined],
     ]),
     ...routeMiddleware(ctx, route, from),
+    ...handlerStreams(ctx, route, from),
     '## Called by',
     callers.length === 0
       ? 'No request in the app calls it (it may be called from outside).'
@@ -1018,6 +1038,12 @@ function requestSection(
       ],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
       [
+        'Stream',
+        site.stream
+          ? `${site.stream.api === 'event-source' ? 'EventSource' : 'streamed fetch'}${site.stream.withCredentials ? ' · with credentials' : ''}`
+          : undefined,
+      ],
+      [
         'Call path',
         site.callStack.length > 1 ? site.callStack.map((f) => code(f.callee)).join(' → ') : undefined,
       ],
@@ -1026,6 +1052,7 @@ function requestSection(
     site.bodyType && `**Request body**${typeSource(site.bodyType)} ${typeBlock(ctx, site.bodyType, from)}`,
     site.responseType &&
       `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,
+    ...(site.stream ? siteEvents(ctx, site.stream, from) : []),
     check && check.mismatches.length > 0 && typeCheckTable(check),
     examples(ctx, site),
     next.length > 0 && `**Leads to** ${next.map((s) => code(requestLabel(s))).join(', ')}:`,
@@ -1048,7 +1075,11 @@ function typeCheckTable(check: SiteTypeCheck): string {
   return `**Type check**: ${check.mismatched} of ${plural(check.checked, 'checked capture')} didn't match.\n\n${table(
     ['Part', 'Field', 'Problem', 'Expected', 'Captured', 'Captures'],
     check.mismatches.map((m) => [
-      m.part === 'response' ? 'response' : 'request body',
+      m.part === 'message'
+        ? `event ${code(m.event ?? 'message')}`
+        : m.part === 'response'
+          ? 'response'
+          : 'request body',
       code(mismatchField(m.path)),
       m.kind,
       m.expected ? code(m.expected) : '',
@@ -1083,8 +1114,75 @@ function example(c: ExportCapture, total: number): string {
   if (req) lines.push(`Request body:\n\n${req}`)
   const res = c.response ? bodyText(c.response.body) : undefined
   if (res) lines.push(`Response body:\n\n${res}`)
+  if (c.stream) lines.push(messagesText(c))
   if (c.redactedPaths.length > 0) lines.push(`Masked: ${c.redactedPaths.map(code).join(', ')}`)
   return lines.join('\n\n')
+}
+
+// --- Event streams (M18) --------------------------------------------------------------------
+
+/** Messages shown per captured stream before the rest are counted. */
+const MAX_MESSAGES = 10
+
+function streamEventNames(s: SseEndpoint): string {
+  if (s.events.length === 0) return 'not found'
+  return s.events.map((e) => code(e.name)).join(', ')
+}
+
+/** The events a site listens to, each with its data type. */
+function siteEvents(ctx: Ctx, stream: NonNullable<RequestSite['stream']>, from: string): string[] {
+  if (stream.events.length === 0) return ['**Events**: none found in the code.']
+  return stream.events.map((e) => {
+    const notes = [
+      e.typeFrom === 'handler' ? 'type from the route handler' : '',
+      e.listened ? '' : 'sent by the route handler, not listened to',
+    ].filter(Boolean)
+    const head = `**Event ${code(e.name)}**${notes.length > 0 ? ` (${notes.join('; ')})` : ''}`
+    return e.dataType ? `${head} ${typeBlock(ctx, e.dataType, from)}` : `${head}: no data type.`
+  })
+}
+
+/** A route handler that answers with an event stream: the events it sends. */
+function handlerStreams(ctx: Ctx, route: Route, from: string): (string | false)[] {
+  const streams = (ctx.model.streams ?? []).filter((s) => s.routeId === route.id)
+  return streams.flatMap((s) => [
+    `## Event stream (${s.method})`,
+    s.events.length === 0
+      ? 'Answers with `text/event-stream`; the events it writes could not be read.'
+      : table(
+          ['Event', 'Data', 'Where'],
+          s.events.map((e) => [
+            code(e.name),
+            e.dataType ? code(e.dataType.text) : 'fixed text',
+            e.loc ? code(`${e.loc.file}:${e.loc.line}`) : '',
+          ]),
+        ),
+    s.events
+      .filter((e) => e.dataType)
+      .map((e) => `**${code(e.name)}** ${typeBlock(ctx, e.dataType as TypeRef, from)}`)
+      .join('\n\n'),
+  ])
+}
+
+/** The connection state and the first messages of a captured stream. */
+function messagesText(c: ExportCapture): string {
+  const stream = c.stream
+  if (!stream) return ''
+  const messages = c.messages ?? []
+  const shown = messages.slice(0, MAX_MESSAGES).map((m) => {
+    const data =
+      m.body?.kind === 'json'
+        ? JSON.stringify(m.body.value)
+        : m.body?.kind === 'text'
+          ? m.body.value
+          : m.body
+            ? ''
+            : '(data not kept)'
+    return `${m.event ?? 'message'}: ${data}`
+  })
+  const more = stream.count > shown.length ? `\n… ${stream.count - shown.length} more` : ''
+  const head = `Messages: ${stream.count} received, ${stream.state}${stream.truncated ? ' (some not kept)' : ''}`
+  return shown.length > 0 ? `${head}\n\n${block('text', cut(shown.join('\n')) + more)}` : `${head}.`
 }
 
 function bodyText(body: CapturedBody): string | undefined {

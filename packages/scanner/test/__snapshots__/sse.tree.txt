@@ -1,0 +1,43 @@
+# Route tree
+
+app [layout, page]
+├─ api
+│  ├─ chat [route]
+│  ├─ clock [route]
+│  └─ jobs
+│     └─ [id] (dynamic)
+│        └─ progress [route]
+├─ chat [page]
+└─ jobs
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  app/page.tsx
+/api/chat  route POST  app/api/chat/route.ts
+/api/clock  route GET  app/api/clock/route.ts
+/api/jobs/[id]/progress  route GET  app/api/jobs/[id]/progress/route.ts
+/chat  page  app/chat/page.tsx
+/jobs/[id]  page  app/jobs/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  app/layout.tsx:5
+
+# Pages
+
+## /  app/page.tsx
+layouts: app/layout.tsx
+HomePage  server  app/page.tsx:4
+├─ Clock  client (use client)  components/Clock.tsx:7
+└─ Link  external next/link
+
+## /chat  app/chat/page.tsx
+layouts: app/layout.tsx
+ChatPage  server  app/chat/page.tsx:3
+└─ Chat  client (use client)  components/Chat.tsx:7
+
+## /jobs/[id]  app/jobs/[id]/page.tsx
+layouts: app/layout.tsx
+JobPage  server  app/jobs/[id]/page.tsx:3
+└─ JobProgress  client (use client)  components/JobProgress.tsx:7

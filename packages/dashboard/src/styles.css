@@ -1189,3 +1189,37 @@ a.stat:hover {
   gap: 8px;
   margin: 0 0 4px;
 }
+
+/* Event streams (M18) */
+.stream-events summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.message-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+}
+.message-timeline li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+}
+.message-time {
+  min-width: 64px;
+  text-align: right;
+  font-family: var(--mono);
+}
+.message-event {
+  min-width: 72px;
+}
+.message-data {
+  flex: 1;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}

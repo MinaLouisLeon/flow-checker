@@ -1,0 +1,26 @@
+# Types
+
+Tick  interface  lib/types.ts:1
+  { n: number; at: string }
+ClockStatus  interface  lib/types.ts:6
+  { state: "running" | "stopped"; ticks: number }
+Progress  interface  lib/types.ts:11
+  { percent: number; step: string }
+ChatRequest  interface  lib/types.ts:16
+  { prompt: string }
+ChatChunk  interface  lib/types.ts:20
+  { delta: string }
+ChatDone  interface  lib/types.ts:24
+  { tokens: number }
+
+# Component types
+
+JobPage  app/jobs/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+RootLayout  app/layout.tsx:5
+  props: { children: ReactNode }
+Clock  components/Clock.tsx:7
+  uses: Tick, ClockStatus
+JobProgress  components/JobProgress.tsx:7
+  props: { id: string }
+  uses: Progress

@@ -380,6 +380,7 @@ function analyze(
   }
 
   const sites = requests.sites(routes)
+  const streams = requests.streams()
   const graphql = requests.graphqlInfo(sites, graphqlFound.base)
   const queryLinks = requests.queryLinks(sites, components)
   const trpc: Trpc | undefined = trpcFound && {
@@ -430,6 +431,7 @@ function analyze(
     ...(middleware ? { middleware } : {}),
     ...(trpc ? { trpc } : {}),
     ...(graphql ? { graphql } : {}),
+    ...(streams.length > 0 ? { streams } : {}),
   }
 }
 

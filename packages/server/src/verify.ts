@@ -125,7 +125,7 @@ export class Verifier {
     for (const incoming of captures) {
       // The runtime must not decide these.
       const { match: _, sourceStack: __, typeCheck: ___, ...rest } = incoming
-      let capture: Capture = { ...rest }
+      let capture: Capture = this.mergeStream({ ...rest })
       const frames = this.mapper.resolve(capture.stack)
       if (frames.length > 0) capture.sourceStack = frames
       capture = this.evaluate(capture)
@@ -138,6 +138,24 @@ export class Verifier {
       }
     }
     this.changed()
+  }
+
+  /**
+   * An update of an open event stream (M18) only carries its new messages, from index
+   * `stream.from`: they are added to the ones already stored.
+   */
+  private mergeStream(capture: Capture): Capture {
+    const from = capture.stream?.from
+    if (!capture.stream || from === undefined) return capture
+    const { from: _, ...stream } = capture.stream
+    const existing = this.store.get(capture.id)
+    const kept = existing?.messages ?? []
+    return {
+      ...capture,
+      stream,
+      messages: [...kept.slice(0, from), ...(capture.messages ?? [])],
+      redactedPaths: [...new Set([...(existing?.redactedPaths ?? []), ...capture.redactedPaths])],
+    }
   }
 
   /**

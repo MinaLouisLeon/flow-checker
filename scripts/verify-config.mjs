@@ -79,6 +79,8 @@ try {
       `    redact: { keys: ['iban'], headers: ['x-session'], patterns: [/SECRET-\\d+/g] },`,
       `    maxBodyBytes: 1234,`,
       `    ignore: ['*/health'],`,
+      `    maxMessages: 7,`,
+      `    maxMessageBytes: 999,`,
       `  },`,
       `  types: { maxDepth: 1 },`,
       `  export: { md: 'out/docs', html: 'out/site' },`,
@@ -214,6 +216,8 @@ try {
     )
     check('capture.maxBodyBytes reaches the runtime', capture.maxBodyBytes === 1234)
     check('capture.ignore reaches the runtime', capture.ignore.includes('*/health'))
+    check('capture.maxMessages reaches the runtime', capture.maxMessages === 7)
+    check('capture.maxMessageBytes reaches the runtime', capture.maxMessageBytes === 999)
     check('capture.storeRaw reaches the runtime', capture.storeRaw === false)
 
     // The tool server redacts again on arrival with the same rules.

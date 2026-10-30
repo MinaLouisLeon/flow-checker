@@ -9,6 +9,7 @@ import { splitGraphqlCapture } from './graphql'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
 import { createQueryTracker, findQueryClient } from './query'
 import { compileRules, redactCapture } from './redact'
+import { isEventStream, readEventStream, recordStream, type StreamRecorder } from './stream'
 import { splitTrpcCapture } from './trpc'
 
 export type { RuntimeConfig } from './options'
@@ -22,7 +23,7 @@ const QUERY_CLIENT_POLLS = 100
 const INTERACTION_WINDOW_MS = 5000
 const FLUSH_MS = 400
 const MAX_QUEUE = 200
-const OWN_FRAMES = /flowChecker|flow-checker[\\/_]dist|runtime[-_]client/
+const OWN_FRAMES = /flowChecker|FlowChecker|flow-checker[\\/_]dist|runtime[-_]client/
 
 type Global = typeof globalThis & { [INSTALLED]?: boolean }
 
@@ -85,7 +86,16 @@ function start(config: RuntimeConfig) {
     else if (!timer) timer = setTimeout(flush, FLUSH_MS)
   }
 
+  /** Event streams still open (M18): closed when the page goes away, so their last messages are sent. */
+  const openStreams = new Set<StreamRecorder>()
+
   const flushOnExit = () => {
+    for (const stream of openStreams) {
+      try {
+        stream.end('closed')
+      } catch {}
+    }
+    openStreams.clear()
     if (captures.length === 0 && events.length === 0) return
     const body = payload()
     try {
@@ -112,6 +122,28 @@ function start(config: RuntimeConfig) {
         pushEvent({ kind: 'capture', at: piece.timestamp, captureId: piece.id })
       }
     } catch {}
+  }
+
+  /** An event stream capture (M18): sent when it opens, then updated with new messages until it ends. */
+  const streamRecorder = (capture: Capture, started: number): StreamRecorder => {
+    const recorder = recordStream(
+      capture,
+      options,
+      (update, first) => {
+        try {
+          if (first) {
+            pushCapture(update)
+            return
+          }
+          captures.push(redactCapture(update, rules, options.storeRaw))
+          schedule()
+        } catch {}
+        if (recorder.ended) openStreams.delete(recorder)
+      },
+      () => performance.now() - started,
+    )
+    openStreams.add(recorder)
+    return recorder
   }
 
   // --- Interactions and navigation ----------------------------------------------------------
@@ -266,21 +298,35 @@ function start(config: RuntimeConfig) {
     try {
       const response = await nativeFetch(input, init)
       current.durationMs = Math.round(performance.now() - started)
-      void finishFetch(current, response.clone(), bodyPromise)
+      void finishFetch(current, response.clone(), bodyPromise, started)
       return response
     } catch (error) {
       current.durationMs = Math.round(performance.now() - started)
       current.error = errorText(error)
-      void finishFetch(current, undefined, bodyPromise)
+      void finishFetch(current, undefined, bodyPromise, started)
       throw error
     }
   }
 
-  const finishFetch = async (capture: Capture, response?: Response, bodyPromise?: Promise<CapturedBody>) => {
+  const finishFetch = async (
+    capture: Capture,
+    response: Response | undefined,
+    bodyPromise: Promise<CapturedBody> | undefined,
+    started: number,
+  ) => {
     try {
       if (bodyPromise) capture.request.body = await bodyPromise.catch(() => ({ kind: 'binary' }) as const)
       if (response) {
         const headers = headersToObject(response.headers)
+        if (isEventStream(headers['content-type']) && response.ok) {
+          // A streamed response (M18): its messages are recorded as they arrive.
+          capture.response = { status: response.status, headers, body: { kind: 'none' } }
+          if (response.statusText) capture.response.statusText = response.statusText
+          const recorder = streamRecorder(capture, started)
+          recorder.open()
+          await readEventStream(response.body, recorder)
+          return
+        }
         const length = Number(headers['content-length'])
         capture.response = {
           status: response.status,
@@ -366,6 +412,102 @@ function start(config: RuntimeConfig) {
         if (xhr.statusText) capture.response.statusText = xhr.statusText
       }
       pushCapture(capture)
+    } catch {}
+  }
+
+  // --- EventSource (M18) --------------------------------------------------------------------
+
+  const NativeEventSource = window.EventSource
+  if (typeof NativeEventSource === 'function') {
+    const listen = EventTarget.prototype.addEventListener
+    /** Per EventSource: its recorder and the event names already recorded. */
+    const tracked = new WeakMap<EventSource, { recorder: StreamRecorder; names: Set<string> }>()
+
+    const track = (source: EventSource, url: string | URL) => {
+      const target = new URL(String(url), location.href)
+      const headers = { accept: 'text/event-stream' }
+      if (!shouldCapture(target, headers)) return
+      const started = performance.now()
+      const capture = baseCapture(randomId('cap'), 'GET', target, headers)
+      capture.transport = 'eventsource'
+      const recorder = streamRecorder(capture, started)
+      const state = { recorder, names: new Set<string>() }
+      tracked.set(source, state)
+      let opened = false
+      listen.call(source, 'open', () => {
+        try {
+          if (opened) {
+            recorder.reconnect()
+            return
+          }
+          opened = true
+          // EventSource doesn't expose the response: it only opens on a 200 event stream.
+          capture.response = {
+            status: 200,
+            headers: { 'content-type': 'text/event-stream' },
+            body: { kind: 'none' },
+          }
+          recorder.open()
+        } catch {}
+      })
+      listen.call(source, 'error', () => {
+        try {
+          // CONNECTING: it will reconnect on its own. CLOSED: it gave up.
+          if (source.readyState !== NativeEventSource.CLOSED) return
+          recorder.end(
+            opened ? 'closed' : 'error',
+            opened ? undefined : 'The event stream could not be opened',
+          )
+        } catch {}
+      })
+      watch(source, 'message')
+    }
+
+    /** Records events with this name. Named events only reach listeners for their name. */
+    const watch = (source: EventSource, name: string) => {
+      const state = tracked.get(source)
+      if (!state || name === 'open' || name === 'error' || state.names.has(name)) return
+      state.names.add(name)
+      listen.call(source, name, (event: Event) => {
+        try {
+          const message = event as MessageEvent
+          state.recorder.message({
+            event: name,
+            ...(message.lastEventId ? { id: message.lastEventId } : {}),
+            data: typeof message.data === 'string' ? message.data : String(message.data),
+          })
+        } catch {}
+      })
+    }
+
+    class FlowCheckerEventSource extends NativeEventSource {
+      constructor(url: string | URL, init?: EventSourceInit) {
+        super(url, init)
+        try {
+          track(this, url)
+        } catch {}
+      }
+
+      override close(): void {
+        try {
+          tracked.get(this)?.recorder.end('closed')
+        } catch {}
+        super.close()
+      }
+    }
+    // Overloaded in the DOM types, so it is set on the prototype rather than overridden.
+    Object.defineProperty(FlowCheckerEventSource.prototype, 'addEventListener', {
+      configurable: true,
+      writable: true,
+      value: function flowCheckerAddEventListener(this: EventSource, ...args: unknown[]) {
+        try {
+          watch(this, String(args[0]))
+        } catch {}
+        return (listen as (...a: unknown[]) => void).apply(this, args)
+      },
+    })
+    try {
+      window.EventSource = FlowCheckerEventSource
     } catch {}
   }
 

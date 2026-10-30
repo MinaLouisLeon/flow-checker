@@ -60,6 +60,15 @@ beforeAll(async () => {
   backendUrl = await listen(
     createServer(async (req, res) => {
       await readBody(req)
+      if (req.url === '/events') {
+        // An upstream event stream, written in pieces (M18).
+        res.writeHead(200, { 'content-type': 'text/event-stream' })
+        res.write('event: tick\ndata: {"n":1,"token":"t1"}\n\n')
+        await new Promise((r) => setTimeout(r, 20))
+        res.write('data: plain text\n\n')
+        res.end()
+        return
+      }
       res.writeHead(200, { 'content-type': 'application/json' })
       res.end(JSON.stringify({ id: 7, token: 'issued-token' }))
     }),
@@ -161,6 +170,25 @@ describe('registerServerRuntime', () => {
     await (await fetch(`${backendUrl}/after-reset`)).text()
     await runtime?.flush()
     expect(received.map((c) => c.request.url)).toContain(`${backendUrl}/after-reset`)
+  })
+
+  it('records an upstream event stream message by message (M18)', async () => {
+    received.length = 0
+    const res = await fetch(`${backendUrl}/events`)
+    expect(await res.text()).toContain('plain text')
+    await new Promise((r) => setTimeout(r, 50))
+    await runtime?.flush()
+    const pieces = received.filter((c) => c.request.url === `${backendUrl}/events`)
+    expect(pieces.length).toBeGreaterThan(0)
+    // The first send is the whole capture; later ones carry only new messages.
+    const last = pieces[pieces.length - 1]
+    expect(last?.stream).toMatchObject({ state: 'closed', count: 2 })
+    const messages = pieces.flatMap((p) => p.messages ?? [])
+    expect(messages.map((m) => [m.event, m.body])).toEqual([
+      ['tick', { kind: 'json', value: { n: 1, token: REDACTED_STRING }, size: 20 }],
+      [undefined, { kind: 'text', value: 'plain text', size: 10 }],
+    ])
+    expect(last?.response?.body).toEqual({ kind: 'none' })
   })
 
   it('leaves a Next-style patched fetch on top of ours as is', async () => {

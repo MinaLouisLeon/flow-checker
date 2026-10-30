@@ -274,3 +274,71 @@ describe('applyVerification', () => {
     ])
   })
 })
+
+describe('checkCapture on event stream messages (M18)', () => {
+  const site = {
+    id: 'req_sse',
+    transport: 'sse' as const,
+    stream: {
+      api: 'event-source' as const,
+      events: [
+        { name: 'tick', dataType: { text: 'Tick', shape: obj({ n: num, token: str }) }, listened: true },
+        { name: 'message', dataType: { text: 'string', shape: str }, listened: true },
+        { name: 'done', listened: true },
+      ],
+    },
+  }
+  const msg = (event: string | undefined, body?: CapturedBody) => ({
+    direction: 'in' as const,
+    ...(event ? { event } : {}),
+    at: 'now',
+    size: 1,
+    ...(body ? { body } : {}),
+  })
+
+  it('checks each typed event that arrived; masked values only need the right JSON type', () => {
+    const check = checkCapture(
+      {
+        request: { body: { kind: 'none' } },
+        messages: [
+          msg('tick', { kind: 'json', value: { n: 1, token: '[REDACTED:string]' } }),
+          msg('tick', { kind: 'json', value: { n: 2, token: '[REDACTED:string]' } }),
+          msg(undefined, { kind: 'text', value: 'hello' }),
+          msg('done', { kind: 'json', value: {} }),
+        ],
+        redactedPaths: ['messages[1].body.token'],
+      },
+      site,
+      typeTable([]),
+    )
+    expect(check?.parts).toEqual([
+      { part: 'message', event: 'tick', type: 'Tick', status: 'ok', messages: 2, mismatches: [] },
+      { part: 'message', event: 'message', type: 'string', status: 'ok', messages: 1, mismatches: [] },
+    ])
+  })
+
+  it('skips messages kept without data, and ignores the response type of a stream site', () => {
+    const check = checkCapture(
+      {
+        request: { body: { kind: 'none' } },
+        response: { status: 200, body: { kind: 'none' } },
+        messages: [msg('tick')],
+        redactedPaths: [],
+      },
+      { ...site, responseType: { text: 'X', shape: num } },
+      typeTable([]),
+    )
+    expect(check?.parts).toEqual([
+      {
+        part: 'message',
+        event: 'tick',
+        type: 'Tick',
+        status: 'skipped',
+        reason: 'Messages were kept without their data (capture.maxMessageBytes).',
+        messages: 0,
+        mismatches: [],
+      },
+    ])
+    expect(typeCheckStatus(check as NonNullable<typeof check>)).toBe('skipped')
+  })
+})
