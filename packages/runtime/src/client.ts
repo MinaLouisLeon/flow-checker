@@ -4,11 +4,12 @@
 // It does nothing unless the app was started by flow-checker (which sets NEXT_PUBLIC_FLOW_CHECKER),
 // never in production builds, and it never throws into the app.
 import type { Capture, CapturedBody, Interaction, SessionEvent } from '@flow-checker/shared'
-import { callerStack, headersToObject, readStream, requestBody, textBody } from './body'
+import { byteLength, callerStack, headersToObject, readStream, requestBody, textBody } from './body'
 import { splitGraphqlCapture } from './graphql'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
 import { createQueryTracker, findQueryClient } from './query'
 import { compileRules, redactCapture } from './redact'
+import { isSocketIoUrl, parseSocketIoFrame } from './socket'
 import { isEventStream, readEventStream, recordStream, type StreamRecorder } from './stream'
 import { splitTrpcCapture } from './trpc'
 
@@ -24,6 +25,8 @@ const INTERACTION_WINDOW_MS = 5000
 const FLUSH_MS = 400
 const MAX_QUEUE = 200
 const OWN_FRAMES = /flowChecker|FlowChecker|flow-checker[\\/_]dist|runtime[-_]client/
+/** A stack frame in code that has no source URL (`eval`ed by a dev tool) or comes from a browser extension. */
+const INJECTED_FRAME = /, <anonymous>:\d+:\d+\)$|(chrome|moz|safari-web)-extension:\/\//
 
 type Global = typeof globalThis & { [INSTALLED]?: boolean }
 
@@ -86,7 +89,7 @@ function start(config: RuntimeConfig) {
     else if (!timer) timer = setTimeout(flush, FLUSH_MS)
   }
 
-  /** Event streams still open (M18): closed when the page goes away, so their last messages are sent. */
+  /** Event streams and WebSockets still open (M18, M19): closed when the page goes away, so their last messages are sent. */
   const openStreams = new Set<StreamRecorder>()
 
   const flushOnExit = () => {
@@ -511,6 +514,124 @@ function start(config: RuntimeConfig) {
     } catch {}
   }
 
+  // --- WebSocket (M19) ----------------------------------------------------------------------
+
+  const NativeWebSocket = window.WebSocket
+  if (typeof NativeWebSocket === 'function') {
+    const listen = EventTarget.prototype.addEventListener
+    /** Per WebSocket: records a message, `in` (received) or `out` (sent); `closing` once the app closes it. */
+    const tracked = new WeakMap<
+      WebSocket,
+      { record: (direction: 'in' | 'out', data: unknown) => void; closing: boolean }
+    >()
+
+    const track = (socket: WebSocket, url: string | URL, protocols?: string | string[]) => {
+      // Dev tools that inject code into the page (Console Ninja, browser extensions) open
+      // sockets of their own, from code without a source URL.
+      if (
+        callerStack(OWN_FRAMES)
+          .slice(0, 6)
+          .some((frame) => INJECTED_FRAME.test(frame))
+      )
+        return
+      // Relative and http(s) URLs are allowed; they connect over ws(s).
+      const target = new URL(String(url), location.href)
+      if (target.protocol === 'http:') target.protocol = 'ws:'
+      if (target.protocol === 'https:') target.protocol = 'wss:'
+      const asHttp = new URL(target.href.replace(/^ws/, 'http'))
+      if (!shouldCapture(asHttp, {})) return
+      const started = performance.now()
+      const headers: Record<string, string> = {}
+      const asked = typeof protocols === 'string' ? [protocols] : (protocols ?? [])
+      if (asked.length > 0) headers['sec-websocket-protocol'] = asked.join(', ')
+      const capture = baseCapture(randomId('cap'), 'GET', target, headers)
+      capture.transport = 'websocket'
+      const recorder = streamRecorder(capture, started)
+      const stream = capture.stream
+      const socketIo = isSocketIoUrl(target)
+      if (stream && socketIo) stream.socketIo = true
+      /** socket.io binary events: their attachments come next, in frames of their own. */
+      let attachments = 0
+
+      const record = (direction: 'in' | 'out', data: unknown) => {
+        if (typeof data !== 'string') {
+          if (socketIo && attachments > 0) {
+            attachments--
+            return
+          }
+          recorder.message({ direction, binary: true, size: binarySize(data) })
+          return
+        }
+        if (!socketIo) {
+          recorder.message({ direction, data })
+          return
+        }
+        const event = parseSocketIoFrame(data)
+        if (!event) return
+        attachments = event.attachments ?? 0
+        recorder.message({ direction, event: event.name, value: event.value, size: byteLength(data) })
+      }
+      const state = { record, closing: false }
+      tracked.set(socket, state)
+
+      let opened = false
+      listen.call(socket, 'open', () => {
+        try {
+          opened = true
+          capture.response = { status: 101, headers: {}, body: { kind: 'none' } }
+          if (stream && socket.protocol) stream.protocol = socket.protocol
+          recorder.open()
+        } catch {}
+      })
+      listen.call(socket, 'message', (event: Event) => {
+        try {
+          state.record('in', (event as MessageEvent).data)
+        } catch {}
+      })
+      listen.call(socket, 'close', (event: Event) => {
+        try {
+          const close = event as CloseEvent
+          if (stream) {
+            stream.closeCode = close.code
+            if (close.reason) stream.closeReason = close.reason
+          }
+          // 1006: the connection dropped (or never opened) without a close frame. Closed by the
+          // app before it opened (React strict mode's first mount): not a failure.
+          if (!opened && state.closing) recorder.end('closed')
+          else if (!opened) recorder.end('error', 'The WebSocket could not be opened')
+          else if (close.code === 1006) recorder.end('error', 'The connection was lost (code 1006)')
+          else recorder.end('closed')
+        } catch {}
+      })
+    }
+
+    class FlowCheckerWebSocket extends NativeWebSocket {
+      constructor(url: string | URL, protocols?: string | string[]) {
+        super(url, protocols)
+        try {
+          track(this, url, protocols)
+        } catch {}
+      }
+
+      override send(data: Parameters<WebSocket['send']>[0]): void {
+        // Sent first: a send that throws (still connecting) sent nothing.
+        super.send(data)
+        try {
+          tracked.get(this)?.record('out', data)
+        } catch {}
+      }
+
+      override close(code?: number, reason?: string): void {
+        const state = tracked.get(this)
+        if (state) state.closing = true
+        super.close(code, reason)
+      }
+    }
+    try {
+      window.WebSocket = FlowCheckerWebSocket
+    } catch {}
+  }
+
   console.info(`[flow-checker] capturing requests → ${ingest.origin}`)
 }
 
@@ -606,4 +727,12 @@ function fiberName(type: unknown, depth = 0): string | undefined {
     if (t.type) return fiberName(t.type, depth + 1) // memo
   }
   return undefined
+}
+
+/** Size of binary WebSocket data. */
+function binarySize(data: unknown): number {
+  if (data instanceof Blob) return data.size
+  if (data instanceof ArrayBuffer) return data.byteLength
+  if (ArrayBuffer.isView(data)) return data.byteLength
+  return 0
 }

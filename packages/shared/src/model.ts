@@ -506,6 +506,34 @@ export const SseEndpointSchema = z.object({
 })
 export type SseEndpoint = z.infer<typeof SseEndpointSchema>
 
+// ---------------------------------------------------------------------------------------------
+// WebSockets (M19).
+
+/** One kind of message on a WebSocket: which way it goes, its name and the type of its data. */
+export const SocketMessageSchema = z.object({
+  /** `in`: received (`onmessage`, `socket.on(name)`). `out`: sent (`ws.send()`, `socket.emit(name)`). */
+  direction: z.enum(['in', 'out']),
+  /** The socket.io event name. `message` for native WebSocket messages, which have no name. */
+  name: z.string(),
+  /** The data's type (parsed as JSON for native WebSockets), when the code declares one. */
+  dataType: TypeRefSchema.optional(),
+  /** The first place it is listened to or sent. */
+  loc: SourceLocSchema.optional(),
+})
+export type SocketMessage = z.infer<typeof SocketMessageSchema>
+
+/** A request site that opens a WebSocket: `new WebSocket(url)` or socket.io's `io(url)`. */
+export const SiteSocketSchema = z.object({
+  api: z.enum(['websocket', 'socket.io']),
+  /** Messages it listens to and sends, one entry per direction and name. */
+  messages: z.array(SocketMessageSchema),
+  /** Subprotocols asked for: `new WebSocket(url, ['v1'])`. */
+  protocols: z.array(z.string()).optional(),
+  /** socket.io namespace (`io('http://host/chat')`), when it isn't `/`. */
+  namespace: z.string().optional(),
+})
+export type SiteSocket = z.infer<typeof SiteSocketSchema>
+
 export const ServerActionRefSchema = z.object({
   name: z.string(),
   loc: SourceLocSchema,
@@ -528,8 +556,9 @@ export const RequestSiteSchema = z.object({
    * `trpc`: a tRPC procedure call (hooks, `queryOptions()`, the vanilla client), see `procedure`.
    * `graphql`: a GraphQL operation sent by Apollo, urql or Relay, see `operation`.
    * `sse`: an event stream, `new EventSource()` or a streamed `fetch` (M18), see `stream`.
+   * `websocket`: `new WebSocket()` or socket.io's `io()` (M19), see `socket`.
    */
-  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc', 'graphql', 'sse']),
+  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc', 'graphql', 'sse', 'websocket']),
   /** Transport `api-client`: the configured module and the function or method called. */
   client: z.object({ module: z.string(), name: z.string() }).optional(),
   /**
@@ -554,6 +583,8 @@ export const RequestSiteSchema = z.object({
   operation: OperationRefSchema.optional(),
   /** Transport `sse` (M18): the events it listens to and their types. Checked per message. */
   stream: SiteStreamSchema.optional(),
+  /** Transport `websocket` (M19): the messages it sends and receives and their types. Checked per message. */
+  socket: SiteSocketSchema.optional(),
   /** Absent when it could not be resolved. Server actions are always `POST`. */
   method: HttpMethodSchema.optional(),
   /** Absent for server actions, which post to the current page. */
@@ -1013,7 +1044,8 @@ export const AppModelSchema = z.object({
   /**
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
    * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
-   * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams.
+   * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams,
+   * version 7 (before M19) no WebSockets.
    */
   version: z
     .union([
@@ -1023,6 +1055,7 @@ export const AppModelSchema = z.object({
       z.literal(4),
       z.literal(5),
       z.literal(6),
+      z.literal(7),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

@@ -5,13 +5,13 @@
 //
 // Run after `pnpm build`:  node scripts/record-captures.mjs [fixture...]
 import { spawn, spawnSync } from 'node:child_process'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { chromium } from '@playwright/test'
 
 const repo = resolve(import.meta.dirname, '..')
 const outDir = join(repo, 'packages', 'server', 'test', 'recordings')
-const PORTS = { mockApi: 4010, dashboard: 4477, app: 3077 }
+const PORTS = { mockApi: 4010, sockets: 4011, dashboard: 4477, app: 3077 }
 const app = `http://localhost:${PORTS.app}`
 const dashboard = `http://127.0.0.1:${PORTS.dashboard}`
 
@@ -267,6 +267,24 @@ const scripts = {
     await page.waitForSelector('text=tokens')
     await settle(page)
   },
+  // WebSockets (M19): each socket is closed by the page before moving on, so every capture ends
+  // with its close code.
+  websocket: async (page) => {
+    await page.goto(`${app}/`)
+    await page.waitForSelector('text=Ticker closed after 3 quotes')
+    await settle(page)
+    await page.click('button:has-text("Ping")')
+    await page.waitForSelector('text=Answer: pong: ping')
+    await settle(page)
+    await page.goto(`${app}/chat`)
+    await page.waitForSelector('text=Joined as ada')
+    await page.fill('input[placeholder="Say something"]', 'hello sockets')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('li:has-text("hello sockets")')
+    await page.click('button:has-text("Leave")')
+    await page.waitForSelector('text=Left the chat')
+    await settle(page)
+  },
 }
 
 /** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */
@@ -359,6 +377,11 @@ function scrub(value) {
 
 async function record(fixture, browser) {
   const mock = start(process.execPath, ['fixtures/mock-api/server.js'], 'mock-api')
+  // Fixtures with their own socket server (M19).
+  const socketServer = `fixtures/${fixture}/socket-server.mjs`
+  const sockets = existsSync(join(repo, socketServer))
+    ? start(process.execPath, [socketServer], 'sockets')
+    : undefined
   const dev = start(
     process.execPath,
     [
@@ -376,6 +399,7 @@ async function record(fixture, browser) {
   )
   try {
     await waitFor(`http://127.0.0.1:${PORTS.mockApi}/users`, 20_000)
+    if (sockets) await waitFor(`http://127.0.0.1:${PORTS.sockets}/health`, 20_000)
     await waitFor(`${dashboard}/api/health`, 60_000)
     await fetch(`${dashboard}/api/captures`, { method: 'DELETE' })
     await waitFor(app, 180_000)
@@ -409,6 +433,7 @@ async function record(fixture, browser) {
   } finally {
     dev.stop()
     mock.stop()
+    sockets?.stop()
     await new Promise((r) => setTimeout(r, 1500))
   }
 }

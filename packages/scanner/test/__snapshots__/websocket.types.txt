@@ -1,0 +1,25 @@
+# Types
+
+Subscribe  interface  lib/types.ts:2
+  { type: "subscribe"; symbols: string[] }
+Quote  interface  lib/types.ts:8
+  { type: "quote"; symbol: string; price: number }
+Joined  interface  lib/types.ts:15
+  { user: string; token: string }
+ChatMessage  interface  lib/types.ts:21
+  { id: number; user: string; text: string; at: number }
+Draft  interface  lib/types.ts:29
+  { text: string }
+ServerEvents  interface  lib/types.ts:33
+  { joined: (joined: Joined) => void; chat: (message: ChatMessage) => void }
+ClientEvents  interface  lib/types.ts:38
+  { chat: (draft: Draft) => void }
+
+# Component types
+
+RootLayout  app/layout.tsx:5
+  props: { children: ReactNode }
+Chat  components/Chat.tsx:9
+  uses: ServerEvents, ClientEvents, ChatMessage
+Ticker  components/Ticker.tsx:10
+  uses: Quote, Subscribe

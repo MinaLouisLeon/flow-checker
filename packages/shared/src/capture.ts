@@ -33,13 +33,14 @@ export const CapturedBodySchema = z.discriminatedUnion('kind', [
 export type CapturedBody = z.infer<typeof CapturedBodySchema>
 
 /**
- * One message on an event stream (M18). SSE messages always come in. `body` is the `data`
- * (parsed as JSON when it is JSON), redacted like other bodies; it is left out when the message
- * is larger than `capture.maxMessageBytes`.
+ * One message on an event stream (M18) or a WebSocket (M19). SSE messages always come in;
+ * WebSocket messages go both ways. `body` is the data (parsed as JSON when it is JSON, the
+ * arguments for socket.io events), redacted like other bodies; it is left out when the message
+ * is larger than `capture.maxMessageBytes`. Binary WebSocket messages keep only their size.
  */
 export const CapturedMessageSchema = z.object({
   direction: z.enum(['in', 'out']),
-  /** SSE `event:` field. Absent for unnamed events (`message`). */
+  /** SSE `event:` field or socket.io event name. Absent for unnamed events (`message`). */
   event: z.string().optional(),
   /** SSE `id:` field. */
   id: z.string().optional(),
@@ -51,13 +52,13 @@ export const CapturedMessageSchema = z.object({
 })
 export type CapturedMessage = z.infer<typeof CapturedMessageSchema>
 
-/** The state of an event stream connection (M18). */
+/** The state of an event stream (M18) or WebSocket (M19) connection. */
 export const CapturedStreamSchema = z.object({
   /** `open` while it is connected (the runtime sends updates), `closed` when it ended, `error` when it failed. */
   state: z.enum(['open', 'closed', 'error']),
-  /** Messages received, including the ones not kept. */
+  /** Messages received and sent, including the ones not kept. */
   count: z.number().int().nonnegative(),
-  /** Bytes of message data received. */
+  /** Bytes of message data received and sent. */
   bytes: z.number().int().nonnegative(),
   /** Messages were dropped (over `capture.maxMessages`) or kept without data (over `capture.maxMessageBytes`). */
   truncated: z.boolean().optional(),
@@ -68,6 +69,13 @@ export const CapturedStreamSchema = z.object({
    * first one. The tool server appends them to what it has and removes the field.
    */
   from: z.number().int().nonnegative().optional(),
+  /** WebSocket (M19): messages are socket.io packets, decoded into events. */
+  socketIo: z.boolean().optional(),
+  /** WebSocket (M19): the subprotocol the server picked. */
+  protocol: z.string().optional(),
+  /** WebSocket (M19): the close code and reason. */
+  closeCode: z.number().int().optional(),
+  closeReason: z.string().optional(),
 })
 export type CapturedStream = z.infer<typeof CapturedStreamSchema>
 
@@ -120,8 +128,11 @@ export const CaptureSchema = z.object({
   sessionId: z.string(),
   /** Where the request was sent from. */
   origin: z.enum(['browser', 'server']),
-  /** `http` is Node's http/https module (axios on the server). `eventsource`: `new EventSource()` (M18). */
-  transport: z.enum(['fetch', 'xhr', 'http', 'eventsource']),
+  /**
+   * `http` is Node's http/https module (axios on the server). `eventsource`: `new EventSource()`
+   * (M18). `websocket`: `new WebSocket()`, also socket.io's (M19).
+   */
+  transport: z.enum(['fetch', 'xhr', 'http', 'eventsource', 'websocket']),
   /** ISO time the request started. */
   timestamp: z.string(),
   durationMs: z.number(),
@@ -188,8 +199,8 @@ export const CaptureSchema = z.object({
     })
     .optional(),
   /**
-   * Event stream (M18): an `EventSource`, or a fetch answered with `text/event-stream`. The
-   * messages are here, not in `response.body`.
+   * Event stream (M18): an `EventSource`, or a fetch answered with `text/event-stream`; or a
+   * WebSocket (M19). The messages are here, not in `response.body`.
    */
   stream: CapturedStreamSchema.optional(),
   messages: z.array(CapturedMessageSchema).optional(),

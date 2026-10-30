@@ -352,6 +352,29 @@ function scoreSite(
     return undefined
   }
 
+  // WebSockets (M19): a WebSocket capture only comes from a WebSocket site, socket.io frames only
+  // from a socket.io site, and socket.io event names tell sites on the same URL apart.
+  const socketCapture = capture.transport === 'websocket'
+  if (site.transport === 'websocket') {
+    if (!socketCapture) return undefined
+    const api = site.socket?.api
+    if (api && (api === 'socket.io') !== !!capture.stream?.socketIo) return undefined
+    add('socket', 10, api === 'socket.io' ? 'socket.io' : 'WebSocket')
+    if (api === 'socket.io') {
+      const label = (direction: string, name: string) =>
+        `${direction === 'out' ? 'sends' : 'receives'} ${name}`
+      const seen = new Set((capture.messages ?? []).map((m) => label(m.direction, m.event ?? 'message')))
+      const known = new Set(site.socket?.messages.map((m) => label(m.direction, m.name)))
+      if (seen.size > 0 && known.size > 0) {
+        const hits = [...seen].filter((name) => known.has(name))
+        if (hits.length === seen.size) add('socket', 10, hits.join(', '))
+        else if (hits.length === 0) add('socket', -10, `doesn't use ${[...seen].join(', ')}`)
+      }
+    }
+  } else if (socketCapture) {
+    return undefined
+  }
+
   if (site.origin === 'server-action' && info.action) {
     const id = parent?.serverActionId
     const action = id ? context.resolveAction(id) : undefined

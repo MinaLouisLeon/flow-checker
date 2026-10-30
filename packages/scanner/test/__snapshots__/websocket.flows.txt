@@ -1,0 +1,10 @@
+# Navigation
+
+## HomePage  app/page.tsx
+link /chat -> /chat  event onClick
+
+# Flows
+
+## Ping click  (/)
+1. Ping onClick on /
+2. GET ws://localhost:4011/echo

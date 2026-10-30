@@ -89,5 +89,5 @@ re-run them on their own before assuming a regression.
 | M16 | tRPC                                              | Done    |
 | M17 | GraphQL                                           | Done    |
 | M18 | SSE                                               | Done    |
-| M19 | WebSockets                                        | Planned |
+| M19 | WebSockets                                        | Done    |
 | M20 | Release v0.2.0                                    | Planned |

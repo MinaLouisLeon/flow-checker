@@ -26,6 +26,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M16 | tRPC                  | Model version 5. Batches split in the runtime before redaction (`runtime/src/trpc.ts`); router read by syntax.           |
 | M17 | GraphQL               | Model version 6. graphql-js in the scanner only; runtime reads operations by regex; fragments are global by name.        |
 | M18 | SSE                   | Model version 7. Streams sent on open, then only new messages (`stream.from`), merged by the verifier.                   |
+| M19 | WebSockets            | Model version 8. Reuses the M18 stream recorder both ways; socket.io decoded from its WS frames, not patched.            |
 
 ## Gotchas
 
@@ -117,7 +118,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Recordings were made on app port 3077 (`node scripts/record-captures.mjs graphql-apollo graphql-apollo-v3
   graphql-urql graphql-relay`).
 
-## M18 — SSE (done, branch `feat/sse`)
+## M18 — SSE (done, merged to `dev`)
 
 - Open streams are sent as one capture id many times: the first send is the whole capture, later ones only carry
   new messages with `stream.from`; `Verifier.mergeStream()` appends them. The store replaces by id, so each update
@@ -137,3 +138,28 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Bash heredocs with backticks fail here (`unexpected EOF`) but may still run part of the command: write patch
   scripts with the Write tool.
 - Recordings were made on app port 3077 (`node scripts/record-captures.mjs sse`).
+
+## M19 — WebSockets (done, branch `feat/websockets`)
+
+- Captures reuse the M18 `stream` / `messages` fields and recorder (`message()` now takes a direction, parsed
+  values and binary sizes). Sent messages are type-checked with paths under `sent[<name>]`, received ones under
+  `messages[<name>]`, so the same name both ways doesn't collide.
+- socket.io-client isn't patched: its URLs carry `EIO=`, and `runtime/src/socket.ts` decodes the engine.io /
+  socket.io text frames (only events are kept). Its HTTP long-polling is a default ignore glob; messages sent
+  before the upgrade are lost, so the fixture uses `transports: ['websocket']`.
+- socket.io sites are written with an http URL but connect over ws: `matchRequestUrl()` compares origins with
+  ws ↔ http. The site URL is `<origin>/socket.io/`; the written path is the namespace.
+- Socket uses (`send`, `on`, `emit`) are found by the holder's text in the _outermost_ function around the
+  socket (SSE used the innermost), so a ref set in an effect and used in an event handler is followed.
+- Console Ninja (VS Code extension on this machine) injects code into Next's dev polyfill that opens its own
+  WebSocket to `ws://127.0.0.1:<port>/`. The runtime skips sockets whose stack has a frame ending in
+  `, <anonymous>:l:c)` (eval without a source URL) or a browser extension URL.
+- React strict mode closes the first-mount socket before it opens: the runtime marks sockets the app `close()`d
+  as `closed`, not `error`. The `websocket` recording has two such empty captures (ticker and chat).
+- Next route handlers can't upgrade connections, so the fixture has its own `socket-server.mjs` (ws + socket.io,
+  port 4011, `destroyUpgrade: false` so socket.io leaves `/live` and `/echo` alone). `record-captures.mjs`
+  starts a fixture's `socket-server.mjs` when there is one.
+- A `dev` worktree under the session temp folder doesn't work (paths too long: checkout fails without
+  `core.longpaths`, then vite / vitest can't resolve their `#imports`). For an A/B timing, `git stash push -- <file>`
+  one file instead: the scanner hooks cost ~3% on the fixture snapshot tests.
+- Recordings were made on app port 3077 (`node scripts/record-captures.mjs websocket`).

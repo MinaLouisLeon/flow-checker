@@ -1,5 +1,5 @@
-// Event streams (M18): a `text/event-stream` parser, and a recorder that keeps a capture's
-// messages within `capture.maxMessages` / `capture.maxMessageBytes` and sends updates while the
+// Event streams (M18): a `text/event-stream` parser, and a recorder (also used for WebSockets,
+// M19) that keeps a capture's messages within `capture.maxMessages` / `capture.maxMessageBytes` and sends updates while the
 // stream is open. Web platform APIs only: used by the browser and the server runtime.
 import type { Capture, CapturedBody, CapturedMessage } from '@flow-checker/shared'
 import { byteLength } from './body'
@@ -81,6 +81,23 @@ export function messageBody(data: string): CapturedBody {
   return { kind: 'text', value: data, size }
 }
 
+/**
+ * One message for the recorder: an SSE event, or a WebSocket message (M19) in either direction.
+ * Text `data` is parsed as JSON when it is JSON; `value` is data that is already parsed
+ * (socket.io event arguments); binary data keeps only its size.
+ */
+export interface RecordedMessage {
+  /** Default `in`. */
+  direction?: 'in' | 'out'
+  event?: string
+  id?: string
+  data?: string
+  value?: unknown
+  binary?: boolean
+  /** Bytes on the wire. Taken from `data` when absent. */
+  size?: number
+}
+
 export interface StreamLimits {
   maxMessages: number
   maxMessageBytes: number
@@ -89,7 +106,7 @@ export interface StreamLimits {
 export interface StreamRecorder {
   /** The connection is open (EventSource `open`, fetch response headers). Sends the capture. */
   open(): void
-  message(event: SseEvent): void
+  message(message: RecordedMessage): void
   /** EventSource reconnected after the connection dropped. */
   reconnect(): void
   /** The stream ended. Sends the last update. */
@@ -160,7 +177,7 @@ export function recordStream(
     message(event) {
       if (ended || !capture.stream) return
       const stream = capture.stream
-      const size = byteLength(event.data)
+      const size = event.size ?? byteLength(event.data ?? '')
       stream.count++
       stream.bytes += size
       if (messages.length >= limits.maxMessages) {
@@ -169,14 +186,16 @@ export function recordStream(
         return
       }
       const message: CapturedMessage = {
-        direction: 'in',
+        direction: event.direction ?? 'in',
         ...(event.event && event.event !== 'message' ? { event: event.event } : {}),
         ...(event.id ? { id: event.id } : {}),
         at: new Date().toISOString(),
         size,
       }
       if (size > limits.maxMessageBytes) stream.truncated = true
-      else message.body = messageBody(event.data)
+      else if (event.binary) message.body = { kind: 'binary', size }
+      else if ('value' in event) message.body = { kind: 'json', value: event.value, size }
+      else message.body = messageBody(event.data ?? '')
       messages.push(message)
       schedule()
     },
