@@ -70,6 +70,11 @@ export const CaptureMatchSchema = z.object({
   score: z.number(),
   /** Best candidates first (at most a few). */
   candidates: z.array(MatchCandidateSchema),
+  /**
+   * Unmatched, and sent by another site's script (e.g. a Google sign-in SDK) to another origin,
+   * with no project code on its stack: not something the scanner missed.
+   */
+  thirdParty: z.boolean().optional(),
 })
 export type CaptureMatch = z.infer<typeof CaptureMatchSchema>
 
@@ -121,7 +126,8 @@ export interface SiteVerification {
 /** `GET /api/verification`. */
 export interface VerificationSummary {
   sites: Record<string, SiteVerification>
-  counts: { matched: number; ambiguous: number; unmatched: number; manual: number }
+  /** `thirdParty`: unmatched requests other sites' scripts sent, not counted in `unmatched`. */
+  counts: { matched: number; ambiguous: number; unmatched: number; manual: number; thirdParty?: number }
 }
 
 // --- URL and route patterns -----------------------------------------------------------------

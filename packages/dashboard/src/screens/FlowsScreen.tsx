@@ -103,7 +103,7 @@ function FlowStatusBadge({ status }: { status?: FlowStatus }) {
   if (!status || status.status === 'unconfirmed') {
     return (
       <Badge tone="muted" title="Inferred from the code. Not walked in the app yet.">
-        inferred
+        not walked yet
       </Badge>
     )
   }

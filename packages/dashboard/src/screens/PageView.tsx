@@ -1,9 +1,16 @@
-import type { ComponentRef, QueryLink, RequestSite, Route } from '@flow-checker/shared'
+import {
+  type ComponentRef,
+  type Navigation,
+  type QueryLink,
+  type RequestSite,
+  type Route,
+  urlText,
+} from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
 import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
-import { QueryLinkList, RequestList } from '../RequestView'
+import { QueryLinkList, RequestList, triggerLabel } from '../RequestView'
 import { href } from '../router'
 import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 import { ComponentPanel } from './ComponentPanel'
@@ -25,9 +32,16 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
   const open = appUrl(route, meta.appPort)
   if (route.kind === 'route-handler') return <RouteHandlerView route={route} index={index} />
   const requests = pageRequests(index, routeId)
-  const onLoad = requests.filter((s) => LOAD_TRIGGERS.has(s.trigger.kind))
-  const onEvent = requests.filter((s) => !LOAD_TRIGGERS.has(s.trigger.kind))
-  const links = pageLinks(index, routeId)
+  // The page's own tree, apart from what its layouts send on every page under them.
+  const own = index.pageTree.get(route.id) ?? new Set<string>()
+  const fromPage = requests.filter((s) => own.has(s.componentId as string))
+  const fromLayouts = requests.filter((s) => !own.has(s.componentId as string))
+  const onLoad = fromPage.filter((s) => LOAD_TRIGGERS.has(s.trigger.kind))
+  const onEvent = fromPage.filter((s) => !LOAD_TRIGGERS.has(s.trigger.kind))
+  const allLinks = pageLinks(index, routeId)
+  const links = allLinks.filter((l) => own.has(l.componentId as string))
+  const layoutLinks = allLinks.filter((l) => !own.has(l.componentId as string))
+  const navigations = index.model.navigations.filter((n) => n.componentId && own.has(n.componentId))
 
   return (
     <div className="screen screen-split">
@@ -94,13 +108,34 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
 
         <MiddlewareSection index={index} routeId={routeId} />
 
+        {navigations.length > 0 && (
+          <Section title="Leaves this page" aside={<span className="count">{navigations.length}</span>}>
+            <NavigationList navigations={navigations} />
+          </Section>
+        )}
+
         <Section title="Page-load requests" aside={<span className="count">{onLoad.length}</span>}>
-          <RequestList sites={onLoad} empty="Nothing is fetched when this page loads." open={false} />
+          <RequestList sites={onLoad} empty="This page fetches nothing when it loads." open={false} owners />
         </Section>
 
         {onEvent.length > 0 && (
           <Section title="Requests on interaction" aside={<span className="count">{onEvent.length}</span>}>
-            <RequestList sites={onEvent} empty="" open={false} />
+            <RequestList sites={onEvent} empty="" open={false} owners />
+          </Section>
+        )}
+
+        {fromLayouts.length + layoutLinks.length > 0 && (
+          <Section
+            title="From layouts"
+            aside={<span className="count">{fromLayouts.length + layoutLinks.length}</span>}
+          >
+            <details className="layout-requests">
+              <summary className="muted">
+                Sent by the layouts around this page, on every page under them. Show them.
+              </summary>
+              <RequestList sites={fromLayouts} empty="" open={false} owners />
+              {layoutLinks.length > 0 && <QueryLinkList links={layoutLinks} />}
+            </details>
           </Section>
         )}
 
@@ -161,6 +196,85 @@ function pageRequests(index: ModelIndex, routeId: string): RequestSite[] {
   return index.model.requests.filter(
     (s) => s.componentId && (index.routesOf.get(s.componentId) ?? []).includes(routeId),
   )
+}
+
+const NAV_LABEL: Record<Navigation['kind'], string> = {
+  link: 'link',
+  push: 'router.push',
+  replace: 'router.replace',
+  redirect: 'redirect',
+  'permanent-redirect': 'permanent redirect',
+}
+
+/** Where the page sends the user: redirects while it renders, links and router calls. */
+function NavigationList({ navigations }: { navigations: Navigation[] }) {
+  const { index } = useData()
+  // Redirects first: a page that only redirects is mostly that.
+  const sorted = [...navigations].sort(
+    (a, b) => Number(b.kind.includes('redirect')) - Number(a.kind.includes('redirect')),
+  )
+  return (
+    <ul className="list nav-list">
+      {sorted.map((nav) => {
+        const target = nav.targetRouteId ? index.routes.get(nav.targetRouteId) : undefined
+        const options = target ? [] : candidatePages(index, nav.href)
+        const owner = nav.componentId ? index.components.get(nav.componentId)?.name : undefined
+        return (
+          <li key={nav.id}>
+            <Badge tone={nav.kind.includes('redirect') ? 'warn' : 'muted'}>{NAV_LABEL[nav.kind]}</Badge>
+            {target ? (
+              <a href={href({ name: 'page', routeId: target.id })}>
+                <code>{target.path}</code>
+              </a>
+            ) : (
+              <code className="break" title={nav.href.text}>
+                {urlText(nav.href)}
+              </code>
+            )}
+            {options.length > 0 && (
+              <span className="muted">
+                {' '}
+                one of{' '}
+                {options.map((r, i) => (
+                  <span key={r.id}>
+                    {i > 0 && ', '}
+                    <a href={href({ name: 'page', routeId: r.id })}>
+                      <code>{r.path}</code>
+                    </a>
+                  </span>
+                ))}
+              </span>
+            )}
+            <span className="spacer" />
+            <span className="muted">
+              {triggerLabel(nav.trigger)}
+              {owner ? ` · ${owner}` : ''}
+            </span>
+            <SourceLink file={nav.loc.file} line={nav.loc.line} column={nav.loc.column} />
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+/** Pages an href with placeholders could go to: `/:locale/jobs/:param` -> `/[locale]/jobs/applied`, ... */
+function candidatePages(index: ModelIndex, url: Navigation['href']): Route[] {
+  if (!url.path) return []
+  const want = url.path.split('/').filter(Boolean)
+  const found: Route[] = []
+  for (const route of index.model.routes) {
+    if (route.kind !== 'page' || route.slot || route.intercepting) continue
+    const have = route.path.split('/').filter(Boolean)
+    if (have.length !== want.length) continue
+    const fits = have.every((seg, i) => {
+      const w = want[i] as string
+      return w.startsWith(':') || (seg.startsWith('[') && !seg.startsWith('[...')) || seg === w
+    })
+    if (fits) found.push(route)
+  }
+  // Only worth listing when the placeholders leave a few pages.
+  return found.length <= 6 ? found : []
 }
 
 /** React Query cache calls made by the page's components (M13). */

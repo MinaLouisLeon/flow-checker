@@ -182,3 +182,22 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   versions.
 - A test harness that hosts a fake upstream in the same process must not `spawnSync` the browser script: the
   blocked event loop stalls the page's server fetch.
+
+## Scan accuracy on a real app (branch `feat/scan-accuracy-fixes`, after M20)
+
+- Found by running 0.2.0 on jobseekk (54 pages, `request()` wrapper → `getProxyUrl()` → `secureApiFetch()` → `fetch`).
+  Patterns are reproduced in `packages/scanner/test/wrappers.test.ts`; model version 9 (`prop` component refs).
+- `#str` follows project calls through `#evaluate`; ternaries use `#truth` (array/string `includes`, `===`, `!`,
+  `&&`/`||`), else `optionalQuery()` (same URL with/without a query). Placeholders are assumed not to hold `?`/`&`.
+- Shorthand `{ method }` / `{ submit }`: the name node's symbol is the property. `declarationOf` uses
+  `getValueSymbol()`, and mutation/trigger code compares symbols with `refersTo()`.
+- Branch twins: one call into a wrapper reaching `fetch` on several `if` branches made 2 sites per call (doubling
+  sites and warnings). `#mergeTwins()` (start of `sites()`) keeps the unguarded branch; a guarded branch with a
+  default method (`?? 'POST'`, tracked as `Str.fallback`) gives way to a different method.
+- `#followUses()` places triggers through local functions (`const go = useCallback(...)`), returned objects and
+  wrappers (`guard(m.mutate)`), up the walk's frames. Dependency lists (`[mutate]`) are not calls.
+- Matcher: stack-source points per frame depend on how many sites share the line (`locSites`): 25 / 15 / 5.
+  Without it, an unknown-URL site won with the wrapper's frames alone (score 75).
+- `isThirdParty()`: cross-origin, no source-mapped project frame, and a cross-origin script on the stack.
+- To check the dashboard on a real app without touching its running instance: `flow-checker export --html <dir>`
+  reads `.flow-checker/` but writes nothing there; serve the folder with any static server.

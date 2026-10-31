@@ -152,7 +152,7 @@ describe('verification', () => {
     ])
     const verification = await json<VerificationSummary>('/api/verification')
     expect(verification.sites.req_table).toMatchObject({ captures: 1, lastCaptureId: 'cap_table' })
-    expect(verification.counts).toEqual({ matched: 1, ambiguous: 0, unmatched: 0, manual: 0 })
+    expect(verification.counts).toEqual({ matched: 1, ambiguous: 0, unmatched: 0, manual: 0, thirdParty: 0 })
     expect((await json<CaptureSummary[]>('/api/sites/req_table/captures')).map((c) => c.id)).toEqual([
       'cap_table',
     ])

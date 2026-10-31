@@ -274,8 +274,9 @@ export const ComponentRefSchema = z.object({
    * `external`: from a package (see `module`).
    * `unresolved`: the scanner could not find a component declaration.
    * `excluded`: declared in a file the config's `include`/`exclude` leaves out.
+   * `prop`: passed in by the parent, e.g. `({ as: Tag }) => <Tag />`.
    */
-  resolution: z.enum(['project', 'external', 'unresolved', 'excluded']),
+  resolution: z.enum(['project', 'external', 'unresolved', 'excluded', 'prop']),
   componentId: z.string().optional(),
   /** Import specifier the tag came from, when it was imported. */
   module: z.string().optional(),
@@ -1045,7 +1046,7 @@ export const AppModelSchema = z.object({
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
    * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
    * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams,
-   * version 7 (before M19) no WebSockets.
+   * version 7 (before M19) no WebSockets, version 8 no `prop` component references.
    */
   version: z
     .union([
@@ -1056,6 +1057,7 @@ export const AppModelSchema = z.object({
       z.literal(5),
       z.literal(6),
       z.literal(7),
+      z.literal(8),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

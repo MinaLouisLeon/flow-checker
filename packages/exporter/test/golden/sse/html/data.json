@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "sse",
   "model": {
-    "version": 8,
+    "version": 9,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -1298,7 +1298,8 @@
       "matched": 4,
       "ambiguous": 0,
       "unmatched": 0,
-      "manual": 0
+      "manual": 0,
+      "thirdParty": 0
     }
   },
   "flows": {

@@ -4,6 +4,7 @@ import type {
   AppModel,
   Component,
   ComponentRef,
+  Flag,
   Flow,
   MiddlewareRewrite,
   MiddlewareRoute,
@@ -54,6 +55,18 @@ export interface ScanNote {
   requestId?: string
 }
 
+/** A page-to-page navigation edge. */
+export interface NavEdge {
+  source: string
+  target: string
+  kinds: Navigation['kind'][]
+  /**
+   * Every navigation on it runs on every page under a layout or the middleware (a header link, a
+   * login redirect), so the map can hide it.
+   */
+  shared?: boolean
+}
+
 export interface ModelIndex {
   model: AppModel
   routes: Map<string, Route>
@@ -67,6 +80,8 @@ export interface ModelIndex {
   handlerCallers: Map<string, RequestSite[]>
   /** Component id → where it is rendered. */
   renderedBy: Map<string, RenderSite[]>
+  /** Page route id → components its page file renders, down its own tree (not its layouts). */
+  pageTree: Map<string, Set<string>>
   /** Component id → routes whose page or layouts render it (directly or further down). */
   routesOf: Map<string, string[]>
   /** Type id → where it is used. */
@@ -77,7 +92,7 @@ export interface ModelIndex {
   /** Route id -> flows that pass through it. */
   flowsByRoute: Map<string, Flow[]>
   /** Page-to-page navigation edges (from the page whose own tree has the link or call). */
-  navEdges: { source: string; target: string; kinds: Navigation['kind'][] }[]
+  navEdges: NavEdge[]
   /** React Query cache links (M13). */
   queryLinks: Map<string, QueryLink>
   /** Site id -> cache links that run after it (its mutation callbacks, or a server prefetch). */
@@ -171,11 +186,14 @@ export function buildIndex(model: AppModel): ModelIndex {
       .sort((x, y) => x.path.split('/').length - y.path.split('/').length)
     return withLayout[0] ? [withLayout[0].id] : []
   }
-  const edges = new Map<string, { source: string; target: string; kinds: Navigation['kind'][] }>()
-  const addEdge = (source: string, target: string, kind: Navigation['kind']) => {
+  // Only in a layout (a header or menu), not in any page's own tree: on every page under it.
+  const inLayoutOnly = (componentId: string) => !pages.some((r) => pageTree.get(r.id)?.has(componentId))
+  const edges = new Map<string, NavEdge>()
+  const addEdge = (source: string, target: string, kind: Navigation['kind'], shared = false) => {
     if (source === target) return
     const key = `${source}->${target}`
-    const edge = edges.get(key) ?? { source, target, kinds: [] }
+    const edge = edges.get(key) ?? { source, target, kinds: [], shared }
+    if (!shared) delete edge.shared
     if (!edge.kinds.includes(kind)) edge.kinds.push(kind)
     edges.set(key, edge)
   }
@@ -183,9 +201,10 @@ export function buildIndex(model: AppModel): ModelIndex {
     const target = nav.targetRouteId
     if (!target) continue
     if (nav.componentId) {
-      for (const source of sourcesOf(nav.componentId)) addEdge(source, target, nav.kind)
+      const shared = inLayoutOnly(nav.componentId)
+      for (const source of sourcesOf(nav.componentId)) addEdge(source, target, nav.kind, shared)
     } else if (nav.origin === 'middleware') {
-      for (const source of nav.sourceRouteIds ?? []) addEdge(source, target, nav.kind)
+      for (const source of nav.sourceRouteIds ?? []) addEdge(source, target, nav.kind, true)
     } else if (nav.serverAction) {
       const name = nav.serverAction.name
       for (const site of model.requests) {
@@ -227,6 +246,7 @@ export function buildIndex(model: AppModel): ModelIndex {
     handlerCallers,
     renderedBy,
     routesOf,
+    pageTree,
     typeUsage,
     notes: scanNotes(model),
     navigations: new Map(model.navigations.map((n) => [n.id, n])),
@@ -312,6 +332,14 @@ function hasUnresolved(shape: TypeShape): boolean {
   }
 }
 
+/** Flags for what the scan couldn't resolve about a request (one note per request). */
+const SCAN_GAPS = new Set<Flag['kind']>([
+  'dynamic-url',
+  'unknown-method',
+  'unknown-response',
+  'unknown-trigger',
+])
+
 function scanNotes(model: AppModel): ScanNote[] {
   const notes: ScanNote[] = []
   for (const route of model.routes) {
@@ -349,7 +377,21 @@ function scanNotes(model: AppModel): ScanNote[] {
   }
   for (const site of model.requests) {
     const first = site.callStack[0]
+    // What the scan couldn't resolve about one request is one note, not one per gap.
+    const gaps = site.flags.filter((f) => SCAN_GAPS.has(f.kind))
+    if (gaps.length > 0) {
+      notes.push({
+        kind: 'request',
+        message: `${requestLabel(site)}: ${gaps.length === 1 ? gaps[0]?.message : gaps.map((f) => f.message.replace(/\.$/, '')).join(' · ')}`,
+        file: first?.file ?? '',
+        ...(first ? { line: first.line, column: first.column } : {}),
+        ...(site.componentId ? { componentId: site.componentId } : {}),
+        ...(site.origin === 'route-handler' && site.routeId ? { routeId: site.routeId } : {}),
+        requestId: site.id,
+      })
+    }
     for (const flag of site.flags) {
+      if (SCAN_GAPS.has(flag.kind)) continue
       notes.push({
         kind:
           flag.kind === 'stale'

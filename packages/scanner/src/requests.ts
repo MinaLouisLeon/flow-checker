@@ -228,6 +228,8 @@ interface Str {
   parts: Part[]
   /** Set when the value starts with `process.env.X` (or its fallback). */
   env?: string
+  /** Set when the value is the default after `??` / `||`, e.g. `options.method ?? 'POST'`. */
+  fallback?: boolean
 }
 
 /** Where an expression's value comes from, after following parameters and constants. */
@@ -342,6 +344,16 @@ interface Found {
   operation?: OperationRef
   stream?: SiteStream
   socket?: SiteSocket
+  /** The method is a default (none given, or `?? 'POST'`), not one the code chose. */
+  methodDefault?: boolean
+}
+
+/** What `#mergeTwins` needs to know about a site. */
+interface SiteMeta {
+  originKey: string
+  methodDefault: boolean
+  /** Per call frame: reached only on some paths of its function (`if`, ternary, `&&`). */
+  guarded: boolean[]
 }
 
 export interface RequestScannerOptions {
@@ -386,6 +398,8 @@ export class RequestScanner {
   readonly #hookSites = new Map<Node, string[]>()
   /** Site id -> what its hook does, for React Query sites. */
   readonly #siteKinds = new Map<string, { kind: HookDef['kind']; client: boolean }>()
+  readonly #siteMeta = new Map<string, SiteMeta>()
+  #twinsMerged = false
   /** Nesting of `#evaluate`, so values that refer to each other end. */
   #evalDepth = 0
   /** tRPC (M16): the endpoint and the router's procedures by path. */
@@ -793,6 +807,7 @@ export class RequestScanner {
 
   /** Every site, sorted by where it starts, with route handler and server action chains linked. */
   sites(routes: Route[]): RequestSite[] {
+    this.#mergeTwins()
     const sites = [...this.#sites.values()]
     const handlers = routes
       .filter((r) => r.kind === 'route-handler')
@@ -824,6 +839,84 @@ export class RequestScanner {
       if (chain.length > 0) site.chain = chain.map((s) => s.id)
     }
     return sites.sort(bySite)
+  }
+
+  /**
+   * One call into a wrapper can reach the network on several branches of it, e.g. a multipart
+   * branch and the normal one. When the branches send the same request (same URL, and the same
+   * method or only a default one on the guarded branch) they are one site: the branch that isn't
+   * guarded by an `if` is kept.
+   */
+  #mergeTwins() {
+    if (this.#twinsMerged) return
+    this.#twinsMerged = true
+    const groups = new Map<string, RequestSite[]>()
+    for (const site of this.#sites.values()) {
+      const meta = this.#siteMeta.get(site.id)
+      if (!meta || site.callStack.length < 2) continue
+      const url = site.url
+        ? `${site.url.base ?? ''} ${site.url.path ?? site.url.text} ${site.url.query ?? ''}`
+        : ''
+      const key = [
+        meta.originKey,
+        site.transport,
+        url,
+        site.hook?.name ?? '',
+        site.procedure?.path ?? '',
+      ].join('|')
+      const group = groups.get(key) ?? []
+      group.push(site)
+      groups.set(key, group)
+    }
+    const removed = new Set<string>()
+    for (const group of groups.values()) {
+      for (let i = 0; i < group.length; i++) {
+        for (let j = i + 1; j < group.length; j++) {
+          const a = group[i] as RequestSite
+          const b = group[j] as RequestSite
+          if (removed.has(a.id) || removed.has(b.id)) continue
+          const drop = this.#twinToDrop(a, b)
+          if (drop) removed.add(drop.id)
+        }
+      }
+    }
+    for (const id of removed) {
+      this.#sites.delete(id)
+      this.#siteKinds.delete(id)
+      this.#siteMeta.delete(id)
+    }
+    if (removed.size === 0) return
+    for (const [node, ids] of this.#hookSites) {
+      this.#hookSites.set(
+        node,
+        ids.filter((id) => !removed.has(id)),
+      )
+    }
+  }
+
+  /** Which of two sites to drop when they are branches of the same call, if they are. */
+  #twinToDrop(a: RequestSite, b: RequestSite): RequestSite | undefined {
+    const loc = (f: CallFrame) => `${f.file}:${f.line}:${f.column}`
+    let shared = 0
+    while (
+      shared < a.callStack.length &&
+      shared < b.callStack.length &&
+      loc(a.callStack[shared] as CallFrame) === loc(b.callStack[shared] as CallFrame)
+    ) {
+      shared++
+    }
+    // They must share at least the call in the origin, and split inside a wrapper.
+    if (shared === 0 || shared === a.callStack.length || shared === b.callStack.length) return undefined
+    const metaA = this.#siteMeta.get(a.id)
+    const metaB = this.#siteMeta.get(b.id)
+    if (!metaA || !metaB) return undefined
+    const guardedA = metaA.guarded.slice(shared).some(Boolean)
+    const guardedB = metaB.guarded.slice(shared).some(Boolean)
+    if (a.method === b.method) return guardedA && !guardedB ? a : b
+    // Different methods: only a guarded branch's default method gives way.
+    if (guardedA && !guardedB && metaA.methodDefault) return a
+    if (guardedB && !guardedA && metaB.methodDefault) return b
+    return undefined
   }
 
   /**
@@ -1570,7 +1663,7 @@ export class RequestScanner {
       const frame: Frame = {
         ...this.#frame(call, scope),
         hook: { def },
-        ...(type === 'mutation' ? { trigger: this.#mutationTrigger(call, scope) } : {}),
+        ...(type === 'mutation' ? { trigger: this.#mutationTrigger(call, scope, w.frames) } : {}),
       }
       this.#emitTrpc(w, frame, path, type)
       const options = call.getArguments()[type === 'mutation' ? 0 : 1]
@@ -1609,7 +1702,7 @@ export class RequestScanner {
         callee: anchor === call ? oneLine(call.getExpression().getText()) : def.name,
         scope,
         hook: { def },
-        ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope) } : {}),
+        ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope, w.frames) } : {}),
       }
       this.#emitTrpc(w, frame, options.trpc.path, type)
       if (type !== 'mutation') continue
@@ -1742,7 +1835,7 @@ export class RequestScanner {
         ...(typeArg && !def.multi ? { typeArg } : {}),
         ...(parts ? { parts } : {}),
       },
-      ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope) } : {}),
+      ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope, w.frames) } : {}),
     }
     // SWR passes the key to the fetcher. An inline function written in a factory
     // (`(id) => queryOptions({ queryFn: () => getItem(id) })`) sees the factory's arguments.
@@ -2106,6 +2199,10 @@ export class RequestScanner {
     const [input, init] = call.getArguments()
     const methodProp = this.#prop(init, env, 'method')
     const method = methodProp === 'absent' ? 'GET' : this.#method(methodProp)
+    // `GET` because none was given, or a wrapper's `options.method ?? 'POST'`.
+    const methodDefault =
+      methodProp === 'absent' ||
+      (methodProp !== 'unknown' && !!this.#str(methodProp.node, methodProp.env)?.fallback)
     const body = this.#bodyOf(propValue(this.#prop(init, env, 'body')), env)
     // `Accept: text/event-stream`: the response is read as an event stream (M18).
     const headers = propValue(this.#prop(init, env, 'headers'))
@@ -2116,6 +2213,7 @@ export class RequestScanner {
         url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
         ...(body ? { bodyType: body } : {}),
         stream: { api: 'fetch', events: [] },
+        ...(methodDefault ? { methodDefault } : {}),
       }
     }
     return {
@@ -2123,6 +2221,7 @@ export class RequestScanner {
       ...(method ? { method } : {}),
       url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
       ...(body ? { bodyType: body } : {}),
+      ...(methodDefault ? { methodDefault } : {}),
     }
   }
 
@@ -2477,6 +2576,11 @@ export class RequestScanner {
     site.flags = flagsOf(site)
     site.hash = siteHash(frames, site, (node) => this.#loc(node).file)
     this.#sites.set(id, site)
+    this.#siteMeta.set(id, {
+      originKey: w.origin.key,
+      methodDefault: !!found.methodDefault,
+      guarded: frames.map((f) => isGuarded(f.node)),
+    })
     if (hookFrame?.hook?.def.rq) {
       this.#siteKinds.set(id, { kind: hookFrame.hook.def.kind, client: !!hookFrame.hook.def.client })
     }
@@ -2522,7 +2626,8 @@ export class RequestScanner {
     if (origin.kind === 'route-handler') return { kind: 'route-handler' }
     if (origin.kind === 'server-action') return { kind: 'server-action' }
     if (origin.kind === 'middleware') return { kind: 'middleware' }
-    return { kind: origin.client ? 'page-load' : 'server-render' }
+    if (origin.client) return this.#escapedTrigger(frames) ?? { kind: 'page-load' }
+    return { kind: 'server-render' }
   }
 
   /** Looks for an enclosing event handler or effect between `node` and `scope`. */
@@ -2579,36 +2684,159 @@ export class RequestScanner {
     return undefined
   }
 
-  /** Where `mutation.mutate(...)` / `const { trigger } = useSWRMutation(...)` is called. */
-  #mutationTrigger(hook: CallExpression, scope: Node): Trigger {
-    const variable = hook.getParentIfKind(ts.SyntaxKind.VariableDeclaration)
-    const name = variable?.getNameNode()
-    const calls: Node[] = []
-    if (name && N.isIdentifier(name)) {
-      const symbol = name.getSymbol()
-      for (const access of scope.getDescendantsOfKind(ts.SyntaxKind.PropertyAccessExpression)) {
-        if (!MUTATE_MEMBERS.has(access.getName()) || access.getExpression().getSymbol() !== symbol) continue
-        const call = access.getParentIfKind(ts.SyntaxKind.CallExpression)
-        if (call) calls.push(call)
+  /**
+   * Where `mutation.mutate(...)` / `const { trigger } = useSWRMutation(...)` is called. When a
+   * custom hook returns the mutate function (`return { save: mutation.mutate }`), the callers
+   * of the hook are searched, up the walk's frames. A mutation never runs on page load: a call
+   * that can't be placed is `unknown`, unless it is made right in the component's body.
+   */
+  #mutationTrigger(hook: CallExpression, scope: Node, frames: Frame[] = []): Trigger {
+    return this.#followUses(this.#mutateUses(hook, MUTATE_MEMBERS, scope), scope, frames, MUTATE_MEMBERS)
+  }
+
+  /**
+   * A call in a local function a custom hook hands out (`const goTo = () => router.push(...)`,
+   * `return { goTo }`): what starts it is where the hook's caller uses it. Undefined when no frame
+   * is in such a function, so the origin's default applies.
+   */
+  #escapedTrigger(frames: Frame[]): Trigger | undefined {
+    for (let i = frames.length - 1; i >= 0; i--) {
+      const frame = frames[i] as Frame
+      if (!localHolder(frame.node, frame.scope)) continue
+      return this.#followUses(
+        { calls: [frame.node], escapes: new Set() },
+        frame.scope,
+        frames.slice(0, i),
+        new Set(),
+      )
+    }
+    return undefined
+  }
+
+  /**
+   * Follows calls and references of a function value to what starts them: an event prop, an
+   * effect, or a call while rendering (`page-load`). Through local functions that hold them, and
+   * up the walk's frames when a custom hook returns them (`selfMembers`: what to look for when the
+   * hook returns the value itself). `unknown` when nothing places it.
+   */
+  #followUses(
+    start: { calls: Node[]; escapes: Set<string> },
+    scope: Node,
+    frames: Frame[],
+    selfMembers: Set<string>,
+  ): Trigger {
+    let uses = start
+    let useScope = scope
+    for (let level = frames.length - 1; ; level--) {
+      const queue = [...uses.calls]
+      const seen = new Set<Node>()
+      let rendered: Node | undefined
+      while (queue.length > 0) {
+        const use = queue.shift() as Node
+        if (seen.has(use)) continue
+        seen.add(use)
+        const found = this.#triggerAt(use, useScope)
+        if (found) return found
+        // Called in a local function (`const submit = useCallback(async () => mutate())`):
+        // follow where that function is called, passed or returned. Inline callbacks
+        // (`items.map(() => ...)`) run where they are written.
+        const fn = localHolder(use, useScope)
+        if (!fn) {
+          if (N.isCallExpression(use)) rendered ??= use
+          continue
+        }
+        const holder = holderName(fn)
+        const symbol = holder?.getSymbol()
+        if (!holder || !symbol) continue
+        for (const ref of useScope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
+          if (ref === holder || !refersTo(ref, symbol) || isDependencyList(ref)) continue
+          const returned = returnedAs(ref)
+          if (returned && ref.getFirstAncestor(isFunctionLike) === useScope) uses.escapes.add(returned)
+          else {
+            const parent = ref.getParent()
+            queue.push(parent && N.isCallExpression(parent) && parent.getExpression() === ref ? parent : ref)
+          }
+        }
       }
-    } else if (name && N.isObjectBindingPattern(name)) {
+      if (rendered && uses.escapes.size === 0) return { kind: 'page-load', loc: this.#loc(rendered) }
+      const caller = frames[level]
+      if (uses.escapes.size === 0 || !caller || !N.isCallExpression(caller.node)) break
+      // The hook's result as the caller sees it: `const { save } = useSave()`.
+      const members = uses.escapes.has(SELF) ? new Set([...uses.escapes, ...selfMembers]) : uses.escapes
+      uses = this.#mutateUses(caller.node, members, caller.scope)
+      useScope = caller.scope
+    }
+    return { kind: 'unknown' }
+  }
+
+  /**
+   * Uses of the members of a call's result (`const m = useX(); m.mutate()` or
+   * `const { mutate } = useX()`): calls and references, plus the names the scope returns them
+   * under (`SELF` when it returns the result itself).
+   */
+  #mutateUses(
+    call: CallExpression,
+    members: Set<string>,
+    scope: Node,
+  ): { calls: Node[]; escapes: Set<string> } {
+    const calls: Node[] = []
+    const escapes = new Set<string>()
+    const use = (ref: Node) => {
+      if (isDependencyList(ref)) return
+      const parent = ref.getParent()
+      if (parent && N.isCallExpression(parent) && parent.getExpression() === ref) {
+        calls.push(parent)
+        return
+      }
+      const returned = returnedAs(ref)
+      if (returned && ref.getFirstAncestor(isFunctionLike) === scope) escapes.add(returned)
+      else calls.push(ref)
+    }
+    const variable = call.getParentIfKind(ts.SyntaxKind.VariableDeclaration)
+    const name = variable?.getNameNode()
+    if (!name) {
+      // `return useMutation(...)` / `return useSave()`: the caller gets the result itself.
+      const returned = returnedAs(call)
+      if (returned) escapes.add(returned === SELF ? SELF : returned)
+      return { calls, escapes }
+    }
+    if (N.isIdentifier(name)) {
+      const symbol = name.getSymbol()
+      for (const ref of scope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
+        if (ref === name || !refersTo(ref, symbol)) continue
+        const parent = ref.getParent()
+        if (parent && N.isPropertyAccessExpression(parent) && parent.getExpression() === ref) {
+          if (members.has(parent.getName())) use(parent)
+          continue
+        }
+        if (members.has(SELF)) use(ref)
+        else {
+          const returned = returnedAs(ref)
+          if (returned === SELF) for (const m of members) escapes.add(m)
+        }
+      }
+    } else if (N.isObjectBindingPattern(name)) {
       for (const element of name.getElements()) {
         const member = element.getPropertyNameNode()?.getText() ?? element.getName()
-        if (!MUTATE_MEMBERS.has(member)) continue
+        if (!members.has(member)) continue
         const symbol = element.getNameNode().getSymbol()
         for (const ref of scope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
-          if (ref === element.getNameNode() || ref.getSymbol() !== symbol) continue
-          const call = ref.getParentIfKind(ts.SyntaxKind.CallExpression)
-          if (call && call.getExpression() === ref) calls.push(call)
-          else calls.push(ref)
+          if (ref === element.getNameNode() || !refersTo(ref, symbol)) continue
+          use(ref)
         }
       }
     }
-    for (const call of calls) {
-      const found = this.#classify(call, scope, 0)
-      if (found) return found
+    return { calls, escapes }
+  }
+
+  /** The trigger of a call, or of a function passed straight to an event prop (`onClick={save}`). */
+  #triggerAt(node: Node, scope: Node): Trigger | undefined {
+    const parent = node.getParent()
+    if (parent && N.isJsxExpression(parent)) {
+      const attr = parent.getParentIfKind(ts.SyntaxKind.JsxAttribute)
+      if (attr) return attributeTrigger(attr, this.#loc(attr))
     }
-    return calls.length > 0 ? { kind: 'page-load', loc: this.#loc(calls[0] as Node) } : { kind: 'unknown' }
+    return this.#classify(node, scope, 0)
   }
 
   /** `const [state, formAction] = useActionState(...)`: where `formAction` is used. */
@@ -2815,6 +3043,21 @@ export class RequestScanner {
     if (depth > MAX_DEPTH) return 'unknown'
     const r = this.#evaluate(obj, env)
     if (!r.node) return 'absent'
+    const value = skipWrappers(r.node)
+    if (N.isConditionalExpression(value)) {
+      // `cond ? { ...options, headers } : options`: the picked branch, or what both branches agree on.
+      const truth = this.#truth(value.getCondition(), r.env)
+      if (truth !== undefined)
+        return this.#prop(truth ? value.getWhenTrue() : value.getWhenFalse(), r.env, name, depth + 1)
+      const yes = this.#prop(value.getWhenTrue(), r.env, name, depth + 1)
+      const no = this.#prop(value.getWhenFalse(), r.env, name, depth + 1)
+      if (yes === 'unknown' || no === 'unknown') return 'unknown'
+      if (yes === 'absent' || no === 'absent') return yes === no ? 'absent' : 'unknown'
+      if (yes.node === no.node) return yes
+      const a = this.#str(yes.node, yes.env)
+      const b = this.#str(no.node, no.env)
+      return a && b && strText(a) === strText(b) ? yes : 'unknown'
+    }
     if (!N.isObjectLiteralExpression(r.node)) return 'unknown'
     const properties = r.node.getProperties()
     for (let i = properties.length - 1; i >= 0; i--) {
@@ -2882,9 +3125,21 @@ export class RequestScanner {
           const fallback = next(node.getRight())
           return fallback ? { ...fallback, env: envName } : { parts: [{ hole: envName }], env: envName }
         }
-        return next(node.getLeft()) ?? next(node.getRight())
+        const left = next(node.getLeft())
+        if (left) return left
+        const right = next(node.getRight())
+        return right ? { ...right, fallback: true } : undefined
       }
       return undefined
+    }
+    if (N.isConditionalExpression(node)) {
+      // `cond ? '/a' : '/b'`: the branch the condition picks, or the value both branches share.
+      const truth = this.#truth(node.getCondition(), env)
+      if (truth !== undefined) return next(truth ? node.getWhenTrue() : node.getWhenFalse())
+      const yes = next(node.getWhenTrue())
+      const no = next(node.getWhenFalse())
+      // `cursor ? \`/faqs?cursor=\${cursor}\` : '/faqs'`: one path, with an optional query.
+      return yes && no ? optionalQuery([yes, no]) : undefined
     }
     const envName = envVarOf(node)
     if (envName) return { parts: [{ hole: envName }], env: envName }
@@ -2914,8 +3169,105 @@ export class RequestScanner {
         const arg = node.getArguments()[0]
         return arg ? next(arg) : undefined
       }
-      if (N.isPropertyAccessExpression(callee) && callee.getName() === 'toString')
-        return next(callee.getExpression())
+      if (N.isPropertyAccessExpression(callee)) {
+        const name = callee.getName()
+        if (name === 'toString' || name === 'trim') return next(callee.getExpression())
+        if (name === 'toUpperCase' || name === 'toLowerCase') {
+          const value = next(callee.getExpression())
+          if (!value) return undefined
+          const parts = value.parts.map((p) =>
+            'text' in p ? { text: name === 'toUpperCase' ? p.text.toUpperCase() : p.text.toLowerCase() } : p,
+          )
+          return { ...value, parts }
+        }
+      }
+      // A project function with several returns, e.g. `withCursor(url, cursor)`: the URL they share.
+      const fn = calleeFunction(node)
+      if (fn && isFunctionLike(fn) && isProject(fn) && this.#isScanned(fn)) {
+        const body = fn.getBody()
+        const returns = body
+          ? body
+              .getDescendantsOfKind(ts.SyntaxKind.ReturnStatement)
+              .filter((r) => r.getFirstAncestor(isFunctionLike) === fn)
+          : []
+        if (body && N.isBlock(body) && returns.length > 1) {
+          const fnEnv = bind(fn, node.getArguments(), env)
+          const values = returns.map((r) => next(r.getExpression(), fnEnv))
+          return values.every((v): v is Str => !!v) ? optionalQuery(values) : undefined
+        }
+      }
+      // A project function that returns the string, e.g. `proxyUrl(endpoint)`.
+      const r = this.#evaluate(node, env)
+      if (r.node && r.node !== node) return next(r.node, r.env)
+    }
+    return undefined
+  }
+
+  /** The value of a condition when it can be told from the code, e.g. `LIST.includes('/x')`. */
+  #truth(expr: Node, env: Env, depth = 0): boolean | undefined {
+    if (depth > 10) return undefined
+    const node = skipWrappers(expr)
+    if (node.getKind() === ts.SyntaxKind.TrueKeyword) return true
+    if (node.getKind() === ts.SyntaxKind.FalseKeyword) return false
+    if (N.isPrefixUnaryExpression(node) && node.getOperatorToken() === ts.SyntaxKind.ExclamationToken) {
+      const inner = this.#truth(node.getOperand(), env, depth + 1)
+      return inner === undefined ? undefined : !inner
+    }
+    if (N.isBinaryExpression(node)) {
+      const op = node.getOperatorToken().getKind()
+      if (op === ts.SyntaxKind.AmpersandAmpersandToken || op === ts.SyntaxKind.BarBarToken) {
+        const a = this.#truth(node.getLeft(), env, depth + 1)
+        const b = this.#truth(node.getRight(), env, depth + 1)
+        if (op === ts.SyntaxKind.AmpersandAmpersandToken)
+          return a === false || b === false ? false : a && b ? true : undefined
+        return a === true || b === true ? true : a === false && b === false ? false : undefined
+      }
+      const equal = op === ts.SyntaxKind.EqualsEqualsEqualsToken || op === ts.SyntaxKind.EqualsEqualsToken
+      const notEqual =
+        op === ts.SyntaxKind.ExclamationEqualsEqualsToken || op === ts.SyntaxKind.ExclamationEqualsToken
+      if (equal || notEqual) {
+        const left = this.#str(node.getLeft(), env)
+        const right = this.#str(node.getRight(), env)
+        const a = literalOf(left)
+        const b = literalOf(right)
+        // `'/users/:id' === '/login'` is false even with the hole.
+        const same =
+          a !== undefined && b !== undefined
+            ? a === b
+            : left && b !== undefined && !couldEqual(left, b)
+              ? false
+              : right && a !== undefined && !couldEqual(right, a)
+                ? false
+                : undefined
+        if (same === undefined) return undefined
+        return equal ? same : !same
+      }
+      return undefined
+    }
+    // `LIST.includes(value)` on a constant array of strings.
+    if (N.isCallExpression(node)) {
+      const callee = node.getExpression()
+      const arg = node.getArguments()[0]
+      if (!N.isPropertyAccessExpression(callee) || callee.getName() !== 'includes' || !arg) return undefined
+      const list = this.#evaluate(callee.getExpression(), env)
+      const array = list.node ? skipWrappers(list.node) : undefined
+      if (!array || !N.isArrayLiteralExpression(array)) {
+        // `url.includes('?')` on a string.
+        const text = this.#str(callee.getExpression(), env)
+        const needle = literalOf(this.#str(arg, env))
+        if (!text || needle === undefined) return undefined
+        const whole = literalOf(text)
+        if (whole !== undefined) return whole.includes(needle)
+        // Placeholders stand for path values (`/users/${slug}`): they don't hold `?` or `&`.
+        return text.parts.some((p) => 'text' in p && p.text.includes(needle))
+      }
+      const items = array.getElements().map((e) => literalOf(this.#str(e, list.env)))
+      if (items.some((i) => i === undefined)) return undefined
+      const str = this.#str(arg, env)
+      const value = literalOf(str)
+      if (value !== undefined) return items.includes(value)
+      // `['/login'].includes(\`/users/\${id}\`)`: false when no item fits the pattern.
+      return str && !items.some((i) => couldEqual(str, i as string)) ? false : undefined
     }
     return undefined
   }
@@ -3174,6 +3526,34 @@ function literalOf(value: Str | undefined): string | undefined {
   return value.parts.map((p) => ('text' in p ? p.text : '')).join('')
 }
 
+/**
+ * Values that are one URL with an optional query (`/faqs` and `/faqs?cursor=:cursor`): the one
+ * without it. Undefined when they are different URLs.
+ */
+function optionalQuery(values: Str[]): Str | undefined {
+  const texts = values.map(strText)
+  let shortest = 0
+  texts.forEach((t, i) => {
+    if (t.length < (texts[shortest] as string).length) shortest = i
+  })
+  const base = texts[shortest] as string
+  const same = texts.every((t) => t === base || (t.startsWith(base) && /^[?&]/.test(t.slice(base.length))))
+  return same ? values[shortest] : undefined
+}
+
+/** Whether a value with holes (any text) could be `text` at runtime. */
+function couldEqual(value: Str, text: string): boolean {
+  const source = value.parts
+    .map((p) => ('text' in p ? p.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '.*'))
+    .join('')
+  return new RegExp(`^${source}$`, 's').test(text)
+}
+
+/** A string value as text with its holes, for comparing two values. */
+function strText(value: Str): string {
+  return value.parts.map((p) => ('text' in p ? p.text : `{${p.hole}}`)).join('')
+}
+
 /** A function that writes SSE text: a fixed event name or the parameter that gives it, and the data's parameter. */
 interface SseHelper {
   event?: string
@@ -3273,6 +3653,110 @@ function navOutcome(frames: Frame[]): Navigation['outcome'] {
 
 type FunctionLike = FunctionDeclaration | FunctionExpression | ArrowFunction | MethodDeclaration
 
+/** The name a local function is kept under: `const submit = useCallback(() => ...)`, `function submit() {}`. */
+function holderName(fn: Node): Node | undefined {
+  if (N.isFunctionDeclaration(fn)) return fn.getNameNode()
+  let node = fn
+  let parent = skipParens(node.getParent())
+  if (parent && N.isCallExpression(parent) && CALLBACK_HOOKS.has(calleeName(parent) ?? '')) {
+    node = parent
+    parent = skipParens(parent.getParent())
+  }
+  if (parent && N.isVariableDeclaration(parent) && parent.getInitializer() === node) {
+    const name = parent.getNameNode()
+    return N.isIdentifier(name) ? name : undefined
+  }
+  return undefined
+}
+
+/** The innermost named local function (`const go = () => ...`) around `node`, inside `scope`. */
+function localHolder(node: Node, scope: Node): Node | undefined {
+  for (
+    let fn = node.getFirstAncestor(isFunctionLike);
+    fn && fn !== scope;
+    fn = fn.getFirstAncestor(isFunctionLike)
+  ) {
+    if (holderName(fn)) return fn
+  }
+  return undefined
+}
+
+/** An identifier that names the symbol, including shorthand `{ submit }` (whose own symbol is the property). */
+function refersTo(ref: Node, symbol: TsSymbol | undefined): boolean {
+  if (!symbol) return false
+  if (ref.getSymbol() === symbol) return true
+  const parent = ref.getParent()
+  return !!parent && N.isShorthandPropertyAssignment(parent) && parent.getValueSymbol() === symbol
+}
+
+/** In a hook's dependency list: `useCallback(fn, [mutate])`. */
+function isDependencyList(ref: Node): boolean {
+  const list = ref.getParent()
+  if (!list || !N.isArrayLiteralExpression(list)) return false
+  const call = list.getParent()
+  if (!call || !N.isCallExpression(call) || call.getArguments().at(-1) !== list) return false
+  const name = calleeName(call) ?? ''
+  return EFFECT_HOOKS.has(name) || CALLBACK_HOOKS.has(name)
+}
+
+/** `returnedAs()` when the value itself is returned. */
+const SELF = '\u0000self'
+
+/**
+ * The name a value is returned under from its function: `return { save: m.mutate }` -> `save`,
+ * `return { mutate }` -> `mutate`, `return m` -> `SELF`. Undefined when it isn't returned.
+ */
+function returnedAs(value: Node): string | undefined {
+  let node = value
+  let name: string | undefined
+  for (let parent = node.getParent(); parent; node = parent, parent = parent.getParent()) {
+    if (N.isParenthesizedExpression(parent) || N.isAsExpression(parent) || N.isSatisfiesExpression(parent))
+      continue
+    if (name === undefined && N.isPropertyAssignment(parent) && parent.getInitializer() === node) {
+      name = propertyName(parent.getNameNode())
+      continue
+    }
+    if (name === undefined && N.isShorthandPropertyAssignment(parent)) {
+      name = parent.getName()
+      continue
+    }
+    if (name !== undefined && N.isObjectLiteralExpression(parent)) continue
+    // `return { follow: guard(m.mutate) }`: a wrapper still hands the function out.
+    if (N.isCallExpression(parent) && parent.getExpression() !== node) continue
+    if (N.isReturnStatement(parent)) return name ?? SELF
+    if (N.isArrowFunction(parent) && parent.getBody() === node) return name ?? SELF
+    return undefined
+  }
+  return undefined
+}
+
+/**
+ * Reached only on some paths of its function: inside an `if` / `switch`, a ternary branch or the
+ * right side of `&&` / `||` / `??`. Unlike `isConditional`, code after an early return counts as
+ * the main path.
+ */
+function isGuarded(node: Node): boolean {
+  let child: Node = node
+  for (let parent = node.getParent(); parent && !isFunctionLike(parent); parent = parent.getParent()) {
+    if (N.isArrowFunction(parent) || N.isFunctionExpression(parent)) break
+    if (N.isConditionalExpression(parent) && child !== parent.getCondition()) return true
+    if (N.isBinaryExpression(parent) && child === parent.getRight()) {
+      const op = parent.getOperatorToken().getKind()
+      if (
+        op === ts.SyntaxKind.AmpersandAmpersandToken ||
+        op === ts.SyntaxKind.BarBarToken ||
+        op === ts.SyntaxKind.QuestionQuestionToken
+      ) {
+        return true
+      }
+    }
+    if (N.isIfStatement(parent) && child !== parent.getExpression()) return true
+    if (N.isCaseClause(parent) || N.isDefaultClause(parent)) return true
+    child = parent
+  }
+  return false
+}
+
 function isFunctionLike(node: Node | undefined): node is FunctionLike {
   return (
     !!node &&
@@ -3349,12 +3833,13 @@ function bindParams(fn: FunctionLike, values: Binding[]): Env {
 function declarationOf(identifier: Node): Node | undefined {
   const symbol = identifier.getSymbol()
   if (!symbol) return undefined
-  // Shorthand `{ method }` resolves to the property; use the value it refers to.
-  const value =
-    identifier.getParent() && N.isShorthandPropertyAssignment(identifier.getParent() as Node)
-      ? (identifier.getParent() as Node).getSymbol()?.getValueDeclaration()
-      : undefined
-  if (value && !N.isShorthandPropertyAssignment(value)) return value
+  // Shorthand `{ method }` resolves to the property; use the variable it refers to.
+  const parent = identifier.getParent()
+  if (parent && N.isShorthandPropertyAssignment(parent)) {
+    const valueSymbol = parent.getValueSymbol()
+    const value = valueSymbol ? unalias(valueSymbol).getValueDeclaration() : undefined
+    if (value && !N.isShorthandPropertyAssignment(value)) return value
+  }
   const resolved = unalias(symbol)
   return resolved.getValueDeclaration() ?? resolved.getDeclarations()[0]
 }

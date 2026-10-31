@@ -38,7 +38,7 @@ const EVENT_TYPES: Record<string, string[]> = {
   onKeyDown: ['keydown'],
 }
 
-type TimelineEvent =
+export type TimelineEvent =
   | {
       at: number
       iso: string
@@ -120,9 +120,13 @@ export class FlowTracker {
       name: name.trim() || 'Recorded flow',
       startedAt: new Date().toISOString(),
     }
+    // Without a name, the recording is named after the pages it went through when it stops.
+    this.#unnamed = !name.trim()
     this.changed()
     return this.#recording
   }
+
+  #unnamed = false
 
   /** Stops the recording and saves it to overrides.json. */
   stop(): RecordedFlow | undefined {
@@ -132,11 +136,13 @@ export class FlowTracker {
     const endedAt = new Date().toISOString()
     const from = Date.parse(recording.startedAt)
     const to = Date.parse(endedAt)
-    const events = this.#store
-      .allSessions()
-      .flatMap((s) => this.#timeline(s))
-      .filter((e) => e.at >= from && e.at <= to)
-      .sort((a, b) => a.at - b.at)
+    const events = loadsFirst(
+      this.#store
+        .allSessions()
+        .flatMap((s) => this.#timeline(s))
+        .filter((e) => e.at >= from && e.at <= to)
+        .sort((a, b) => a.at - b.at),
+    )
     const steps = events.map((e) => this.#recordedStep(e)).filter((s): s is RecordedStep => Boolean(s))
     // The inferred flow walked end to end inside the recording, if any.
     let flowId: string | undefined
@@ -149,7 +155,7 @@ export class FlowTracker {
     }
     const saved: RecordedFlow = {
       id: recording.id,
-      name: recording.name,
+      name: this.#unnamed ? recordingName(steps, recording.startedAt) : recording.name,
       kind: 'named',
       ...(flowId ? { flowId } : {}),
       startedAt: recording.startedAt,
@@ -391,14 +397,16 @@ export class FlowTracker {
         out.push({ at, iso: event.at, kind: 'navigation', how: event.how, url: event.url })
       } else {
         const capture = this.#store.get(event.captureId)
-        if (capture) out.push({ at, iso: event.at, kind: 'capture', capture })
+        // Another site's script talking to its servers is not a step of the app's flow.
+        if (capture && !capture.match?.thirdParty) out.push({ at, iso: event.at, kind: 'capture', capture })
       }
     }
     // Stable: events with the same time keep their logged order.
-    return out
+    const sorted = out
       .map((e, i) => ({ e, i }))
       .sort((a, b) => a.e.at - b.e.at || a.i - b.i)
       .map(({ e }) => e)
+    return loadsFirst(sorted)
   }
 
   #recordedStep(e: TimelineEvent): RecordedStep | undefined {
@@ -455,6 +463,44 @@ export class FlowTracker {
 }
 
 /** Splits a flow at its interactions, with what each part must show. */
+/** A name for a recording saved without one: the pages it went through, e.g. `/en → /en/jobs`. */
+export function recordingName(steps: RecordedStep[], startedAt: string): string {
+  const paths: string[] = []
+  for (const step of steps) {
+    if (step.kind === 'navigate' && paths.at(-1) !== step.path) paths.push(step.path)
+  }
+  if (paths.length === 0) {
+    const time = new Date(startedAt).toTimeString().slice(0, 5)
+    return `Recorded flow ${time}`
+  }
+  const shown = paths.length > 3 ? [paths[0], '…', paths.at(-1)] : paths
+  return shown.join(' → ')
+}
+
+/**
+ * A page `load` is logged once the runtime starts, after the page's first requests went out.
+ * It is moved before the browser captures made on that page just before it.
+ */
+export function loadsFirst(events: TimelineEvent[]): TimelineEvent[] {
+  const out = [...events]
+  for (let i = 0; i < out.length; i++) {
+    const nav = out[i] as TimelineEvent
+    if (nav.kind !== 'navigation' || nav.how !== 'load') continue
+    let to = i
+    while (to > 0) {
+      const before = out[to - 1] as TimelineEvent
+      if (before.kind !== 'capture' || before.capture.origin !== 'browser') break
+      if (before.capture.pageUrl !== nav.url) break
+      to--
+    }
+    if (to < i) {
+      out.splice(i, 1)
+      out.splice(to, 0, nav)
+    }
+  }
+  return out
+}
+
 function segmentsOf(flow: Flow, model: AppModel): Segment[] {
   const components = new Map(model.components.map((c) => [c.id, c.name]))
   const sites = new Map(model.requests.map((s) => [s.id, s]))

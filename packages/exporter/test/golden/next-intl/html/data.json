@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "next-intl",
   "model": {
-    "version": 8,
+    "version": 9,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -1220,7 +1220,8 @@
       "matched": 4,
       "ambiguous": 0,
       "unmatched": 0,
-      "manual": 0
+      "manual": 0,
+      "thirdParty": 0
     }
   },
   "flows": {
@@ -1352,11 +1353,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0ldgejuv5rs",
-        "score": 180,
+        "score": 170,
         "candidates": [
           {
             "siteId": "req_0ldgejuv5rs",
-            "score": 180,
+            "score": 170,
             "evidence": [
               {
                 "signal": "url",
@@ -1370,7 +1371,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 65,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -1538,11 +1539,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0ivpze9dolu",
-        "score": 180,
+        "score": 170,
         "candidates": [
           {
             "siteId": "req_0ivpze9dolu",
-            "score": 180,
+            "score": 170,
             "evidence": [
               {
                 "signal": "url",
@@ -1556,7 +1557,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 65,
                 "detail": "3 frame(s) on the call path"
               },
               {
