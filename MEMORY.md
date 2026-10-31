@@ -30,6 +30,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M20 | Release v0.2.0        | Matrix app has every v0.2.0 transport; it caught a React Query key race on Next 15. Publish = push the `v0.2.0` tag.     |
 | M21 | Components/Requests   | List logic is pure in `dashboard/src/lists.ts`; `siteHref()` opens the request page, `ownerHref()` the component.        |
 | M22 | Server hook placement | `cli/server-hook.ts` is shared by doctor, init and dev; the rule is shape-only (any wrapper around the blocks fails).    |
+| M23 | Dashboard fixes       | Lists that grow with the app use `CappedList` / `useCapped` (5, then "+N more"); request bodies render once opened.      |
 
 ## Gotchas
 
@@ -228,3 +229,14 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Doctor tests now need real `register()` text (`NODE_BODY` / `EDGE_BODY` from `server-hook.ts`): a bare top-level
   `await import(...)` fails the placement check.
 - Patch scripts with backticks or `\n` must not go through bash heredocs (they get mangled); use the Edit tool.
+
+## M23 — Dashboard fixes (branch `feat/m23-dashboard-fixes`)
+
+- A closed `<details>` still renders its children in React: request rows render their body only once opened
+  (`LazyDetails` in `RequestView.tsx`). That, more than capping, keeps big pages small.
+- Scroll memory keys positions by an id stored in `history.state`. `replaceScreen()` must pass the current
+  `history.state` along, or the entry looks new and the screen jumps.
+- `dashboard/test/synthetic.ts` builds a big model over a fixture snapshot with type-only imports, so both vitest and
+  the Playwright spec (`e2e/dashboard-limits.spec.ts`, which rewrites an export's `data.js`) can use it.
+- Playwright scrolls an element into view before clicking it; to test that a toggle keeps the scroll position, click
+  it from script (`locator.evaluate((b) => b.click())`).

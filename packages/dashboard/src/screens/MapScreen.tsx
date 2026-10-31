@@ -16,8 +16,8 @@ import { isVerified as isSiteVerified } from '@flow-checker/shared'
 import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
-import { href, replaceScreen } from '../router'
-import { Badge, matches, SearchBox } from '../ui'
+import { href, type MapView, replaceScreen } from '../router'
+import { Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
 
 interface RouteNodeData extends Record<string, unknown> {
   route: Route
@@ -31,8 +31,8 @@ type RouteNode = Node<RouteNodeData, 'route'>
 
 const nodeTypes = { route: RouteNodeView }
 
-export function MapScreen({ view, q }: { view: 'graph' | 'tree'; q: string }) {
-  const setView = (next: 'graph' | 'tree') => replaceScreen({ name: 'map', view: next, q })
+export function MapScreen({ view, q }: { view: MapView; q: string }) {
+  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q })
   const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next })
 
   return (
@@ -45,10 +45,19 @@ export function MapScreen({ view, q }: { view: 'graph' | 'tree'; q: string }) {
           <button type="button" aria-pressed={view === 'tree'} onClick={() => setView('tree')}>
             Tree
           </button>
+          <button type="button" aria-pressed={view === 'handlers'} onClick={() => setView('handlers')}>
+            Route handlers
+          </button>
         </fieldset>
         <SearchBox value={q} onChange={setQuery} placeholder="Search routes and files" />
       </div>
-      {view === 'graph' ? <RouteGraphView q={q} /> : <RouteTreeView q={q} />}
+      {view === 'graph' ? (
+        <RouteGraphView q={q} />
+      ) : view === 'tree' ? (
+        <RouteTreeView q={q} />
+      ) : (
+        <RouteHandlerList q={q} />
+      )}
     </div>
   )
 }
@@ -241,6 +250,40 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
       </div>
       <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>
+  )
+}
+
+/** Route handlers only, as a list: in the tree they sit at the bottom of each folder (M23). */
+function RouteHandlerList({ q }: { q: string }) {
+  const { index } = useData()
+  const all = index.model.routes.filter((r) => r.kind === 'route-handler')
+  const handlers = all.filter((r) => matches(q, r.path, r.file)).sort((a, b) => a.path.localeCompare(b.path))
+  if (all.length === 0) return <Empty>No route handlers found.</Empty>
+  if (handlers.length === 0) return <Empty>No route handlers match.</Empty>
+  return (
+    <ul className="list handler-list">
+      {handlers.map((route) => {
+        const callers = index.handlerCallers.get(route.id)?.length ?? 0
+        const sends = index.handlerRequests.get(route.id)?.length ?? 0
+        return (
+          <li key={route.id}>
+            <a href={href({ name: 'page', routeId: route.id })}>
+              <code>{route.path}</code>
+            </a>
+            {(route.methods ?? []).map((m) => (
+              <span key={m} className={`method method-${m.toLowerCase()}`}>
+                {m}
+              </span>
+            ))}
+            <span className="muted">
+              {callers} caller{callers === 1 ? '' : 's'} · sends {sends}
+            </span>
+            <span className="spacer" />
+            <SourceLink file={route.file} />
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 

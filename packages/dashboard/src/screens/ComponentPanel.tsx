@@ -2,7 +2,7 @@ import { useData } from '../context'
 import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
-import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
+import { Badge, CappedList, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 
 export function ComponentPanel({
   componentId,
@@ -108,16 +108,18 @@ export function ComponentPanel({
         {parents.length === 0 ? (
           <Empty>Not rendered by another project component.</Empty>
         ) : (
-          <ul className="list">
-            {parents.map((p) => (
+          <CappedList
+            className="list"
+            items={parents}
+            render={(p) => (
               <li key={`${p.parentId}:${p.ref.loc.line}`}>
                 <a href={link(p.parentId)}>{index.components.get(p.parentId)?.name ?? p.parentId}</a>
                 <RefBadges site={p.ref} />
                 <span className="spacer" />
                 <SourceLink file={p.ref.loc.file} line={p.ref.loc.line} column={p.ref.loc.column} />
               </li>
-            ))}
-          </ul>
+            )}
+          />
         )}
       </Section>
 
@@ -125,15 +127,17 @@ export function ComponentPanel({
         {routeIds.length === 0 ? (
           <Empty>Not reachable from any page.</Empty>
         ) : (
-          <ul className="chips">
-            {routeIds.map((id) => (
+          <CappedList
+            className="chips"
+            items={routeIds}
+            render={(id) => (
               <li key={id}>
                 <a className="chip" href={href({ name: 'page', routeId: id, componentId: component.id })}>
                   {index.routes.get(id)?.path ?? id}
                 </a>
               </li>
-            ))}
-          </ul>
+            )}
+          />
         )}
       </Section>
     </div>

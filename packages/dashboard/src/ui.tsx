@@ -1,6 +1,7 @@
 import type { Component, ComponentRef } from '@flow-checker/shared'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useData } from './context'
+import { CAP, capped } from './lists'
 import { editorUrl } from './model-index'
 
 export function Badge({
@@ -189,4 +190,45 @@ export function matches(query: string, ...fields: (string | undefined)[]): boole
   const q = query.trim().toLowerCase()
   if (!q) return true
   return fields.some((f) => f?.toLowerCase().includes(q))
+}
+
+/** A list that grows with the app: the first few entries, then "+N more" (M23). */
+export function useCapped<T>(items: readonly T[], limit = CAP) {
+  const [expanded, setExpanded] = useState(false)
+  return { ...capped(items, expanded, limit), expand: () => setExpanded(true) }
+}
+
+export function MoreButton({ hidden, onClick }: { hidden: number; onClick: () => void }) {
+  if (hidden <= 0) return null
+  return (
+    <button type="button" className="more-button" onClick={onClick}>
+      +{hidden} more
+    </button>
+  )
+}
+
+/** A capped `<ul>`: the first entries, then a "+N more" row. */
+export function CappedList<T>({
+  items,
+  className,
+  limit,
+  render,
+}: {
+  items: readonly T[]
+  className?: string
+  limit?: number
+  /** Renders one entry, keyed (a `<li>`). */
+  render: (item: T) => ReactNode
+}) {
+  const { shown, hidden, expand } = useCapped(items, limit)
+  return (
+    <ul className={className}>
+      {shown.map(render)}
+      {hidden > 0 && (
+        <li className="more-row">
+          <MoreButton hidden={hidden} onClick={expand} />
+        </li>
+      )}
+    </ul>
+  )
 }

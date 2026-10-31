@@ -22,7 +22,7 @@ async function openCard(page: Page, label: string) {
 test('every overview card opens a screen', async ({ page }) => {
   const expected: [string, RegExp][] = [
     ['Pages', /#\/map$/],
-    ['Route handlers', /#\/map\?view=tree$/],
+    ['Route handlers', /#\/map\?view=handlers$/],
     ['Components', /#\/components$/],
     ['Types', /#\/types$/],
     ['Requests', /#\/requests$/],

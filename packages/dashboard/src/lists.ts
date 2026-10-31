@@ -1,6 +1,14 @@
 // Rows, filters and sorting for the Components and Requests screens (M21). Pure functions of the
 // model index, so they are unit-tested without rendering.
-import { type Component, type RequestSite, RequestSiteSchema, urlText } from '@flow-checker/shared'
+import {
+  type Component,
+  type NamedType,
+  type Navigation,
+  type QueryLink,
+  type RequestSite,
+  RequestSiteSchema,
+  urlText,
+} from '@flow-checker/shared'
 import type { ModelIndex } from './model-index'
 
 export const COMPONENT_KINDS = ['server', 'client', 'shared'] as const satisfies Component['kind'][]
@@ -142,6 +150,155 @@ export function groupSame(sites: RequestSite[]): RequestSite[][] {
     const group = groups.get(key)
     if (group) group.push(site)
     else groups.set(key, [site])
+  }
+  return [...groups.values()]
+}
+
+// ---------------------------------------------------------------------------------------------
+// Bounded lists and folding (M23). Lists that grow with the app show a few entries plus "+N more",
+// and entries that say the same thing fold into one row.
+
+/** How many entries a capped list shows before "+N more". */
+export const CAP = 5
+
+/** The first `limit` items unless expanded, and how many are hidden. */
+export function capped<T>(
+  items: readonly T[],
+  expanded: boolean,
+  limit = CAP,
+): { shown: T[]; hidden: number } {
+  if (expanded || items.length <= limit) return { shown: [...items], hidden: 0 }
+  return { shown: items.slice(0, limit), hidden: items.length - limit }
+}
+
+/** A cache call with no key, procedure or operation hits every query: no need to list them. */
+export function hitsEveryQuery(link: Pick<QueryLink, 'key' | 'procedure' | 'operation'>): boolean {
+  return link.key === undefined && link.procedure === undefined && link.operation === undefined
+}
+
+/**
+ * Navigations that are the same code (kind, target, trigger, line), in first-seen order. A
+ * navigation in a shared hook is found once per component that uses the hook.
+ */
+export function groupNavigations(navigations: Navigation[]): Navigation[][] {
+  return groupBy(navigations, (n) => {
+    const t = n.trigger
+    return `${n.kind} ${n.href.text} ${t.kind} ${t.event ?? ''} ${n.loc.file}:${n.loc.line}:${n.loc.column}`
+  })
+}
+
+/** Callers of a route handler that send one method and URL. */
+export interface CallerGroup {
+  /** `POST /api/auth/login`: the URL the callers send, concrete for a catch-all handler. */
+  label: string
+  /** Callers that send it from the same line fold into one row. */
+  rows: RequestSite[][]
+  count: number
+}
+
+/** Callers grouped by the URL they send (sorted), each folded by the line that sends it. */
+export function callerGroups(sites: RequestSite[], index: ModelIndex, q = ''): CallerGroup[] {
+  const kept = sites.filter((site) =>
+    matchesAll(
+      q,
+      `${site.method ?? '?'} ${siteTarget(site)}`,
+      site.url?.text,
+      siteOwner(site, index),
+      ...site.callStack.map((f) => f.file),
+    ),
+  )
+  const byUrl = groupBy(kept, (s) => `${s.method ?? '?'} ${siteTarget(s)}`)
+  return byUrl
+    .map((group) => {
+      const first = group[0] as RequestSite
+      return {
+        label: `${first.method ?? '?'} ${siteTarget(first)}`,
+        rows: groupBy(group, (s) => {
+          const at = sendLine(s)
+          return at ? `${at.file}:${at.line}` : s.id
+        }),
+        count: group.length,
+      }
+    })
+    .sort((a, b) => urlOf(a.label).localeCompare(urlOf(b.label)) || a.label.localeCompare(b.label))
+}
+
+/** The line that sends the request: the last frame of its call path. */
+export function sendLine(site: RequestSite): RequestSite['callStack'][number] | undefined {
+  return site.callStack[site.callStack.length - 1]
+}
+
+const urlOf = (label: string) => label.slice(label.indexOf(' ') + 1)
+
+/** A row of the Types screen: one type, or a generic with its instantiations folded under it. */
+export interface TypeRow {
+  /** `ApiResponse<…>` for a folded generic, else the type's name. */
+  name: string
+  types: NamedType[]
+  /** Uses of each type, in the order of `types`. */
+  uses: number[]
+  total: number
+}
+
+export interface TypeFilter {
+  q: string
+  /** Also list types with no uses. */
+  unused?: boolean
+  /** Always listed (the selected type). */
+  keep?: string
+}
+
+/** Where a type is used: props, component bodies, other types and requests. */
+export function typeUses(index: ModelIndex, typeId: string): number {
+  const u = index.typeUsage.get(typeId)
+  return (
+    (u?.props.length ?? 0) + (u?.usedBy.length ?? 0) + (u?.inTypes.length ?? 0) + (u?.requests.length ?? 0)
+  )
+}
+
+/**
+ * Types, with each generic's instantiations (`Page<User>`, `Page<Post>`: same declaration) folded
+ * into one row. Unused types are left out unless `unused` is set.
+ */
+export function typeRows(index: ModelIndex, filter: TypeFilter): { rows: TypeRow[]; unused: number } {
+  let unused = 0
+  const groups = groupBy(index.model.types, (t) => {
+    const at = t.definedAt
+    return `${baseName(t.name)} ${at.file}:${at.line}:${at.column}`
+  })
+  const rows: TypeRow[] = []
+  for (const group of groups) {
+    const all = group.map((t) => ({ t, uses: typeUses(index, t.id) }))
+    const matching = all.filter(({ t }) => matchesAll(filter.q, t.name, t.definedAt.file))
+    const kept = matching.filter(({ t, uses }) => filter.unused || uses > 0 || t.id === filter.keep)
+    unused += matching.length - kept.length
+    if (kept.length === 0) continue
+    const first = (group[0] as NamedType).name
+    const generic = group.length > 1 || first.includes('<')
+    rows.push({
+      name: generic ? `${baseName(first)}<…>` : first,
+      types: kept.map(({ t }) => t),
+      uses: kept.map(({ uses }) => uses),
+      total: kept.reduce((sum, { uses }) => sum + uses, 0),
+    })
+  }
+  return { rows, unused }
+}
+
+/** `ApiResponse<User>` -> `ApiResponse`. */
+function baseName(name: string): string {
+  const at = name.indexOf('<')
+  return at < 0 ? name : name.slice(0, at)
+}
+
+/** Items with the same key, in first-seen order. */
+function groupBy<T>(items: readonly T[], key: (item: T) => string): T[][] {
+  const groups = new Map<string, T[]>()
+  for (const item of items) {
+    const k = key(item)
+    const group = groups.get(k)
+    if (group) group.push(item)
+    else groups.set(k, [item])
   }
   return [...groups.values()]
 }

@@ -9,10 +9,11 @@ import {
   type Trigger,
   urlText,
 } from '@flow-checker/shared'
+import { Children, type ReactNode, useState } from 'react'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import { GraphqlFact } from './GraphqlView'
-import { groupSame, siteOwner } from './lists'
+import { groupSame, hitsEveryQuery, siteOwner } from './lists'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
@@ -21,7 +22,7 @@ import { StreamEvents } from './SseView'
 import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
-import { Badge, Empty, SourceLink } from './ui'
+import { Badge, Empty, MoreButton, SourceLink, useCapped } from './ui'
 
 const TRIGGER_LABEL: Record<Trigger['kind'], string> = {
   'server-render': 'server render',
@@ -74,14 +75,20 @@ export function triggerLabel(trigger: Trigger): string {
   return trigger.kind === 'event' && trigger.event ? trigger.event : TRIGGER_LABEL[trigger.kind]
 }
 
+/** Rows a request list shows before "+N more". */
+const REQUEST_LIMIT = 20
+
 export function RequestList({
   sites,
   empty,
   open,
   owners,
+  limit = REQUEST_LIMIT,
 }: {
   sites: RequestSite[]
   empty: string
+  /** Rows shown before "+N more": lists of requests grow with the app. */
+  limit?: number
   /** Expand the details. Default: when there are three or fewer. */
   open?: boolean
   /**
@@ -91,11 +98,12 @@ export function RequestList({
   owners?: boolean
 }) {
   const { index } = useData()
-  if (sites.length === 0) return <Empty>{empty}</Empty>
   const groups = owners ? groupSame(sites) : sites.map((s) => [s])
+  const { shown, hidden, expand } = useCapped(groups, limit)
+  if (sites.length === 0) return <Empty>{empty}</Empty>
   return (
     <ul className="requests">
-      {groups.map((group) => {
+      {shown.map((group) => {
         const first = group[0] as RequestSite
         if (group.length === 1)
           return (
@@ -106,7 +114,7 @@ export function RequestList({
         const names = [...new Set(group.map((s) => siteOwner(s, index)))]
         return (
           <li key={first.id}>
-            <details className="request request-group">
+            <LazyDetails className="request request-group">
               <summary>
                 <RequestSummary site={first} />
                 <span className="muted request-owner" title={names.join(', ')}>
@@ -127,11 +135,40 @@ export function RequestList({
                   </li>
                 ))}
               </ul>
-            </details>
+            </LazyDetails>
           </li>
         )
       })}
+      {hidden > 0 && (
+        <li className="more-row">
+          <MoreButton hidden={hidden} onClick={expand} />
+        </li>
+      )}
     </ul>
+  )
+}
+
+/**
+ * `<details>` whose content is only rendered once opened: a closed request still costs dozens of
+ * DOM nodes (types, call path, cache links), and a page can list hundreds.
+ */
+function LazyDetails({
+  className,
+  open = false,
+  children,
+}: {
+  className: string
+  open?: boolean
+  /** The `<summary>` first, then the body. */
+  children: ReactNode
+}) {
+  const [opened, setOpened] = useState(open)
+  const [summary, ...body] = Children.toArray(children)
+  return (
+    <details className={className} open={open} onToggle={(e) => e.currentTarget.open && setOpened(true)}>
+      {summary}
+      {opened && body}
+    </details>
   )
 }
 
@@ -186,7 +223,7 @@ export function RequestItem({ site, open, owner }: { site: RequestSite; open: bo
   const chain = (site.chain ?? []).map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
 
   return (
-    <details className="request" open={open}>
+    <LazyDetails className="request" open={open}>
       <summary>
         <RequestSummary site={site} />
         {owner && <span className="muted request-owner">from {siteOwner(site, index)}</span>}
@@ -347,7 +384,7 @@ export function RequestItem({ site, open, owner }: { site: RequestSite; open: bo
           </ol>
         </div>
       </div>
-    </details>
+    </LazyDetails>
   )
 }
 
@@ -363,13 +400,11 @@ const LINK_LABEL: Record<QueryLink['kind'], string> = {
 /** React Query cache calls: what they do, the key they target, and the queries they hit (M13). */
 export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[]; showTargets?: boolean }) {
   const { index } = useData()
+  const { shown, hidden, expand } = useCapped(links)
   return (
     <ul className="list query-links">
-      {links.map((link) => {
+      {shown.map((link) => {
         const owner = link.componentId ? index.components.get(link.componentId) : undefined
-        const targets = link.targetSiteIds
-          .map((id) => index.requests.get(id))
-          .filter((s): s is RequestSite => !!s)
         return (
           <li key={link.id}>
             <span>
@@ -385,26 +420,47 @@ export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[
                   in <a href={href({ name: 'component', componentId: owner.id })}>{owner.name}</a>
                 </span>
               )}
-              {showTargets && (
-                <span className="muted">
-                  {' → '}
-                  {targets.length === 0
-                    ? 'no scanned query'
-                    : targets.map((t, i) => (
-                        <span key={t.id}>
-                          {i > 0 && ', '}
-                          <code>{siteLabel(t, index)}</code>
-                        </span>
-                      ))}
-                </span>
-              )}
+              {showTargets && <QueryTargets link={link} />}
             </span>
             <span className="spacer" />
             <SourceLink file={link.loc.file} line={link.loc.line} column={link.loc.column} />
           </li>
         )
       })}
+      {hidden > 0 && (
+        <li className="more-row">
+          <MoreButton hidden={hidden} onClick={expand} />
+        </li>
+      )}
     </ul>
+  )
+}
+
+/** The queries a cache call hits: a few, then "+N more". A call with no key hits every query. */
+function QueryTargets({ link }: { link: QueryLink }) {
+  const { index } = useData()
+  const targets = link.targetSiteIds.map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
+  const { shown, hidden, expand } = useCapped(targets)
+  return (
+    <span className="muted">
+      {' → '}
+      {hitsEveryQuery(link)
+        ? 'every query'
+        : targets.length === 0
+          ? 'no scanned query'
+          : shown.map((t, i) => (
+              <span key={t.id}>
+                {i > 0 && ', '}
+                <code>{siteLabel(t, index)}</code>
+              </span>
+            ))}
+      {!hitsEveryQuery(link) && hidden > 0 && (
+        <>
+          {' '}
+          <MoreButton hidden={hidden} onClick={expand} />
+        </>
+      )}
+    </span>
   )
 }
 

@@ -14,6 +14,7 @@ import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
 import { RequestsScreen } from './screens/RequestsScreen'
 import { TypesScreen } from './screens/TypesScreen'
+import { useScrollMemory } from './scroll'
 import { Empty } from './ui'
 
 const NAV: {
@@ -38,6 +39,7 @@ export function App() {
   const meta = useMeta()
   const rescan = useRescan()
   const screen = useScreen()
+  useScrollMemory(screen)
   const captureOn = Boolean(meta.data?.capture)
   const exported = meta.data?.exported
   const live = useLiveFeed(captureOn || Boolean(meta.data?.watching))
@@ -160,7 +162,7 @@ function ScreenView({ screen }: { screen: Screen }) {
     case 'requests':
       return <RequestsScreen {...screen} />
     case 'types':
-      return <TypesScreen typeId={screen.typeId} q={screen.q} />
+      return <TypesScreen typeId={screen.typeId} q={screen.q} unused={screen.unused} />
     case 'flows':
       return <FlowsScreen flowId={screen.flowId} q={screen.q} />
     case 'live':

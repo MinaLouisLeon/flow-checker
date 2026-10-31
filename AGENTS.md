@@ -93,7 +93,7 @@ re-run them on their own before assuming a regression.
 | M20 | Release v0.2.0                                    | Done    |
 | M21 | Components and Requests screens                   | Done    |
 | M22 | Server hook placement check                       | Done    |
-| M23 | Dashboard fixes (bounded lists, scroll, handlers) | Planned |
+| M23 | Dashboard fixes (bounded lists, scroll, handlers) | Done    |
 | M24 | React Query keys                                  | Planned |
 | M25 | Scanner fixes (triggers, URLs, components, types) | Planned |
 | M26 | Release v0.2.2                                    | Planned |
