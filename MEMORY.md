@@ -28,6 +28,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M18 | SSE                   | Model version 7. Streams sent on open, then only new messages (`stream.from`), merged by the verifier.                   |
 | M19 | WebSockets            | Model version 8. Reuses the M18 stream recorder both ways; socket.io decoded from its WS frames, not patched.            |
 | M20 | Release v0.2.0        | Matrix app has every v0.2.0 transport; it caught a React Query key race on Next 15. Publish = push the `v0.2.0` tag.     |
+| M21 | Components/Requests   | List logic is pure in `dashboard/src/lists.ts`; `siteHref()` opens the request page, `ownerHref()` the component.        |
 
 ## Gotchas
 
@@ -201,3 +202,16 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - `isThirdParty()`: cross-origin, no source-mapped project frame, and a cross-origin script on the stack.
 - To check the dashboard on a real app without touching its running instance: `flow-checker export --html <dir>`
   reads `.flow-checker/` but writes nothing there; serve the folder with any static server.
+
+## M21 — Components and Requests screens (branch `feat/m21-components-requests-screens`)
+
+- v0.2.2 rule: problems found on a real test app are fixed as general code patterns, each with its own test case
+  written from scratch. Never match names, paths or helpers from that app.
+- `lists.ts` holds the list logic (rows, filters, sorting, `requestWhen()`, `siteOwner()`, `groupSame()`), so it is
+  tested in node without rendering. `RequestView` re-exports `siteOwner` for the older imports.
+- Big lists render 200 rows at a time (`usePaged()` in `ui.tsx`); the selected row is always included. That kept
+  search at ~20–40 ms per keystroke on the perf app without a windowing library.
+- A CSS rule that comes after one with higher specificity on the same element trips biome's
+  `noDescendingSpecificity`; `.row-group:not([open]) > summary::before` matches `.request[open] > summary::before`.
+- Claude in Chrome can't open `file://` pages. To look at an exported site, serve the folder on 127.0.0.1
+  and add `?v=N` to the URL after re-exporting: the browser otherwise reuses the cached `data.js`.

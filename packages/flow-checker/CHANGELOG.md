@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **Components and Requests screens.** The dashboard has two new screens, also in the static HTML export. The Overview's Components and Requests cards now open them.
+  - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared) and by what it has (sends requests, things to check, not on any page), and sorted by name, requests or pages.
+  - **Requests:** every request, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status, transport and flags. The same request sent from several places is one row.
+  - The selected item opens beside the list, and the filters stay in the URL.
+  - Each part of the cards' detail line (`117 server`, `106 on events`...) opens the matching filtered list. The Requests card also counts requests with an unknown trigger.
+- Links to a request (the overview's to-do list, Live, flows, the GraphQL / tRPC / SSE / WebSocket / Postman sections) open the request on its own instead of the component that sends it.
+
+## 0.2.1
+
 Fixes found by running 0.2.0 on a large real app (a 54-page Next.js 16 app with its own `request()` wrapper). Models saved by 0.2 still load.
 
 - **URLs through helpers.** A URL built by a project function (`proxyUrl(endpoint)`) is followed into it, including ternaries the scan can decide (`AUTH_ENDPOINTS.includes(endpoint) ? '/api/auth…' : '/api…'`, `===` checks, `url.includes('?')`), `.toUpperCase()` / `.toLowerCase()` / `.trim()`, and helpers that add an optional query (`withCursor(url, cursor)` with several returns, `cursor ? '/x?cursor=…' : '/x'`). On that app, unresolved URLs went from 728 of 857 sites to 35.

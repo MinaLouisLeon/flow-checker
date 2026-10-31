@@ -1,5 +1,5 @@
 import type { Component, ComponentRef } from '@flow-checker/shared'
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { useData } from './context'
 import { editorUrl } from './model-index'
 
@@ -128,6 +128,60 @@ export function SearchBox({
       aria-label={placeholder}
       onChange={(e) => onChange(e.target.value)}
     />
+  )
+}
+
+export function Select<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: T
+  options: { value: T; label: string }[]
+  onChange: (value: T) => void
+}) {
+  return (
+    <select
+      className="select"
+      aria-label={label}
+      title={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value as T)}
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+const PAGE_SIZE = 200
+
+/**
+ * Long lists render 200 rows at a time, so typing in a search box stays quick on large apps.
+ * `resetKey` (the filters) starts again from the first page; `selected` is always shown.
+ */
+export function usePaged<T>(items: T[], resetKey: string, selected = -1) {
+  const [limit, setLimit] = useState(PAGE_SIZE)
+  useEffect(() => setLimit(PAGE_SIZE), [resetKey])
+  const shown = Math.max(limit, selected + 1)
+  return {
+    items: items.slice(0, shown),
+    more: Math.max(0, items.length - shown),
+    showMore: () => setLimit(shown + PAGE_SIZE),
+  }
+}
+
+export function ShowMore({ more, onClick }: { more: number; onClick: () => void }) {
+  if (more <= 0) return null
+  return (
+    <button type="button" className="button show-more" onClick={onClick}>
+      Show {Math.min(more, PAGE_SIZE)} more <span className="muted">({more} hidden)</span>
+    </button>
   )
 }
 
