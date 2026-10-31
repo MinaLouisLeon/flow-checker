@@ -1337,3 +1337,56 @@ a.stat:hover {
 .stat-detail a:hover {
   color: var(--accent);
 }
+
+/* Bounded lists and folded rows (M23) */
+.more-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+}
+.more-button:hover {
+  text-decoration: underline;
+}
+.more-row {
+  list-style: none;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.caller-groups > li.caller-group {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+.caller-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.callers {
+  margin-left: 18px;
+}
+.type-group > details {
+  width: 100%;
+}
+.type-group > details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.type-group-name {
+  font-weight: 600;
+}
+.type-instances {
+  margin: 4px 0 0 18px;
+}

@@ -12,6 +12,12 @@
   - `doctor` now reads `register()` (a function, an arrow or function expression, `export { setup as register }`, or a re-export from another project file) and fails when a block is inside an `if` / `else`, `switch`, loop, `try`, a ternary or `&&`, a nested callback, after other code or an early `return`, or when `register` isn't `async`. It names the line and prints the lines to move. Each block (Node.js and edge) is checked on its own.
   - `init` edits an existing `register()` instead of asking you to: it puts the blocks first, makes `register` `async` when needed (`void` becomes `Promise<void>`), gives an `() => init()` arrow a body, and moves misplaced blocks when run again. Shapes it can't edit (a re-export from another file) still get a note.
   - `dev` warns at start when the server hook is misplaced, and again, once, when your app answers route handlers that send requests but no server-side request is captured within 10 s. Live shows the same warning as a banner.
+- **Dashboard on large apps.**
+  - Lists that grow with the app show five entries, then "+N more": the queries a cache call hits, cache calls, where a page leads, route handler callers, layout requests and where a type is used. A cache call with no key reads "→ every query". Request details are only rendered when opened. A page that listed about 120 queries per cache call (about 44,700 DOM nodes) now stays small.
+  - A new screen opens at the top instead of at the previous screen's scroll position. Back and forward return to where you were; search boxes and toggles keep the position.
+  - Route handler pages list the requests the handler sends first, then its callers grouped by the URL they send (the concrete paths for a catch-all handler like `/api/[...path]`), with callers on the same line folded into one row and a search box. The Overview's Route handlers card opens a list of route handlers.
+  - Types: instantiations of a generic (`Page<User>`, `Page<Post>`) fold into one row, and unused types are behind a "Show unused" toggle.
+  - A navigation in a shared hook is one row "from N components" instead of one per component.
 
 ## 0.2.1
 

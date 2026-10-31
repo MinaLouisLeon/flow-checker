@@ -45,7 +45,7 @@ export function Overview() {
         <Stat
           label="Route handlers"
           value={handlers.length}
-          link={href({ name: 'map', view: 'tree', q: '' })}
+          link={href({ name: 'map', view: 'handlers', q: '' })}
         />
         <Stat
           label="Components"
