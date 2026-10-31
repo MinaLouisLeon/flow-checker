@@ -15,6 +15,7 @@ Then use your app as usual. Each request the app sends shows up in the dashboard
 - **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, tRPC (v10 and v11: hooks, the vanilla client and v11 `queryOptions()`, typed from the router's procedures), GraphQL (Apollo Client 3 and 4, urql and Relay: operations by name, typed from codegen, the Relay compiler or your schema), server-sent events (`new EventSource()` and streamed `fetch`, with the events each listens to and their data types), WebSockets (`new WebSocket()` and socket.io, with the messages each sends and receives and their types), Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Middleware (`middleware.ts`, or `proxy.ts` on Next.js 16) is read too: which routes its `config.matcher` selects, its redirects (with the condition around each one), its rewrites (used to tell which page answered a URL) and the requests it sends. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
 - **Captures real traffic** while you test, in the browser and on the server, with passwords, tokens and auth headers **masked before anything is saved**.
 - **Verifies the map.** Each capture is matched to the request site that sent it, which marks that site `✓ verified`. The captured data is compared with the declared types (missing fields, extra fields, wrong types, unexpected `null`), and flows are confirmed when you walk them.
+- **Checks the code against your Postman collection** (optional): requests the collection doesn't have, endpoints nothing calls, and types from saved examples.
 - **Keeps up with your edits.** Files are watched and re-scanned incrementally. Requests whose code changed since they were captured are marked `↻ needs re-check`.
 - **Exports documentation:** Markdown (with Mermaid route maps and sequence diagrams) and a static, read-only copy of the dashboard you can host anywhere.
 
@@ -93,6 +94,20 @@ Every command shows its progress on stderr. In a terminal, a live line shows a s
 
 In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` lines are printed, as plain text.
 
+### React Query
+
+`useQuery`, `useInfiniteQuery`, the suspense hooks, `useQueries` / `useSuspenseQueries` (one request per entry), `useMutation`, `usePrefetchQuery` and `queryClient.fetchQuery` / `prefetchQuery` / `ensureQueryData` (and their infinite forms) are request sites, in v4 and v5. Each query's key is read into segments (`['todos', 'detail', :id]`), also through key factories, `queryOptions()` and functions that return options.
+
+`invalidateQueries`, `refetchQueries`, `resetQueries`, `removeQueries` and `setQueryData` are linked to the queries their key hits (by prefix, or `exact`) and to the mutation whose callback calls them, so a flow shows which queries a mutation refreshes. A server-side `prefetchQuery` handed over with `HydrationBoundary` (v4: `Hydrate`) is linked to the client query it fills. While you test, each request a query or mutation sends carries its key, and captures are matched by it.
+
+### Middleware
+
+`middleware.ts` (and `proxy.ts` on Next.js 16) is read for its `config.matcher`: each page shows whether middleware runs on it. `NextResponse.redirect()` becomes an edge on the route map with the condition around it (`if !token`), `NextResponse.rewrite()` and next-intl's default locale are used to tell which page answered a captured URL, and requests the middleware sends get a `middleware` trigger. On Node.js (`proxy.ts`) those requests are captured like the rest of the server; on the edge runtime, best effort (see [limits](#limits)).
+
+### tRPC
+
+Procedure calls are request sites in v10 and v11: `createTRPCReact` hooks (`trpc.todo.byId.useQuery()`), the vanilla client (`client.todo.add.mutate()`), `utils` calls and v11's `useTRPC()` with `queryOptions()` / `mutationOptions()`. The router is read from the route handler's `fetchRequestHandler()` (or the client's `AppRouter` type), so each call gets its procedure's input type (from `.input()`) and output type without annotations. While you test, a batched request is split into one capture per procedure, each matched and type-checked on its own.
+
 ### Postman collections
 
 Point flow-checker at a Postman collection (config `postman`, or `flow-checker postman import --collection <src>`) and every scan is checked against it:
@@ -163,6 +178,8 @@ export default defineConfig({
 })
 ```
 
+Event stream and WebSocket capture keep at most `capture.maxMessages` (200) messages per connection, and messages over `capture.maxMessageBytes` (64 kB) without their data.
+
 ## Sensitive data
 
 Redaction is **on by default** and happens in the runtime, before a capture leaves your app:
@@ -195,7 +212,7 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 - Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.
 - tRPC: procedures called through `createCaller` or a server-side `createTRPCOptionsProxy({ router })` run without an HTTP request and are not request sites. Subscriptions are found in the code, but their streams are captured as plain requests. The router must be reachable from `fetchRequestHandler({ router })` or the client's `AppRouter` type.
 - Next.js before 15.3: browser capture needs webpack (no Turbopack) and `withFlowChecker()`.
-- Large repositories: the first scan of a ~1,800-file app takes about 10 s and a re-scan after an edit a few seconds. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
+- Large repositories: the first scan of a ~1,800-file app takes about 10–12 s and a re-scan after an edit about 4 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
 
 ## License
 

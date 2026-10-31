@@ -201,11 +201,19 @@ function start(config: RuntimeConfig) {
 
   // The QueryClient lives in React state, so it can only be found once React has rendered.
   const queries = createQueryTracker()
-  let lastLookup = 0
+  // A failed lookup is reused only by requests sent in the same task. A time window is not safe:
+  // React can commit the QueryClientProvider right after a failed lookup, and the queries it
+  // mounts send their requests a few ms later (lost keys on Next 15 in the matrix).
+  let lookedUpThisTask = false
   const lookForQueryClient = () => {
     try {
       if (queries.ready) return
-      lastLookup = Date.now()
+      if (!lookedUpThisTask) {
+        lookedUpThisTask = true
+        setTimeout(() => {
+          lookedUpThisTask = false
+        }, 0)
+      }
       const client = findQueryClient([
         document,
         document.documentElement,
@@ -220,10 +228,10 @@ function start(config: RuntimeConfig) {
     lookForQueryClient()
     if (queries.ready || ++polls >= QUERY_CLIENT_POLLS) clearInterval(poll)
   }, QUERY_CLIENT_POLL_MS)
-  /** The query or mutation sending the current request. Looks for the client first, at most every 50 ms. */
+  /** The query or mutation sending the current request. Looks for the client first, once per task. */
   const currentQuery = () => {
     if (queries.ready) return queries.current()
-    if (Date.now() - lastLookup > 50) lookForQueryClient()
+    if (!lookedUpThisTask) lookForQueryClient()
     // Found just now: the query that sends this request started before it could be wrapped.
     return queries.ready ? (queries.current() ?? queries.guess()) : undefined
   }

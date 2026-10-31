@@ -1,7 +1,7 @@
 name: Release
 
 # Publishes @integr8-media/flow-checker to npm with provenance when a version tag is pushed:
-#   git tag v0.1.0 && git push origin v0.1.0
+#   git tag v0.2.0 && git push origin v0.2.0
 # The tag must match packages/flow-checker/package.json.
 #
 # Needs the NPM_TOKEN repository secret (an npm automation or granular token with publish

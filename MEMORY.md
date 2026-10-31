@@ -27,6 +27,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M17 | GraphQL               | Model version 6. graphql-js in the scanner only; runtime reads operations by regex; fragments are global by name.        |
 | M18 | SSE                   | Model version 7. Streams sent on open, then only new messages (`stream.from`), merged by the verifier.                   |
 | M19 | WebSockets            | Model version 8. Reuses the M18 stream recorder both ways; socket.io decoded from its WS frames, not patched.            |
+| M20 | Release v0.2.0        | Matrix app has every v0.2.0 transport; it caught a React Query key race on Next 15. Publish = push the `v0.2.0` tag.     |
 
 ## Gotchas
 
@@ -163,3 +164,21 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `core.longpaths`, then vite / vitest can't resolve their `#imports`). For an A/B timing, `git stash push -- <file>`
   one file instead: the scanner hooks cost ~3% on the fixture snapshot tests.
 - Recordings were made on app port 3077 (`node scripts/record-captures.mjs websocket`).
+
+## M20 — Release v0.2.0 (branch `feat/release-v0.2.0`, not yet published)
+
+- Compare performance against a published version on the same machine, not against numbers in the docs:
+  `FLOW_CHECKER_CLI=<install>/node_modules/@integr8-media/flow-checker/dist/cli.js node scripts/perf/bench.mjs`.
+  On this machine 0.1.0 measured 10.3 s / 3.7 s (the docs say ~9–10 s / 3.4 s).
+- To profile a scan: `node --cpu-prof --cpu-prof-dir=<dir> dist/cli.js scan --root <app>`; the scan runs in a worker,
+  so the larger `.cpuprofile` is the one to read.
+- ts-morph's `getImplementation()` on a bodiless function searches every statement of its file by name. On lib
+  declarations (`fetch` in `lib.dom.d.ts`) that cost ~1 s per perf-app scan; `functionOf()` now skips `.d.ts` files.
+- The browser runtime must not cache a failed QueryClient lookup across tasks: React can commit the provider right
+  after it, and the queries' requests follow within ms. The race only showed on Next 15 (about 1 load in 3), and
+  a single matrix run can pass by luck: reload the page ~10 times to check.
+- The matrix's WebSocket echo server is a hand-written handshake + short text frames in `next-matrix.mjs` (no `ws`
+  dependency in the script). React Query, tRPC, urql and zod are installed into each matrix app at the fixtures'
+  versions.
+- A test harness that hosts a fake upstream in the same process must not `spawnSync` the browser script: the
+  blocked event loop stalls the page's server fetch.

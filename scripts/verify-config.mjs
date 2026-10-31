@@ -84,7 +84,39 @@ try {
       `  },`,
       `  types: { maxDepth: 1 },`,
       `  export: { md: 'out/docs', html: 'out/site' },`,
+      `  postman: { collection: 'contract/api.postman_collection.json' },`,
+      `  graphql: { schema: 'api/schema.graphql', endpoint: '/api/gql' },`,
       `})`,
+    ),
+    // The API contract (postman): one request the code sends, one nothing calls.
+    'web/contract/api.postman_collection.json': JSON.stringify({
+      info: {
+        name: 'Verify API',
+        schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
+      },
+      item: [
+        {
+          name: 'Create note',
+          request: { method: 'POST', url: { raw: '/api/notes', path: ['api', 'notes'] } },
+        },
+        { name: 'Unused', request: { method: 'GET', url: { raw: '/api/unused', path: ['api', 'unused'] } } },
+      ],
+    }),
+    // GraphQL (graphql.schema, graphql.endpoint): an untyped urql query, typed from the schema.
+    'web/api/schema.graphql': 'type Query { notes: [Note!]! }\ntype Note { id: ID!, text: String! }\n',
+    'web/node_modules/urql/package.json': JSON.stringify({ name: 'urql', types: 'index.d.ts' }),
+    'web/node_modules/urql/index.d.ts': lines(
+      'export declare function gql(strings: TemplateStringsArray, ...values: unknown[]): any',
+      'export declare function useQuery(args: { query: unknown }): [{ data?: any }]',
+    ),
+    'web/src/application/notes/page.tsx': lines(
+      `'use client'`,
+      `import { gql, useQuery } from 'urql'`,
+      'const NotesQuery = gql`query Notes { notes { id text } }`',
+      `export default function Notes() {`,
+      `  const [{ data }] = useQuery({ query: NotesQuery })`,
+      `  return <main>{data?.notes.length}</main>`,
+      `}`,
     ),
     'web/package.json': JSON.stringify({ name: 'web', private: true, dependencies: { next: '16.0.0' } }),
     'web/tsconfig.json': JSON.stringify({
@@ -159,6 +191,32 @@ try {
     JSON.stringify(deep ?? {}).includes('"reason":"depth"'),
     JSON.stringify(deep?.shape ?? deep),
   )
+
+  // --- postman, graphql ----------------------------------------------------------------------
+  const notes = model.requests.find((s) => s.transport === 'api-client' && s.url?.path === '/api/notes')
+  check(
+    'postman.collection: ky.post /api/notes is matched to "Create note"',
+    notes?.contract?.name === 'Create note',
+    JSON.stringify(notes?.contract),
+  )
+  const unused = model.postman?.requests.find((r) => r.name === 'Unused')
+  check(
+    'postman.collection: the request nothing calls is flagged',
+    unused?.siteIds.length === 0 && unused.flags.length > 0,
+    JSON.stringify(unused),
+  )
+  check(
+    'graphql.schema: types come from api/schema.graphql',
+    model.graphql?.schema?.path === 'api/schema.graphql' && model.graphql.schema.types === 2,
+    JSON.stringify(model.graphql?.schema),
+  )
+  const notesOp = model.requests.find((s) => s.transport === 'graphql' && s.operation?.name === 'Notes')
+  check(
+    'graphql.endpoint: operations are sent to /api/gql',
+    model.graphql?.endpoint?.path === '/api/gql' && notesOp?.url?.path === '/api/gql',
+    `${JSON.stringify(model.graphql?.endpoint)} ${JSON.stringify(notesOp?.url)}`,
+  )
+  check('graphql.schema: the untyped query gets its data type', Boolean(notesOp?.responseType))
 
   // --- doctor: root, devCommand, ports -------------------------------------------------------
   const doctor = spawnSync(process.execPath, [cli, 'doctor', ...config], { cwd: top, encoding: 'utf8' })
