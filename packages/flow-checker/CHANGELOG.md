@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.1
 
 Fixes found by running 0.2.0 on a large real app (a 54-page Next.js 16 app with its own `request()` wrapper). Models saved by 0.2 still load.
 
