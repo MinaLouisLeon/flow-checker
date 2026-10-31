@@ -304,6 +304,13 @@ function waitForTransports(dashboard) {
   ).catch(async (error) => {
     const list = await get('/api/captures').catch(() => [])
     error.message += `\nMissing: ${(await missing(list).catch(() => [])).join(', ')}`
+    // Tells a key the browser never sent apart from one the matcher did not use.
+    for (const c of list.filter((x) => x.origin === 'browser' && x.url.endsWith('/api/todos'))) {
+      const full = (await get(`/api/captures/${c.id}`).catch(() => ({}))).capture
+      const top = full?.match?.candidates?.[0]
+      error.message += `\nReact Query capture ${c.id}: query=${JSON.stringify(full?.query ?? null)} at ${full?.timestamp ?? '-'}`
+      error.message += `\n  top candidate ${top?.siteId ?? '-'}: ${top?.evidence?.map((e) => `${e.signal}${e.points >= 0 ? '+' : ''}${e.points}`).join(' ') ?? '-'}`
+    }
     error.message += `\nCaptured:\n${list.map((c) => `  ${c.origin} ${c.transport} ${c.method} ${c.url.slice(0, 100)} ${c.procedure ?? c.operation ?? ''} stream=${c.stream?.count ?? '-'} match=${c.match?.status ?? '-'} types=${c.typeCheck ?? '-'}`).join('\n') || '  nothing'}`
     throw error
   })

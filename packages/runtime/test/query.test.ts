@@ -142,6 +142,18 @@ describe('findQueryClient', () => {
     expect(findQueryClient([null, { __reactFiber$xyz: leaf }])).toBe(client)
   })
 
+  it('searches the tree on screen, not the copy React saved on the container', () => {
+    // After React's first commit: the saved root fiber is the empty copy, and its FiberRoot
+    // points at the committed tree that holds the provider.
+    const provider = { memoizedProps: { client } }
+    const current: Record<string, unknown> = { child: provider }
+    const saved: Record<string, unknown> = { child: null, stateNode: { current } }
+    current.stateNode = saved.stateNode
+    expect(findQueryClient([{ __reactContainer$abc: saved }])).toBe(client)
+    const leaf = { return: saved }
+    expect(findQueryClient([{ __reactFiber$xyz: leaf }])).toBe(client)
+  })
+
   it('returns nothing without React or without a client', () => {
     expect(findQueryClient([{}, { __reactContainer$a: { child: { memoizedProps: { value: 1 } } } }])).toBe(
       undefined,

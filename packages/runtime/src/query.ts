@@ -250,6 +250,8 @@ interface Fiber {
   sibling?: Fiber | null
   return?: Fiber | null
   memoizedProps?: Record<string, unknown> | null
+  /** On the root fiber: React's FiberRoot, whose `current` is the tree on screen. */
+  stateNode?: { current?: Fiber | null } | null
 }
 
 /** Fibers looked at before giving up: enough for big trees, cheap enough to retry. */
@@ -259,6 +261,10 @@ const MAX_FIBERS = 20_000
  * The QueryClient from a `QueryClientProvider` (its `client` prop) or the context provider it
  * renders (`value`), searched from React's root fiber, which React keeps on the root container
  * (`__reactContainer$…`) or reaches from any element (`__reactFiber$…`).
+ *
+ * Both keys hold the fiber React saved when it set them, and React swaps between two copies of
+ * the tree on each commit. Right after the first commit the saved root has no children, so the
+ * search starts from the tree on screen (`stateNode.current`) instead.
  */
 export function findQueryClient(roots: readonly unknown[]): unknown {
   for (const root of roots) {
@@ -274,15 +280,25 @@ function rootFiber(node: unknown): Fiber | undefined {
   if (!node || typeof node !== 'object') return undefined
   const record = node as Record<string, unknown>
   for (const key of Object.keys(record)) {
-    if (key.startsWith('__reactContainer$')) return record[key] as Fiber
+    if (key.startsWith('__reactContainer$')) return liveRoot(record[key] as Fiber | undefined)
   }
   for (const key of Object.keys(record)) {
     if (!key.startsWith('__reactFiber$')) continue
     let fiber = record[key] as Fiber | undefined
     for (let i = 0; fiber?.return && i < 10_000; i++) fiber = fiber.return
-    return fiber
+    return liveRoot(fiber)
   }
   return undefined
+}
+
+/** The root fiber of the tree on screen, or `fiber` itself when React does not say. */
+function liveRoot(fiber: Fiber | undefined): Fiber | undefined {
+  try {
+    const current = fiber?.stateNode?.current
+    return current && typeof current === 'object' ? current : fiber
+  } catch {
+    return fiber
+  }
 }
 
 function searchFibers(start: Fiber): unknown {
