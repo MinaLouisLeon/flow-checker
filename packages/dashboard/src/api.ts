@@ -6,6 +6,7 @@ import {
   type ExportCapture,
   type ExportData,
   type FlowsSummary,
+  matchedSiteIds,
   type RecordedFlow,
   type ScanEvent,
   type ServerCaptureStatus,
@@ -209,7 +210,7 @@ export function useSiteCaptures(siteId: string, enabled: boolean) {
     queryFn: () => {
       const data = embedded()
       if (!data) return getJson<CaptureSummary[]>(`api/sites/${encodeURIComponent(siteId)}/captures`)
-      return embeddedCaptures(data, (c) => c.match?.status === 'matched' && c.match.siteId === siteId)
+      return embeddedCaptures(data, (c) => matchedSiteIds(c.match).includes(siteId))
     },
     enabled,
     staleTime: Number.POSITIVE_INFINITY,

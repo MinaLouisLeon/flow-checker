@@ -1,3 +1,4 @@
+import type { Settings } from '@/types/settings'
 import type { NewTodo, Todo, TodoPatch } from '@/types/todo'
 import type { User } from '@/types/user'
 
@@ -29,3 +30,5 @@ export const updateTodo = (id: number, patch: TodoPatch) =>
 
 export const fetchUsers = () => http<User[]>('/users')
 export const deleteUser = (id: number) => http<User>(`/users/${id}`, { method: 'DELETE' })
+
+export const fetchSettings = () => http<Settings>('/settings')

@@ -94,6 +94,6 @@ re-run them on their own before assuming a regression.
 | M21 | Components and Requests screens                   | Done    |
 | M22 | Server hook placement check                       | Done    |
 | M23 | Dashboard fixes (bounded lists, scroll, handlers) | Done    |
-| M24 | React Query keys                                  | Planned |
+| M24 | React Query keys                                  | Done    |
 | M25 | Scanner fixes (triggers, URLs, components, types) | Planned |
 | M26 | Release v0.2.2                                    | Planned |

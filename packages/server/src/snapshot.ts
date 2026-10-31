@@ -12,6 +12,7 @@ import {
   EXPORT_VERSION,
   type ExportCapture,
   type ExportData,
+  matchedSiteIds,
 } from '@flow-checker/shared'
 import type { ServerActionInfo } from './actions'
 import { FlowTracker } from './flows'
@@ -116,11 +117,12 @@ function pickCaptures(all: readonly Capture[], verifier: Verifier): Capture[] {
   for (let i = all.length - 1; i >= 0; i--) {
     const c = all[i]
     if (!c) continue
-    const siteId = c.match?.status === 'matched' ? c.match.siteId : undefined
-    if (siteId) {
-      const n = perSite.get(siteId) ?? 0
-      if (n >= EXPORT_CAPTURES_PER_SITE) continue
-      perSite.set(siteId, n + 1)
+    // A shared query's request (M24) counts for each site that shares it.
+    const siteIds = matchedSiteIds(c.match)
+    if (siteIds.length > 0) {
+      const wanted = siteIds.filter((id) => (perSite.get(id) ?? 0) < EXPORT_CAPTURES_PER_SITE)
+      if (wanted.length === 0) continue
+      for (const id of wanted) perSite.set(id, (perSite.get(id) ?? 0) + 1)
       keep.add(c.id)
     } else if (unmatched < EXPORT_UNMATCHED_CAPTURES) {
       unmatched++

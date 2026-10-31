@@ -18,6 +18,12 @@
   - Route handler pages list the requests the handler sends first, then its callers grouped by the URL they send (the concrete paths for a catch-all handler like `/api/[...path]`), with callers on the same line folded into one row and a search box. The Overview's Route handlers card opens a list of route handlers.
   - Types: instantiations of a generic (`Page<User>`, `Page<Post>`) fold into one row, and unused types are behind a "Show unused" toggle.
   - A navigation in a shared hook is one row "from N components" instead of one per component.
+- **React Query keys.**
+  - Enum members (`[QueryKeys.feed]`, also `const enum`, imported or re-exported), `as const` object properties and `const` strings are read as fixed key segments, also inside template literals. Before, an enum member was read as a runtime value (`[:feed]`).
+  - A key segment the scan can't read (a value from a package, a module value it can't follow) is shown as `?name` and is never treated as "any value": a cache call whose key starts with one (or with a runtime value) says "key not known" instead of hitting every query in the app, and one with a known start links by that start only.
+  - Keys and query functions passed to your own query hooks (`useList({ queryKey, queryFn })` calling `useInfiniteQuery`, with destructured, spread or positional arguments) are followed per call: each call is its own query site with its key, instead of a plain `fetch`, so invalidations of that key find it.
+  - Components that mount the same query (same key and query function) share one request. Its capture now verifies all of them (`+N shared` on Live) instead of being ambiguous.
+- `.flow-checker/model.json` is now version 10. Version 1–9 files still load.
 
 ## 0.2.1
 

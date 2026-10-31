@@ -1,6 +1,7 @@
 # Route tree
 
 src/app [layout, page]
+├─ settings [page]
 ├─ todos
 │  └─ [id] (dynamic) [page]
 └─ users [page]
@@ -8,6 +9,7 @@ src/app [layout, page]
 # Routes
 
 /  page  src/app/page.tsx
+/settings  page  src/app/settings/page.tsx
 /todos/[id]  page  src/app/todos/[id]/page.tsx
 /users  page  src/app/users/page.tsx
 
@@ -25,6 +27,12 @@ TodosPage  server  src/app/page.tsx:4
 ├─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:9
 └─ TodoList  client (use client)  src/components/TodoList.tsx:9
    └─ Link  external next/link  [conditional]
+
+## /settings  src/app/settings/page.tsx
+layouts: src/app/layout.tsx
+SettingsPage  server  src/app/settings/page.tsx:4
+├─ SettingsBadge  client (use client)  src/components/SettingsBadge.tsx:8
+└─ SettingsPanel  client (use client)  src/components/SettingsPanel.tsx:13
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx

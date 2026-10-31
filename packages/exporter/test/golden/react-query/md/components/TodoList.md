@@ -46,7 +46,7 @@ Takes no props.
 
 **Response** `Todo[]` (see [`Todo`](../types.md#typ_0fc96ucq8sd))
 
-**Captured** `GET http://localhost:4010/todos` → 200 OK · 8 ms · 2026-10-30 01:38 UTC · page `/` (newest of 3)
+**Captured** `GET http://localhost:4010/todos` → 200 OK · 8 ms · 2026-10-31 22:51 UTC · page `/` (newest of 3)
 
 Response body:
 
@@ -96,7 +96,7 @@ Response body:
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `PATCH http://localhost:4010/todos/2` → 200 OK · 7 ms · 2026-10-30 01:38 UTC · page `/`
+**Captured** `PATCH http://localhost:4010/todos/2` → 200 OK · 8 ms · 2026-10-31 22:51 UTC · page `/`
 
 Request body:
 

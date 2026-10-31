@@ -22,8 +22,8 @@ M6 matching + verification · M7 flows · M8 type comparison · M9 watch + incre
 M11 public release v0.1.0 · M12 CLI progress output · M13 React Query keys and cache links ·
 M14 middleware / proxy · M15 Postman collection import · M16 tRPC · M17 GraphQL · M18 SSE ·
 M19 WebSockets · M20 release v0.2.0 (published; 0.2.1 followed with scan-accuracy fixes) ·
-M21 Components and Requests screens · M22 server hook placement check · M23 dashboard fixes
-(branch `feat/m23-dashboard-fixes`).
+M21 Components and Requests screens · M22 server hook placement check · M23 dashboard fixes ·
+M24 React Query keys (branch `feat/m24-react-query-keys`).
 
-Next: M24 React Query keys, then M25–M26 for v0.2.2 (see `docs/PLAN.md`, "v0.2.2 milestones").
+Next: M25 scanner fixes, then M26 release v0.2.2 (see `docs/PLAN.md`, "v0.2.2 milestones").
 Fixes must target code patterns, not the app they were found on.

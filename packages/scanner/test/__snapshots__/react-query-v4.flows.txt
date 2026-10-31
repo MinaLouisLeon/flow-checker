@@ -27,5 +27,5 @@ link /todos/:id -> /todos/[id]  event onClick  conditional
 ## UserList click  (/users)
 1. UserList onClick on /users
 2. DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
-3. removeQueries ['users', :id]
+3. removeQueries ['users', :id] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
 4. invalidateQueries ['users'] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users

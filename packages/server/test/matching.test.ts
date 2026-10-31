@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { applyPostman, importLocalPostman } from '@flow-checker/postman'
 import { scanProject } from '@flow-checker/scanner'
-import { type AppModel, type Capture, type CaptureMatch, urlText } from '@flow-checker/shared'
+import { type AppModel, type Capture, type CaptureMatch, matchedSiteIds, urlText } from '@flow-checker/shared'
 import { describe, expect, it } from 'vitest'
 import type { ServerActionInfo } from '../src/actions'
 import { Matcher } from '../src/matcher'
@@ -139,7 +139,11 @@ describe('matching recorded fixture captures', () => {
         const match = matches.get(capture.id)
         total++
         if (match?.status === 'matched') matched++
-        lines.push(`${describeCapture(capture)}\n  → ${match?.status} ${label(model, match?.siteId)}`)
+        // A query several components mount (M24): one request, matched to all of them.
+        const shared = (match?.sharedWith ?? []).map((id) => `\n    + ${label(model, id)}`).join('')
+        lines.push(
+          `${describeCapture(capture)}\n  → ${match?.status} ${label(model, match?.siteId)}${shared}`,
+        )
       }
       lines.push('')
     }
@@ -152,7 +156,7 @@ describe('matching recorded fixture captures', () => {
   it('verifies every request site the fixture runs exercised', () => {
     for (const { recording, model } of loaded) {
       const matches = replay(model, recording)
-      const verified = new Set([...matches.values()].map((m) => m.siteId).filter(Boolean))
+      const verified = new Set([...matches.values()].flatMap((m) => matchedSiteIds(m)))
       // Sites with no recording step: none. Every scanned request was exercised.
       const missing = model.requests.filter((s) => !verified.has(s.id)).map((s) => label(model, s.id))
       expect(missing).toEqual([])

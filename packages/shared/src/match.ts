@@ -67,6 +67,11 @@ export const CaptureMatchSchema = z.object({
   /** `manual` when you assigned it in the dashboard. */
   by: z.enum(['auto', 'manual']),
   siteId: z.string().optional(),
+  /**
+   * Matched: other sites that send this same request (M24). Components that mount the same React
+   * Query query (same key, same query function) share one request, so it verifies all of them.
+   */
+  sharedWith: z.array(z.string()).optional(),
   score: z.number(),
   /** Best candidates first (at most a few). */
   candidates: z.array(MatchCandidateSchema),
@@ -77,6 +82,12 @@ export const CaptureMatchSchema = z.object({
   thirdParty: z.boolean().optional(),
 })
 export type CaptureMatch = z.infer<typeof CaptureMatchSchema>
+
+/** The sites a match verifies: its site and the sites that share the request with it (M24). */
+export function matchedSiteIds(match: CaptureMatch | undefined): string[] {
+  if (match?.status !== 'matched' || !match.siteId) return []
+  return [match.siteId, ...(match.sharedWith ?? [])]
+}
 
 /** `.flow-checker/overrides.json`: your decisions, safe to commit. */
 export const OverridesSchema = z.object({

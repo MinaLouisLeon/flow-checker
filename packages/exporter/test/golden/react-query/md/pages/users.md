@@ -42,7 +42,7 @@
 
 **Response** `User[]` (see [`User`](../types.md#typ_25sov0zzv45))
 
-**Captured** `GET http://localhost:4010/users` → 200 OK · 33 ms · 2026-10-30 01:38 UTC
+**Captured** `GET http://localhost:4010/users` → 200 OK · 30 ms · 2026-10-31 22:51 UTC
 
 Response body:
 
@@ -76,7 +76,7 @@ Response body:
 
 **Response** `User[]` (see [`User`](../types.md#typ_25sov0zzv45))
 
-**Captured** `GET http://localhost:4010/users` → 200 OK · 10 ms · 2026-10-30 01:38 UTC · page `/users` (newest of 2)
+**Captured** `GET http://localhost:4010/users` → 200 OK · 10 ms · 2026-10-31 22:51 UTC · page `/users` (newest of 2)
 
 Response body:
 
@@ -110,7 +110,7 @@ Response body:
 
 **Response** `Todo[]` (see [`Todo`](../types.md#typ_0fc96ucq8sd))
 
-**Captured** `GET http://localhost:4010/todos?userId=2` → 200 OK · 8 ms · 2026-10-30 01:38 UTC · page `/users` (newest of 2)
+**Captured** `GET http://localhost:4010/todos?userId=2` → 200 OK · 6 ms · 2026-10-31 22:51 UTC · page `/users` (newest of 2)
 
 Response body:
 
@@ -142,7 +142,7 @@ Response body:
 { id: number; name: string; email: string; role: "admin" | "member" }
 ```
 
-**Captured** `GET http://localhost:4010/users/2` → 200 OK · 4 ms · 2026-10-30 01:38 UTC · page `/users`
+**Captured** `GET http://localhost:4010/users/2` → 200 OK · 3 ms · 2026-10-31 22:51 UTC · page `/users`
 
 Response body:
 
@@ -172,7 +172,7 @@ Response body:
 { id: number; name: string; email: string; role: "admin" | "member" }
 ```
 
-**Captured** `GET http://localhost:4010/users/1` → 200 OK · 5 ms · 2026-10-30 01:38 UTC · page `/users`
+**Captured** `GET http://localhost:4010/users/1` → 200 OK · 5 ms · 2026-10-31 22:51 UTC · page `/users`
 
 Response body:
 

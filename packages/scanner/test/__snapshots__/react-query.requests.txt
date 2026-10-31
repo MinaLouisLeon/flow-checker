@@ -12,6 +12,26 @@ POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useMutation  ev
   response: Todo
   via: useMutation src/components/AddTodoForm.tsx:14 > http src/services/todos.ts:30 > fetch src/services/todos.ts:8
 
+## SettingsBadge  src/components/SettingsBadge.tsx:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  fetch useQuery([QueryKey.Settings])  page-load
+  key: ['settings']
+  response: Settings
+  via: useApiQuery src/components/SettingsBadge.tsx:9 > useQuery src/hooks/useApiQuery.ts:6 > http src/services/settings.ts:4 > fetch src/services/todos.ts:8
+
+## SettingsPanel  src/components/SettingsPanel.tsx:13
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  fetch useQuery([QueryKey.Settings])  page-load
+  key: ['settings']
+  response: Settings
+  via: useApiQuery src/components/SettingsPanel.tsx:15 > useQuery src/hooks/useApiQuery.ts:6 > http src/services/settings.ts:4 > fetch src/services/todos.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch useQuery([SCOPES.users, STATS])  page-load
+  key: ['users', 'stats']
+  response: User[]
+  via: useQuery src/components/SettingsPanel.tsx:16 > http src/services/users.ts:12 > fetch src/services/todos.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useQuery([version, 'todos'])  page-load
+  key: [?version, 'todos']
+  response: Todo[]
+  via: useQuery src/components/SettingsPanel.tsx:17 > http src/services/todos.ts:25 > fetch src/services/todos.ts:8
+
 ## TodoDetail  src/components/TodoDetail.tsx:13
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useSWR(['todo', id])  page-load
   response: Todo
@@ -56,6 +76,13 @@ invalidate ['todos']  invalidateQueries  AddTodoForm  event onSubmit  success  s
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (TodoList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (UserList)
 
+invalidate ['settings']  invalidateQueries  SettingsPanel  event onClick  src/components/SettingsPanel.tsx:24
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  (SettingsBadge)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  (SettingsPanel)
+
+invalidate [?version]  invalidateQueries  SettingsPanel  event onClick  src/components/SettingsPanel.tsx:27
+  hits: (key not known)
+
 set-data ['todos', 'detail', :id]  setQueryData  TodoList  event onChange  exact success  src/components/TodoList.tsx:16
   after: PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
   hits: (no scanned query)
@@ -66,15 +93,21 @@ invalidate ['todos', 'list']  invalidateQueries  TodoList  event onChange  succe
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (UserList)
 
 remove ['users', :id]  removeQueries  UserList  event onClick  exact  src/components/UserList.tsx:37
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (SettingsPanel)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
 
 refetch ['users']  refetchQueries  UserList  event onClick  src/components/UserList.tsx:44
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (SettingsPanel)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (UserList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  (UserList)
 
 reset (all queries)  resetQueries  UserList  event onClick  src/components/UserList.tsx:47
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  (SettingsBadge)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  (SettingsPanel)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (SettingsPanel)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (SettingsPanel)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (TodoList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (UserList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (UserList)

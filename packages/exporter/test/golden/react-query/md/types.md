@@ -2,7 +2,7 @@
 
 [← Overview](README.md)
 
-5 named types, fully resolved.
+6 named types, fully resolved.
 
 ## <a id="typ_28rtveus0ih"></a>TodoDetailProps
 
@@ -14,6 +14,16 @@ interface TodoDetailProps { id: number }
 
 Used by: props of [`TodoDetail`](components/TodoDetail.md).
 
+## <a id="typ_0ccr3ev5sff"></a>Settings
+
+interface · `src/types/settings.ts:1`
+
+```ts
+interface Settings { theme: "light" | "dark"; locale: string; digest: string | null }
+```
+
+Used by: request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings`](components/SettingsBadge.md#req_092dy6av59n), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings`](components/SettingsPanel.md#req_1psqg80jksx).
+
 ## <a id="typ_0fc96ucq8sd"></a>Todo
 
 interface · `src/types/todo.ts:1`
@@ -22,7 +32,7 @@ interface · `src/types/todo.ts:1`
 interface Todo { id: number; userId: number; title: string; done: boolean }
 ```
 
-Used by: used in [`TodoDetail`](components/TodoDetail.md), used in [`TodoList`](components/TodoList.md), request [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](components/AddTodoForm.md#req_1ybk9xw63lt), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](components/TodoDetail.md#req_27sy7hb0xsq), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](components/TodoList.md#req_1di2bq7b96m), request [`PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](components/TodoList.md#req_2bvpz71hbm1), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId`](components/UserList.md#req_0ht2fssv0ja).
+Used by: used in [`TodoDetail`](components/TodoDetail.md), used in [`TodoList`](components/TodoList.md), request [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](components/AddTodoForm.md#req_1ybk9xw63lt), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](components/SettingsPanel.md#req_1dhqpyygtma), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](components/TodoDetail.md#req_27sy7hb0xsq), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](components/TodoList.md#req_1di2bq7b96m), request [`PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](components/TodoList.md#req_2bvpz71hbm1), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId`](components/UserList.md#req_0ht2fssv0ja).
 
 ## <a id="typ_1llbjxbqwwk"></a>NewTodo
 
@@ -52,4 +62,4 @@ interface · `src/types/user.ts:1`
 interface User { id: number; name: string; email: string; role: "admin" | "member" }
 ```
 
-Used by: request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users`](components/UsersPage.md#req_2a0uqvzh6dw), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users`](components/UserList.md#req_0m4arr015hb), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id`](components/UserList.md#req_0ka937821vy), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id`](components/UserList.md#req_1g8keamimjw).
+Used by: request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users`](components/UsersPage.md#req_2a0uqvzh6dw), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users`](components/SettingsPanel.md#req_01zlsrjrncf), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users`](components/UserList.md#req_0m4arr015hb), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id`](components/UserList.md#req_0ka937821vy), request [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id`](components/UserList.md#req_1g8keamimjw).

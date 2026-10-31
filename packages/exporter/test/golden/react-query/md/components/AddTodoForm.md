@@ -50,7 +50,7 @@ Takes no props.
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `POST http://localhost:4010/todos` → 201 Created · 9 ms · 2026-10-30 01:38 UTC · page `/`
+**Captured** `POST http://localhost:4010/todos` → 201 Created · 8 ms · 2026-10-31 22:51 UTC · page `/`
 
 Request body:
 

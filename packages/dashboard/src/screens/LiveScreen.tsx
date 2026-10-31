@@ -473,7 +473,11 @@ function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?
     // A shared route handler (e.g. a catch-all proxy) says little: name the feature that called it.
     const parentSite = parent?.match?.siteId ? index.requests.get(parent.match.siteId) : undefined
     const via = site?.origin === 'route-handler' && parentSite ? parentSite : undefined
-    const title = site ? siteLabel(site, index) : match.siteId
+    const label = site ? siteLabel(site, index) : match.siteId
+    // One request for a query several components mount (M24): it verifies each of them.
+    const shared = (match.sharedWith ?? []).map((id) => index.requests.get(id)).filter((s) => !!s)
+    const owners = shared.map((s) => siteOwner(s, index))
+    const title = shared.length > 0 ? `${label}, shared with ${owners.join(', ')}` : label
     return (
       <Badge tone="ok" title={via ? `${title}, for ${siteLabel(via, index)}` : title}>
         ✓{' '}
@@ -482,6 +486,7 @@ function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?
           : site
             ? siteOwner(site, index)
             : 'matched'}
+        {shared.length > 0 ? ` +${shared.length} shared` : ''}
         {match.by === 'manual' ? ' (you)' : ''}
       </Badge>
     )
