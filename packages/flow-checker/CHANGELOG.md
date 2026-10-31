@@ -15,6 +15,7 @@ Fixes found by running 0.2.0 on a large real app (a 54-page Next.js 16 app with 
   - The route map lays out many sibling pages in a grid of columns by route group, opens at a readable zoom, counts each page's own components, drops the stacked edge labels, and hides layout links and middleware redirects behind a toggle.
   - Live: server hops show which feature they were made for (`LatestPosts › GET /api/[...proxy]`), and the toolbar wraps instead of running into the side panel.
   - Recorded flows put the page load first and are named after the pages they went through when no name is given. An unwalked flow says "not walked yet". The route tree leaves out folders with no route files.
+- **React Query keys on the first request.** The browser runtime found the app's `QueryClient` through the copy of React's tree saved on the root, which is empty right after React's first commit. A query that sent its request then lost its key (seen on Next 13.4 on macOS). It now searches the tree on screen.
 - `.flow-checker/model.json` is now version 9. Version 1–8 files still load.
 
 ## 0.2.0
