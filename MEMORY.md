@@ -29,6 +29,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M19 | WebSockets            | Model version 8. Reuses the M18 stream recorder both ways; socket.io decoded from its WS frames, not patched.            |
 | M20 | Release v0.2.0        | Matrix app has every v0.2.0 transport; it caught a React Query key race on Next 15. Publish = push the `v0.2.0` tag.     |
 | M21 | Components/Requests   | List logic is pure in `dashboard/src/lists.ts`; `siteHref()` opens the request page, `ownerHref()` the component.        |
+| M22 | Server hook placement | `cli/server-hook.ts` is shared by doctor, init and dev; the rule is shape-only (any wrapper around the blocks fails).    |
 
 ## Gotchas
 
@@ -215,3 +216,15 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `noDescendingSpecificity`; `.row-group:not([open]) > summary::before` matches `.request[open] > summary::before`.
 - Claude in Chrome can't open `file://` pages. To look at an exported site, serve the folder on 127.0.0.1
   and add `?v=N` to the URL after re-exporting: the browser otherwise reuses the cached `data.js`.
+
+## M22 — Server hook placement (branch `feat/m22-server-hook-placement`)
+
+- `server-hook.ts` parses with `ts` from ts-morph (`createSourceFile`, no project): `findRegister()` follows
+  re-exports and tsconfig aliases; `editServerHook()` must use the lookup's own `SourceFile`, or nodes from two parses
+  never compare equal.
+- The dev safety net only waits on route handlers that have route-handler sites in the model: a handler that just
+  answers sends no server request, so a working hook would look broken.
+- Watch timers ignore captures timestamped before the watch started: a re-scan re-adds old captures to the store.
+- Doctor tests now need real `register()` text (`NODE_BODY` / `EDGE_BODY` from `server-hook.ts`): a bare top-level
+  `await import(...)` fails the placement check.
+- Patch scripts with backticks or `\n` must not go through bash heredocs (they get mangled); use the Edit tool.

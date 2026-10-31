@@ -7,7 +7,6 @@ import { DEFAULT_PORTS, type FlowCheckerConfig, PACKAGE_NAME } from '@flow-check
 import { ts } from 'ts-morph'
 import { ConfigError, findConfigFile, loadConfig } from './config'
 import { checkGraphql } from './graphql'
-import { EDGE_BODY } from './init'
 import { checkPostman } from './postman'
 import { createProgress } from './progress'
 import {
@@ -21,6 +20,7 @@ import {
   readPackageJson,
 } from './project'
 import type { CliIO } from './run'
+import { checkHookFile, EDGE_BODY } from './server-hook'
 
 export interface DoctorCommandOptions {
   root?: string
@@ -341,7 +341,7 @@ function checkHooks(root: string, appDir: string, next: ReturnType<typeof nextVe
       hint: wired ? undefined : 'Run "flow-checker init" to add it.',
     })
   }
-  hook('instrumentation', 'Server hook', 'server')
+  checks.push(serverHookCheck(root, dir))
   hook('instrumentation-client', 'Browser hook', 'client')
   const middleware = checkMiddleware(root, appDir, next)
   if (middleware) checks.push(middleware)
@@ -365,6 +365,28 @@ function checkHooks(root: string, appDir: string, next: ReturnType<typeof nextVe
     })
   }
   return checks
+}
+
+/**
+ * The server hook (M22): the flow-checker block must be the first statement of register(),
+ * outside any condition, or server capture may silently stay off.
+ */
+function serverHookCheck(root: string, dir: string): Check {
+  const name = 'Server hook'
+  const file = findHook(dir, 'instrumentation')
+  if (!file) {
+    return {
+      name,
+      status: 'fail',
+      message: `no ${rel(root, join(dir, 'instrumentation'))}.ts`,
+      hint: 'Run "flow-checker init" to add it.',
+    }
+  }
+  const check = checkHookFile(root, file, 'server')
+  if (check.status === 'missing') {
+    return { name, status: 'fail', message: check.message, hint: 'Run "flow-checker init" to add it.' }
+  }
+  return { name, ...check, status: check.status }
 }
 
 /**
@@ -396,7 +418,12 @@ function checkMiddleware(
     }
   }
   const hook = findHook(hookDir(root, appDir), 'instrumentation')
-  const wired = hook ? readFileSync(hook, 'utf8').includes(`${PACKAGE_NAME}/runtime/edge`) : false
+  const edge = hook ? checkHookFile(root, hook, 'edge') : undefined
+  if (edge && edge.status !== 'missing' && edge.status !== 'ok') {
+    // The edge block is there but misplaced: each block is checked on its own.
+    return { name: 'Middleware', ...edge, status: edge.status }
+  }
+  const wired = edge?.status === 'ok'
   return {
     name: 'Middleware',
     status: wired ? 'ok' : 'warn',

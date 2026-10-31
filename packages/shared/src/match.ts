@@ -130,6 +130,17 @@ export interface VerificationSummary {
   counts: { matched: number; ambiguous: number; unmatched: number; manual: number; thirdParty?: number }
 }
 
+/**
+ * `GET /api/server-capture` and the live feed's `server-capture` event (M22). `missing`: browser
+ * requests reached a route handler that sends requests, but no server capture followed, so the
+ * server hook most likely never ran.
+ */
+export interface ServerCaptureStatus {
+  state: 'waiting' | 'running' | 'missing'
+  /** The browser request that started the wait, e.g. `POST /api/login`. */
+  request?: string
+}
+
 // --- URL and route patterns -----------------------------------------------------------------
 
 function escapeRegex(text: string): string {

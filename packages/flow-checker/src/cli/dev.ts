@@ -21,10 +21,18 @@ import { configExportDirs, writeFormat } from './export'
 import { graphqlForScan } from './graphql'
 import { appOrigins, contractSummary, postmanForScan } from './postman'
 import { createProgress, scanReporter, scanSteps } from './progress'
-import { defaultDevCommand, ensureGitignore, findDashboardDir, hookStatus } from './project'
+import {
+  defaultDevCommand,
+  ensureGitignore,
+  findDashboardDir,
+  findHook,
+  hookDir,
+  hookStatus,
+} from './project'
 import type { CliIO } from './run'
 import { summary } from './scan'
 import { createScanRunner } from './scan-runner'
+import { checkHookFile } from './server-hook'
 
 export interface DevCommandOptions {
   root?: string
@@ -45,6 +53,8 @@ export interface DevCommandOptions {
   watch?: boolean
   /** Called after each re-scan triggered by a file change (tests). */
   onRescan?: (model: AppModel, files: string[]) => void
+  /** How long to wait for a server capture before warning (tests). Default: 10 s. */
+  serverCaptureWaitMs?: number
 }
 
 export interface DevSession {
@@ -180,7 +190,16 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     appPort,
     version,
     port: options.port ?? config.ports?.dashboard ?? DEFAULT_PORTS.dashboard,
-    capture: { store, token, options: captureOptions },
+    capture: {
+      store,
+      token,
+      options: captureOptions,
+      serverCaptureWaitMs: options.serverCaptureWaitMs,
+      onServerCaptureMissing: (status) =>
+        io.err(
+          `Warning: server capture isn't running. Your app answered ${status.request ?? 'a route handler'}, but no server-side request was captured. Run "flow-checker doctor" to check the server hook.`,
+        ),
+    },
     exporter: {
       dirs: { md: shownPath(root, exportDirs.md), html: shownPath(root, exportDirs.html) },
       write: (format, data, { force }) => {
@@ -244,12 +263,19 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   let app: AppProcess | undefined
   let stopped = false
   if (options.app) {
-    const hooks = hookStatus(root, model.project.appDir ? resolve(root, model.project.appDir) : root)
+    const appRoot = model.project.appDir ? resolve(root, model.project.appDir) : root
+    const hooks = hookStatus(root, appRoot)
     if (!hooks.client || !hooks.server) {
       const missing = [!hooks.client && 'browser', !hooks.server && 'server'].filter(Boolean).join(' and ')
       io.err(
         `The ${missing} capture hook is missing, so those requests won't be captured. Run "flow-checker init".`,
       )
+    }
+    // A misplaced server hook (M22) may never run: say so before the app starts.
+    const serverHook = findHook(hookDir(root, appRoot), 'instrumentation')
+    const placement = hooks.server && serverHook ? checkHookFile(root, serverHook, 'server') : undefined
+    if (placement?.status === 'fail') {
+      io.err(`Server hook: ${placement.message}. Run "flow-checker doctor" for the fix.`)
     }
     const command = options.devCommand ?? config.devCommand ?? defaultDevCommand(root)
     io.out(`Starting your app: ${command} (port ${appPort})`)

@@ -22,7 +22,7 @@ M6 matching + verification · M7 flows · M8 type comparison · M9 watch + incre
 M11 public release v0.1.0 · M12 CLI progress output · M13 React Query keys and cache links ·
 M14 middleware / proxy · M15 Postman collection import · M16 tRPC · M17 GraphQL · M18 SSE ·
 M19 WebSockets · M20 release v0.2.0 (published; 0.2.1 followed with scan-accuracy fixes) ·
-M21 Components and Requests screens (branch `feat/m21-components-requests-screens`).
+M21 Components and Requests screens · M22 server hook placement check (branch `feat/m22-server-hook-placement`).
 
-Next: M22 server hook placement check, then M23–M26 for v0.2.2 (see `docs/PLAN.md`, "v0.2.2 milestones").
+Next: M23 dashboard fixes, then M24–M26 for v0.2.2 (see `docs/PLAN.md`, "v0.2.2 milestones").
 Fixes must target code patterns, not the app they were found on.
