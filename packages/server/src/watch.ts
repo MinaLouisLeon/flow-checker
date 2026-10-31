@@ -134,8 +134,12 @@ const RECENT_MS = 10_000
  * started. Recording the hash of files written shortly before the start lets `flush` drop those,
  * since their content didn't change. Files written after the start are left out so an edit made
  * during the initial walk is still reported; older files are skipped to keep start-up cheap.
+ *
+ * `startedAt` is whole milliseconds (`Date.now()`) while `mtimeMs` has a fraction: a file written
+ * earlier in the same millisecond (mtime 1000.4, start 1000) was written before the start. Comparing
+ * the raw values left it out, and its late event came through as an edit (flaky on macOS CI).
  */
-async function seedRecentFiles(
+export async function seedRecentFiles(
   watched: Record<string, string[]>,
   startedAt: number,
   reported: Map<string, string>,
@@ -145,7 +149,8 @@ async function seedRecentFiles(
     paths.map(async (path) => {
       try {
         const info = await stat(path)
-        if (!info.isFile() || info.mtimeMs < startedAt - RECENT_MS || info.mtimeMs >= startedAt) return
+        const writtenAt = Math.floor(info.mtimeMs)
+        if (!info.isFile() || writtenAt < startedAt - RECENT_MS || writtenAt > startedAt) return
         const hash = contentHash(path)
         if (hash !== undefined && !reported.has(path)) reported.set(path, hash)
       } catch {

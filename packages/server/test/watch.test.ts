@@ -1,9 +1,10 @@
 // M9: the file watcher reports source changes in batches and ignores build output and packages.
-import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { isWatched, type WatchBatch, watchProject } from '../src'
+import { seedRecentFiles } from '../src/watch'
 
 const dirs: string[] = []
 afterAll(() => {
@@ -27,6 +28,30 @@ describe('isWatched', () => {
     ['node_modules', false, false],
   ])('%s', (rel, isFile, expected) => {
     expect(isWatched(root, join(root, rel), isFile)).toBe(expected)
+  })
+})
+
+describe('seedRecentFiles', () => {
+  it('counts a file written earlier in the start millisecond as written before the start', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'flow-checker-seed-'))
+    dirs.push(root)
+    const startedAt = Math.floor(Date.now() / 1000) * 1000 - 5_000
+    const at = (ms: number) => new Date(ms)
+    for (const [name, mtime] of [
+      ['same-ms.ts', startedAt + 0.4],
+      ['before.ts', startedAt - 2_000],
+      ['after.ts', startedAt + 1],
+      ['old.ts', startedAt - 60_000],
+    ] as const) {
+      writeFileSync(join(root, name), `export const x = '${name}'\n`)
+      utimesSync(join(root, name), at(mtime), at(mtime))
+    }
+    const reported = new Map<string, string>()
+    await seedRecentFiles({ [root]: ['same-ms.ts', 'before.ts', 'after.ts', 'old.ts'] }, startedAt, reported)
+    expect([...reported.keys()].map((p) => p.slice(root.length + 1)).sort()).toEqual([
+      'before.ts',
+      'same-ms.ts',
+    ])
   })
 })
 
