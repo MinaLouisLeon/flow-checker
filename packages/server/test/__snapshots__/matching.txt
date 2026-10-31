@@ -27,6 +27,52 @@ browser GET localhost:4010/todos
   → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
 browser GET localhost:4010/todos/3
   → matched TodoDetail · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+server GET localhost:4010/users (in GET /users)
+  → matched UsersPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/users
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/todos
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/users/1
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/users/2
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/users/1
+  → ambiguous -
+browser GET localhost:4010/users
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/users/2
+  → ambiguous -
+
+## react-query-v4
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser PATCH localhost:4010/todos/2
+  → matched TodoList · PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser POST localhost:4010/todos
+  → matched AddTodoForm · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos
+  → matched TodoStats · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+browser GET localhost:4010/todos/3
+  → matched TodoDetail · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+server GET localhost:4010/users (in GET /users)
+  → matched UsersPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/users
+  → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser DELETE localhost:4010/users/2
+  → matched UserList · DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
 
 ## server-actions
 server GET localhost:4010/products (in GET /products)
@@ -95,3 +141,227 @@ browser GET localhost:4010/todos
   → matched TodoPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
 browser POST localhost:4010/todos
   → matched TodoPanel · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+
+## middleware
+server GET localhost:4010/products (in GET /shop)
+  → matched ProductsPage · GET {API_URL ?? http://localhost:4010}/products
+server GET localhost:4010/me (in GET /dashboard)
+  → matched middleware · GET {API_URL ?? http://localhost:4010}/me
+server GET localhost:4010/me (in GET /dashboard)
+  → matched middleware · GET {API_URL ?? http://localhost:4010}/me
+server GET localhost:4010/users (in GET /dashboard)
+  → matched DashboardPage · GET {API_URL ?? http://localhost:4010}/users
+server GET localhost:4010/me (in GET /dashboard/settings)
+  → matched middleware · GET {API_URL ?? http://localhost:4010}/me
+server GET localhost:4010/settings (in GET /dashboard/settings)
+  → matched SettingsPage · GET {API_URL ?? http://localhost:4010}/settings
+server GET localhost:4010/me (in GET /dashboard)
+  → matched middleware · GET {API_URL ?? http://localhost:4010}/me
+server GET localhost:4010/users (in GET /dashboard)
+  → matched DashboardPage · GET {API_URL ?? http://localhost:4010}/users
+
+## postman
+server GET localhost:4010/users
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+browser POST localhost:4010/todos
+  → matched TodoPanel · POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+server GET localhost:4010/users/2 (in GET /users/2)
+  → matched UserPage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser DELETE localhost:4010/users/2
+  → matched DeleteUserButton · DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+browser GET localhost:4010/products
+  → matched ProductPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+browser GET localhost:4010/todos
+  → matched TodoPanel · GET http://localhost:4010/todos
+server GET localhost:4010/users (in GET /)
+  → matched HomePage · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+
+## trpc-v10
+browser GET localhost:3077/api/trpc/ping [batch 1/3]
+  → matched HealthBadge · GET /api/trpc/ping
+browser GET localhost:3077/api/trpc/todo.list [batch 2/3]
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/ping,todo.list,user.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/user.list [batch 3/3]
+  → matched UserList · GET /api/trpc/user.list
+server GET localhost:4010/users (in GET /api/trpc/ping,todo.list,user.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users
+browser POST localhost:3077/api/trpc/todo.add
+  → matched AddTodoForm · POST /api/trpc/todo.add
+server POST localhost:4010/todos (in POST /api/trpc/todo.add)
+  → matched POST /api/trpc/[trpc] · POST {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.list
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/todo.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser POST localhost:3077/api/trpc/todo.toggle
+  → matched TodoDetail · POST /api/trpc/todo.toggle
+server PATCH localhost:4010/todos/3 (in POST /api/trpc/todo.toggle)
+  → matched POST /api/trpc/[trpc] · PATCH {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/todo.feed
+  → matched TodoFeed · GET /api/trpc/todo.feed
+server GET localhost:4010/todos (in GET /api/trpc/todo.feed)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.feed
+  → matched TodoFeed · GET /api/trpc/todo.feed
+server GET localhost:4010/todos (in GET /api/trpc/todo.feed)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+
+## trpc
+browser GET localhost:3077/api/trpc/health.ping [batch 1/2]
+  → matched HealthBadge · GET /api/trpc/health.ping
+browser GET localhost:3077/api/trpc/todo.list [batch 2/2]
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/health.ping,todo.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser POST localhost:3077/api/trpc/todo.add
+  → matched AddTodoForm · POST /api/trpc/todo.add
+server POST localhost:4010/todos (in POST /api/trpc/todo.add)
+  → matched POST /api/trpc/[trpc] · POST {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.list
+  → matched TodoList · GET /api/trpc/todo.list
+server GET localhost:4010/todos (in GET /api/trpc/todo.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/user.byId
+  → matched TodoDetail · GET /api/trpc/user.byId
+server GET localhost:4010/users/1 (in GET /api/trpc/user.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users/:id
+browser POST localhost:3077/api/trpc/todo.toggle
+  → matched TodoDetail · POST /api/trpc/todo.toggle
+server PATCH localhost:4010/todos/3 (in POST /api/trpc/todo.toggle)
+  → matched POST /api/trpc/[trpc] · PATCH {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/todo.byId
+  → matched TodoDetail · GET /api/trpc/todo.byId
+server GET localhost:4010/todos/3 (in GET /api/trpc/todo.byId)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/todos/:id
+browser GET localhost:3077/api/trpc/user.list
+  → matched UserList · GET /api/trpc/user.list
+server GET localhost:4010/users (in GET /api/trpc/user.list)
+  → matched GET /api/trpc/[trpc] · GET {API_URL ?? http://localhost:4010}/users
+
+## graphql-apollo
+browser POST localhost:3077/api/graphql [Viewer 1/2]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos 2/2]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todo]
+  → matched TodoView · POST /api/graphql
+browser POST localhost:3077/api/graphql [ToggleTodo]
+  → matched TodoView · POST /api/graphql
+browser POST localhost:3077/api/graphql [Search]
+  → matched UserSearch · POST /api/graphql
+browser POST localhost:3077/api/graphql [Users]
+  → matched UserSearch · POST /api/graphql
+
+## graphql-apollo-v3
+browser POST localhost:3077/api/graphql [Todos persisted]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Viewer persisted]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Viewer]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo persisted]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [Viewer persisted]
+  → matched ViewerBadge · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todos persisted]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todo persisted]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [Todo]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [DeleteTodo persisted]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [DeleteTodo]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [Search persisted]
+  → matched Search · POST /api/graphql
+browser POST localhost:3077/api/graphql [Search]
+  → matched Search · POST /api/graphql
+
+## graphql-urql
+browser GET localhost:3077/api/graphql [Todos]
+  → matched TodoList · GET /api/graphql
+browser POST localhost:3077/api/graphql [AddTodo]
+  → matched AddTodoForm · POST /api/graphql
+browser GET localhost:3077/api/graphql [Todos]
+  → matched TodoList · GET /api/graphql
+browser GET localhost:3077/api/graphql [Todo]
+  → matched TodoDetail · GET /api/graphql
+browser POST localhost:3077/api/graphql [ToggleTodo]
+  → matched TodoDetail · POST /api/graphql
+browser GET localhost:3077/api/graphql [Todo]
+  → matched TodoDetail · GET /api/graphql
+browser GET localhost:3077/api/graphql [Users]
+  → matched UserList · GET /api/graphql
+
+## graphql-relay
+browser POST localhost:3077/api/graphql [TodoListQuery persisted]
+  → matched TodoList · POST /api/graphql
+browser POST localhost:3077/api/graphql [AddTodoFormMutation persisted]
+  → matched AddTodoForm · POST /api/graphql
+browser POST localhost:3077/api/graphql [TodoDetailQuery persisted]
+  → matched TodoPage · POST /api/graphql
+browser POST localhost:3077/api/graphql [TodoDetailToggleMutation persisted]
+  → matched TodoDetail · POST /api/graphql
+browser POST localhost:3077/api/graphql [UserListQuery persisted]
+  → matched UserList · POST /api/graphql
+
+## sse
+browser GET localhost:3077/api/clock
+  → matched Clock · GET /api/clock?count=3
+browser GET localhost:3077/api/clock
+  → matched Clock · GET /api/clock?count=3
+browser GET localhost:3077/api/jobs/7/progress
+  → matched JobProgress · GET /api/jobs/:id/progress
+browser POST localhost:3077/api/chat
+  → matched Chat · POST /api/chat
+
+## websocket
+browser GET localhost:4011/live
+  → matched Ticker · GET ws://localhost:4011/live
+browser GET localhost:4011/live
+  → matched Ticker · GET ws://localhost:4011/live
+browser GET localhost:4011/echo
+  → matched Ping · GET ws://localhost:4011/echo
+browser GET localhost:4011/socket.io/
+  → matched Chat · GET http://localhost:4011/socket.io/
+browser GET localhost:4011/socket.io/
+  → matched Chat · GET http://localhost:4011/socket.io/

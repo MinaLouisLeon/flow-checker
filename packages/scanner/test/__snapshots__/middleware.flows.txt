@@ -1,0 +1,28 @@
+# Navigation
+
+## DashboardPage  app/dashboard/page.tsx
+link /dashboard/settings -> /dashboard/settings  event onClick
+
+## RootLayout  app/layout.tsx
+link / -> /  event onClick
+link /dashboard -> /dashboard  event onClick
+link /shop -> /products  event onClick
+
+## HomePage  app/page.tsx
+link /login -> /login  event onClick
+
+## middleware  proxy.ts
+permanent-redirect / -> /  middleware
+  from: (no page)  path /old-home
+redirect /dashboard -> /dashboard  middleware
+  from: /login  path /login
+redirect /login -> /login  middleware
+  from: /dashboard, /dashboard/settings
+  if: !token
+redirect /login?expired=1 -> /login  middleware
+  from: /dashboard, /dashboard/settings
+  if: token && !user
+
+# Flows
+
+(none)

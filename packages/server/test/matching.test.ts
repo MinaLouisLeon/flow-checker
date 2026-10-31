@@ -2,13 +2,32 @@
 // The captures are real: recorded from each fixture app with scripts/record-captures.mjs.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { applyPostman, importLocalPostman } from '@flow-checker/postman'
 import { scanProject } from '@flow-checker/scanner'
 import { type AppModel, type Capture, type CaptureMatch, urlText } from '@flow-checker/shared'
 import { describe, expect, it } from 'vitest'
 import type { ServerActionInfo } from '../src/actions'
 import { Matcher } from '../src/matcher'
 
-const FIXTURES = ['basic', 'react-query', 'server-actions', 'bff', 'next-intl', 'mismatch']
+const FIXTURES = [
+  'basic',
+  'react-query',
+  'react-query-v4',
+  'server-actions',
+  'bff',
+  'next-intl',
+  'mismatch',
+  'middleware',
+  'postman',
+  'trpc-v10',
+  'trpc',
+  'graphql-apollo',
+  'graphql-apollo-v3',
+  'graphql-urql',
+  'graphql-relay',
+  'sse',
+  'websocket',
+]
 const repo = join(import.meta.dirname, '..', '..', '..')
 
 interface Recording {
@@ -21,7 +40,23 @@ function load(fixture: string) {
   const recording = JSON.parse(
     readFileSync(join(import.meta.dirname, 'recordings', `${fixture}.json`), 'utf8'),
   ) as Recording
-  const model = scanProject({ root: join(repo, 'fixtures', fixture) })
+  const root = join(repo, 'fixtures', fixture)
+  const scanned = scanProject({ root })
+  // The CLI checks each scan against the configured Postman collection (M15). Recorded on port 3077.
+  const model =
+    fixture === 'postman'
+      ? applyPostman(
+          scanned,
+          importLocalPostman({
+            root,
+            config: {
+              collection: 'postman/collections/Fixture API',
+              environment: 'postman/environments/local.yaml',
+            },
+          }),
+          { appOrigins: ['http://localhost:3077'] },
+        )
+      : scanned
   return { recording, model }
 }
 
@@ -35,13 +70,22 @@ function replay(model: AppModel, recording: Recording, degrade?: { noStack?: boo
   for (const original of ordered) {
     const capture = degrade?.noStack ? { ...original, stack: [] } : original
     const parentId = capture.origin === 'server' ? capture.parent?.captureId : undefined
+    // A tRPC batch was split into pieces (M16): the hop's parent is one of them.
+    const parents = !parentId
+      ? []
+      : matches.has(parentId)
+        ? [matches.get(parentId)]
+        : recording.captures.filter((c) => c.procedure?.batch?.id === parentId).map((c) => matches.get(c.id))
     matches.set(
       capture.id,
-      matcher.match(capture, {
-        frames: degrade?.noStack ? [] : (capture.sourceStack ?? []),
-        resolveAction: (id) => (degrade?.noActions ? undefined : recording.actions[id]),
-        parentMatch: parentId ? matches.get(parentId) : undefined,
-      }),
+      matcher.matchWithParents(
+        capture,
+        {
+          frames: degrade?.noStack ? [] : (capture.sourceStack ?? []),
+          resolveAction: (id) => (degrade?.noActions ? undefined : recording.actions[id]),
+        },
+        parents,
+      ),
     )
   }
   return matches
@@ -52,7 +96,13 @@ function label(model: AppModel, siteId: string | undefined): string {
   if (!site) return '-'
   const component = model.components.find((c) => c.id === site.componentId)
   const route = model.routes.find((r) => r.id === site.routeId)
-  const owner = component?.name ?? (route ? `${site.handlerMethod} ${route.path}` : site.serverAction?.name)
+  const owner =
+    component?.name ??
+    (route
+      ? `${site.handlerMethod} ${route.path}`
+      : site.origin === 'middleware'
+        ? 'middleware'
+        : site.serverAction?.name)
   const target =
     site.transport === 'server-action'
       ? `action ${site.serverAction?.name}`
@@ -64,7 +114,13 @@ function label(model: AppModel, siteId: string | undefined): string {
 
 function describeCapture(c: Capture): string {
   const url = new URL(c.request.url)
-  const action = c.serverAction ? ` [action]` : ''
+  const action = c.serverAction
+    ? ` [action]`
+    : c.procedure?.batch
+      ? ` [batch ${c.procedure.batch.index + 1}/${c.procedure.batch.size}]`
+      : c.operation
+        ? ` [${c.operation.name ?? `#${c.operation.hash?.slice(0, 8)}`}${c.operation.batch ? ` ${c.operation.batch.index + 1}/${c.operation.batch.size}` : ''}${c.operation.persisted ? ' persisted' : ''}]`
+        : ''
   const parent = c.parent ? ` (in ${c.parent.method} ${new URL(c.parent.url, url).pathname})` : ''
   return `${c.origin} ${c.request.method} ${url.host}${url.pathname}${action}${parent}`
 }

@@ -1,6 +1,6 @@
 {
   "name": "@integr8-media/flow-checker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Map a Next.js App Router project: pages, components, requests, types and flows, verified against live traffic and exported as documentation.",
   "keywords": [
     "nextjs",
@@ -46,6 +46,10 @@
       "types": "./dist/runtime-server.d.ts",
       "default": "./dist/runtime-server.js"
     },
+    "./runtime/edge": {
+      "types": "./dist/runtime-edge.d.ts",
+      "default": "./dist/runtime-edge.js"
+    },
     "./next": {
       "import": {
         "types": "./dist/next.d.ts",
@@ -86,6 +90,7 @@
   "devDependencies": {
     "@flow-checker/dashboard": "workspace:*",
     "@flow-checker/exporter": "workspace:*",
+    "@flow-checker/postman": "workspace:*",
     "@flow-checker/runtime": "workspace:*",
     "@flow-checker/scanner": "workspace:*",
     "@flow-checker/server": "workspace:*",
@@ -96,8 +101,10 @@
     "@hono/node-server": "catalog:",
     "@jridgewell/trace-mapping": "catalog:",
     "chokidar": "catalog:",
+    "graphql": "catalog:",
     "hono": "catalog:",
     "ts-morph": "catalog:",
+    "yaml": "catalog:",
     "zod": "catalog:"
   }
 }

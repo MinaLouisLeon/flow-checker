@@ -25,9 +25,9 @@ Takes no props.
 
 | Request | Trigger | From | Status |
 | --- | --- | --- | --- |
-| [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_21j0fo1p54x) | event onSubmit | [`AddTodoForm`]() | ✓ verified (1 capture) |
+| [`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`](#req_1ybk9xw63lt) | event onSubmit | [`AddTodoForm`]() | ✓ verified (1 capture) |
 
-### <a id="req_21j0fo1p54x"></a>`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
+### <a id="req_1ybk9xw63lt"></a>`POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos`
 
 |  |  |
 | --- | --- |
@@ -50,7 +50,7 @@ Takes no props.
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `POST http://localhost:4010/todos` → 201 Created · 10 ms · 2026-10-28 10:56 UTC · page `/`
+**Captured** `POST http://localhost:4010/todos` → 201 Created · 9 ms · 2026-10-30 01:38 UTC · page `/`
 
 Request body:
 

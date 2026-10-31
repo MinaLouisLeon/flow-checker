@@ -14,9 +14,20 @@ link /todos/:id -> /todos/[id]  event onClick  conditional
 ## AddTodoForm submit  (/ -> /todos/[id])
 1. AddTodoForm onSubmit on /
 2. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
-3. push -> /todos/[id]
-4. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+3. invalidateQueries ['todos'] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos, GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+4. push -> /todos/[id]
+5. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
 
 ## TodoList change  (/)
 1. TodoList onChange on /
 2. PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
+3. setQueryData ['todos', 'detail', :id]
+4. invalidateQueries ['todos', 'list'] -> GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos, GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId
+
+## UserList mouseenter  (/users)
+1. UserList onMouseEnter on /users
+2. GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+
+## UserList click  (/users)
+1. UserList onClick on /users
+2. GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id

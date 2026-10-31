@@ -157,3 +157,59 @@ describe('flow-checker doctor', () => {
     expect(checks['Dashboard port']).toMatchObject({ status: 'warn', message: `${port} is in use` })
   })
 })
+
+describe('flow-checker doctor: middleware (M14)', () => {
+  const base = (next: string, files: Record<string, string>) =>
+    project({
+      'package.json': JSON.stringify({ scripts: { dev: 'next dev' } }),
+      'src/app/page.tsx': '',
+      'src/instrumentation-client.ts': CLIENT,
+      ...installed(next),
+      ...files,
+    })
+  const EDGE = "await import('@integr8-media/flow-checker/runtime/edge')\n"
+
+  it('has no middleware check without a middleware file', async () => {
+    const root = base('16.1.0', { 'src/instrumentation.ts': SERVER })
+    expect(byName(await runDoctor({ root, ...(await freePorts()) })).Middleware).toBeUndefined()
+  })
+
+  it('is fine with proxy.ts on Next 16 (Node.js runtime)', async () => {
+    const root = base('16.1.0', {
+      'src/instrumentation.ts': SERVER,
+      'src/proxy.ts': 'export function proxy() {}\n',
+    })
+    const check = byName(await runDoctor({ root, ...(await freePorts()) })).Middleware
+    expect(check?.status).toBe('ok')
+    expect(check?.message).toContain('src/proxy.ts runs on Node.js')
+  })
+
+  it('warns about proxy.ts before Next 16', async () => {
+    const root = base('15.5.0', {
+      'src/instrumentation.ts': SERVER,
+      'src/proxy.ts': 'export function proxy() {}\n',
+    })
+    const check = byName(await runDoctor({ root, ...(await freePorts()) })).Middleware
+    expect(check?.status).toBe('warn')
+    expect(check?.message).toBe("Next.js 15.5.0 doesn't run src/proxy.ts")
+  })
+
+  it('asks for the edge hook for middleware.ts on the edge runtime', async () => {
+    const files = { 'src/middleware.ts': 'export function middleware() {}\n' }
+    const missing = base('15.5.0', { ...files, 'src/instrumentation.ts': SERVER })
+    const check = byName(await runDoctor({ root: missing, ...(await freePorts()) })).Middleware
+    expect(check?.status).toBe('warn')
+    expect(check?.hint).toContain('registerEdgeRuntime(process.env.FLOW_CHECKER_RUNTIME)')
+
+    const wired = base('15.5.0', { ...files, 'src/instrumentation.ts': SERVER + EDGE })
+    expect(byName(await runDoctor({ root: wired, ...(await freePorts()) })).Middleware?.status).toBe('ok')
+
+    const node = base('15.5.0', {
+      'src/middleware.ts': "export function middleware() {}\nexport const config = { runtime: 'nodejs' }\n",
+      'src/instrumentation.ts': SERVER,
+    })
+    const onNode = byName(await runDoctor({ root: node, ...(await freePorts()) })).Middleware
+    expect(onNode?.status).toBe('ok')
+    expect(onNode?.message).toContain('runs on Node.js')
+  })
+})

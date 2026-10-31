@@ -1,0 +1,41 @@
+# Route tree
+
+src/app [layout, page]
+├─ todos
+│  └─ [id] (dynamic) [page]
+└─ users [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/todos/[id]  page  src/app/todos/[id]/page.tsx
+/users  page  src/app/users/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:6
+└─ Providers  client (use client)  src/app/providers.tsx:6
+   └─ QueryClientProvider  external @tanstack/react-query
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+TodosPage  server  src/app/page.tsx:5
+├─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:9
+├─ TodoList  client (use client)  src/components/TodoList.tsx:9
+│  └─ Link  external next/link  [conditional]
+└─ TodoStats  client (use client)  src/components/TodoStats.tsx:9
+
+## /todos/[id]  src/app/todos/[id]/page.tsx
+layouts: src/app/layout.tsx
+TodoPage  server  src/app/todos/[id]/page.tsx:3
+└─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:8
+   └─ Link  external next/link  [conditional]
+
+## /users  src/app/users/page.tsx
+layouts: src/app/layout.tsx
+UsersPage  server  src/app/users/page.tsx:7
+├─ HydrateClient  client (use client)  src/components/HydrateClient.tsx:6
+│  └─ Hydrate  external @tanstack/react-query
+└─ UserList  client (use client)  src/components/UserList.tsx:7

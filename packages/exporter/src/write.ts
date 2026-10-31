@@ -25,6 +25,8 @@ export interface WriteOptions {
   generatedAt: string
   /** Write into a folder that has other files and no manifest. */
   force?: boolean
+  /** Called after each file is written (CLI progress output). */
+  onFile?: (done: number, total: number) => void
 }
 
 /** Writes the files to `dir`, replacing the previous export there. Returns the paths written. */
@@ -50,10 +52,12 @@ export function writeExport(dir: string, files: OutputFiles, options: WriteOptio
     removeEmptyParents(dir, dirname(join(dir, old)))
   }
 
+  let written = 0
   for (const name of names) {
     const file = join(dir, name)
     mkdirSync(dirname(file), { recursive: true })
     writeFileSync(file, files[name] as string | Uint8Array)
+    options.onFile?.(++written, names.length)
   }
   const manifest: Manifest = {
     version: 1,

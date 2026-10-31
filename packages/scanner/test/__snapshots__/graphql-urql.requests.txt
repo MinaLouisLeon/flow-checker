@@ -1,0 +1,63 @@
+# Requests
+
+## AddTodoForm  src/components/AddTodoForm.tsx:16
+POST /api/graphql  graphql useMutation  event onSubmit
+  operation: AddTodo (mutation)
+  body: AddTodoMutationVariables
+  response: AddTodoMutation
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/AddTodoForm.tsx:19
+
+## TodoDetail  src/components/TodoDetail.tsx:30
+GET /api/graphql  graphql useQuery  page-load
+  operation: Todo (query)
+  body: TodoQueryVariables
+  response: TodoQuery
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/TodoDetail.tsx:31
+POST /api/graphql  graphql useMutation  event onClick
+  operation: ToggleTodo (mutation)
+  body: ToggleTodoMutationVariables
+  response: ToggleTodoMutation
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/TodoDetail.tsx:32
+
+## TodoList  src/components/TodoList.tsx:17
+GET /api/graphql  graphql useQuery  page-load
+  operation: Todos (query)
+  body: TodosQueryVariables
+  response: TodosQuery
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/TodoList.tsx:18
+
+## UserList  src/components/UserList.tsx:16
+GET /api/graphql  graphql client.query  event onClick
+  operation: Users (query)
+  response: UsersQuery
+  handled by: src/app/api/graphql/route.ts
+  via: client.query src/components/UserList.tsx:21
+
+# GraphQL
+
+endpoint: /api/graphql
+client: urql /api/graphql (GET queries)  src/lib/urql.ts:5
+schema: file schema.graphql, 7 types
+
+mutation AddTodo  tag  1 caller(s)  types: schema  src/components/AddTodoForm.tsx:7
+  variables: AddTodoMutationVariables
+  data: AddTodoMutation
+
+query Todo  tag  1 caller(s)  types: schema  src/components/TodoDetail.tsx:5
+  variables: TodoQueryVariables
+  data: TodoQuery
+
+mutation ToggleTodo  tag  1 caller(s)  types: schema  src/components/TodoDetail.tsx:20
+  variables: ToggleTodoMutationVariables
+  data: ToggleTodoMutation
+
+query Todos  tag  1 caller(s)  types: schema  src/components/TodoList.tsx:7
+  variables: TodosQueryVariables
+  data: TodosQuery
+
+query Users  tag  1 caller(s)  types: schema  src/components/UserList.tsx:6
+  data: UsersQuery

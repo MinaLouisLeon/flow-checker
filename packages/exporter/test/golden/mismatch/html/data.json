@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "mismatch",
   "model": {
-    "version": 1,
+    "version": 8,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -565,7 +565,8 @@
           "rt_12v7saiyoj2"
         ]
       }
-    ]
+    ],
+    "queryLinks": []
   },
   "verification": {
     "sites": {

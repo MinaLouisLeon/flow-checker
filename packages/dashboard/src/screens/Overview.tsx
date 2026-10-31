@@ -1,8 +1,13 @@
 import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
+import { GraphqlSection } from '../GraphqlView'
 import type { NoteKind, ScanNote } from '../model-index'
+import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
+import { SocketsSection } from '../SocketView'
+import { StreamsSection } from '../SseView'
+import { TrpcSection } from '../TrpcView'
 import { Empty, Section, SourceLink } from '../ui'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
@@ -12,6 +17,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
   request: 'Requests the scan could not fully resolve',
+  middleware: 'Middleware the scan could not fully read',
 }
 
 export function Overview() {
@@ -32,6 +38,8 @@ export function Overview() {
   const serverHops = model.requests.length - clientRequests.length
   const verified = model.requests.filter(isVerified).length
   const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
+  // Postman flags get their own section below, not the generic "could not resolve" group.
+  const notes = index.notes.filter((n) => !isPostmanNote(n, index))
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
@@ -121,13 +129,21 @@ export function Overview() {
         )}
       </Section>
 
-      <Section title="To check" aside={<span className="count">{index.notes.length}</span>}>
-        {index.notes.length === 0 ? (
+      <Section title="To check" aside={<span className="count">{notes.length}</span>}>
+        {notes.length === 0 ? (
           <Empty>The scan resolved every page, component, type and request.</Empty>
         ) : (
-          <NoteGroups notes={index.notes} />
+          <NoteGroups notes={notes} />
         )}
       </Section>
+
+      <PostmanSection index={index} />
+
+      <TrpcSection index={index} />
+
+      <GraphqlSection index={index} />
+      <StreamsSection index={index} />
+      <SocketsSection index={index} />
 
       <Section title="Pages">
         <ul className="list">

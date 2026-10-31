@@ -1,17 +1,25 @@
 // Scores a capture against every scanned request site (docs/PLAN.md 8).
 // Each site first has to be possible at all (same side, method, URL, server action, route
 // handler). Then evidence adds points, and the best site wins if it is clearly ahead.
+
+import { parseTrpcUrl } from '@flow-checker/runtime/trpc'
 import {
   type AppModel,
   type Capture,
   type CaptureMatch,
   type Component,
+  formatQueryKey,
   generalizePath,
+  isOpenKey,
   type MatchCandidate,
   type MatchEvidence,
+  type Middleware,
   matchRequestUrl,
+  middlewareRunsOn,
+  queryKeyMatchesValue,
   type RequestSite,
   routePathRegex,
+  servedPaths,
 } from '@flow-checker/shared'
 import { type ServerActionInfo, sameSourceFile } from './actions'
 import { type SourceFrame, shortName } from './stack'
@@ -48,6 +56,26 @@ const GENERIC_CALLEES = new Set([
   'useLayoutEffect',
   'mutate',
   'mutateAsync',
+  'query',
+  'mutation',
+  'queryOptions',
+  'mutationOptions',
+  // GraphQL clients (M17): their own frames carry these names too.
+  'useLazyQuery',
+  'useSubscription',
+  'useBackgroundQuery',
+  'useLazyLoadQuery',
+  'useQueryLoader',
+  'usePreloadedQuery',
+  'useFragment',
+  'commitMutation',
+  'fetchQuery',
+  'loadQuery',
+  'executeQuery',
+  'executeMutation',
+  'client.query',
+  'client.mutate',
+  'client.mutation',
 ])
 
 /** DOM events that fit each trigger event prop. */
@@ -96,20 +124,53 @@ export interface MatchContext {
 export class Matcher {
   private readonly sites: SiteInfo[]
   private readonly siteIds: Set<string>
+  private readonly middleware: Middleware | undefined
+  private readonly trpcEndpoints: string[]
+  /** GraphQL operation id -> its persisted query ids (M17). */
+  private readonly graphqlHashes: Map<string, string[]>
 
   constructor(model: AppModel) {
     this.sites = indexSites(model)
     this.siteIds = new Set(model.requests.map((s) => s.id))
+    this.middleware = model.middleware
+    this.trpcEndpoints = model.trpc ? [model.trpc.endpoint] : []
+    this.graphqlHashes = new Map((model.graphql?.operations ?? []).map((o) => [o.id, o.hashes]))
   }
 
   hasSite(id: string): boolean {
     return this.siteIds.has(id)
   }
 
+  /**
+   * A server hop whose browser request was a tRPC batch split into pieces (M16): it belongs to
+   * the piece whose site leads to it, so each piece's match is tried as the parent and the best
+   * result kept.
+   */
+  matchWithParents(
+    capture: Capture,
+    context: MatchContext,
+    parents: (CaptureMatch | undefined)[],
+  ): CaptureMatch {
+    if (parents.length <= 1) return this.match(capture, { ...context, parentMatch: parents[0] })
+    let best: CaptureMatch | undefined
+    for (const parentMatch of parents) {
+      const match = this.match(capture, { ...context, parentMatch })
+      if (!best || rank(match) > rank(best)) best = match
+    }
+    return best as CaptureMatch
+  }
+
   match(capture: Capture, context: MatchContext): CaptureMatch {
     const candidates: MatchCandidate[] = []
+    const parentUrl = capture.origin === 'server' ? capture.parent?.url : undefined
+    const scoring: Scoring = {
+      middleware: this.middleware,
+      fromMiddleware: capture.origin === 'server' && fromMiddleware(capture, context, this.middleware),
+      trpcParent: parentUrl ? parseTrpcUrl(parentUrl, { endpoints: this.trpcEndpoints })?.paths : undefined,
+      graphqlHashes: this.graphqlHashes,
+    }
     for (const info of this.sites) {
-      const evidence = scoreSite(info, capture, context)
+      const evidence = scoreSite(info, capture, context, scoring)
       if (!evidence) continue
       const score = evidence.reduce((sum, e) => sum + e.points, 0)
       candidates.push({ siteId: info.site.id, score, evidence })
@@ -139,8 +200,37 @@ export class Matcher {
   }
 }
 
+/** Facts about the capture that every site's score uses. */
+interface Scoring {
+  middleware: Middleware | undefined
+  /** The server capture was sent from middleware code (M14). */
+  fromMiddleware: boolean
+  /** Server capture made while a tRPC request ran: the procedures that request called (M16). */
+  trpcParent: string[] | undefined
+  /** GraphQL operation id -> persisted query ids (M17). */
+  graphqlHashes: Map<string, string[]>
+}
+
+/** Next runs middleware / proxy through its web adapter, on the edge and on Node.js. */
+const MIDDLEWARE_FRAME = /[\\/]next[\\/]dist[\\/](esm[\\/])?server[\\/]web[\\/](adapter|sandbox)/
+
+/** A source-mapped frame in the middleware file, or Next's middleware adapter on the stack. */
+function fromMiddleware(
+  capture: Capture,
+  context: MatchContext,
+  middleware: Middleware | undefined,
+): boolean {
+  if (middleware && context.frames.some((f) => f.file === middleware.file)) return true
+  return capture.stack.some((line) => MIDDLEWARE_FRAME.test(line))
+}
+
 /** Evidence for one site, or `undefined` when the site cannot have sent this capture. */
-function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): MatchEvidence[] | undefined {
+function scoreSite(
+  info: SiteInfo,
+  capture: Capture,
+  context: MatchContext,
+  scoring: Scoring,
+): MatchEvidence[] | undefined {
   const { site } = info
   const evidence: MatchEvidence[] = []
   const add = (signal: MatchEvidence['signal'], points: number, detail?: string) =>
@@ -150,7 +240,8 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
 
   if (info.side !== 'any' && info.side !== capture.origin) return undefined
   const method = capture.request.method.toUpperCase()
-  if (site.method && site.method !== method) return undefined
+  // GraphQL clients send queries as GET or POST depending on setup (and persisted query retries).
+  if (site.method && site.method !== method && site.transport !== 'graphql') return undefined
 
   const browserAction = capture.origin === 'browser' ? capture.serverAction?.id : undefined
   if ((site.transport === 'server-action') !== Boolean(browserAction)) return undefined
@@ -185,8 +276,103 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
     if (!parent) return undefined
     if (info.handler.method && parent.method.toUpperCase() !== info.handler.method) return undefined
     const handled = pathOf(parent.url)
-    if (handled === undefined || !info.handler.path.test(handled)) return undefined
+    const served = handled === undefined ? [] : servedPaths(scoring.middleware, handled)
+    if (!served.some((p) => info.handler?.path.test(p))) return undefined
     add('route', 40, `in ${parent.method} ${handled}`)
+  }
+
+  // Middleware (M14): it only runs on requests its matcher selects.
+  if (site.origin === 'middleware') {
+    const requested = pathOf(parent?.url)
+    const runs =
+      scoring.middleware && requested !== undefined
+        ? middlewareRunsOn(scoring.middleware, requested)
+        : undefined
+    if (runs === 'no' && !scoring.fromMiddleware) return undefined
+    if (runs === 'yes' || runs === 'conditional')
+      add('middleware', runs === 'yes' ? 20 : 10, `runs on ${requested}`)
+    if (scoring.fromMiddleware) add('middleware', 30, 'sent from middleware')
+  } else if (scoring.fromMiddleware) {
+    add('middleware', -30, 'sent from middleware, the site is not')
+  }
+
+  // tRPC (M16): the procedure a call (or the batch a server hop ran in) was for.
+  const called = capture.procedure
+  if (called && site.transport === 'trpc') {
+    if (site.procedure && site.procedure.path !== called.path) return undefined
+    add('trpc-procedure', 20, called.path)
+  } else if (called) {
+    add('trpc-procedure', -20, `a call to ${called.path}, the site is not tRPC`)
+  }
+  if (site.origin === 'route-handler' && site.procedure && scoring.trpcParent) {
+    // Runs in a procedure's resolver: that procedure must be one the incoming request called.
+    if (!scoring.trpcParent.includes(site.procedure.path)) return undefined
+    add('trpc-procedure', scoring.trpcParent.length === 1 ? 30 : 15, `in ${site.procedure.path}`)
+  }
+
+  // GraphQL (M17): every operation goes to the same URL, so the operation decides.
+  const sent = capture.operation
+  if (site.transport === 'graphql') {
+    const op = site.operation
+    if (!sent) {
+      add('graphql-operation', -20, 'no GraphQL operation in the request')
+    } else if (op) {
+      if (sent.type && sent.type !== op.type) return undefined
+      const byHash = !!sent.hash && !!scoring.graphqlHashes.get(op.id)?.includes(sent.hash)
+      if (sent.name !== undefined && op.name && sent.name !== op.name && !byHash) return undefined
+      if (sent.name && sent.name === op.name) add('graphql-operation', 40, op.name)
+      else if (byHash) add('graphql-operation', 40, `${op.name} (persisted id)`)
+      else if (sent.hash && !sent.name && hashIsKnown(scoring.graphqlHashes, sent.hash)) return undefined
+    }
+  } else if (sent) {
+    add('graphql-operation', -20, `a GraphQL ${sent.type ?? 'operation'}, the site is not GraphQL`)
+  }
+
+  // Event streams (M18): `new EventSource()` only comes from an EventSource site, and the event
+  // names received tell sites on the same URL apart.
+  const streamed = !!capture.stream || capture.transport === 'eventsource'
+  if (site.transport === 'sse') {
+    const api = site.stream?.api
+    const eventSource = capture.transport === 'eventsource'
+    if (!streamed) {
+      add('stream', -15, 'not an event stream')
+    } else if (api && (api === 'event-source') !== eventSource) {
+      return undefined
+    } else {
+      add('stream', 10, eventSource ? 'EventSource' : 'streamed fetch')
+      const received = new Set((capture.messages ?? []).map((m) => m.event ?? 'message'))
+      const listened = new Set(site.stream?.events.filter((e) => e.listened).map((e) => e.name))
+      if (received.size > 0 && listened.size > 0) {
+        const hits = [...received].filter((name) => listened.has(name))
+        if (hits.length === received.size) add('stream', 10, `listens to ${hits.join(', ')}`)
+        else if (hits.length === 0) add('stream', -10, `doesn't listen to ${[...received].join(', ')}`)
+      }
+    }
+  } else if (capture.transport === 'eventsource') {
+    return undefined
+  }
+
+  // WebSockets (M19): a WebSocket capture only comes from a WebSocket site, socket.io frames only
+  // from a socket.io site, and socket.io event names tell sites on the same URL apart.
+  const socketCapture = capture.transport === 'websocket'
+  if (site.transport === 'websocket') {
+    if (!socketCapture) return undefined
+    const api = site.socket?.api
+    if (api && (api === 'socket.io') !== !!capture.stream?.socketIo) return undefined
+    add('socket', 10, api === 'socket.io' ? 'socket.io' : 'WebSocket')
+    if (api === 'socket.io') {
+      const label = (direction: string, name: string) =>
+        `${direction === 'out' ? 'sends' : 'receives'} ${name}`
+      const seen = new Set((capture.messages ?? []).map((m) => label(m.direction, m.event ?? 'message')))
+      const known = new Set(site.socket?.messages.map((m) => label(m.direction, m.name)))
+      if (seen.size > 0 && known.size > 0) {
+        const hits = [...seen].filter((name) => known.has(name))
+        if (hits.length === seen.size) add('socket', 10, hits.join(', '))
+        else if (hits.length === 0) add('socket', -10, `doesn't use ${[...seen].join(', ')}`)
+      }
+    }
+  } else if (socketCapture) {
+    return undefined
   }
 
   if (site.origin === 'server-action' && info.action) {
@@ -231,7 +417,9 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
   }
 
   const routePath = capture.origin === 'browser' ? pathOf(capture.pageUrl) : parent && pathOf(parent.url)
-  if (routePath !== undefined && info.routes.some((r) => r.test(routePath))) {
+  // A rewritten path is answered by another route (M14).
+  const served = routePath === undefined ? [] : servedPaths(scoring.middleware, routePath)
+  if (routePath !== undefined && info.routes.some((r) => served.some((p) => r.test(p)))) {
     add('route', site.trigger.kind === 'server-render' ? 25 : 15, routePath)
   }
 
@@ -241,13 +429,51 @@ function scoreSite(info: SiteInfo, capture: Capture, context: MatchContext): Mat
   const trigger = site.trigger
   if (trigger.kind === 'event') {
     const types = trigger.event ? EVENT_TYPES[trigger.event] : undefined
-    if (!interaction) add('trigger', -10, `no interaction for ${trigger.event ?? 'event'}`)
+    // The runtime records clicks, submits, changes and Enter: hover or focus leaves no interaction.
+    const untracked =
+      !!trigger.event && !types && /^on(Mouse|Pointer|Focus|Blur|Scroll|Touch)/.test(trigger.event)
+    if (untracked) {
+      if (!interaction) add('trigger', 5, `${trigger.event} is not recorded`)
+    } else if (!interaction) add('trigger', -10, `no interaction for ${trigger.event ?? 'event'}`)
     else if (!types || types.includes(interaction.type)) add('trigger', 10, `${interaction.type} event`)
   } else if ((trigger.kind === 'page-load' || trigger.kind === 'effect') && !interaction) {
     add('trigger', 5, trigger.kind)
   }
 
+  // React Query (M13): the key the browser request was sent for.
+  const query = capture.origin === 'browser' ? capture.query : undefined
+  if (query) {
+    const siteKind = site.hook?.name === 'useMutation' ? 'mutation' : site.queryKey ? 'query' : undefined
+    if (!site.hook) {
+      add('query-key', -10, `sent by a React Query ${query.kind}, not from a query hook here`)
+    } else if (siteKind && siteKind !== query.kind) {
+      add('query-key', -15, `sent by a ${query.kind}, the site is a ${siteKind}`)
+    } else if (site.procedure && query.key) {
+      // tRPC keys start with the procedure path: `[['todo', 'list'], { input, type }]`.
+      const first = query.key[0]
+      const path = Array.isArray(first) ? first.join('.') : undefined
+      if (path === site.procedure.path) add('query-key', 10, path)
+    } else if (site.queryKey && query.key) {
+      const text = formatQueryKey(site.queryKey)
+      if (!queryKeyMatchesValue(site.queryKey, query.key)) add('query-key', -30, `key is not ${text}`)
+      // A key with no fixed part fits any query, so it tells little.
+      else add('query-key', isOpenKey(site.queryKey) ? 10 : 45, text)
+    }
+  }
+
   return evidence
+}
+
+/** Whether some operation has this persisted id (then a site with another operation is ruled out). */
+function hashIsKnown(hashes: Map<string, string[]>, hash: string): boolean {
+  for (const list of hashes.values()) if (list.includes(hash)) return true
+  return false
+}
+
+/** Matched beats ambiguous beats unmatched; then the higher score. */
+function rank(match: CaptureMatch): number {
+  const status = match.status === 'matched' ? 2 : match.status === 'ambiguous' ? 1 : 0
+  return status * 100_000 + match.score
 }
 
 function sameAction(action: ServerActionInfo, site: { name: string; file: string }): boolean {
@@ -287,6 +513,8 @@ export function fingerprint(capture: Capture): string {
     capture.serverAction?.id ?? parent?.serverActionId ?? '',
     parent ? `${parent.method} ${generalizePath(pathOf(parent.url) ?? '')}` : '',
     capture.interaction?.componentChain[0] ?? '',
+    // Every GraphQL operation goes to the same URL (M17).
+    ...(capture.operation ? [`gql:${capture.operation.name ?? capture.operation.hash ?? ''}`] : []),
   ].join('|')
 }
 
@@ -315,7 +543,10 @@ function indexSites(model: AppModel): SiteInfo[] {
     const component = site.componentId ? components.get(site.componentId) : undefined
     const kind = site.trigger.kind
     const side =
-      kind === 'server-render' || kind === 'route-handler' || kind === 'server-action'
+      kind === 'server-render' ||
+      kind === 'route-handler' ||
+      kind === 'server-action' ||
+      kind === 'middleware'
         ? 'server'
         : kind === 'unknown'
           ? 'any'

@@ -1,0 +1,28 @@
+# Route tree
+
+app [layout, page]
+└─ users
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  app/page.tsx
+/users/[id]  page  app/users/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  app/layout.tsx:5
+
+# Pages
+
+## /  app/page.tsx
+layouts: app/layout.tsx
+HomePage  server  app/page.tsx:9
+├─ Link  external next/link
+├─ ProductPanel  client (use client)  components/ProductPanel.tsx:7
+└─ TodoPanel  client (use client)  components/TodoPanel.tsx:8
+
+## /users/[id]  app/users/[id]/page.tsx
+layouts: app/layout.tsx
+UserPage  server  app/users/[id]/page.tsx:7
+└─ DeleteUserButton  client (use client)  components/DeleteUserButton.tsx:7

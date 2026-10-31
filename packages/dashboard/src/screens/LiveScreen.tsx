@@ -10,8 +10,11 @@ import {
   useRecording,
 } from '../api'
 import { useData } from '../context'
+import { GraphqlCaptureFact } from '../GraphqlView'
 import { siteHref, siteLabel, siteOwner } from '../RequestView'
 import { href, type MatchFilter, replaceScreen } from '../router'
+import { MessageTimeline } from '../SseView'
+import { TrpcCaptureFact } from '../TrpcView'
 import { CaptureTypeCheck, StaleBadge, TypeCheckBadge } from '../TypeCheckView'
 import { Badge, Empty, matches, SearchBox, Section } from '../ui'
 
@@ -32,6 +35,12 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
   route: 'route',
   parent: 'parent request',
   trigger: 'trigger',
+  'query-key': 'query key',
+  middleware: 'middleware',
+  'trpc-procedure': 'tRPC procedure',
+  'graphql-operation': 'GraphQL operation',
+  stream: 'event stream',
+  socket: 'WebSocket',
   manual: 'manual',
 }
 
@@ -278,6 +287,17 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
               )}
             </>
           )}
+          {c.query && (
+            <>
+              <dt>React Query</dt>
+              <dd>
+                {c.query.kind}{' '}
+                {c.query.key ? <code className="break">{JSON.stringify(c.query.key)}</code> : null}
+              </dd>
+            </>
+          )}
+          <TrpcCaptureFact capture={c} q={q} />
+          <GraphqlCaptureFact capture={c} q={q} />
           {c.serverAction && (
             <>
               <dt>Server action</dt>
@@ -337,6 +357,8 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
         <BodyView body={c.request.body} />
         <HeadersView headers={c.request.headers} />
       </Section>
+
+      <MessageTimeline capture={c} />
 
       <Section title="Response">
         {c.response ? (

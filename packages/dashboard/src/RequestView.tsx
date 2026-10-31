@@ -1,10 +1,23 @@
 // One request site: method + URL, how and when it is sent, body and response types,
 // the server hops it leads to, and the call stack from the component down to the network call.
-import { hasCaptures, type RequestSite, type Trigger, urlText } from '@flow-checker/shared'
+import {
+  formatQueryKey,
+  hasCaptures,
+  type QueryLink,
+  queryLinkTarget,
+  type RequestSite,
+  type Trigger,
+  urlText,
+} from '@flow-checker/shared'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
+import { GraphqlFact } from './GraphqlView'
 import type { ModelIndex } from './model-index'
+import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
+import { SocketMessages } from './SocketView'
+import { StreamEvents } from './SseView'
+import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
 import { Badge, Empty, SourceLink } from './ui'
@@ -16,6 +29,7 @@ const TRIGGER_LABEL: Record<Trigger['kind'], string> = {
   event: 'event',
   'route-handler': 'route handler',
   'server-action': 'server action',
+  middleware: 'middleware',
   unknown: 'unknown trigger',
 }
 
@@ -26,6 +40,7 @@ const TRIGGER_TITLE: Record<Trigger['kind'], string> = {
   event: 'Sent when the user interacts',
   'route-handler': 'Sent by a route handler when it is called',
   'server-action': 'Sent by a server action when it is called',
+  middleware: 'Sent by middleware (middleware.ts / proxy.ts) before a matching request is handled',
   unknown: 'The scan could not tell what starts this request',
 }
 
@@ -47,6 +62,7 @@ export function siteOwner(site: RequestSite, index: ModelIndex): string {
     return `${site.handlerMethod ?? ''} ${index.routes.get(site.routeId)?.path ?? 'route handler'}`.trim()
   }
   if (site.origin === 'server-action') return `action ${site.serverAction?.name ?? '?'}`
+  if (site.origin === 'middleware') return `middleware ${index.model.middleware?.file ?? ''}`.trim()
   return site.origin
 }
 
@@ -160,14 +176,26 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
               <dt>URL as written</dt>
               <dd>
                 <code>{site.url.text}</code>
+                {site.url.confidence === 'postman' && (
+                  <span className="muted"> · path from the Postman collection</span>
+                )}
               </dd>
             </>
           )}
-          {site.hook?.key && (
+          <PostmanFact site={site} index={index} />
+          <TrpcFact site={site} index={index} />
+          <GraphqlFact site={site} index={index} />
+          {(site.queryKey || site.hook?.key) && (
             <>
               <dt>Key</dt>
               <dd>
-                <code>{site.hook.key}</code>
+                <code>{site.queryKey ? formatQueryKey(site.queryKey) : site.hook?.key}</code>
+                {site.queryKey && site.hook?.key && (
+                  <span className="muted">
+                    {' '}
+                    from <code>{site.hook.key}</code>
+                  </span>
+                )}
               </dd>
             </>
           )}
@@ -210,13 +238,25 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
           )}
         </dl>
 
-        <TypeBlock title="Request body" text={site.bodyType?.text} shape={site.bodyType?.shape} />
         <TypeBlock
-          title="Response"
-          text={site.responseType?.text}
-          shape={site.responseType?.shape}
-          empty="Not found in the code. Live capture will fill it in."
+          title="Request body"
+          text={site.bodyType?.text}
+          shape={site.bodyType?.shape}
+          source={site.bodyType?.source}
         />
+        {site.stream ? (
+          <StreamEvents site={site} />
+        ) : site.socket ? (
+          <SocketMessages site={site} />
+        ) : (
+          <TypeBlock
+            title="Response"
+            text={site.responseType?.text}
+            shape={site.responseType?.shape}
+            source={site.responseType?.source}
+            empty="Not found in the code. Live capture will fill it in."
+          />
+        )}
 
         {chain.length > 0 && (
           <div className="request-chain">
@@ -229,6 +269,19 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {(index.linksFrom.get(site.id) ?? []).length > 0 && (
+          <div className="request-links">
+            <h4>Then in the query cache</h4>
+            <QueryLinkList links={index.linksFrom.get(site.id) ?? []} />
+          </div>
+        )}
+        {(index.linksTo.get(site.id) ?? []).length > 0 && (
+          <div className="request-links">
+            <h4>Refreshed by</h4>
+            <QueryLinkList links={index.linksTo.get(site.id) ?? []} showTargets={false} />
           </div>
         )}
 
@@ -249,6 +302,63 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
         </div>
       </div>
     </details>
+  )
+}
+
+const LINK_LABEL: Record<QueryLink['kind'], string> = {
+  invalidate: 'invalidates',
+  refetch: 'refetches',
+  reset: 'resets',
+  remove: 'removes',
+  'set-data': 'sets data of',
+  hydrate: 'hydrates',
+}
+
+/** React Query cache calls: what they do, the key they target, and the queries they hit (M13). */
+export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[]; showTargets?: boolean }) {
+  const { index } = useData()
+  return (
+    <ul className="list query-links">
+      {links.map((link) => {
+        const owner = link.componentId ? index.components.get(link.componentId) : undefined
+        const targets = link.targetSiteIds
+          .map((id) => index.requests.get(id))
+          .filter((s): s is RequestSite => !!s)
+        return (
+          <li key={link.id}>
+            <span>
+              <Badge tone="muted" title={link.method}>
+                {LINK_LABEL[link.kind]}
+              </Badge>{' '}
+              <code>{queryLinkTarget(link)}</code>
+              {link.exact && <span className="muted"> exact</span>}
+              {link.outcome && <span className="muted"> on {link.outcome}</span>}
+              {owner && (
+                <span className="muted">
+                  {' '}
+                  in <a href={href({ name: 'component', componentId: owner.id })}>{owner.name}</a>
+                </span>
+              )}
+              {showTargets && (
+                <span className="muted">
+                  {' → '}
+                  {targets.length === 0
+                    ? 'no scanned query'
+                    : targets.map((t, i) => (
+                        <span key={t.id}>
+                          {i > 0 && ', '}
+                          <code>{siteLabel(t, index)}</code>
+                        </span>
+                      ))}
+                </span>
+              )}
+            </span>
+            <span className="spacer" />
+            <SourceLink file={link.loc.file} line={link.loc.line} column={link.loc.column} />
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 
@@ -306,10 +416,12 @@ function TypeBlock({
   title,
   text,
   shape,
+  source,
   empty,
 }: {
   title: string
   text?: string
+  source?: 'postman'
   shape?: Parameters<typeof TypeShapeView>[0]['shape']
   empty?: string
 }) {
@@ -324,7 +436,7 @@ function TypeBlock({
   return (
     <div className="request-type">
       <h4>
-        {title} <code className="muted">{text}</code>
+        {title} <code className="muted">{text}</code> <PostmanTypeBadge source={source} />
       </h4>
       <TypeShapeView shape={shape} />
     </div>

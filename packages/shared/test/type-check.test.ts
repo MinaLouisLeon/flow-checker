@@ -230,6 +230,7 @@ describe('applyVerification', () => {
     requests,
     navigations: [],
     flows: [],
+    queryLinks: [],
   })
 
   it('marks mismatched sites with a type-mismatch flag, and clears it again', () => {
@@ -271,5 +272,137 @@ describe('applyVerification', () => {
       ['inferred', 0],
       ['inferred', 0],
     ])
+  })
+})
+
+describe('checkCapture on event stream messages (M18)', () => {
+  const site = {
+    id: 'req_sse',
+    transport: 'sse' as const,
+    stream: {
+      api: 'event-source' as const,
+      events: [
+        { name: 'tick', dataType: { text: 'Tick', shape: obj({ n: num, token: str }) }, listened: true },
+        { name: 'message', dataType: { text: 'string', shape: str }, listened: true },
+        { name: 'done', listened: true },
+      ],
+    },
+  }
+  const msg = (event: string | undefined, body?: CapturedBody) => ({
+    direction: 'in' as const,
+    ...(event ? { event } : {}),
+    at: 'now',
+    size: 1,
+    ...(body ? { body } : {}),
+  })
+
+  it('checks each typed event that arrived; masked values only need the right JSON type', () => {
+    const check = checkCapture(
+      {
+        request: { body: { kind: 'none' } },
+        messages: [
+          msg('tick', { kind: 'json', value: { n: 1, token: '[REDACTED:string]' } }),
+          msg('tick', { kind: 'json', value: { n: 2, token: '[REDACTED:string]' } }),
+          msg(undefined, { kind: 'text', value: 'hello' }),
+          msg('done', { kind: 'json', value: {} }),
+        ],
+        redactedPaths: ['messages[1].body.token'],
+      },
+      site,
+      typeTable([]),
+    )
+    expect(check?.parts).toEqual([
+      { part: 'message', event: 'tick', type: 'Tick', status: 'ok', messages: 2, mismatches: [] },
+      { part: 'message', event: 'message', type: 'string', status: 'ok', messages: 1, mismatches: [] },
+    ])
+  })
+
+  it('skips messages kept without data, and ignores the response type of a stream site', () => {
+    const check = checkCapture(
+      {
+        request: { body: { kind: 'none' } },
+        response: { status: 200, body: { kind: 'none' } },
+        messages: [msg('tick')],
+        redactedPaths: [],
+      },
+      { ...site, responseType: { text: 'X', shape: num } },
+      typeTable([]),
+    )
+    expect(check?.parts).toEqual([
+      {
+        part: 'message',
+        event: 'tick',
+        type: 'Tick',
+        status: 'skipped',
+        reason: 'Messages were kept without their data (capture.maxMessageBytes).',
+        messages: 0,
+        mismatches: [],
+      },
+    ])
+    expect(typeCheckStatus(check as NonNullable<typeof check>)).toBe('skipped')
+  })
+})
+
+describe('checkCapture on WebSocket messages (M19)', () => {
+  const site = {
+    id: 'req_ws',
+    transport: 'websocket' as const,
+    socket: {
+      api: 'socket.io' as const,
+      messages: [
+        { direction: 'in' as const, name: 'chat', dataType: { text: 'Chat', shape: obj({ text: str }) } },
+        { direction: 'out' as const, name: 'chat', dataType: { text: 'Draft', shape: obj({ text: str }) } },
+        { direction: 'out' as const, name: 'typing' },
+      ],
+    },
+  }
+  const msg = (direction: 'in' | 'out', event: string, value: unknown) => ({
+    direction,
+    event,
+    at: 'now',
+    size: 1,
+    body: { kind: 'json' as const, value },
+  })
+
+  it('checks each direction on its own, with sent paths under `sent[]`', () => {
+    const check = checkCapture(
+      {
+        request: { body: { kind: 'none' } },
+        messages: [
+          msg('in', 'chat', { text: 'hi' }),
+          msg('out', 'chat', { text: 3 }),
+          msg('out', 'typing', true),
+        ],
+        redactedPaths: [],
+      },
+      site,
+      typeTable([]),
+    )
+    expect(check?.parts).toEqual([
+      { part: 'message', event: 'chat', type: 'Chat', status: 'ok', messages: 1, mismatches: [] },
+      {
+        part: 'message',
+        event: 'chat',
+        direction: 'out',
+        type: 'Draft',
+        status: 'mismatch',
+        messages: 1,
+        mismatches: [
+          { kind: 'wrong-type', path: 'sent[chat].body.text', expected: 'string', actual: 'number 3' },
+        ],
+      },
+    ])
+    const summary = summarizeTypeChecks([{ captureId: 'cap_1', check: check as NonNullable<typeof check> }])
+    expect(summary?.mismatches[0]).toMatchObject({ part: 'message', event: 'chat', direction: 'out' })
+    const model = {
+      version: MODEL_VERSION,
+      requests: [{ ...site, status: 'inferred', flags: [] }],
+    } as unknown as AppModel
+    const applied = applyVerification(model, {
+      sites: { req_ws: { captures: 1, typeCheck: summary } },
+    } as never)
+    expect(applied.requests[0]?.flags[0]?.message).toBe(
+      `Sent "chat" doesn't match Draft: text is number 3 (expected string) (1 of 1 capture).`,
+    )
   })
 })

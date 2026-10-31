@@ -16,6 +16,10 @@
 
 - To [`/[locale]/login`](%5Blocale%5D.login.md) (link)
 
+## Middleware
+
+[`src/proxy.ts`](../middleware.md) runs before every request to this route.
+
 ## Requests
 
 This page sends no requests the scan found.

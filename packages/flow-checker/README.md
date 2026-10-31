@@ -12,9 +12,10 @@ Then use your app as usual. Each request the app sends shows up in the dashboard
 
 ## What it does
 
-- **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
+- **Scans the code.** Routes (groups, dynamic, catch-all, parallel and intercepting segments, next-intl `[locale]`), the component tree with server/client boundaries, and every request: `fetch`, axios, your own wrapper clients (and any HTTP library or API client package you list in `apiClients`), React Query, SWR, tRPC (v10 and v11: hooks, the vanilla client and v11 `queryOptions()`, typed from the router's procedures), GraphQL (Apollo Client 3 and 4, urql and Relay: operations by name, typed from codegen, the Relay compiler or your schema), server-sent events (`new EventSource()` and streamed `fetch`, with the events each listens to and their data types), WebSockets (`new WebSocket()` and socket.io, with the messages each sends and receives and their types), Server Actions and route handlers (including the second hop to your backend). It also finds navigation between pages (`Link`, `router.push`, `redirect`) and infers user flows such as _login → verify OTP → dashboard_. Middleware (`middleware.ts`, or `proxy.ts` on Next.js 16) is read too: which routes its `config.matcher` selects, its redirects (with the condition around each one), its rewrites (used to tell which page answered a URL) and the requests it sends. Types of request bodies, responses and props are fully resolved by the TypeScript compiler.
 - **Captures real traffic** while you test, in the browser and on the server, with passwords, tokens and auth headers **masked before anything is saved**.
 - **Verifies the map.** Each capture is matched to the request site that sent it, which marks that site `✓ verified`. The captured data is compared with the declared types (missing fields, extra fields, wrong types, unexpected `null`), and flows are confirmed when you walk them.
+- **Checks the code against your Postman collection** (optional): requests the collection doesn't have, endpoints nothing calls, and types from saved examples.
 - **Keeps up with your edits.** Files are watched and re-scanned incrementally. Requests whose code changed since they were captured are marked `↻ needs re-check`.
 - **Exports documentation:** Markdown (with Mermaid route maps and sequence diagrams) and a static, read-only copy of the dashboard you can host anywhere.
 
@@ -58,6 +59,7 @@ flow-checker scan       # scan only, write .flow-checker/model.json
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
 flow-checker export     # Markdown docs and/or a static HTML site
 flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitignore
+flow-checker postman import   # read a Postman collection to check the code against
 ```
 
 | Option                                       | Commands                  | Meaning                                                                                       |
@@ -76,12 +78,69 @@ flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitig
 | `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
 | `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
 | `--force`                                    | export                    | Write into a folder that has other files                                                      |
+| `--collection <src>`                         | postman import            | v2.1 JSON file, v3 YAML folder or cloud collection id (default: `postman.collection`)         |
+| `--environment <src>`                        | postman import            | Environment file or cloud id for `{{variables}}`                                              |
+| `--api-key-env <name>`                       | postman import            | Env variable with the Postman API key, for cloud ids (default `POSTMAN_API_KEY`)              |
+| `--verbose`                                  | all                       | Also print the resolved config, where the scan runs and other details                         |
+| `-q, --quiet`                                | all                       | No progress output: only results, warnings and errors                                         |
+
+Every command shows its progress on stderr. In a terminal, a live line shows a spinner, a bar for the whole command, the current step and its time, and each finished step leaves a `✓` line with what it found:
+
+```text
+✓ Loaded: 1,806 files (3.8 s)
+✓ Routes: 401 pages, 200 route handlers (0.2 s)
+⠸ [█████████░░░░░░░░░░░]  47%  Walking components… route 300/601  1.3 s
+```
+
+In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` lines are printed, as plain text.
+
+### React Query
+
+`useQuery`, `useInfiniteQuery`, the suspense hooks, `useQueries` / `useSuspenseQueries` (one request per entry), `useMutation`, `usePrefetchQuery` and `queryClient.fetchQuery` / `prefetchQuery` / `ensureQueryData` (and their infinite forms) are request sites, in v4 and v5. Each query's key is read into segments (`['todos', 'detail', :id]`), also through key factories, `queryOptions()` and functions that return options.
+
+`invalidateQueries`, `refetchQueries`, `resetQueries`, `removeQueries` and `setQueryData` are linked to the queries their key hits (by prefix, or `exact`) and to the mutation whose callback calls them, so a flow shows which queries a mutation refreshes. A server-side `prefetchQuery` handed over with `HydrationBoundary` (v4: `Hydrate`) is linked to the client query it fills. While you test, each request a query or mutation sends carries its key, and captures are matched by it.
+
+### Middleware
+
+`middleware.ts` (and `proxy.ts` on Next.js 16) is read for its `config.matcher`: each page shows whether middleware runs on it. `NextResponse.redirect()` becomes an edge on the route map with the condition around it (`if !token`), `NextResponse.rewrite()` and next-intl's default locale are used to tell which page answered a captured URL, and requests the middleware sends get a `middleware` trigger. On Node.js (`proxy.ts`) those requests are captured like the rest of the server; on the edge runtime, best effort (see [limits](#limits)).
+
+### tRPC
+
+Procedure calls are request sites in v10 and v11: `createTRPCReact` hooks (`trpc.todo.byId.useQuery()`), the vanilla client (`client.todo.add.mutate()`), `utils` calls and v11's `useTRPC()` with `queryOptions()` / `mutationOptions()`. The router is read from the route handler's `fetchRequestHandler()` (or the client's `AppRouter` type), so each call gets its procedure's input type (from `.input()`) and output type without annotations. While you test, a batched request is split into one capture per procedure, each matched and type-checked on its own.
+
+### Postman collections
+
+Point flow-checker at a Postman collection (config `postman`, or `flow-checker postman import --collection <src>`) and every scan is checked against it:
+
+- Each request in the code is matched to a collection request by method and URL (`{{baseUrl}}/users/:id` fits `` `${API}/users/${id}` ``). Requests the collection doesn't have are flagged **not in collection**; collection requests nothing calls are listed as **unused endpoints**.
+- Saved response examples give a type to requests whose code has none (marked "from Postman example"), and captures are then checked against it. When the code declares a type, it is checked against the examples (**contract mismatch**).
+- A URL the scan can't resolve is filled in from the collection request its function names and method point to, when exactly one fits.
+
+`postman import` prints a summary and the list of findings; the dashboard overview and the Markdown export (`postman.md`) show them too.
+
+### GraphQL
+
+Apollo Client (3 and 4), urql and Relay calls are request sites, one per operation. Every operation goes to the same URL, so captures are matched by operation name, or by persisted query id. Batched requests are split into one capture per operation, and type checks compare `variables` and `data`.
+
+Types come from type arguments at the call, codegen's typed documents or the Relay compiler first. Without those, set `graphql.schema` (or let flow-checker find `schema.graphql` / the schema in your Relay or codegen config), or `graphql.introspection` to ask a running endpoint (see [config](../../docs/config.md#graphql)). The dashboard overview lists every operation with its types and callers, and fragments with the components that read them.
+
+### Server-sent events
+
+`new EventSource(url)` and a `fetch` read as an event stream (`Accept: text/event-stream`, or any fetch of a route handler that answers with `text/event-stream`) are request sites. The scan lists the events each one listens to (`onmessage`, `addEventListener('tick', ...)`) with the type its data is read as (`JSON.parse(e.data) as Tick`, `const t: Tick = JSON.parse(e.data)`, `MessageEvent<Tick>`), and reads the events a route handler writes (`event: tick` / `data: ${JSON.stringify(tick)}`, also through a helper like `send('tick', tick)`). Events the code has no type for take the handler's.
+
+While you test, each stream is captured message by message: the dashboard shows the capture as soon as it opens, then every message with its time, event name and data (redacted like bodies), and each message is checked against its event's type. `capture.maxMessages` (200) and `capture.maxMessageBytes` (64 kB) limit what is kept per connection.
+
+### WebSockets
+
+`new WebSocket(url)` and socket.io's `io(url)` are request sites. The scan lists the messages each one sends and receives with their types: `ws.send(JSON.stringify(subscribe))` and `JSON.parse(e.data) as Quote` for native sockets, `socket.emit('chat', draft)` and `socket.on('chat', (message) => ...)` for socket.io (typed events such as `Socket<ServerEvents, ClientEvents>` give both types).
+
+While you test, every message in both directions is captured (redacted like bodies), with the close code; socket.io events are read from its frames by name. The dashboard shows a timeline of what was sent and received, and each message is checked against its type. `capture.maxMessages` and `capture.maxMessageBytes` limit what is kept per connection, as for event streams.
 
 ## Setup in detail
 
 `flow-checker init` shows what it will change and asks first:
 
-- `instrumentation-client.ts` (browser hook) and `instrumentation.ts` (server hook), next to your `app` directory (in `src/` when you use `src/app`). If `instrumentation.ts` already exports `register()`, it prints the lines to add instead of editing it.
+- `instrumentation-client.ts` (browser hook) and `instrumentation.ts` (server hook), next to your `app` directory (in `src/` when you use `src/app`). If `instrumentation.ts` already exports `register()`, it prints the lines to add instead of editing it. The server hook also registers a small edge runtime, so requests sent from middleware on the edge runtime (`middleware.ts` before Next.js 16) are captured too; hooks written by 0.1 can get it from `init` or `doctor`.
 - `flow-checker.config.ts`.
 - `.gitignore` entries for captured data.
 
@@ -112,8 +171,14 @@ export default defineConfig({
     ignore: ['/api/health'],
   },
   export: { md: 'docs/flow', html: '.flow-checker/site' },
+  // A Postman collection to check the code against (v2.1 JSON, v3 YAML folder or { id, apiKeyEnv }).
+  postman: { collection: 'postman/collections/My API', environment: 'postman/environments/dev.yaml' },
+  // GraphQL types when the code has none: a schema file, or live introspection (env:NAME headers).
+  graphql: { schema: 'schema.graphql' },
 })
 ```
+
+Event stream and WebSocket capture keep at most `capture.maxMessages` (200) messages per connection, and messages over `capture.maxMessageBytes` (64 kB) without their data.
 
 ## Sensitive data
 
@@ -133,15 +198,21 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 ├─ overrides.json      your decisions: manual matches, flow names, recordings (safe to commit)
 ├─ captures/           captured requests (gitignored)
 ├─ sessions/           browsing sessions used to confirm flows (gitignored)
-└─ cache/              ingest token, code hashes (gitignored)
+├─ cache/              ingest token, code hashes, GraphQL introspection (gitignored)
+└─ postman/            the last imported Postman collection (gitignored)
 ```
 
 ## Limits
 
-- App Router only. GraphQL, WebSockets and SSE streams are captured as plain requests only.
-- Edge runtime and middleware: server capture is best effort (`fetch` only), and middleware redirects are not scanned yet.
+- App Router only.
+- WebSockets: only in the browser (not sockets opened on the server). A socket created at module level (outside a component or a function it calls) isn't a request site. socket.io: messages sent over HTTP long-polling before the connection moves to a WebSocket aren't captured (use `transports: ['websocket']` to capture everything), acks aren't recorded, binary attachments keep no data, and namespaces aren't told apart when matching.
+- Server-sent events: an EventSource only reports named events someone listens to, so events the app has no listener for aren't recorded. Event streams read by libraries such as `@microsoft/fetch-event-source` are captured (they use `fetch`), but their listeners aren't read by the scan. Streams on the edge runtime are captured as plain requests.
+- GraphQL: subscriptions over WebSockets are captured as WebSocket messages, but aren't linked to their operations. Operations sent through your own `fetch` wrapper (not Apollo, urql or Relay) are plain requests. Server resolvers aren't linked to the operations that run them.
+- Edge runtime (middleware before Next.js 16): capture is best effort, `fetch` only and without the incoming request. Middleware on Node.js (`proxy.ts`, or `runtime: 'nodejs'`) is captured like the rest of the server.
+- Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.
+- tRPC: procedures called through `createCaller` or a server-side `createTRPCOptionsProxy({ router })` run without an HTTP request and are not request sites. Subscriptions are found in the code, but their streams are captured as plain requests. The router must be reachable from `fetchRequestHandler({ router })` or the client's `AppRouter` type.
 - Next.js before 15.3: browser capture needs webpack (no Turbopack) and `withFlowChecker()`.
-- Large repositories: the first scan of a ~1,800-file app takes about 10 s and a re-scan after an edit a few seconds. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
+- Large repositories: the first scan of a ~1,800-file app takes about 10–12 s and a re-scan after an edit about 4 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
 
 ## License
 

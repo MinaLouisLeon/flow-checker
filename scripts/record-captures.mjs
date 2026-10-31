@@ -5,13 +5,13 @@
 //
 // Run after `pnpm build`:  node scripts/record-captures.mjs [fixture...]
 import { spawn, spawnSync } from 'node:child_process'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { chromium } from '@playwright/test'
 
 const repo = resolve(import.meta.dirname, '..')
 const outDir = join(repo, 'packages', 'server', 'test', 'recordings')
-const PORTS = { mockApi: 4010, dashboard: 4477, app: 3077 }
+const PORTS = { mockApi: 4010, sockets: 4011, dashboard: 4477, app: 3077 }
 const app = `http://localhost:${PORTS.app}`
 const dashboard = `http://127.0.0.1:${PORTS.dashboard}`
 
@@ -42,6 +42,30 @@ const scripts = {
     await page.fill('input[placeholder="New todo"]', 'Record captures')
     await page.click('button[type=submit]')
     await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    // Server prefetch + HydrationBoundary, useQueries, then queryClient methods.
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.hover('li button >> nth=0')
+    await settle(page)
+    // A click without hovering first, so ensureQueryData has nothing cached for this user.
+    await page.dispatchEvent('li >> nth=1 >> button >> nth=0', 'click')
+    await settle(page)
+    await page.click('button:has-text("Refresh")')
+    await settle(page)
+  },
+  'react-query-v4': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.click('input[type=checkbox] >> nth=1')
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.click('button:has-text("Delete") >> nth=1')
     await settle(page)
   },
   'server-actions': async (page) => {
@@ -82,6 +106,33 @@ const scripts = {
     await page.waitForURL(/\/dashboard/)
     await settle(page, 2500)
   },
+  middleware: async (page) => {
+    // Signed out: the proxy sends the dashboard to the login page.
+    await page.goto(`${app}/dashboard`)
+    await page.waitForURL(`${app}/login`)
+    await settle(page)
+    // A rewrite (the products page answers /shop) and a permanent redirect.
+    await page.goto(`${app}/shop`)
+    await settle(page)
+    await page.goto(`${app}/old-home`)
+    await page.waitForURL(`${app}/`)
+    await settle(page)
+    // A session the API doesn't know: the proxy's session check fails.
+    await page.context().addCookies([{ name: 'session', value: 'expired', url: app }])
+    await page.goto(`${app}/dashboard`)
+    await page.waitForURL(/\/login\?expired=1/)
+    await settle(page)
+    // Signed in: the dashboard loads, and the login page sends you back to it.
+    await page.context().addCookies([{ name: 'session', value: await signIn(), url: app }])
+    await page.goto(`${app}/dashboard`)
+    await settle(page)
+    await page.click('a:has-text("Settings")')
+    await page.waitForURL(`${app}/dashboard/settings`)
+    await settle(page)
+    await page.goto(`${app}/login`)
+    await page.waitForURL(`${app}/dashboard`)
+    await settle(page)
+  },
   mismatch: async (page) => {
     await page.goto(`${app}/`)
     await settle(page)
@@ -90,6 +141,163 @@ const scripts = {
     await page.waitForSelector('li:has-text("Check types")')
     await settle(page)
   },
+  // M15: every site of the Postman fixture, including the delete that isn't in the collection.
+  postman: async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[name=title]', 'Check the contract')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('li:has-text("Check the contract")')
+    await settle(page)
+    await page.goto(`${app}/users/2`)
+    await settle(page)
+    await page.click('button:has-text("Delete")')
+    await page.waitForURL(`${app}/`)
+    await settle(page)
+  },
+  // tRPC (M16): the home page batches several queries into one request.
+  'trpc-v10': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/feed`)
+    await settle(page)
+    await page.click('button:has-text("More")')
+    await settle(page)
+  },
+  trpc: async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+  },
+  // GraphQL (M17): every fixture serves the same schema from its own /api/graphql route.
+  // Apollo 4: the home page sends Viewer + Todos as one batched POST (array body).
+  'graphql-apollo': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.click('input[type=checkbox]')
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.fill('input[placeholder="Search"]', 'a')
+    await page.click('button[type=submit]')
+    await settle(page)
+    await page.click('button:has-text("Load users")')
+    await settle(page)
+  },
+  // Apollo 3 with automatic persisted queries: each first request is hash-only and retried with the query.
+  'graphql-apollo-v3': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Delete")')
+    await page.waitForURL(`${app}/`)
+    await settle(page)
+    await page.goto(`${app}/search`)
+    await settle(page)
+    await page.fill('input[placeholder="Search"]', 'a')
+    await page.click('button[type=submit]')
+    await settle(page)
+  },
+  // urql: queries are GET requests, mutations POST.
+  'graphql-urql': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.click('button:has-text("Load users")')
+    await settle(page)
+  },
+  // Relay: persisted documents only ({ doc_id, variables }, no query text).
+  'graphql-relay': async (page) => {
+    await page.goto(`${app}/`)
+    await settle(page)
+    await page.fill('input[placeholder="New todo"]', 'Record captures')
+    await page.click('button[type=submit]')
+    await page.waitForURL(/\/todos\/\d+/)
+    await settle(page)
+    await page.click('button:has-text("Mark")')
+    await settle(page)
+    await page.goto(`${app}/users`)
+    await settle(page)
+    await page.click('button:has-text("Load users")')
+    await settle(page)
+  },
+  // Event streams (M18): each stream ends on its own, so `networkidle` is reached.
+  sse: async (page) => {
+    await page.goto(`${app}/`)
+    await page.waitForSelector('text=Clock stopped after 3 ticks')
+    await settle(page)
+    await page.goto(`${app}/jobs/7`)
+    await settle(page)
+    await page.click('button:has-text("Start job")')
+    await page.waitForSelector('text=Job finished')
+    await settle(page)
+    await page.goto(`${app}/chat`)
+    await settle(page)
+    await page.fill('input[placeholder="Say something"]', 'hello there')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('text=tokens')
+    await settle(page)
+  },
+  // WebSockets (M19): each socket is closed by the page before moving on, so every capture ends
+  // with its close code.
+  websocket: async (page) => {
+    await page.goto(`${app}/`)
+    await page.waitForSelector('text=Ticker closed after 3 quotes')
+    await settle(page)
+    await page.click('button:has-text("Ping")')
+    await page.waitForSelector('text=Answer: pong: ping')
+    await settle(page)
+    await page.goto(`${app}/chat`)
+    await page.waitForSelector('text=Joined as ada')
+    await page.fill('input[placeholder="Say something"]', 'hello sockets')
+    await page.click('button[type=submit]')
+    await page.waitForSelector('li:has-text("hello sockets")')
+    await page.click('button:has-text("Leave")')
+    await page.waitForSelector('text=Left the chat')
+    await settle(page)
+  },
+}
+
+/** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */
+async function signIn() {
+  const post = (path, body) =>
+    fetch(`http://127.0.0.1:${PORTS.mockApi}${path}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then((res) => res.json())
+  const { challengeId } = await post('/auth/login', { email: 'ada@example.com', password: 'password' })
+  const { token } = await post('/auth/verify-otp', { challengeId, code: '123456' })
+  return token
 }
 
 function start(command, args, label) {
@@ -169,6 +377,11 @@ function scrub(value) {
 
 async function record(fixture, browser) {
   const mock = start(process.execPath, ['fixtures/mock-api/server.js'], 'mock-api')
+  // Fixtures with their own socket server (M19).
+  const socketServer = `fixtures/${fixture}/socket-server.mjs`
+  const sockets = existsSync(join(repo, socketServer))
+    ? start(process.execPath, [socketServer], 'sockets')
+    : undefined
   const dev = start(
     process.execPath,
     [
@@ -186,6 +399,7 @@ async function record(fixture, browser) {
   )
   try {
     await waitFor(`http://127.0.0.1:${PORTS.mockApi}/users`, 20_000)
+    if (sockets) await waitFor(`http://127.0.0.1:${PORTS.sockets}/health`, 20_000)
     await waitFor(`${dashboard}/api/health`, 60_000)
     await fetch(`${dashboard}/api/captures`, { method: 'DELETE' })
     await waitFor(app, 180_000)
@@ -219,6 +433,7 @@ async function record(fixture, browser) {
   } finally {
     dev.stop()
     mock.stop()
+    sockets?.stop()
     await new Promise((r) => setTimeout(r, 1500))
   }
 }

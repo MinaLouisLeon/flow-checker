@@ -1,0 +1,775 @@
+{
+  "version": 8,
+  "project": {
+    "appDir": "app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "app",
+    "files": {
+      "layout": "app/layout.tsx",
+      "page": "app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "chat",
+          "kind": "static",
+          "name": "chat"
+        },
+        "dir": "app/chat",
+        "files": {
+          "page": "app/chat/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_12v7saiyoj2",
+      "path": "/",
+      "kind": "page",
+      "file": "app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_0ku4o3jpe9o"
+    },
+    {
+      "id": "rt_034pyllgtar",
+      "path": "/chat",
+      "kind": "page",
+      "file": "app/chat/page.tsx",
+      "segments": [
+        {
+          "raw": "chat",
+          "kind": "static",
+          "name": "chat"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_071fu3pg2y0"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_071fu3pg2y0",
+      "name": "ChatPage",
+      "file": "app/chat/page.tsx",
+      "loc": {
+        "file": "app/chat/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Chat",
+          "resolution": "project",
+          "componentId": "cmp_25ygt4ib9ws",
+          "module": "@/components/Chat",
+          "loc": {
+            "file": "app/chat/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_2dznycb4aq7",
+      "name": "RootLayout",
+      "file": "app/layout.tsx",
+      "loc": {
+        "file": "app/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0ku4o3jpe9o",
+      "name": "HomePage",
+      "file": "app/page.tsx",
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Ticker",
+          "resolution": "project",
+          "componentId": "cmp_0v03dzyy6xu",
+          "module": "@/components/Ticker",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        },
+        {
+          "name": "Ping",
+          "resolution": "project",
+          "componentId": "cmp_24ds4vfe8jw",
+          "module": "@/components/Ping",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 10,
+            "column": 7
+          }
+        },
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 11,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_25ygt4ib9ws",
+      "name": "Chat",
+      "file": "components/Chat.tsx",
+      "loc": {
+        "file": "components/Chat.tsx",
+        "line": 9,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_0z1w2tfwh0s",
+        "typ_0m3wwrt3nt8",
+        "typ_165m1q160hg"
+      ]
+    },
+    {
+      "id": "cmp_24ds4vfe8jw",
+      "name": "Ping",
+      "file": "components/Ping.tsx",
+      "loc": {
+        "file": "components/Ping.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0v03dzyy6xu",
+      "name": "Ticker",
+      "file": "components/Ticker.tsx",
+      "loc": {
+        "file": "components/Ticker.tsx",
+        "line": 10,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_1kri650o74u",
+        "typ_01lxex28a31"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_01lxex28a31",
+      "name": "Subscribe",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 2,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "type",
+            "type": {
+              "kind": "literal",
+              "value": "subscribe"
+            }
+          },
+          {
+            "name": "symbols",
+            "type": {
+              "kind": "array",
+              "element": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1kri650o74u",
+      "name": "Quote",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "type",
+            "type": {
+              "kind": "literal",
+              "value": "quote"
+            }
+          },
+          {
+            "name": "symbol",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1zt0n6v0ec6",
+      "name": "Joined",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 15,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "user",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "token",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_165m1q160hg",
+      "name": "ChatMessage",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 21,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "user",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "text",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "at",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_03lhxhb27lz",
+      "name": "Draft",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 29,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "text",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0z1w2tfwh0s",
+      "name": "ServerEvents",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 33,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "joined",
+            "type": {
+              "kind": "function",
+              "params": [
+                {
+                  "name": "joined",
+                  "type": {
+                    "kind": "ref",
+                    "typeId": "typ_1zt0n6v0ec6",
+                    "name": "Joined"
+                  }
+                }
+              ],
+              "returns": {
+                "kind": "primitive",
+                "name": "void"
+              }
+            }
+          },
+          {
+            "name": "chat",
+            "type": {
+              "kind": "function",
+              "params": [
+                {
+                  "name": "message",
+                  "type": {
+                    "kind": "ref",
+                    "typeId": "typ_165m1q160hg",
+                    "name": "ChatMessage"
+                  }
+                }
+              ],
+              "returns": {
+                "kind": "primitive",
+                "name": "void"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0m3wwrt3nt8",
+      "name": "ClientEvents",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 38,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "chat",
+            "type": {
+              "kind": "function",
+              "params": [
+                {
+                  "name": "draft",
+                  "type": {
+                    "kind": "ref",
+                    "typeId": "typ_03lhxhb27lz",
+                    "name": "Draft"
+                  }
+                }
+              ],
+              "returns": {
+                "kind": "primitive",
+                "name": "void"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1go4wbvvrlb",
+      "origin": "component",
+      "componentId": "cmp_25ygt4ib9ws",
+      "transport": "websocket",
+      "socket": {
+        "api": "socket.io",
+        "messages": [
+          {
+            "direction": "in",
+            "name": "joined",
+            "dataType": {
+              "text": "Joined",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_1zt0n6v0ec6",
+                "name": "Joined"
+              }
+            },
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 17,
+              "column": 5
+            }
+          },
+          {
+            "direction": "in",
+            "name": "chat",
+            "dataType": {
+              "text": "ChatMessage",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_165m1q160hg",
+                "name": "ChatMessage"
+              }
+            },
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 18,
+              "column": 5
+            }
+          },
+          {
+            "direction": "out",
+            "name": "chat",
+            "dataType": {
+              "text": "Draft",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_03lhxhb27lz",
+                "name": "Draft"
+              }
+            },
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 27,
+              "column": 5
+            }
+          }
+        ]
+      },
+      "method": "GET",
+      "url": {
+        "text": "SOCKET_URL",
+        "confidence": "exact",
+        "base": "http://localhost:4011",
+        "path": "/socket.io/"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "components/Chat.tsx",
+          "line": 15,
+          "column": 3
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/Chat.tsx",
+          "line": 16,
+          "column": 25,
+          "callee": "io"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0tzuulwcs14"
+    },
+    {
+      "id": "req_1pacrdimeqg",
+      "origin": "component",
+      "componentId": "cmp_24ds4vfe8jw",
+      "transport": "websocket",
+      "socket": {
+        "api": "websocket",
+        "messages": [
+          {
+            "direction": "out",
+            "name": "message",
+            "dataType": {
+              "text": "\"ping\"",
+              "shape": {
+                "kind": "literal",
+                "value": "ping"
+              }
+            },
+            "loc": {
+              "file": "components/Ping.tsx",
+              "line": 12,
+              "column": 27
+            }
+          },
+          {
+            "direction": "in",
+            "name": "message",
+            "loc": {
+              "file": "components/Ping.tsx",
+              "line": 13,
+              "column": 5
+            }
+          }
+        ]
+      },
+      "method": "GET",
+      "url": {
+        "text": "`${WS_URL}/echo`",
+        "confidence": "exact",
+        "base": "ws://localhost:4011",
+        "path": "/echo"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "components/Ping.tsx",
+          "line": 21,
+          "column": 29
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/Ping.tsx",
+          "line": 11,
+          "column": 20,
+          "callee": "new WebSocket"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "19dmh1jncti"
+    },
+    {
+      "id": "req_0utndx9wfnl",
+      "origin": "component",
+      "componentId": "cmp_0v03dzyy6xu",
+      "transport": "websocket",
+      "socket": {
+        "api": "websocket",
+        "messages": [
+          {
+            "direction": "out",
+            "name": "message",
+            "dataType": {
+              "text": "Subscribe",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_01lxex28a31",
+                "name": "Subscribe"
+              }
+            },
+            "loc": {
+              "file": "components/Ticker.tsx",
+              "line": 18,
+              "column": 7
+            }
+          },
+          {
+            "direction": "in",
+            "name": "message",
+            "dataType": {
+              "text": "Quote",
+              "shape": {
+                "kind": "ref",
+                "typeId": "typ_1kri650o74u",
+                "name": "Quote"
+              }
+            },
+            "loc": {
+              "file": "components/Ticker.tsx",
+              "line": 21,
+              "column": 5
+            }
+          }
+        ],
+        "protocols": [
+          "ticker.v1"
+        ]
+      },
+      "method": "GET",
+      "url": {
+        "text": "`${WS_URL}/live`",
+        "confidence": "exact",
+        "base": "ws://localhost:4011",
+        "path": "/live"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "components/Ticker.tsx",
+          "line": 14,
+          "column": 3
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/Ticker.tsx",
+          "line": 15,
+          "column": 16,
+          "callee": "new WebSocket"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0ujv6ojpi9h"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_19kgzoz0qly",
+      "origin": "component",
+      "componentId": "cmp_0ku4o3jpe9o",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/chat\"",
+        "confidence": "exact",
+        "path": "/chat"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 11,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 11,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 11,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_034pyllgtar"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_1ogren7ws05",
+      "name": "Ping click",
+      "routeId": "rt_12v7saiyoj2",
+      "componentId": "cmp_24ds4vfe8jw",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_12v7saiyoj2",
+          "componentId": "cmp_24ds4vfe8jw",
+          "event": "onClick",
+          "loc": {
+            "file": "components/Ping.tsx",
+            "line": 21,
+            "column": 29
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1pacrdimeqg"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_12v7saiyoj2"
+      ]
+    }
+  ],
+  "queryLinks": []
+}

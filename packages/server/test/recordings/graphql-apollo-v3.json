@@ -1,0 +1,1715 @@
+{
+  "fixture": "graphql-apollo-v3",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvuu414r3jb3juws",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.379Z",
+      "durationMs": 316,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+              }
+            }
+          },
+          "size": 166
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "operation": {
+        "name": "Todos",
+        "hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "typeCheck": {
+        "siteId": "req_0tco1ayy7vx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "TodosData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu414il3u15yq1",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.370Z",
+      "durationMs": 342,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+              }
+            }
+          },
+          "size": 167
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "operation": {
+        "name": "Viewer",
+        "hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "typeCheck": {
+        "siteId": "req_0zshh8iwl6e",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu41dozeaquhqi",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.700Z",
+      "durationMs": 71,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+              }
+            },
+            "query": "query Todos {\n  todos {\n    ...TodoFields\n    __typename\n  }\n}\n\nfragment TodoFields on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          },
+          "size": 317
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "1",
+                  "title": "Write the schema",
+                  "done": true,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          },
+          "size": 240
+        }
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query",
+        "hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0tco1ayy7vx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "TodosData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu41eao6r3ew8y",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.722Z",
+      "durationMs": 78,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+              }
+            },
+            "query": "query Viewer {\n  viewer {\n    id\n    name\n    email\n    __typename\n  }\n}"
+          },
+          "size": 257
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "viewer": {
+                "id": "u1",
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "__typename": "User"
+              }
+            }
+          },
+          "size": 99
+        }
+      },
+      "operation": {
+        "name": "Viewer",
+        "type": "query",
+        "hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0zshh8iwl6e",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43gswo3rzo83",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.404Z",
+      "durationMs": 19,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "AddTodo",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+              }
+            }
+          },
+          "size": 203
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "AddTodo",
+        "hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "typeCheck": {
+        "siteId": "req_1vvhclt0a1p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "AddTodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43hd6m0julh9",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.425Z",
+      "durationMs": 23,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "AddTodo",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+              }
+            },
+            "query": "mutation AddTodo($input: AddTodoInput!) {\n  addTodo(input: $input) {\n    ...TodoFields\n    __typename\n  }\n}\n\nfragment TodoFields on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          },
+          "size": 399
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "addTodo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "__typename": "Todo"
+              }
+            }
+          },
+          "size": 90
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "AddTodo",
+        "type": "mutation",
+        "hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1vvhclt0a1p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "AddTodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43i72vl0obnn",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.455Z",
+      "durationMs": 23,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+              }
+            }
+          },
+          "size": 167
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "viewer": {
+                "id": "u1",
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "__typename": "User"
+              }
+            }
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Viewer",
+        "hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0zshh8iwl6e",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43i8zxe8x14z",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.456Z",
+      "durationMs": 35,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+              }
+            }
+          },
+          "size": 166
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "1",
+                  "title": "Write the schema",
+                  "done": true,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "4",
+                  "title": "Record captures",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          },
+          "size": 310
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Todos",
+        "hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0tco1ayy7vx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "TodosData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu44kclhtxbxxy",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:48.828Z",
+      "durationMs": 28,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+              }
+            }
+          },
+          "size": 173
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:48 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "typeCheck": {
+        "siteId": "req_1pbvj0u5igd",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu44l5pxcxf7b8",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:48.857Z",
+      "durationMs": 48,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+              }
+            },
+            "query": "query Todo($id: ID!) {\n  todo(id: $id) {\n    ...TodoFields\n    status\n    owner {\n      id\n      name\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment TodoFields on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          },
+          "size": 413
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:48 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "__typename": "Todo",
+                "status": "OPEN",
+                "owner": {
+                  "id": "u1",
+                  "name": "Ada Lovelace",
+                  "__typename": "User"
+                }
+              }
+            }
+          },
+          "size": 165
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "type": "query",
+        "hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1pbvj0u5igd",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu45r1ka2otzj7",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:50.365Z",
+      "durationMs": 17,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "DeleteTodo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+              }
+            }
+          },
+          "size": 179
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:50 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T10:33:50.362Z"
+      },
+      "operation": {
+        "name": "DeleteTodo",
+        "hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "typeCheck": {
+        "siteId": "req_16r77ymnxz7",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "DeleteTodoData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu45rj48y9efub",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:50.384Z",
+      "durationMs": 19,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "DeleteTodo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+              }
+            },
+            "query": "mutation DeleteTodo($id: ID!) {\n  deleteTodo(id: $id)\n}"
+          },
+          "size": 247
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:50 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "deleteTodo": true
+            }
+          },
+          "size": 28
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T10:33:50.362Z"
+      },
+      "operation": {
+        "name": "DeleteTodo",
+        "type": "mutation",
+        "hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_16r77ymnxz7",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "DeleteTodoData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4940m1o96g91",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:54.720Z",
+      "durationMs": 52,
+      "pageUrl": "http://localhost:3077/search",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Search",
+            "variables": {
+              "text": "a"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+              }
+            }
+          },
+          "size": 177
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:54 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Search\"",
+        "componentChain": [
+          "Search",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:33:54.713Z"
+      },
+      "operation": {
+        "name": "Search",
+        "hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "typeCheck": {
+        "siteId": "req_0k4apzrnh4p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "SearchVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "SearchData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu495oo48xvg4a",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:54.780Z",
+      "durationMs": 19,
+      "pageUrl": "http://localhost:3077/search",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Search",
+            "variables": {
+              "text": "a"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+              }
+            },
+            "query": "query Search($text: String!) {\n  search(text: $text) {\n    __typename\n    ... on Todo {\n      id\n      title\n      __typename\n    }\n    ... on User {\n      id\n      name\n      __typename\n    }\n  }\n}"
+          },
+          "size": 400
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:54 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "search": [
+                {
+                  "__typename": "Todo",
+                  "id": "1",
+                  "title": "Write the schema"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "2",
+                  "title": "Add a route handler"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "3",
+                  "title": "Try a persisted query"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u1",
+                  "name": "Ada Lovelace"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u2",
+                  "name": "Grace Hopper"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u3",
+                  "name": "Alan Turing"
+                }
+              ]
+            }
+          },
+          "size": 364
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Search\"",
+        "componentChain": [
+          "Search",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:33:54.713Z"
+      },
+      "operation": {
+        "name": "Search",
+        "type": "query",
+        "hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0k4apzrnh4p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "SearchVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "SearchData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -32,6 +32,53 @@ export const CapturedBodySchema = z.discriminatedUnion('kind', [
 ])
 export type CapturedBody = z.infer<typeof CapturedBodySchema>
 
+/**
+ * One message on an event stream (M18) or a WebSocket (M19). SSE messages always come in;
+ * WebSocket messages go both ways. `body` is the data (parsed as JSON when it is JSON, the
+ * arguments for socket.io events), redacted like other bodies; it is left out when the message
+ * is larger than `capture.maxMessageBytes`. Binary WebSocket messages keep only their size.
+ */
+export const CapturedMessageSchema = z.object({
+  direction: z.enum(['in', 'out']),
+  /** SSE `event:` field or socket.io event name. Absent for unnamed events (`message`). */
+  event: z.string().optional(),
+  /** SSE `id:` field. */
+  id: z.string().optional(),
+  /** ISO time it arrived. */
+  at: z.string(),
+  /** Size of the data in bytes. */
+  size: z.number().int().nonnegative(),
+  body: CapturedBodySchema.optional(),
+})
+export type CapturedMessage = z.infer<typeof CapturedMessageSchema>
+
+/** The state of an event stream (M18) or WebSocket (M19) connection. */
+export const CapturedStreamSchema = z.object({
+  /** `open` while it is connected (the runtime sends updates), `closed` when it ended, `error` when it failed. */
+  state: z.enum(['open', 'closed', 'error']),
+  /** Messages received and sent, including the ones not kept. */
+  count: z.number().int().nonnegative(),
+  /** Bytes of message data received and sent. */
+  bytes: z.number().int().nonnegative(),
+  /** Messages were dropped (over `capture.maxMessages`) or kept without data (over `capture.maxMessageBytes`). */
+  truncated: z.boolean().optional(),
+  /** EventSource reconnects after the connection dropped. */
+  reconnects: z.number().int().positive().optional(),
+  /**
+   * Runtime updates of an open stream only carry the new messages: `from` is the index of the
+   * first one. The tool server appends them to what it has and removes the field.
+   */
+  from: z.number().int().nonnegative().optional(),
+  /** WebSocket (M19): messages are socket.io packets, decoded into events. */
+  socketIo: z.boolean().optional(),
+  /** WebSocket (M19): the subprotocol the server picked. */
+  protocol: z.string().optional(),
+  /** WebSocket (M19): the close code and reason. */
+  closeCode: z.number().int().optional(),
+  closeReason: z.string().optional(),
+})
+export type CapturedStream = z.infer<typeof CapturedStreamSchema>
+
 export const CapturedRequestSchema = z.object({
   method: z.string(),
   /** Absolute URL. */
@@ -81,8 +128,11 @@ export const CaptureSchema = z.object({
   sessionId: z.string(),
   /** Where the request was sent from. */
   origin: z.enum(['browser', 'server']),
-  /** `http` is Node's http/https module (axios on the server). */
-  transport: z.enum(['fetch', 'xhr', 'http']),
+  /**
+   * `http` is Node's http/https module (axios on the server). `eventsource`: `new EventSource()`
+   * (M18). `websocket`: `new WebSocket()`, also socket.io's (M19).
+   */
+  transport: z.enum(['fetch', 'xhr', 'http', 'eventsource', 'websocket']),
   /** ISO time the request started. */
   timestamp: z.string(),
   durationMs: z.number(),
@@ -95,6 +145,65 @@ export const CaptureSchema = z.object({
   /** Server action called by this request (from the `Next-Action` header). */
   serverAction: z.object({ id: z.string() }).optional(),
   interaction: InteractionSchema.optional(),
+  /**
+   * React Query run the request was sent from (M13): the query or mutation whose function was
+   * running, and its key as JSON (redacted like bodies). Browser only.
+   */
+  query: z
+    .object({
+      kind: z.enum(['query', 'mutation']),
+      key: z.array(z.unknown()).optional(),
+    })
+    .optional(),
+  /**
+   * tRPC call (M16). A batched request (`/api/trpc/a.b,c.d?batch=1`) is split into one capture
+   * per procedure: each has its own input as the request body, its own result (or error) as the
+   * response, and `batch` says where it came from. The URL is the single-procedure form.
+   */
+  procedure: z
+    .object({
+      path: z.string(),
+      type: z.enum(['query', 'mutation', 'subscription']),
+      batch: z
+        .object({
+          /** Id the runtime gave the whole request. Server hops still point to it as `parent.captureId`. */
+          id: z.string(),
+          index: z.number().int().nonnegative(),
+          size: z.number().int().positive(),
+        })
+        .optional(),
+    })
+    .optional(),
+  /**
+   * GraphQL operation (M17), read from the body (or the GET query). A batched request (an array
+   * of operations) is split into one capture per operation: each has its own operation as the
+   * request body and its own result as the response, and `batch` says where it came from.
+   */
+  operation: z
+    .object({
+      /** `operationName`, else the name in the query text. Absent when only a hash was sent. */
+      name: z.string().optional(),
+      type: z.enum(['query', 'mutation', 'subscription']).optional(),
+      /** Persisted query hash or document id (`extensions.persistedQuery.sha256Hash`, `doc_id`, `documentId`). */
+      hash: z.string().optional(),
+      /** Only the hash was sent, no query text. */
+      persisted: z.boolean().optional(),
+      batch: z
+        .object({
+          /** Id the runtime gave the whole request. */
+          id: z.string(),
+          index: z.number().int().nonnegative(),
+          size: z.number().int().positive(),
+        })
+        .optional(),
+    })
+    .optional(),
+  /**
+   * Event stream (M18): an `EventSource`, or a fetch answered with `text/event-stream`; or a
+   * WebSocket (M19). The messages are here, not in `response.body`.
+   */
+  stream: CapturedStreamSchema.optional(),
+  messages: z.array(CapturedMessageSchema).optional(),
   parent: CaptureParentSchema.optional(),
   /** Stack frames where the request was sent, innermost first. */
   stack: z.array(z.string()),
@@ -168,6 +277,12 @@ export interface CaptureSummary {
   pageUrl?: string
   serverActionId?: string
   parentCaptureId?: string
+  /** tRPC procedure path (M16). */
+  procedure?: string
+  /** GraphQL operation name (M17), or its hash when only that was sent. */
+  operation?: string
+  /** Event streams (M18): messages received and the connection state. */
+  stream?: { state: NonNullable<Capture['stream']>['state']; count: number }
   /** Nearest component from the interaction, if any. */
   component?: string
   redacted: boolean
@@ -193,6 +308,11 @@ export function summarizeCapture(c: Capture): CaptureSummary {
     pageUrl: c.pageUrl,
     serverActionId: c.serverAction?.id,
     parentCaptureId: c.parent?.captureId,
+    ...(c.procedure ? { procedure: c.procedure.path } : {}),
+    ...(c.operation && (c.operation.name || c.operation.hash)
+      ? { operation: c.operation.name || `#${c.operation.hash?.slice(0, 12)}` }
+      : {}),
+    ...(c.stream ? { stream: { state: c.stream.state, count: c.stream.count } } : {}),
     component: c.interaction?.componentChain[0],
     redacted: c.redacted,
     match: c.match && {

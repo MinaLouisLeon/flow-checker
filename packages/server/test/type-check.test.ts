@@ -87,7 +87,17 @@ function label(model: AppModel, siteId: string): string {
 }
 
 describe('type comparison on recorded fixture captures', () => {
-  it.each(['basic', 'react-query', 'server-actions', 'bff', 'next-intl'])(
+  it.each([
+    'basic',
+    'react-query',
+    'server-actions',
+    'bff',
+    'next-intl',
+    'graphql-apollo',
+    'graphql-apollo-v3',
+    'graphql-urql',
+    'graphql-relay',
+  ])(
     '%s: correct types give no mismatches',
     (fixture) => {
       const { model, verification } = verify(fixture)
@@ -147,5 +157,30 @@ describe('mismatch fixture', () => {
     })
     // Correctly typed: verified, no flag.
     expect(byUrl('/todos')).toEqual({ status: 'verified', flags: [], found: [] })
+  }, 120_000)
+})
+
+describe('sse fixture (M18)', () => {
+  it('checks every event, and flags only the job progress whose percent is text', () => {
+    const { served, verification } = verify('sse')
+    const result = served.requests.map((site) => ({
+      url: site.url?.path,
+      status: site.status,
+      checked: verification[site.id]?.typeCheck?.checked,
+      found: verification[site.id]?.typeCheck?.mismatches.map(
+        (m) => `${m.part} ${m.event} ${describeMismatch(m)}`,
+      ),
+    }))
+    expect(result).toEqual([
+      { url: '/api/chat', status: 'verified', checked: 1, found: [] },
+      // The first clock stream is closed at once by React's strict mode: nothing to check.
+      { url: '/api/clock', status: 'verified', checked: 1, found: [] },
+      {
+        url: '/api/jobs/:id/progress',
+        status: 'mismatch',
+        checked: 1,
+        found: ['message progress percent is string "25%" (expected number)'],
+      },
+    ])
   }, 120_000)
 })

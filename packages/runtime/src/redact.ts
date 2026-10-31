@@ -172,6 +172,11 @@ function luhn(digits: string): boolean {
   return sum % 10 === 0
 }
 
+function redactedKey(r: Redactor, key: unknown[]): unknown[] {
+  const body = r.body({ kind: 'json', value: key }, 'query.key')
+  return body.kind === 'json' && Array.isArray(body.value) ? body.value : key
+}
+
 /** Returns a redacted copy of the capture. With `storeRaw`, returns it unchanged. */
 export function redactCapture(capture: Capture, rules: RedactRules, storeRaw = false): Capture {
   if (storeRaw) return { ...capture, redacted: false }
@@ -191,10 +196,23 @@ export function redactCapture(capture: Capture, rules: RedactRules, storeRaw = f
       body: r.body(capture.response.body, 'response.body'),
     },
     parent: capture.parent && { ...capture.parent, url: r.url(capture.parent.url, 'parent.url') },
+    // Keys can hold ids, emails or tokens (`['user', email]`): masked like a JSON body.
+    query: capture.query && {
+      ...capture.query,
+      ...(capture.query.key ? { key: redactedKey(r, capture.query.key) } : {}),
+    },
+  }
+  // Event stream messages (M18). An update only carries the messages from `stream.from` on.
+  if (capture.messages) {
+    const from = capture.stream?.from ?? 0
+    out.messages = capture.messages.map((m, i) =>
+      m.body ? { ...m, body: r.body(m.body, `messages[${from + i}].body`) } : m,
+    )
   }
   if (out.pageUrl === undefined) delete out.pageUrl
   if (out.response === undefined) delete out.response
   if (out.parent === undefined) delete out.parent
+  if (out.query === undefined) delete out.query
   out.redacted = true
   out.redactedPaths = [...new Set([...capture.redactedPaths, ...r.paths])]
   return out

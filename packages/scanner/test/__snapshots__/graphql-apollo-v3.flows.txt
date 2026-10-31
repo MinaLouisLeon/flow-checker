@@ -1,0 +1,31 @@
+# Navigation
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+push /todos/:id -> /todos/[id]  event onSubmit  success
+
+## TodoDetail  src/components/TodoDetail.tsx
+push / -> /  event onClick  success
+
+## TodoList  src/components/TodoList.tsx
+link /todos/:id -> /todos/[id]  event onClick  conditional
+
+# Flows
+
+## AddTodoForm submit  (/ -> /todos/[id])
+1. AddTodoForm onSubmit on /
+2. POST /api/graphql
+3. refetchQueries GraphQL Todos -> POST /api/graphql
+4. refetchQueries GraphQL Viewer -> POST /api/graphql
+5. push -> /todos/[id]
+6. load POST /api/graphql
+
+## Search submit  (/search)
+1. Search onSubmit on /search
+2. POST /api/graphql
+
+## TodoDetail click  (/todos/[id] -> /)
+1. TodoDetail onClick on /todos/[id]
+2. POST /api/graphql
+3. push -> /
+4. load POST /api/graphql
+5. load POST /api/graphql

@@ -261,6 +261,8 @@ export const TypeRefSchema = z.object({
   /** Source text of the annotation, or the checker's rendering when the type was inferred. */
   text: z.string(),
   shape: TypeShapeSchema,
+  /** `postman`: not in the code, taken from the Postman collection's saved examples (M15). */
+  source: z.literal('postman').optional(),
 })
 export type TypeRef = z.infer<typeof TypeRefSchema>
 
@@ -329,9 +331,10 @@ export const RequestUrlSchema = z.object({
   text: z.string(),
   /**
    * `exact`: fully resolved. `pattern`: resolved with `:param` placeholders for values only
-   * known at runtime. `unknown`: the path could not be resolved.
+   * known at runtime. `unknown`: the path could not be resolved. `postman`: the code didn't say,
+   * the path comes from the matching Postman collection request (M15).
    */
-  confidence: z.enum(['exact', 'pattern', 'unknown']),
+  confidence: z.enum(['exact', 'pattern', 'unknown', 'postman']),
   /** Origin or base URL, e.g. `http://localhost:4010`. Absent for same-origin paths like `/api/x`. */
   base: z.string().optional(),
   /** Environment variable the base comes from, e.g. `NEXT_PUBLIC_API_URL`. `base` is then its fallback. */
@@ -350,6 +353,7 @@ export const TriggerSchema = z.object({
    * `effect`: inside `useEffect` / `useLayoutEffect`.
    * `event`: a user interaction, see `event`.
    * `route-handler` / `server-action`: runs when the handler or action is called (second hop).
+   * `middleware`: runs in `middleware.ts` / `proxy.ts` before a matching request is handled (M14).
    */
   kind: z.enum([
     'server-render',
@@ -358,6 +362,7 @@ export const TriggerSchema = z.object({
     'event',
     'route-handler',
     'server-action',
+    'middleware',
     'unknown',
   ]),
   /** Event prop, e.g. `onSubmit`, `onClick`, or `action` for `<form action={...}>`. */
@@ -371,6 +376,9 @@ export const FlagSchema = z.object({
   /**
    * Added by the tool server: `type-mismatch` when captured data doesn't fit the declared types
    * (M8), `stale` when the code changed after the last capture (M9).
+   * From a Postman collection (M15): `not-in-collection` (a site the collection has no request
+   * for), `contract-mismatch` (the code's type doesn't fit the saved examples) and, on collection
+   * requests, `unused-endpoint` (no site calls it).
    */
   kind: z.enum([
     'dynamic-url',
@@ -379,10 +387,152 @@ export const FlagSchema = z.object({
     'unknown-trigger',
     'type-mismatch',
     'stale',
+    'not-in-collection',
+    'contract-mismatch',
+    'unused-endpoint',
   ]),
   message: z.string(),
 })
 export type Flag = z.infer<typeof FlagSchema>
+
+// ---------------------------------------------------------------------------------------------
+// React Query keys and cache links (M13).
+
+/**
+ * One segment of a query key. `static`: a literal or constant. `param`: a value only known at
+ * runtime (`:id`), matches any one segment. `object`: `{ status: 'open', page: :page }`.
+ * `rest`: a spread the scanner could not resolve, matches any number of segments.
+ */
+export type QueryKeyPart =
+  | { kind: 'static'; value: string | number | boolean | null }
+  | { kind: 'param'; name: string }
+  | { kind: 'object'; entries: { key: string; value: QueryKeyPart }[] }
+  | { kind: 'rest'; text: string }
+
+export const QueryKeyPartSchema: z.ZodType<QueryKeyPart> = z.lazy(() =>
+  z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('static'),
+      value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    }),
+    z.object({ kind: z.literal('param'), name: z.string() }),
+    z.object({
+      kind: z.literal('object'),
+      entries: z.array(z.object({ key: z.string(), value: QueryKeyPartSchema })),
+    }),
+    z.object({ kind: z.literal('rest'), text: z.string() }),
+  ]),
+)
+
+// ---------------------------------------------------------------------------------------------
+// tRPC (M16).
+
+export const TRPC_PROCEDURE_TYPES = ['query', 'mutation', 'subscription'] as const
+export const TrpcProcedureTypeSchema = z.enum(TRPC_PROCEDURE_TYPES)
+export type TrpcProcedureType = z.infer<typeof TrpcProcedureTypeSchema>
+
+/** A tRPC procedure a request site calls (client) or runs in (server), by its dotted path. */
+export const ProcedureRefSchema = z.object({
+  /** e.g. `todo.byId`. */
+  path: z.string(),
+  type: TrpcProcedureTypeSchema,
+})
+export type ProcedureRef = z.infer<typeof ProcedureRefSchema>
+
+// ---------------------------------------------------------------------------------------------
+// GraphQL (M17).
+
+export const GRAPHQL_OPERATION_TYPES = ['query', 'mutation', 'subscription'] as const
+export const GraphqlOperationTypeSchema = z.enum(GRAPHQL_OPERATION_TYPES)
+export type GraphqlOperationType = z.infer<typeof GraphqlOperationTypeSchema>
+
+export const GRAPHQL_LIBRARIES = ['apollo', 'urql', 'relay'] as const
+export const GraphqlLibrarySchema = z.enum(GRAPHQL_LIBRARIES)
+export type GraphqlLibrary = z.infer<typeof GraphqlLibrarySchema>
+
+/** The GraphQL operation a request site sends, see `AppModel.graphql.operations`. */
+export const OperationRefSchema = z.object({
+  /** See `GraphqlOperation.id`. */
+  id: z.string(),
+  /** e.g. `GetTodos`. Empty for an anonymous operation. */
+  name: z.string(),
+  type: GraphqlOperationTypeSchema,
+})
+export type OperationRef = z.infer<typeof OperationRefSchema>
+
+// ---------------------------------------------------------------------------------------------
+// Server-sent events (M18).
+
+/** One kind of event on an event stream: the name and the type of its parsed `data`. */
+export const SseEventSchema = z.object({
+  /** The `event:` field. `message` for events without one (what `onmessage` gets). */
+  name: z.string(),
+  /** The type of `data` parsed as JSON, when the code declares one. */
+  dataType: TypeRefSchema.optional(),
+  /** Where it is listened to (client) or sent (route handler). */
+  loc: SourceLocSchema.optional(),
+})
+export type SseEvent = z.infer<typeof SseEventSchema>
+
+/** A request site that opens an event stream. */
+export const SiteStreamSchema = z.object({
+  /** `event-source`: `new EventSource(url)`. `fetch`: a fetch whose response is read as an event stream. */
+  api: z.enum(['event-source', 'fetch']),
+  /**
+   * Events the code listens to (`onmessage`, `addEventListener('x')`), then the ones the route
+   * handler sends that it doesn't (`listened: false`). `typeFrom` says where the type came from.
+   */
+  events: z.array(
+    SseEventSchema.extend({
+      listened: z.boolean(),
+      typeFrom: z.enum(['code', 'handler']).optional(),
+    }),
+  ),
+  /** `new EventSource(url, { withCredentials: true })`. */
+  withCredentials: z.boolean().optional(),
+})
+export type SiteStream = z.infer<typeof SiteStreamSchema>
+
+/** A route handler that answers with `text/event-stream` (M18). */
+export const SseEndpointSchema = z.object({
+  id: z.string(),
+  routeId: z.string(),
+  method: HttpMethodSchema,
+  /** Events it writes (`event: x` / `data: ...` text). An empty list when none could be read. */
+  events: z.array(SseEventSchema),
+  loc: SourceLocSchema,
+  /** Request sites that open this stream. */
+  siteIds: z.array(z.string()),
+})
+export type SseEndpoint = z.infer<typeof SseEndpointSchema>
+
+// ---------------------------------------------------------------------------------------------
+// WebSockets (M19).
+
+/** One kind of message on a WebSocket: which way it goes, its name and the type of its data. */
+export const SocketMessageSchema = z.object({
+  /** `in`: received (`onmessage`, `socket.on(name)`). `out`: sent (`ws.send()`, `socket.emit(name)`). */
+  direction: z.enum(['in', 'out']),
+  /** The socket.io event name. `message` for native WebSocket messages, which have no name. */
+  name: z.string(),
+  /** The data's type (parsed as JSON for native WebSockets), when the code declares one. */
+  dataType: TypeRefSchema.optional(),
+  /** The first place it is listened to or sent. */
+  loc: SourceLocSchema.optional(),
+})
+export type SocketMessage = z.infer<typeof SocketMessageSchema>
+
+/** A request site that opens a WebSocket: `new WebSocket(url)` or socket.io's `io(url)`. */
+export const SiteSocketSchema = z.object({
+  api: z.enum(['websocket', 'socket.io']),
+  /** Messages it listens to and sends, one entry per direction and name. */
+  messages: z.array(SocketMessageSchema),
+  /** Subprotocols asked for: `new WebSocket(url, ['v1'])`. */
+  protocols: z.array(z.string()).optional(),
+  /** socket.io namespace (`io('http://host/chat')`), when it isn't `/`. */
+  namespace: z.string().optional(),
+})
+export type SiteSocket = z.infer<typeof SiteSocketSchema>
 
 export const ServerActionRefSchema = z.object({
   name: z.string(),
@@ -392,8 +542,8 @@ export type ServerActionRef = z.infer<typeof ServerActionRefSchema>
 
 export const RequestSiteSchema = z.object({
   id: z.string(),
-  /** Where the code that sends the request runs. */
-  origin: z.enum(['component', 'route-handler', 'server-action']),
+  /** Where the code that sends the request runs. `middleware`: `middleware.ts` / `proxy.ts` (M14). */
+  origin: z.enum(['component', 'route-handler', 'server-action', 'middleware']),
   /** Origin `component`: the component. */
   componentId: z.string().optional(),
   /** Origin `route-handler`: the handler's route and exported method. */
@@ -401,11 +551,20 @@ export const RequestSiteSchema = z.object({
   handlerMethod: HttpMethodSchema.optional(),
   /** Transport `server-action`: the action called. Origin `server-action`: the action it runs in. */
   serverAction: ServerActionRefSchema.optional(),
-  /** `api-client`: a call to a function listed in the config's `apiClients` (see `client`). */
-  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action']),
+  /**
+   * `api-client`: a call to a function listed in the config's `apiClients` (see `client`).
+   * `trpc`: a tRPC procedure call (hooks, `queryOptions()`, the vanilla client), see `procedure`.
+   * `graphql`: a GraphQL operation sent by Apollo, urql or Relay, see `operation`.
+   * `sse`: an event stream, `new EventSource()` or a streamed `fetch` (M18), see `stream`.
+   * `websocket`: `new WebSocket()` or socket.io's `io()` (M19), see `socket`.
+   */
+  transport: z.enum(['fetch', 'axios', 'api-client', 'server-action', 'trpc', 'graphql', 'sse', 'websocket']),
   /** Transport `api-client`: the configured module and the function or method called. */
   client: z.object({ module: z.string(), name: z.string() }).optional(),
-  /** Set when a data-fetching hook runs the request. `key` is the query/SWR key as written. */
+  /**
+   * Set when a data-fetching hook (or a `queryClient` method such as `prefetchQuery`) runs the
+   * request. `key` is the query/SWR key as written.
+   */
   hook: z
     .object({
       name: z.string(),
@@ -413,6 +572,19 @@ export const RequestSiteSchema = z.object({
       key: z.string().optional(),
     })
     .optional(),
+  /** React Query: the query or mutation key, parsed into segments (M13). */
+  queryKey: z.array(QueryKeyPartSchema).optional(),
+  /**
+   * tRPC (M16). Transport `trpc`: the procedure called. Origin `route-handler`: the procedure
+   * whose resolver sends this request (the handler is the tRPC endpoint).
+   */
+  procedure: ProcedureRefSchema.optional(),
+  /** Transport `graphql` (M17): the operation sent. `bodyType` is its variables, `responseType` its `data`. */
+  operation: OperationRefSchema.optional(),
+  /** Transport `sse` (M18): the events it listens to and their types. Checked per message. */
+  stream: SiteStreamSchema.optional(),
+  /** Transport `websocket` (M19): the messages it sends and receives and their types. Checked per message. */
+  socket: SiteSocketSchema.optional(),
   /** Absent when it could not be resolved. Server actions are always `POST`. */
   method: HttpMethodSchema.optional(),
   /** Absent for server actions, which post to the current page. */
@@ -422,6 +594,16 @@ export const RequestSiteSchema = z.object({
   responseType: TypeRefSchema.optional(),
   /** From the call in the origin (outermost) down to the network call. */
   callStack: z.array(CallFrameSchema),
+  /** The Postman collection request it calls (M15), see `AppModel.postman`. */
+  contract: z
+    .object({
+      requestId: z.string(),
+      /** The request's name in the collection. */
+      name: z.string(),
+      /** `url`: matched by method and URL. `code`: the URL was unknown and the call's names and method pointed to it. */
+      by: z.enum(['url', 'code']),
+    })
+    .optional(),
   /** For a request to one of the app's route handlers: that route. */
   targetRouteId: z.string().optional(),
   /** Requests this one leads to on the server: route handler (BFF) hops or fetches in the server action. */
@@ -441,14 +623,58 @@ export const RequestSiteSchema = z.object({
 })
 export type RequestSite = z.infer<typeof RequestSiteSchema>
 
+export const QUERY_LINK_KINDS = ['invalidate', 'refetch', 'reset', 'remove', 'set-data', 'hydrate'] as const
+
+/**
+ * A React Query cache call and the queries it hits (M13): `invalidateQueries`, `refetchQueries`,
+ * `resetQueries`, `removeQueries`, `setQueryData`, or a server-side prefetch that a
+ * `HydrationBoundary` hands to the client queries with the same key (`hydrate`).
+ */
+export const QueryLinkSchema = z.object({
+  id: z.string(),
+  kind: z.enum(QUERY_LINK_KINDS),
+  /** The method as called, e.g. `invalidateQueries`, or `prefetchQuery` for `hydrate`. */
+  method: z.string(),
+  origin: z.enum(['component', 'server-action']),
+  componentId: z.string().optional(),
+  /** The key or key prefix it targets. Absent: every query (unless `procedure` is set). */
+  key: z.array(QueryKeyPartSchema).optional(),
+  /**
+   * tRPC (M16): the procedure path or path prefix whose queries it hits, e.g. `todo.list` for
+   * `utils.todo.list.invalidate()` or `trpc.todo.list.pathFilter()`. `''`: every tRPC query.
+   */
+  procedure: z.string().optional(),
+  /** GraphQL (M17): the operation whose queries it refetches, e.g. Apollo's `refetchQueries: ['Todos']`. */
+  operation: z.string().optional(),
+  /** Only queries with exactly this key (`exact: true`, `setQueryData`). */
+  exact: z.boolean().optional(),
+  /** Requests it runs after: the mutation whose callback calls it, or the server prefetch (`hydrate`). */
+  fromSiteIds: z.array(z.string()),
+  /** Query request sites whose key it hits. */
+  targetSiteIds: z.array(z.string()),
+  trigger: TriggerSchema,
+  /** Runs only after the mutation succeeded (`onSuccess`) or failed (`onError`). */
+  outcome: z.enum(['success', 'error']).optional(),
+  loc: SourceLocSchema,
+  callStack: z.array(CallFrameSchema),
+})
+export type QueryLink = z.infer<typeof QueryLinkSchema>
+
 // ---------------------------------------------------------------------------------------------
 // Navigation and flows (M7, docs/PLAN.md 6.6): where the app moves between pages, and the user
 // flows inferred from event handlers (event -> requests -> navigation -> next page -> ...).
 
+/** A request path check in middleware: `pathname === '/x'` (`exact`) or `pathname.startsWith('/x')`. */
+export const PathCheckSchema = z.object({
+  kind: z.enum(['prefix', 'exact']),
+  path: z.string(),
+})
+export type PathCheck = z.infer<typeof PathCheckSchema>
+
 export const NavigationSchema = z.object({
   id: z.string(),
-  /** Where the code that navigates runs. */
-  origin: z.enum(['component', 'server-action']),
+  /** Where the code that navigates runs. `middleware`: a `NextResponse.redirect()` in middleware (M14). */
+  origin: z.enum(['component', 'server-action', 'middleware']),
   componentId: z.string().optional(),
   /** Origin `server-action`: the action that redirects. */
   serverAction: ServerActionRefSchema.optional(),
@@ -472,6 +698,18 @@ export const NavigationSchema = z.object({
   outcome: z.enum(['success', 'error']).optional(),
   /** Only rendered or reached on some paths. */
   conditional: z.boolean().optional(),
+  /**
+   * Origin `middleware`: the other conditions it is under, as written (`!token`). Checks of the
+   * request path are left out: they are in `from` and `sourceRouteIds`.
+   */
+  condition: z.string().optional(),
+  /** Origin `middleware`: the request path check it is under, e.g. `pathname === '/old-home'`. */
+  from: PathCheckSchema.optional(),
+  /**
+   * Origin `middleware`: the pages it can redirect away from. Those the middleware runs on, narrowed
+   * by the path checks around it.
+   */
+  sourceRouteIds: z.array(z.string()).optional(),
   loc: SourceLocSchema,
   /** From the origin down to the navigation call. */
   callStack: z.array(CallFrameSchema),
@@ -501,6 +739,11 @@ export const FlowStepSchema = z.discriminatedUnion('kind', [
     navigationId: z.string(),
     routeId: z.string().optional(),
   }),
+  /** A React Query cache update after the previous request, e.g. invalidating the list it changed (M13). */
+  z.object({
+    kind: z.literal('query-update'),
+    linkId: z.string(),
+  }),
 ])
 export type FlowStep = z.infer<typeof FlowStepSchema>
 
@@ -528,6 +771,266 @@ export const FlowSchema = z.object({
 })
 export type Flow = z.infer<typeof FlowSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Middleware (M14, docs/PLAN.md): `middleware.ts` (Next <= 15) or `proxy.ts` (Next 16), which runs
+// before the requests its `config.matcher` selects.
+
+export const MatcherConditionSchema = z.object({
+  type: z.enum(['header', 'query', 'cookie', 'host']),
+  key: z.string(),
+  value: z.string().optional(),
+})
+export type MatcherCondition = z.infer<typeof MatcherConditionSchema>
+
+export const MiddlewareMatcherSchema = z.object({
+  /** The path pattern as written, e.g. `/dashboard/:path*`. */
+  source: z.string(),
+  /** Runs only when these are present (`has`) or absent (`missing`). */
+  has: z.array(MatcherConditionSchema).optional(),
+  missing: z.array(MatcherConditionSchema).optional(),
+  /** `locale: false`: the pattern ignores the i18n locale prefix (Pages Router i18n only). */
+  locale: z.literal(false).optional(),
+})
+export type MiddlewareMatcher = z.infer<typeof MiddlewareMatcherSchema>
+
+export const MiddlewareRouteSchema = z.object({
+  routeId: z.string(),
+  /**
+   * Runs only for some requests to the route: a matcher with `has` / `missing`, or one that only
+   * fits some values of a dynamic segment (`/(en|de)/:path*` on `/[locale]`).
+   */
+  conditional: z.boolean().optional(),
+})
+export type MiddlewareRoute = z.infer<typeof MiddlewareRouteSchema>
+
+/** `NextResponse.rewrite(url)`: the URL stays, another route answers. */
+export const MiddlewareRewriteSchema = z.object({
+  id: z.string(),
+  /** The route that answers, as written and resolved like request URLs. */
+  href: RequestUrlSchema,
+  targetRouteId: z.string().optional(),
+  /** Where it applies, read from the check around it. Absent: wherever the middleware runs. */
+  from: PathCheckSchema.optional(),
+  /** The `if` conditions it is under, as written. */
+  condition: z.string().optional(),
+  loc: SourceLocSchema,
+})
+export type MiddlewareRewrite = z.infer<typeof MiddlewareRewriteSchema>
+
+export const MiddlewareSchema = z.object({
+  /** `middleware.ts` or `proxy.ts`, project-relative. */
+  file: z.string(),
+  /** `proxy` from Next 16 on, `middleware` before (deprecated in 16). */
+  convention: z.enum(['middleware', 'proxy']),
+  /** How the function is exported: `default`, or the named `proxy` / `middleware` export. */
+  exportName: z.string().optional(),
+  /** The function, or the factory call it is made with. */
+  loc: SourceLocSchema,
+  /** Created by a package factory, e.g. next-intl's `createMiddleware(routing)`. */
+  factory: z.object({ module: z.string(), name: z.string() }).optional(),
+  /** `config.matcher`. Empty: it runs on every request. */
+  matchers: z.array(MiddlewareMatcherSchema),
+  /** Set when `config.matcher` could not be read statically (the routes are then all conditional). */
+  matcherText: z.string().optional(),
+  /** Routes (pages and route handlers) it runs on. */
+  routes: z.array(MiddlewareRouteSchema),
+  rewrites: z.array(MiddlewareRewriteSchema),
+  /**
+   * next-intl `createMiddleware(routing)`: the locales from `defineRouting()`. Paths without a
+   * locale prefix are rewritten to the default locale.
+   */
+  i18n: z
+    .object({
+      locales: z.array(z.string()),
+      defaultLocale: z.string().optional(),
+      localePrefix: z.string().optional(),
+    })
+    .optional(),
+})
+export type Middleware = z.infer<typeof MiddlewareSchema>
+
+// ---------------------------------------------------------------------------------------------
+// Postman collection (M15, docs/PLAN.md): an imported collection used as the API contract.
+
+export const PostmanSourceSchema = z.object({
+  /** `file`: v2.1 JSON export. `folder`: git-native v3 YAML folder. `cloud`: fetched by id. */
+  kind: z.enum(['file', 'folder', 'cloud']),
+  /** Project-relative path (`file`, `folder`). */
+  path: z.string().optional(),
+  /** Collection or environment id (`cloud`). */
+  id: z.string().optional(),
+})
+export type PostmanSource = z.infer<typeof PostmanSourceSchema>
+
+export const PostmanExampleSchema = z.object({
+  name: z.string(),
+  /** HTTP status of the saved response. */
+  status: z.number().int().optional(),
+})
+export type PostmanExample = z.infer<typeof PostmanExampleSchema>
+
+export const PostmanRequestSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** Folder names from the collection root down. */
+  folder: z.array(z.string()),
+  method: HttpMethodSchema,
+  /**
+   * The URL with collection and environment variables filled in. `text` is the URL as written
+   * (`{{baseUrl}}/users/:id`). Unresolved variables in the path become `:name`.
+   */
+  url: RequestUrlSchema,
+  /** Variables the URL uses that neither the collection nor the environment sets. */
+  unresolved: z.array(z.string()).optional(),
+  /** From the saved examples with a 2xx JSON body (`source: 'postman'`). */
+  responseType: TypeRefSchema.optional(),
+  /** From the request's JSON body (GraphQL: its variables). */
+  bodyType: TypeRefSchema.optional(),
+  /** GraphQL (M17): the operation the request's body sends, e.g. `Todos`. */
+  operation: z.string().optional(),
+  examples: z.array(PostmanExampleSchema),
+  /** Request sites that call it. */
+  siteIds: z.array(z.string()),
+  flags: z.array(FlagSchema),
+})
+export type PostmanRequest = z.infer<typeof PostmanRequestSchema>
+
+export const PostmanContractSchema = z.object({
+  collection: z.object({ name: z.string(), source: PostmanSourceSchema }),
+  environment: z.object({ name: z.string(), source: PostmanSourceSchema }).optional(),
+  /** When it was imported (ISO time). */
+  importedAt: z.string(),
+  requests: z.array(PostmanRequestSchema),
+})
+export type PostmanContract = z.infer<typeof PostmanContractSchema>
+
+// ---------------------------------------------------------------------------------------------
+// tRPC (M16): the router read from the code and the endpoint that serves it.
+
+export const TrpcProcedureSchema = z.object({
+  id: z.string(),
+  /** Dotted path, e.g. `todo.byId`. Merged routers add theirs at the top level. */
+  path: z.string(),
+  type: TrpcProcedureTypeSchema,
+  /** The `.query()` / `.mutation()` / `.subscription()` call. */
+  loc: SourceLocSchema,
+  /** From `.input(schema)` (zod), else the resolver's `input` type. */
+  inputType: TypeRefSchema.optional(),
+  /** From `.output(schema)`, else the resolver's return type. */
+  outputType: TypeRefSchema.optional(),
+  /** Client request sites that call it. */
+  siteIds: z.array(z.string()),
+})
+export type TrpcProcedure = z.infer<typeof TrpcProcedureSchema>
+
+export const TrpcSchema = z.object({
+  /** Path the procedures are served under, e.g. `/api/trpc`. */
+  endpoint: z.string(),
+  /** The route handler that serves it (`fetchRequestHandler`), when found. */
+  routeId: z.string().optional(),
+  /** The root router: its variable name and where it is defined. */
+  router: z.object({ name: z.string(), loc: SourceLocSchema }).optional(),
+  procedures: z.array(TrpcProcedureSchema),
+})
+export type Trpc = z.infer<typeof TrpcSchema>
+
+// ---------------------------------------------------------------------------------------------
+// GraphQL (M17): the operations and fragments written in the code, and where their types come from.
+
+export const GraphqlOperationSchema = z.object({
+  id: z.string(),
+  /** Empty for an anonymous operation. */
+  name: z.string(),
+  type: GraphqlOperationTypeSchema,
+  /**
+   * How the document is written. `tag`: a `gql` / `graphql` tagged template (Apollo, urql,
+   * graphql-tag, Relay). `codegen`: the GraphQL Code Generator client preset's `graphql()`.
+   * `generated`: a document constant written by codegen. `file`: an imported `.graphql` file.
+   */
+  source: z.enum(['tag', 'codegen', 'generated', 'file']),
+  /** The tag, call or file. */
+  loc: SourceLocSchema,
+  /** The operation as written, without the fragments it spreads. */
+  document: z.string(),
+  /** Fragments it spreads, directly or through other fragments, by name. */
+  fragments: z.array(z.string()),
+  /**
+   * Persisted query ids: the sha256 of the document as printed with its fragments, and the ids a
+   * persisted query manifest gives it.
+   */
+  hashes: z.array(z.string()),
+  variablesType: TypeRefSchema.optional(),
+  /** The `data` it answers with. */
+  resultType: TypeRefSchema.optional(),
+  /**
+   * `code`: type arguments written in the code (`useQuery<Data, Vars>()`). `codegen`: a
+   * `TypedDocumentNode`. `relay`: the Relay compiler's `$data` / `$variables` types.
+   * `schema` / `introspection`: worked out from the schema file or the live endpoint.
+   */
+  typesFrom: z.enum(['code', 'codegen', 'relay', 'schema', 'introspection']).optional(),
+  /** Where the document doesn't fit the schema, e.g. `Cannot query field "x" on type "Todo".` */
+  errors: z.array(z.string()).optional(),
+  /** Request sites that send it. */
+  siteIds: z.array(z.string()),
+})
+export type GraphqlOperation = z.infer<typeof GraphqlOperationSchema>
+
+export const GraphqlFragmentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** The type it is on, e.g. `Todo`. */
+  on: z.string(),
+  loc: SourceLocSchema,
+  document: z.string(),
+  /** Components that read it (`useFragment`). */
+  componentIds: z.array(z.string()),
+})
+export type GraphqlFragment = z.infer<typeof GraphqlFragmentSchema>
+
+export const GraphqlClientSchema = z.object({
+  library: GraphqlLibrarySchema,
+  /** `new ApolloClient()`, `createClient()`, `Network.create()`. */
+  loc: SourceLocSchema,
+  /** The URL it sends to, when it could be read. */
+  endpoint: RequestUrlSchema.optional(),
+  /** Sends several operations in one request (Apollo's `BatchHttpLink`). */
+  batching: z.boolean().optional(),
+  /** Sends persisted query hashes (Apollo's `createPersistedQueryLink`, urql's persisted exchange). */
+  persisted: z.boolean().optional(),
+  /** Sends queries as GET (urql's default, Apollo's `useGETForQueries`). */
+  getForQueries: z.boolean().optional(),
+})
+export type GraphqlClient = z.infer<typeof GraphqlClientSchema>
+
+export const GraphqlInfoSchema = z.object({
+  /** Where operations are sent. From the clients, the config, or a `/graphql` route handler. */
+  endpoint: RequestUrlSchema.optional(),
+  /** The route handler that serves it, when it is in the app. */
+  routeId: z.string().optional(),
+  clients: z.array(GraphqlClientSchema),
+  /** The schema types were worked out from, when there is one. */
+  schema: z
+    .object({
+      source: z.enum(['file', 'introspection']),
+      /** `file`: project-relative path. */
+      path: z.string().optional(),
+      /** `introspection`: the endpoint asked. */
+      url: z.string().optional(),
+      /** `introspection`: when it was fetched (ISO time). */
+      fetchedAt: z.string().optional(),
+      /** Named types in it (without built-ins). */
+      types: z.number().int().nonnegative(),
+      /** Set when the schema could not be read. */
+      error: z.string().optional(),
+    })
+    .optional(),
+  /** Persisted query manifest whose ids map to the operations. */
+  manifest: z.object({ path: z.string(), operations: z.number().int().nonnegative() }).optional(),
+  operations: z.array(GraphqlOperationSchema),
+  fragments: z.array(GraphqlFragmentSchema),
+})
+export type GraphqlInfo = z.infer<typeof GraphqlInfoSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -538,7 +1041,24 @@ export const ProjectInfoSchema = z.object({
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 
 export const AppModelSchema = z.object({
-  version: z.literal(MODEL_VERSION),
+  /**
+   * Older files read as the current version: version 1 (before M13) has no query keys or links,
+   * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
+   * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams,
+   * version 7 (before M19) no WebSockets.
+   */
+  version: z
+    .union([
+      z.literal(1),
+      z.literal(2),
+      z.literal(3),
+      z.literal(4),
+      z.literal(5),
+      z.literal(6),
+      z.literal(7),
+      z.literal(MODEL_VERSION),
+    ])
+    .transform(() => MODEL_VERSION),
   project: ProjectInfoSchema,
   routeTree: RouteTreeNodeSchema,
   routes: z.array(RouteSchema),
@@ -551,5 +1071,17 @@ export const AppModelSchema = z.object({
   navigations: z.array(NavigationSchema).default([]),
   /** User flows inferred from the code (M7). Recording confirms them at runtime. */
   flows: z.array(FlowSchema).default([]),
+  /** React Query cache calls and the queries they hit (M13). */
+  queryLinks: z.array(QueryLinkSchema).default([]),
+  /** `middleware.ts` / `proxy.ts`, when the project has one (M14). */
+  middleware: MiddlewareSchema.optional(),
+  /** The imported Postman collection and how the code lines up with it (M15). */
+  postman: PostmanContractSchema.optional(),
+  /** The tRPC router and endpoint, when the project uses tRPC (M16). */
+  trpc: TrpcSchema.optional(),
+  /** GraphQL operations, fragments, clients and schema, when the project uses GraphQL (M17). */
+  graphql: GraphqlInfoSchema.optional(),
+  /** Route handlers that answer with an event stream (M18). */
+  streams: z.array(SseEndpointSchema).optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

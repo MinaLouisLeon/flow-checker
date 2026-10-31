@@ -1,5 +1,15 @@
 // Plain-text rendering of a model: used by `flow-checker scan --tree` and snapshot tests.
-import type { AppModel, Component, ComponentRef, Route, RouteTreeNode } from './model'
+import { urlText } from './format-requests'
+import type {
+  AppModel,
+  Component,
+  ComponentRef,
+  MatcherCondition,
+  Middleware,
+  MiddlewareMatcher,
+  Route,
+  RouteTreeNode,
+} from './model'
 
 export function formatModel(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -10,6 +20,8 @@ export function formatModel(model: AppModel): string {
 
   out.push('', '# Routes', '')
   for (const route of model.routes) out.push(formatRouteLine(route))
+
+  if (model.middleware) out.push('', '# Middleware', '', ...formatMiddleware(model.middleware, model.routes))
 
   const layoutIds = new Set<string>()
   for (const route of model.routes) {
@@ -33,6 +45,51 @@ export function formatModel(model: AppModel): string {
   }
 
   return `${out.join('\n')}\n`
+}
+
+function formatMiddleware(mw: Middleware, routeList: Route[]): string[] {
+  const routes = new Map(routeList.map((r) => [r.id, r]))
+  const path = (id: string | undefined) => (id ? (routes.get(id)?.path ?? id) : '?')
+  const factory = mw.factory ? `  (from ${mw.factory.module} ${mw.factory.name})` : ''
+  const out = [`${mw.file}  ${mw.convention}  export ${mw.exportName ?? '?'}${factory}`]
+  if (mw.matcherText !== undefined) out.push(`matcher: ? ${mw.matcherText}`)
+  else
+    out.push(
+      `matcher: ${mw.matchers.length > 0 ? mw.matchers.map(matcherText).join(', ') : '(every request)'}`,
+    )
+  if (mw.i18n) {
+    const extra = [
+      mw.i18n.defaultLocale && `default ${mw.i18n.defaultLocale}`,
+      mw.i18n.localePrefix && `prefix ${mw.i18n.localePrefix}`,
+    ]
+    out.push(
+      `locales: ${mw.i18n.locales.join(', ')}${extra.some(Boolean) ? ` (${extra.filter(Boolean).join(', ')})` : ''}`,
+    )
+  }
+  out.push('runs on:')
+  if (mw.routes.length === 0) out.push('  (no route)')
+  for (const r of mw.routes) {
+    const route = routes.get(r.routeId)
+    const kind = route?.kind === 'route-handler' ? 'route' : 'page'
+    out.push(`  ${path(r.routeId)}  ${kind}${r.conditional ? '  [conditional]' : ''}`)
+  }
+  for (const rw of mw.rewrites) {
+    const from = rw.from ? `${rw.from.path}${rw.from.kind === 'prefix' ? '/*' : ''}` : '(where it runs)'
+    const target = rw.targetRouteId ? ` -> ${path(rw.targetRouteId)}` : ''
+    out.push(`rewrite ${from} to ${urlText(rw.href)}${target}${rw.condition ? `  if ${rw.condition}` : ''}`)
+  }
+  return out
+}
+
+function matcherText(m: MiddlewareMatcher): string {
+  const cond = (word: string, list: MatcherCondition[] | undefined) =>
+    list?.map((c) => `${word} ${c.type} ${c.key}${c.value !== undefined ? `=${c.value}` : ''}`) ?? []
+  const extra = [
+    ...cond('has', m.has),
+    ...cond('missing', m.missing),
+    ...(m.locale === false ? ['locale: false'] : []),
+  ]
+  return extra.length > 0 ? `${m.source} (${extra.join(', ')})` : m.source
 }
 
 function formatRouteTree(root: RouteTreeNode): string[] {

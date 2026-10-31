@@ -1,0 +1,3535 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "postman",
+  "model": {
+    "version": 8,
+    "project": {
+      "appDir": "app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "app",
+      "files": {
+        "layout": "app/layout.tsx",
+        "page": "app/page.tsx"
+      },
+      "children": [
+        {
+          "segment": {
+            "raw": "users",
+            "kind": "static",
+            "name": "users"
+          },
+          "dir": "app/users",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "[id]",
+                "kind": "dynamic",
+                "name": "id"
+              },
+              "dir": "app/users/[id]",
+              "files": {
+                "page": "app/users/[id]/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_12v7saiyoj2",
+        "path": "/",
+        "kind": "page",
+        "file": "app/page.tsx",
+        "segments": [],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_0ku4o3jpe9o"
+      },
+      {
+        "id": "rt_2656kti2wza",
+        "path": "/users/[id]",
+        "kind": "page",
+        "file": "app/users/[id]/page.tsx",
+        "segments": [
+          {
+            "raw": "users",
+            "kind": "static",
+            "name": "users"
+          },
+          {
+            "raw": "[id]",
+            "kind": "dynamic",
+            "name": "id"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_0vmo84pmvzo"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_2dznycb4aq7",
+        "name": "RootLayout",
+        "file": "app/layout.tsx",
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 5,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0ku4o3jpe9o",
+        "name": "HomePage",
+        "file": "app/page.tsx",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 9,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 17,
+              "column": 13
+            }
+          },
+          {
+            "name": "ProductPanel",
+            "resolution": "project",
+            "componentId": "cmp_1n9jz878unm",
+            "module": "@/components/ProductPanel",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 21,
+              "column": 7
+            }
+          },
+          {
+            "name": "TodoPanel",
+            "resolution": "project",
+            "componentId": "cmp_1t97i8o4yqd",
+            "module": "@/components/TodoPanel",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 22,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0vmo84pmvzo",
+        "name": "UserPage",
+        "file": "app/users/[id]/page.tsx",
+        "loc": {
+          "file": "app/users/[id]/page.tsx",
+          "line": 7,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "DeleteUserButton",
+            "resolution": "project",
+            "componentId": "cmp_0yr9r67zb7l",
+            "module": "@/components/DeleteUserButton",
+            "loc": {
+              "file": "app/users/[id]/page.tsx",
+              "line": 14,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ params: Promise<{ id: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "id",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0yr9r67zb7l",
+        "name": "DeleteUserButton",
+        "file": "components/DeleteUserButton.tsx",
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 7,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ id: number }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_1n9jz878unm",
+        "name": "ProductPanel",
+        "file": "components/ProductPanel.tsx",
+        "loc": {
+          "file": "components/ProductPanel.tsx",
+          "line": 7,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_1f1vojxmn7g"
+        ]
+      },
+      {
+        "id": "cmp_1t97i8o4yqd",
+        "name": "TodoPanel",
+        "file": "components/TodoPanel.tsx",
+        "loc": {
+          "file": "components/TodoPanel.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_29n1iw0u1hd"
+        ]
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_2ao02lpx6nv",
+        "name": "User",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/index.ts",
+          "line": 1,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "role",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "literal",
+                    "value": "admin"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": "member"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1f1vojxmn7g",
+        "name": "Product",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/index.ts",
+          "line": 8,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "price",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "stock",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_29n1iw0u1hd",
+        "name": "Todo",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/index.ts",
+          "line": 16,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "userId",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1hvhy5iwv7p",
+        "name": "NewTodo",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/index.ts",
+          "line": 23,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "userId",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_0iv5kcsl9up",
+        "origin": "component",
+        "componentId": "cmp_0ku4o3jpe9o",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/users`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/users"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "responseType": {
+          "text": "User[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_2ao02lpx6nv",
+              "name": "User"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/page.tsx",
+            "line": 10,
+            "column": 23,
+            "callee": "getUsers"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 5,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0fg187m8sqo",
+        "contract": {
+          "requestId": "pmr_0juh4djhx8l",
+          "name": "List users",
+          "by": "url"
+        }
+      },
+      {
+        "id": "req_0zfyatg6d3b",
+        "origin": "component",
+        "componentId": "cmp_0vmo84pmvzo",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/users/${id}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/users/:id"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "callStack": [
+          {
+            "file": "app/users/[id]/page.tsx",
+            "line": 9,
+            "column": 22,
+            "callee": "getUser"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 12,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0cjc3ugqn3q",
+        "contract": {
+          "requestId": "pmr_0kyh3rt9c3n",
+          "name": "Get user",
+          "by": "url"
+        },
+        "responseType": {
+          "text": "{ id: number; name: string; email: string; role: string }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "name",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              },
+              {
+                "name": "email",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              },
+              {
+                "name": "role",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            ]
+          },
+          "source": "postman"
+        }
+      },
+      {
+        "id": "req_1nhvqmicx4q",
+        "origin": "component",
+        "componentId": "cmp_0yr9r67zb7l",
+        "transport": "fetch",
+        "method": "DELETE",
+        "url": {
+          "text": "`${API_URL}/users/${id}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/users/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 12,
+            "column": 7
+          }
+        },
+        "responseType": {
+          "text": "void",
+          "shape": {
+            "kind": "primitive",
+            "name": "void"
+          }
+        },
+        "callStack": [
+          {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 13,
+            "column": 15,
+            "callee": "deleteUser"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 18,
+            "column": 9,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [
+          {
+            "kind": "not-in-collection",
+            "message": "The Postman collection \"Fixture API\" has no DELETE /users/:id request."
+          }
+        ],
+        "hash": "0v5hvfeh041"
+      },
+      {
+        "id": "req_08kv7zxxjyg",
+        "origin": "component",
+        "componentId": "cmp_1n9jz878unm",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/products`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/products"
+        },
+        "trigger": {
+          "kind": "effect",
+          "loc": {
+            "file": "components/ProductPanel.tsx",
+            "line": 10,
+            "column": 3
+          }
+        },
+        "responseType": {
+          "text": "Product[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_1f1vojxmn7g",
+              "name": "Product"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "components/ProductPanel.tsx",
+            "line": 11,
+            "column": 5,
+            "callee": "getProducts"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 23,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "mismatch",
+        "flags": [
+          {
+            "kind": "contract-mismatch",
+            "message": "The response type Product[] doesn't match the Postman example \"200 OK\": [].price is number 49.9 (expected string)."
+          },
+          {
+            "kind": "type-mismatch",
+            "message": "Response doesn't match Product[]: [].price is number 49.9 (expected string) (4 of 4 captures)."
+          }
+        ],
+        "hash": "1ftdj3a383s",
+        "contract": {
+          "requestId": "pmr_266pqs2sv5q",
+          "name": "List products",
+          "by": "url"
+        }
+      },
+      {
+        "id": "req_1e93pbv41le",
+        "origin": "component",
+        "componentId": "cmp_1t97i8o4yqd",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "todosUrl()",
+          "confidence": "postman",
+          "base": "http://localhost:4010",
+          "path": "/todos"
+        },
+        "trigger": {
+          "kind": "effect",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 11,
+            "column": 3
+          }
+        },
+        "responseType": {
+          "text": "Todo[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_29n1iw0u1hd",
+              "name": "Todo"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "components/TodoPanel.tsx",
+            "line": 12,
+            "column": 5,
+            "callee": "listTodos"
+          },
+          {
+            "file": "lib/todos.ts",
+            "line": 10,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0a6z6pqzkty",
+        "contract": {
+          "requestId": "pmr_1786nvyhcbb",
+          "name": "List todos",
+          "by": "code"
+        }
+      },
+      {
+        "id": "req_07zzxwzir2w",
+        "origin": "component",
+        "componentId": "cmp_1t97i8o4yqd",
+        "transport": "fetch",
+        "method": "POST",
+        "url": {
+          "text": "`${API_URL}/todos`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "NEXT_PUBLIC_API_URL",
+          "path": "/todos"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 30,
+            "column": 13
+          }
+        },
+        "bodyType": {
+          "text": "NewTodo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1hvhy5iwv7p",
+            "name": "NewTodo"
+          }
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_29n1iw0u1hd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "components/TodoPanel.tsx",
+            "line": 18,
+            "column": 24,
+            "callee": "createTodo"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 28,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0vavnv5rl27",
+        "contract": {
+          "requestId": "pmr_1jsi4tlr1i9",
+          "name": "Create todo",
+          "by": "url"
+        }
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_187trj3je4u",
+        "origin": "component",
+        "componentId": "cmp_0ku4o3jpe9o",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "`/users/${user.id}`",
+          "confidence": "pattern",
+          "path": "/users/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 17,
+            "column": 13
+          }
+        },
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 17,
+          "column": 13
+        },
+        "callStack": [
+          {
+            "file": "app/page.tsx",
+            "line": 17,
+            "column": 13,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_2656kti2wza"
+      },
+      {
+        "id": "nav_0sd8psgs88b",
+        "origin": "component",
+        "componentId": "cmp_0yr9r67zb7l",
+        "kind": "push",
+        "api": "next",
+        "href": {
+          "text": "'/'",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 12,
+            "column": 7
+          }
+        },
+        "loc": {
+          "file": "components/DeleteUserButton.tsx",
+          "line": 14,
+          "column": 9
+        },
+        "callStack": [
+          {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 14,
+            "column": 9,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_12v7saiyoj2"
+      }
+    ],
+    "flows": [
+      {
+        "id": "flw_0fqpu2cziqz",
+        "name": "DeleteUserButton click",
+        "routeId": "rt_2656kti2wza",
+        "componentId": "cmp_0yr9r67zb7l",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_2656kti2wza",
+            "componentId": "cmp_0yr9r67zb7l",
+            "event": "onClick",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 12,
+              "column": 7
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_1nhvqmicx4q"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_0sd8psgs88b",
+            "routeId": "rt_12v7saiyoj2"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0iv5kcsl9up",
+            "onLoad": true
+          },
+          {
+            "kind": "request",
+            "siteId": "req_08kv7zxxjyg",
+            "onLoad": true
+          },
+          {
+            "kind": "request",
+            "siteId": "req_1e93pbv41le",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_2656kti2wza",
+          "rt_12v7saiyoj2"
+        ]
+      },
+      {
+        "id": "flw_1t5pivgbvgp",
+        "name": "TodoPanel submit",
+        "routeId": "rt_12v7saiyoj2",
+        "componentId": "cmp_1t97i8o4yqd",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_12v7saiyoj2",
+            "componentId": "cmp_1t97i8o4yqd",
+            "event": "onSubmit",
+            "loc": {
+              "file": "components/TodoPanel.tsx",
+              "line": 30,
+              "column": 13
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_07zzxwzir2w"
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_12v7saiyoj2"
+        ]
+      }
+    ],
+    "queryLinks": [],
+    "postman": {
+      "collection": {
+        "name": "Fixture API",
+        "source": {
+          "kind": "folder",
+          "path": "postman/collections/Fixture API"
+        }
+      },
+      "environment": {
+        "name": "Local",
+        "source": {
+          "kind": "file",
+          "path": "postman/environments/local.yaml"
+        }
+      },
+      "importedAt": "2026-10-29T12:00:00.000Z",
+      "requests": [
+        {
+          "id": "pmr_0juh4djhx8l",
+          "name": "List users",
+          "folder": [
+            "Users"
+          ],
+          "method": "GET",
+          "url": {
+            "text": "{{baseUrl}}/users",
+            "confidence": "exact",
+            "base": "http://localhost:4010",
+            "path": "/users"
+          },
+          "responseType": {
+            "text": "{ id: number; name: string; email: string; role: string }[]",
+            "shape": {
+              "kind": "array",
+              "element": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "name": "name",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "email",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "role",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "source": "postman"
+          },
+          "examples": [
+            {
+              "name": "200 OK",
+              "status": 200
+            }
+          ],
+          "siteIds": [
+            "req_0iv5kcsl9up"
+          ],
+          "flags": []
+        },
+        {
+          "id": "pmr_0kyh3rt9c3n",
+          "name": "Get user",
+          "folder": [
+            "Users"
+          ],
+          "method": "GET",
+          "url": {
+            "text": "{{baseUrl}}/users/:id",
+            "confidence": "pattern",
+            "base": "http://localhost:4010",
+            "path": "/users/:id"
+          },
+          "responseType": {
+            "text": "{ id: number; name: string; email: string; role: string }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                },
+                {
+                  "name": "name",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "email",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "role",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            },
+            "source": "postman"
+          },
+          "examples": [
+            {
+              "name": "200 OK",
+              "status": 200
+            },
+            {
+              "name": "404 Not Found",
+              "status": 404
+            }
+          ],
+          "siteIds": [
+            "req_0zfyatg6d3b"
+          ],
+          "flags": []
+        },
+        {
+          "id": "pmr_266pqs2sv5q",
+          "name": "List products",
+          "folder": [
+            "Products"
+          ],
+          "method": "GET",
+          "url": {
+            "text": "{{baseUrl}}/products",
+            "confidence": "exact",
+            "base": "http://localhost:4010",
+            "path": "/products"
+          },
+          "responseType": {
+            "text": "{ id: number; name: string; price: number; stock: number }[]",
+            "shape": {
+              "kind": "array",
+              "element": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "name": "name",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "price",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "name": "stock",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  }
+                ]
+              }
+            },
+            "source": "postman"
+          },
+          "examples": [
+            {
+              "name": "200 OK",
+              "status": 200
+            }
+          ],
+          "siteIds": [
+            "req_08kv7zxxjyg"
+          ],
+          "flags": []
+        },
+        {
+          "id": "pmr_072ggar1q9m",
+          "name": "Delete product",
+          "folder": [
+            "Products"
+          ],
+          "method": "DELETE",
+          "url": {
+            "text": "{{baseUrl}}/products/:id",
+            "confidence": "pattern",
+            "base": "http://localhost:4010",
+            "path": "/products/:id"
+          },
+          "examples": [],
+          "siteIds": [],
+          "flags": [
+            {
+              "kind": "unused-endpoint",
+              "message": "No request in the code calls this endpoint."
+            }
+          ]
+        },
+        {
+          "id": "pmr_1786nvyhcbb",
+          "name": "List todos",
+          "folder": [
+            "Todos"
+          ],
+          "method": "GET",
+          "url": {
+            "text": "{{baseUrl}}/todos",
+            "confidence": "exact",
+            "base": "http://localhost:4010",
+            "path": "/todos"
+          },
+          "responseType": {
+            "text": "{ id: number; userId: number; title: string; done: boolean }[]",
+            "shape": {
+              "kind": "array",
+              "element": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "name": "userId",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "name": "title",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "done",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "boolean"
+                    }
+                  }
+                ]
+              }
+            },
+            "source": "postman"
+          },
+          "examples": [
+            {
+              "name": "200 OK",
+              "status": 200
+            }
+          ],
+          "siteIds": [
+            "req_1e93pbv41le"
+          ],
+          "flags": []
+        },
+        {
+          "id": "pmr_01yry56rvnp",
+          "name": "Get todo",
+          "folder": [
+            "Todos"
+          ],
+          "method": "GET",
+          "url": {
+            "text": "{{baseUrl}}/todos/:id",
+            "confidence": "pattern",
+            "base": "http://localhost:4010",
+            "path": "/todos/:id"
+          },
+          "examples": [],
+          "siteIds": [],
+          "flags": [
+            {
+              "kind": "unused-endpoint",
+              "message": "No request in the code calls this endpoint."
+            }
+          ]
+        },
+        {
+          "id": "pmr_1jsi4tlr1i9",
+          "name": "Create todo",
+          "folder": [
+            "Todos"
+          ],
+          "method": "POST",
+          "url": {
+            "text": "{{baseUrl}}/todos",
+            "confidence": "exact",
+            "base": "http://localhost:4010",
+            "path": "/todos"
+          },
+          "responseType": {
+            "text": "{ id: number; userId: number; title: string; done: boolean }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                },
+                {
+                  "name": "userId",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                },
+                {
+                  "name": "title",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "done",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "boolean"
+                  }
+                }
+              ]
+            },
+            "source": "postman"
+          },
+          "bodyType": {
+            "text": "{ title: string; userId: number }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "title",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "userId",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                }
+              ]
+            },
+            "source": "postman"
+          },
+          "examples": [
+            {
+              "name": "201 Created",
+              "status": 201
+            }
+          ],
+          "siteIds": [
+            "req_07zzxwzir2w"
+          ],
+          "flags": []
+        }
+      ]
+    }
+  },
+  "verification": {
+    "sites": {
+      "req_08kv7zxxjyg": {
+        "captures": 4,
+        "lastAt": "2026-10-30T04:06:58.311Z",
+        "lastCaptureId": "cap_mvugan7rx35c2gaw",
+        "typeCheck": {
+          "checked": 4,
+          "mismatched": 4,
+          "mismatches": [
+            {
+              "kind": "wrong-type",
+              "path": "response.body[].price",
+              "expected": "string",
+              "actual": "number 49.9",
+              "part": "response",
+              "captures": 4,
+              "captureId": "cap_mvugan7rx35c2gaw"
+            }
+          ]
+        }
+      },
+      "req_1e93pbv41le": {
+        "captures": 4,
+        "lastAt": "2026-10-30T04:06:58.312Z",
+        "lastCaptureId": "cap_mvugan7s8epabo45",
+        "typeCheck": {
+          "checked": 4,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_07zzxwzir2w": {
+        "captures": 1,
+        "lastAt": "2026-10-30T04:06:52.345Z",
+        "lastCaptureId": "cap_mvugaim1vbegm98t",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1nhvqmicx4q": {
+        "captures": 1,
+        "lastAt": "2026-10-30T04:06:58.156Z",
+        "lastCaptureId": "cap_mvugan3gssk071e2",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0iv5kcsl9up": {
+        "captures": 3,
+        "lastAt": "2026-10-30T04:06:58.243Z",
+        "lastCaptureId": "cap_mvugan5vjc6a4a18",
+        "typeCheck": {
+          "checked": 3,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0zfyatg6d3b": {
+        "captures": 1,
+        "lastAt": "2026-10-30T04:06:55.532Z",
+        "lastCaptureId": "cap_mvugal2km8jscstw",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 14,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {
+      "flw_0fqpu2cziqz": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      },
+      "flw_1t5pivgbvgp": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      }
+    },
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvugagoxl2nq3u9l",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.857Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:200:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_08kv7zxxjyg",
+        "score": 140,
+        "candidates": [
+          {
+            "siteId": "req_08kv7zxxjyg",
+            "score": 140,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getProducts"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagoz2i06zh97",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.859Z",
+      "durationMs": 11,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1e93pbv41le",
+        "score": 140,
+        "candidates": [
+          {
+            "siteId": "req_1e93pbv41le",
+            "score": 140,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "TodoPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "listTodos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagp4cce9gyma",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.864Z",
+      "durationMs": 8,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:200:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_08kv7zxxjyg",
+        "score": 140,
+        "candidates": [
+          {
+            "siteId": "req_08kv7zxxjyg",
+            "score": 140,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getProducts"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagp6wy0d9ztn",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.866Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1e93pbv41le",
+        "score": 140,
+        "candidates": [
+          {
+            "siteId": "req_1e93pbv41le",
+            "score": 140,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "TodoPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "listTodos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "effect"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugaim1vbegm98t",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:52.345Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Check the contract",
+            "userId": 1
+          },
+          "size": 41
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Check the contract"
+          },
+          "size": 61
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "TodoPanel",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-30T04:06:52.344Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at createTodo (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:204:23)",
+        "at onSubmit (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:94:179)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "createTodo",
+          "file": "lib/api.ts",
+          "line": 28,
+          "column": 21
+        },
+        {
+          "fn": "onSubmit",
+          "file": "components/TodoPanel.tsx",
+          "line": 18,
+          "column": 34
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_07zzxwzir2w",
+        "score": 155,
+        "candidates": [
+          {
+            "siteId": "req_07zzxwzir2w",
+            "score": 155,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "createTodo"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "TodoPanel"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_07zzxwzir2w",
+        "parts": [
+          {
+            "part": "request",
+            "type": "NewTodo",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan3gssk071e2",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.156Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/users/2",
+      "request": {
+        "method": "DELETE",
+        "url": "http://localhost:4010/users/2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 204,
+        "statusText": "No Content",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at deleteUser (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:76:11)",
+        "at onClick (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:24:170)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "deleteUser",
+          "file": "lib/api.ts",
+          "line": 18,
+          "column": 9
+        },
+        {
+          "fn": "onClick",
+          "file": "components/DeleteUserButton.tsx",
+          "line": 13,
+          "column": 25
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1nhvqmicx4q",
+        "score": 150,
+        "candidates": [
+          {
+            "siteId": "req_1nhvqmicx4q",
+            "score": 150,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "DELETE /users/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "deleteUser"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "DeleteUserButton"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/users/2"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "click event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1nhvqmicx4q",
+        "parts": [
+          {
+            "part": "response",
+            "type": "void",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7n4syihlpr",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.307Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:81:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_08kv7zxxjyg",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_08kv7zxxjyg",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getProducts"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7o5i7vgkot",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.308Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Check the contract"
+            }
+          ],
+          "size": 185
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1e93pbv41le",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_1e93pbv41le",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "TodoPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "listTodos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7rx35c2gaw",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.311Z",
+      "durationMs": 5,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at getProducts (http://localhost:3077/_next/static/chunks/_1bprm9j4qxxed._.js:81:23)",
+        "at ProductPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:22:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 23,
+          "column": 21
+        },
+        {
+          "fn": "ProductPanel.useEffect",
+          "file": "components/ProductPanel.tsx",
+          "line": 11,
+          "column": 16
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_08kv7zxxjyg",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_08kv7zxxjyg",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getProducts"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_08kv7zxxjyg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "response.body[].price",
+                "expected": "string",
+                "actual": "number 49.9",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan7s8epabo45",
+      "sessionId": "ses_mvugagixibtu4uul",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.312Z",
+      "durationMs": 6,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Check the contract"
+            }
+          ],
+          "size": 185
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "DeleteUserButton",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T04:06:58.156Z"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:241:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_075vqfzha87gy._.js:1017:195)",
+        "at listTodos (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:243:23)",
+        "at TodoPanel.useEffect (http://localhost:3077/_next/static/chunks/_1anmfrpuxicjv._.js:88:165)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1ghd_next_dist_compiled_react-dom_cjs_react-dom-client_development_1afhhvlk_tdl9.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.ts",
+          "line": 10,
+          "column": 21
+        },
+        {
+          "fn": "TodoPanel.useEffect",
+          "file": "components/TodoPanel.tsx",
+          "line": 12,
+          "column": 14
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1e93pbv41le",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_1e93pbv41le",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "TodoPanel.useEffect"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "listTodos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1e93pbv41le",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugag00n4ew8wdy",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:48.960Z",
+      "durationMs": 188,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:49 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:132:17)",
+        "at async HomePage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:24:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0iv5kcsl9up",
+        "score": 120,
+        "candidates": [
+          {
+            "siteId": "req_0iv5kcsl9up",
+            "score": 120,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "HomePage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0iv5kcsl9up",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugagd0chi70u6r",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:49.428Z",
+      "durationMs": 18,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:49 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:132:17)",
+        "at async HomePage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:24:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0iv5kcsl9up",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_0iv5kcsl9up",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "HomePage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0iv5kcsl9up",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugal2km8jscstw",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:55.532Z",
+      "durationMs": 31,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUser (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:138:17)",
+        "at async UserPage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1iy4ebnff1z-v._.js:21:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUser",
+          "file": "lib/api.ts",
+          "line": 12,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 16
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0zfyatg6d3b",
+        "score": 140,
+        "candidates": [
+          {
+            "siteId": "req_0zfyatg6d3b",
+            "score": 140,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /users/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "UserPage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUser"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/users/2"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0zfyatg6d3b",
+        "parts": [
+          {
+            "part": "response",
+            "type": "{ id: number; name: string; email: string; role: string }",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvugan5vjc6a4a18",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T04:06:58.243Z",
+      "durationMs": 8,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 04:06:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            }
+          ],
+          "size": 73
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/?_rsc=UNYZX3PacoQ5wtLo"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:132:17)",
+        "at async HomePage (<repo>\\fixtures\\postman\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0yajugc-2_tg4._.js:24:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "HomePage",
+          "file": "app/page.tsx",
+          "line": 10,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0iv5kcsl9up",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_0iv5kcsl9up",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "HomePage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0iv5kcsl9up",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 14,
+    "included": 14
+  },
+  "redacted": true
+}

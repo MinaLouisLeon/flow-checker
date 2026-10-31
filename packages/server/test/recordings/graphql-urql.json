@@ -1,0 +1,847 @@
+{
+  "fixture": "graphql-urql",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvuu4rnx2c9t2ids",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:18.765Z",
+      "durationMs": 373,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "query": "query Todos($status: TodoStatus) {\n  todos(status: $status) {\n    id\n    title\n    done\n    __typename\n  }\n}",
+            "operationName": "Todos",
+            "variables": {
+              "status": "OPEN"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:18 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          },
+          "size": 170
+        }
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_19g4fbnqrgn",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodosQueryVariables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodosQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4u08x3vxk2l1",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:21.800Z",
+      "durationMs": 36,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "AddTodo",
+            "query": "mutation AddTodo($input: AddTodoInput!) {\n  addTodo(input: $input) {\n    id\n    title\n    __typename\n  }\n}",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            }
+          },
+          "size": 200
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:21 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "addTodo": {
+                "id": "4",
+                "title": "Record captures",
+                "__typename": "Todo"
+              }
+            }
+          },
+          "size": 77
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "UrqlContext",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-30T10:34:21.783Z"
+      },
+      "operation": {
+        "name": "AddTodo",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_1ncc9k5xsh8",
+        "parts": [
+          {
+            "part": "request",
+            "type": "AddTodoMutationVariables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoMutation",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4u1l59c2nyqq",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:21.849Z",
+      "durationMs": 30,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "query": "query Todos($status: TodoStatus) {\n  todos(status: $status) {\n    id\n    title\n    done\n    __typename\n  }\n}",
+            "operationName": "Todos",
+            "variables": {
+              "status": "OPEN"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:21 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "4",
+                  "title": "Record captures",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          },
+          "size": 240
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "UrqlContext",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-30T10:34:21.783Z"
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_19g4fbnqrgn",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodosQueryVariables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodosQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4vdauhs2lpd4",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:23.566Z",
+      "durationMs": 57,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "query": "query Todo($id: ID!) {\n  todo(id: $id) {\n    id\n    title\n    done\n    status\n    owner {\n      name\n      email\n      __typename\n    }\n    __typename\n  }\n}",
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:23 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "status": "OPEN",
+                "owner": {
+                  "name": "Ada Lovelace",
+                  "email": "ada@example.com",
+                  "__typename": "User"
+                },
+                "__typename": "Todo"
+              }
+            }
+          },
+          "size": 181
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "UrqlContext",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext"
+        ],
+        "at": "2026-10-30T10:34:21.783Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_13zx8cl90id",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoQueryVariables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4wjt7yz0xct6",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:25.097Z",
+      "durationMs": 27,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "ToggleTodo",
+            "query": "mutation ToggleTodo($id: ID!) {\n  toggleTodo(id: $id) {\n    id\n    done\n    status\n    __typename\n  }\n}",
+            "variables": {
+              "id": "4"
+            }
+          },
+          "size": 174
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:25 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "toggleTodo": {
+                "id": "4",
+                "done": true,
+                "status": "DONE",
+                "__typename": "Todo"
+              }
+            }
+          },
+          "size": 82
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T10:34:25.094Z"
+      },
+      "operation": {
+        "name": "ToggleTodo",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0pkoq320yzc",
+        "parts": [
+          {
+            "part": "request",
+            "type": "ToggleTodoMutationVariables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "ToggleTodoMutation",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4wkl2vws2huj",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:25.125Z",
+      "durationMs": 43,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "query": "query Todo($id: ID!) {\n  todo(id: $id) {\n    id\n    title\n    done\n    status\n    owner {\n      name\n      email\n      __typename\n    }\n    __typename\n  }\n}",
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:25 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": true,
+                "status": "DONE",
+                "owner": {
+                  "name": "Ada Lovelace",
+                  "email": "ada@example.com",
+                  "__typename": "User"
+                },
+                "__typename": "Todo"
+              }
+            }
+          },
+          "size": 180
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T10:34:25.094Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_13zx8cl90id",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoQueryVariables",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4ztz8ypm2m0n",
+      "sessionId": "ses_mvuu4rdynz3jg3ym",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:34:29.351Z",
+      "durationMs": 25,
+      "pageUrl": "http://localhost:3077/users",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "application/graphql-response+json, application/graphql+json, application/json, text/event-stream, multipart/mixed"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "query": "query Users {\n  users {\n    id\n    name\n    email\n    __typename\n  }\n}",
+            "operationName": "Users",
+            "variables": {}
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:34:29 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "users": [
+                {
+                  "id": "u1",
+                  "name": "Ada Lovelace",
+                  "email": "ada@example.com",
+                  "__typename": "User"
+                },
+                {
+                  "id": "u2",
+                  "name": "Grace Hopper",
+                  "email": "grace@example.com",
+                  "__typename": "User"
+                },
+                {
+                  "id": "u3",
+                  "name": "Alan Turing",
+                  "email": "alan@example.com",
+                  "__typename": "User"
+                }
+              ]
+            }
+          },
+          "size": 262
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Load users\"",
+        "componentChain": [
+          "UserList",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:34:29.350Z"
+      },
+      "operation": {
+        "name": "Users",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lctc-lafk0au._.js:1448:195)",
+        "at fetchOperation (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:1395:54)",
+        "at fetchOperation.next (<anonymous>)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ho91m_7jzc1z._.js:5272:38"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "typeCheck": {
+        "siteId": "req_0m0edcldv9l",
+        "parts": [
+          {
+            "part": "response",
+            "type": "UsersQuery",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}

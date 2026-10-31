@@ -1,0 +1,65 @@
+# Types
+
+AddTodoInput  type-alias  src/__generated__/AddTodoFormMutation.graphql.ts:14
+  { ownerId?: string | null; title: string }
+AddTodoFormMutation$variables  type-alias  src/__generated__/AddTodoFormMutation.graphql.ts:18
+  { input: AddTodoInput }
+AddTodoFormMutation$data  type-alias  src/__generated__/AddTodoFormMutation.graphql.ts:21
+  { readonly addTodo: { readonly id: string; readonly title: string } }
+AddTodoFormMutation  type-alias  src/__generated__/AddTodoFormMutation.graphql.ts:27
+  { response: AddTodoFormMutation$data; variables: AddTodoFormMutation$variables }
+TodoStatus  type-alias  src/__generated__/TodoDetailQuery.graphql.ts:14
+  "DONE" | "OPEN" | "%future added value"
+TodoDetailQuery$variables  type-alias  src/__generated__/TodoDetailQuery.graphql.ts:15
+  { id: string }
+TodoDetailQuery$data  type-alias  src/__generated__/TodoDetailQuery.graphql.ts:18
+  { readonly todo: { readonly done: boolean; readonly id: string; readonly owner: { readonly name: string }; readonly status: TodoStatus; readonly title: string } | null | undefined }
+TodoDetailQuery  type-alias  src/__generated__/TodoDetailQuery.graphql.ts:29
+  { response: TodoDetailQuery$data; variables: TodoDetailQuery$variables }
+TodoDetailToggleMutation$variables  type-alias  src/__generated__/TodoDetailToggleMutation.graphql.ts:14
+  { id: string }
+TodoDetailToggleMutation$data  type-alias  src/__generated__/TodoDetailToggleMutation.graphql.ts:17
+  { readonly toggleTodo: { readonly done: boolean; readonly id: string } }
+TodoDetailToggleMutation  type-alias  src/__generated__/TodoDetailToggleMutation.graphql.ts:23
+  { response: TodoDetailToggleMutation$data; variables: TodoDetailToggleMutation$variables }
+TodoItem_todo$data  type-alias  src/__generated__/TodoItem_todo.graphql.ts:12
+  { readonly done: boolean; readonly title: string; readonly " $fragmentType": "TodoItem_todo" }
+TodoItem_todo$key  type-alias  src/__generated__/TodoItem_todo.graphql.ts:17
+  { readonly " $data"?: TodoItem_todo$data; readonly " $fragmentSpreads": { TodoItem_todo: true } }
+TodoListQuery$variables  type-alias  src/__generated__/TodoListQuery.graphql.ts:15
+  { [key: string]: never }
+TodoListQuery$data  type-alias  src/__generated__/TodoListQuery.graphql.ts:16
+  { readonly todos: readonly { readonly id: string; readonly " $fragmentSpreads": { TodoItem_todo: true } }[] }
+TodoListQuery  type-alias  src/__generated__/TodoListQuery.graphql.ts:22
+  { response: TodoListQuery$data; variables: TodoListQuery$variables }
+UserListQuery$variables  type-alias  src/__generated__/UserListQuery.graphql.ts:14
+  { [key: string]: never }
+UserListQuery$data  type-alias  src/__generated__/UserListQuery.graphql.ts:15
+  { readonly users: readonly { readonly email: string; readonly id: string; readonly name: string }[] }
+UserListQuery  type-alias  src/__generated__/UserListQuery.graphql.ts:22
+  { response: UserListQuery$data; variables: UserListQuery$variables }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:7
+  props: { children: ReactNode }
+Page  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+AddTodoForm  src/components/AddTodoForm.tsx:8
+  uses: AddTodoFormMutation
+ClientOnly  src/components/ClientOnly.tsx:8
+  props: { children: ReactNode; fallback: ReactNode }
+TodoDetail  src/components/TodoDetail.tsx:27
+  props: { id: string; queryRef: PreloadedQuery<TodoDetailQuery> } = { id: string; queryRef: { kind: "PreloadedQuery"; environment: Environment; environmentProviderOptions?: { [key: string]: unknown } | null; fetchKey: string | number; fetchPolicy: "store-or-network" | "store-and-network" | "network-only"; networkCacheConfig?: CacheConfig | null; id?: string | null; name: string; source?: RelayObservable<GraphQLResponse> | null; variables: TodoDetailQuery$variables; dispose: () => void; isDisposed: boolean } }
+  uses: TodoDetailQuery, TodoDetailToggleMutation
+TodoItem  src/components/TodoItem.tsx:7
+  props: { id: string; todo: TodoItem_todo$key }
+TodoList  src/components/TodoList.tsx:7
+  uses: TodoListQuery
+TodoPage  src/components/TodoPage.tsx:8
+  props: { id: string }
+  uses: TodoDetailQuery
+UserList  src/components/UserList.tsx:7
+  uses: UserListQuery$data, UserListQuery

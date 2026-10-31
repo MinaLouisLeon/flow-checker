@@ -1,0 +1,23 @@
+# Types
+
+User  interface  types/index.ts:1
+  { id: number; name: string; email: string; role: "admin" | "member" }
+Product  interface  types/index.ts:8
+  { id: number; name: string; price: string; stock: number }
+Todo  interface  types/index.ts:16
+  { id: number; userId: number; title: string; done: boolean }
+NewTodo  interface  types/index.ts:23
+  { title: string; userId: number }
+
+# Component types
+
+RootLayout  app/layout.tsx:5
+  props: { children: ReactNode }
+UserPage  app/users/[id]/page.tsx:7
+  props: { params: Promise<{ id: string }> }
+DeleteUserButton  components/DeleteUserButton.tsx:7
+  props: { id: number }
+ProductPanel  components/ProductPanel.tsx:7
+  uses: Product
+TodoPanel  components/TodoPanel.tsx:8
+  uses: Todo

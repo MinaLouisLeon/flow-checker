@@ -1,12 +1,14 @@
 // Plain-text rendering of navigation and inferred flows: `flow-checker scan --flows` and snapshot tests.
 import { triggerText, urlText } from './format-requests'
 import type { AppModel, FlowStep, Navigation } from './model'
+import { queryLinkTarget } from './query-keys'
 
 export function formatFlows(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
   const routes = new Map(model.routes.map((r) => [r.id, r]))
   const sites = new Map(model.requests.map((s) => [s.id, s]))
   const navs = new Map(model.navigations.map((n) => [n.id, n]))
+  const links = new Map(model.queryLinks.map((l) => [l.id, l]))
   const routePath = (id: string | undefined) => (id ? (routes.get(id)?.path ?? id) : '?')
 
   const out: string[] = ['# Navigation']
@@ -16,13 +18,20 @@ export function formatFlows(model: AppModel): string {
     const owner =
       nav.origin === 'server-action'
         ? `server action ${nav.serverAction?.name ?? '?'}`
-        : (components.get(nav.componentId ?? '')?.name ?? 'component')
+        : nav.origin === 'middleware'
+          ? 'middleware'
+          : (components.get(nav.componentId ?? '')?.name ?? 'component')
     const label = `${owner}  ${nav.loc.file}`
     if (label !== group) {
       out.push('', `## ${label}`)
       group = label
     }
     out.push(navLine(nav))
+    if (nav.sourceRouteIds) {
+      const check = nav.from ? `  path ${nav.from.path}${nav.from.kind === 'prefix' ? '/*' : ''}` : ''
+      out.push(`  from: ${nav.sourceRouteIds.map(routePath).join(', ') || '(no page)'}${check}`)
+    }
+    if (nav.condition) out.push(`  if: ${nav.condition}`)
   }
 
   out.push('', '# Flows')
@@ -68,6 +77,15 @@ export function formatFlows(model: AppModel): string {
       case 'navigate': {
         const nav = navs.get(step.navigationId)
         return `${nav?.kind ?? 'navigate'} -> ${step.routeId ? routePath(step.routeId) : nav ? urlText(nav.href) : '?'}`
+      }
+      case 'query-update': {
+        const link = links.get(step.linkId)
+        if (!link) return `${step.linkId}`
+        const key = queryLinkTarget(link)
+        const hits = link.targetSiteIds
+          .map((id) => sites.get(id))
+          .map((s) => (s ? `${s.method ?? '?'} ${s.url ? urlText(s.url) : '?'}` : '?'))
+        return `${link.method} ${key}${hits.length > 0 ? ` -> ${[...new Set(hits)].join(', ')}` : ''}`
       }
     }
   }

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 8,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -545,5 +545,6 @@
         "rt_12v7saiyoj2"
       ]
     }
-  ]
+  ],
+  "queryLinks": []
 }

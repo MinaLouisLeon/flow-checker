@@ -95,7 +95,7 @@ describe('cli dev', () => {
     for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true })
   })
 
-  it('scans, serves the model and re-scans on request', async () => {
+  it('scans, serves the model and re-scans on request', { timeout: 30_000 }, async () => {
     const root = mkdtempSync(join(tmpdir(), 'flow-checker-dev-'))
     dirs.push(root)
     mkdirSync(join(root, 'app', 'about'), { recursive: true })

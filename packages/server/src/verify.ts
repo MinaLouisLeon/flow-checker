@@ -2,6 +2,8 @@
 // decisions in `.flow-checker/overrides.json`, compares matched captures with the site's
 // declared types (M8), and derives each request site's status. Captures taken before a site's
 // code last changed are stale, and a site with only stale captures needs a re-check (M9).
+
+import { splitTrpcCapture } from '@flow-checker/runtime/trpc'
 import {
   type AppModel,
   applyVerification,
@@ -72,9 +74,10 @@ export class Verifier {
 
   /**
    * A new scan result. Every capture is matched again. Site ids include line numbers, so a site
-   * whose lines moved gets a new id: its captures and manual matches move with it.
+   * whose lines moved gets a new id: its captures and manual matches move with it. `changedAt`:
+   * when the files changed, so captures taken while the re-scan ran count as the new code's.
    */
-  setModel(model: AppModel): void {
+  setModel(model: AppModel, changedAt?: Date): void {
     const renamed = pairRenamedSites(this.model.requests, model.requests)
     if (this.overrides.get().matches.some((m) => m.siteId && renamed[m.siteId])) {
       this.overrides.update((current) => ({
@@ -85,7 +88,7 @@ export class Verifier {
         }),
       }))
     }
-    this.history.update(model)
+    this.history.update(model, changedAt)
     this.model = model
     this.matcher = new Matcher(model)
     this.sites = new Map(model.requests.map((s) => [s.id, s]))
@@ -112,20 +115,47 @@ export class Verifier {
     return this.isStale(capture) ? { ...summary, stale: true } : summary
   }
 
+  /** One capture per tRPC procedure (M16), using the scanned endpoint. Others come back as they are. */
+  splitTrpc(capture: Capture): Capture[] {
+    return splitTrpcCapture(capture, this.model.trpc ? [this.model.trpc.endpoint] : [])
+  }
+
   /** Matches and stores new captures from the runtime. */
   ingest(captures: Capture[]): void {
     for (const incoming of captures) {
       // The runtime must not decide these.
       const { match: _, sourceStack: __, typeCheck: ___, ...rest } = incoming
-      let capture: Capture = { ...rest }
+      let capture: Capture = this.mergeStream({ ...rest })
       const frames = this.mapper.resolve(capture.stack)
       if (frames.length > 0) capture.sourceStack = frames
       capture = this.evaluate(capture)
       this.store.add(capture)
-      // Server hops that arrived first can now use this capture's match.
-      if (capture.origin === 'browser') this.rematch(this.store.children(capture.id))
+      // Server hops that arrived first can now use this capture's match. Hops of a split tRPC
+      // batch point to the whole request's id.
+      if (capture.origin === 'browser') {
+        const batch = capture.procedure?.batch?.id
+        this.rematch([...this.store.children(capture.id), ...(batch ? this.store.children(batch) : [])])
+      }
     }
     this.changed()
+  }
+
+  /**
+   * An update of an open event stream (M18) only carries its new messages, from index
+   * `stream.from`: they are added to the ones already stored.
+   */
+  private mergeStream(capture: Capture): Capture {
+    const from = capture.stream?.from
+    if (!capture.stream || from === undefined) return capture
+    const { from: _, ...stream } = capture.stream
+    const existing = this.store.get(capture.id)
+    const kept = existing?.messages ?? []
+    return {
+      ...capture,
+      stream,
+      messages: [...kept.slice(0, from), ...(capture.messages ?? [])],
+      redactedPaths: [...new Set([...(existing?.redactedPaths ?? []), ...capture.redactedPaths])],
+    }
   }
 
   /**
@@ -211,12 +241,22 @@ export class Verifier {
   }
 
   /** The capture with its match and, when matched, the type comparison against that site. */
-  private evaluate(capture: Capture): Capture {
+  private evaluate(incoming: Capture): Capture {
+    const capture = this.namePersisted(incoming)
     const { typeCheck: _, ...rest } = capture
     const match = this.matchOne(capture)
     const site = match.status === 'matched' && match.siteId ? this.sites.get(match.siteId) : undefined
     const typeCheck = site ? checkCapture(capture, site, this.types) : undefined
     return typeCheck ? { ...rest, match, typeCheck } : { ...rest, match }
+  }
+
+  /** A GraphQL query sent by persisted id only: the operation that id belongs to (M17). */
+  private namePersisted(capture: Capture): Capture {
+    const op = capture.operation
+    const hash = op?.hash
+    if (!op || !hash || op.name) return capture
+    const found = this.model.graphql?.operations.find((o) => o.hashes.includes(hash))
+    return found ? { ...capture, operation: { ...op, name: found.name, type: found.type } } : capture
   }
 
   private matchOne(capture: Capture): CaptureMatch {
@@ -233,12 +273,38 @@ export class Verifier {
     const print = fingerprint(capture)
     const decision = this.overrides.get().matches.find((m) => m.fingerprint === print)
     const parentId = capture.origin === 'server' ? capture.parent?.captureId : undefined
-    return this.matcher.match(capture, {
+    const context = {
       frames: capture.sourceStack ?? [],
       resolveAction: this.resolveAction,
-      parentMatch: parentId ? this.store.get(parentId)?.match : undefined,
       override: decision ? decision.siteId : undefined,
-    })
+    }
+    const parent = parentId ? this.store.get(parentId) : undefined
+    // A split tRPC batch: the hop's parent is one of its pieces.
+    const parents = parent ? [parent] : parentId ? this.batchPieces(parentId) : []
+    return this.matcher.matchWithParents(
+      capture,
+      context,
+      parents.map((p) => p.match),
+    )
+  }
+
+  /**
+   * Server hops made for a browser capture. For a piece of a tRPC batch, the hops of the whole
+   * request that matched a site its own site leads to.
+   */
+  children(capture: Capture): Capture[] {
+    const direct = this.store.children(capture.id)
+    const batch = capture.procedure?.batch?.id
+    if (!batch) return direct
+    const siteId = capture.match?.status === 'matched' ? capture.match.siteId : undefined
+    const chain = new Set((siteId && this.sites.get(siteId)?.chain) || [])
+    const hops = this.store.children(batch).filter((c) => !!c.match?.siteId && chain.has(c.match.siteId))
+    return [...direct, ...hops]
+  }
+
+  /** The captures a batched tRPC request was split into, by the whole request's id. */
+  private batchPieces(batchId: string): Capture[] {
+    return this.store.all().filter((c) => c.procedure?.batch?.id === batchId)
   }
 
   /**
@@ -264,7 +330,9 @@ export class Verifier {
       changed = true
       // Server hops of a re-matched browser capture use its site as evidence.
       if (capture.origin === 'browser') {
-        for (const hop of this.store.children(capture.id)) if (!listed.has(hop.id)) hops.push(hop)
+        const batch = capture.procedure?.batch?.id
+        const children = [...this.store.children(capture.id), ...(batch ? this.store.children(batch) : [])]
+        for (const hop of children) if (!listed.has(hop.id) && !hops.includes(hop)) hops.push(hop)
       }
     }
     if (hops.length > 0) this.rematch(hops)

@@ -1,0 +1,4125 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "graphql-apollo-v3",
+  "model": {
+    "version": 8,
+    "project": {
+      "appDir": "src/app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "src/app",
+      "files": {
+        "layout": "src/app/layout.tsx",
+        "page": "src/app/page.tsx"
+      },
+      "children": [
+        {
+          "segment": {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          "dir": "src/app/api",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "graphql",
+                "kind": "static",
+                "name": "graphql"
+              },
+              "dir": "src/app/api/graphql",
+              "files": {
+                "route": "src/app/api/graphql/route.ts"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "segment": {
+            "raw": "search",
+            "kind": "static",
+            "name": "search"
+          },
+          "dir": "src/app/search",
+          "files": {
+            "page": "src/app/search/page.tsx"
+          },
+          "children": []
+        },
+        {
+          "segment": {
+            "raw": "todos",
+            "kind": "static",
+            "name": "todos"
+          },
+          "dir": "src/app/todos",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "[id]",
+                "kind": "dynamic",
+                "name": "id"
+              },
+              "dir": "src/app/todos/[id]",
+              "files": {
+                "page": "src/app/todos/[id]/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_0h4e5x5madf",
+        "path": "/",
+        "kind": "page",
+        "file": "src/app/page.tsx",
+        "segments": [],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_2flvqsq9ypc"
+      },
+      {
+        "id": "rt_0pzuw37lfo4",
+        "path": "/api/graphql",
+        "kind": "route-handler",
+        "file": "src/app/api/graphql/route.ts",
+        "segments": [
+          {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          {
+            "raw": "graphql",
+            "kind": "static",
+            "name": "graphql"
+          }
+        ],
+        "layoutChain": [],
+        "methods": [
+          "GET",
+          "POST"
+        ]
+      },
+      {
+        "id": "rt_0ogco80jbuk",
+        "path": "/search",
+        "kind": "page",
+        "file": "src/app/search/page.tsx",
+        "segments": [
+          {
+            "raw": "search",
+            "kind": "static",
+            "name": "search"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_2bfruin4l64"
+      },
+      {
+        "id": "rt_0rsc27vk284",
+        "path": "/todos/[id]",
+        "kind": "page",
+        "file": "src/app/todos/[id]/page.tsx",
+        "segments": [
+          {
+            "raw": "todos",
+            "kind": "static",
+            "name": "todos"
+          },
+          {
+            "raw": "[id]",
+            "kind": "dynamic",
+            "name": "id"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_1an2304y5ca"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_17dqv782ua7",
+        "name": "RootLayout",
+        "file": "src/app/layout.tsx",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 6,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Providers",
+            "resolution": "project",
+            "componentId": "cmp_27t3g1lua9i",
+            "module": "./providers",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_2flvqsq9ypc",
+        "name": "HomePage",
+        "file": "src/app/page.tsx",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 5,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "ViewerBadge",
+            "resolution": "project",
+            "componentId": "cmp_08pr6kh6ave",
+            "module": "@/components/ViewerBadge",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          },
+          {
+            "name": "TodoList",
+            "resolution": "project",
+            "componentId": "cmp_0l3kw3n479w",
+            "module": "@/components/TodoList",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 10,
+              "column": 7
+            }
+          },
+          {
+            "name": "AddTodoForm",
+            "resolution": "project",
+            "componentId": "cmp_0r1iugj2rde",
+            "module": "@/components/AddTodoForm",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_27t3g1lua9i",
+        "name": "Providers",
+        "file": "src/app/providers.tsx",
+        "loc": {
+          "file": "src/app/providers.tsx",
+          "line": 7,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "ApolloProvider",
+            "resolution": "external",
+            "module": "@apollo/client",
+            "loc": {
+              "file": "src/app/providers.tsx",
+              "line": 9,
+              "column": 10
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_2bfruin4l64",
+        "name": "SearchPage",
+        "file": "src/app/search/page.tsx",
+        "loc": {
+          "file": "src/app/search/page.tsx",
+          "line": 3,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Search",
+            "resolution": "project",
+            "componentId": "cmp_0kv1d6bvioy",
+            "module": "@/components/Search",
+            "loc": {
+              "file": "src/app/search/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_1an2304y5ca",
+        "name": "TodoPage",
+        "file": "src/app/todos/[id]/page.tsx",
+        "loc": {
+          "file": "src/app/todos/[id]/page.tsx",
+          "line": 3,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "TodoDetail",
+            "resolution": "project",
+            "componentId": "cmp_1gqfw2iamk9",
+            "module": "@/components/TodoDetail",
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ params: Promise<{ id: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "id",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0r1iugj2rde",
+        "name": "AddTodoForm",
+        "file": "src/components/AddTodoForm.tsx",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 9,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_0wlmt9r8y2s",
+          "typ_1bkwuejlfje"
+        ]
+      },
+      {
+        "id": "cmp_0kv1d6bvioy",
+        "name": "Search",
+        "file": "src/components/Search.tsx",
+        "loc": {
+          "file": "src/components/Search.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_23i4ebffrfm",
+          "typ_1wwzgmtm01j"
+        ]
+      },
+      {
+        "id": "cmp_1gqfw2iamk9",
+        "name": "TodoDetail",
+        "file": "src/components/TodoDetail.tsx",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_255hzpa6ygn",
+          "typ_1fpq9nx1vnr",
+          "typ_23z70ad4x4v"
+        ],
+        "propsType": {
+          "text": "{ id: string }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0l3kw3n479w",
+        "name": "TodoList",
+        "file": "src/components/TodoList.tsx",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "conditional": true,
+            "loc": {
+              "file": "src/components/TodoList.tsx",
+              "line": 15,
+              "column": 11
+            }
+          }
+        ],
+        "usedTypes": [
+          "typ_1qf74f1isvg"
+        ]
+      },
+      {
+        "id": "cmp_08pr6kh6ave",
+        "name": "ViewerBadge",
+        "file": "src/components/ViewerBadge.tsx",
+        "loc": {
+          "file": "src/components/ViewerBadge.tsx",
+          "line": 7,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [
+          "typ_1y0i7pm0ntp"
+        ]
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_0eodlzjasgm",
+        "name": "SearchResult",
+        "declarationKind": "type-alias",
+        "definedAt": {
+          "file": "src/types/search.ts",
+          "line": 1,
+          "column": 13
+        },
+        "shape": {
+          "kind": "union",
+          "types": [
+            {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "__typename",
+                  "type": {
+                    "kind": "literal",
+                    "value": "Todo"
+                  }
+                },
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "title",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "__typename",
+                  "type": {
+                    "kind": "literal",
+                    "value": "User"
+                  }
+                },
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                },
+                {
+                  "name": "name",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_23i4ebffrfm",
+        "name": "SearchData",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/search.ts",
+          "line": 5,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "search",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "ref",
+                  "typeId": "typ_0eodlzjasgm",
+                  "name": "SearchResult"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1wwzgmtm01j",
+        "name": "SearchVars",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/search.ts",
+          "line": 9,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "text",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_189hnmmjqzy",
+        "name": "User",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 3,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_0drld5pt875",
+        "name": "TodoFields",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 9,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1oh2wp5idbs",
+        "name": "TodoDetailFields",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 15,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "status",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "literal",
+                    "value": "OPEN"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": "DONE"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "owner",
+              "type": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "name",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1qf74f1isvg",
+        "name": "TodosData",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 20,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "todos",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "ref",
+                  "typeId": "typ_0drld5pt875",
+                  "name": "TodoFields"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_255hzpa6ygn",
+        "name": "TodoData",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 24,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "todo",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "ref",
+                    "typeId": "typ_1oh2wp5idbs",
+                    "name": "TodoDetailFields"
+                  },
+                  {
+                    "kind": "primitive",
+                    "name": "null"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1fpq9nx1vnr",
+        "name": "TodoVars",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 28,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_0wlmt9r8y2s",
+        "name": "AddTodoData",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 32,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "addTodo",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_0drld5pt875",
+                "name": "TodoFields"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1bkwuejlfje",
+        "name": "AddTodoVars",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 36,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "input",
+              "type": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "title",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "ownerId",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    },
+                    "optional": true
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_23z70ad4x4v",
+        "name": "DeleteTodoData",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 40,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "deleteTodo",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1y0i7pm0ntp",
+        "name": "ViewerData",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 44,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "viewer",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_189hnmmjqzy",
+                "name": "User"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_1vvhclt0a1p",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "transport": "graphql",
+        "hook": {
+          "name": "useMutation",
+          "module": "@apollo/client"
+        },
+        "operation": {
+          "id": "gqo_1y77gam4ad3",
+          "name": "AddTodo",
+          "type": "mutation"
+        },
+        "method": "POST",
+        "url": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 23,
+            "column": 11
+          }
+        },
+        "bodyType": {
+          "text": "AddTodoVars",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1bkwuejlfje",
+            "name": "AddTodoVars"
+          }
+        },
+        "responseType": {
+          "text": "AddTodoData",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0wlmt9r8y2s",
+            "name": "AddTodoData"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 12,
+            "column": 21,
+            "callee": "useMutation"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1eh3azmu2ge",
+        "targetRouteId": "rt_0pzuw37lfo4"
+      },
+      {
+        "id": "req_0k4apzrnh4p",
+        "origin": "component",
+        "componentId": "cmp_0kv1d6bvioy",
+        "transport": "graphql",
+        "hook": {
+          "name": "useLazyQuery",
+          "module": "@apollo/client"
+        },
+        "operation": {
+          "id": "gqo_1jot47aloch",
+          "name": "Search",
+          "type": "query"
+        },
+        "method": "POST",
+        "url": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/Search.tsx",
+            "line": 19,
+            "column": 13
+          }
+        },
+        "bodyType": {
+          "text": "SearchVars",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1wwzgmtm01j",
+            "name": "SearchVars"
+          }
+        },
+        "responseType": {
+          "text": "SearchData",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_23i4ebffrfm",
+            "name": "SearchData"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/Search.tsx",
+            "line": 10,
+            "column": 30,
+            "callee": "useLazyQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "17m6466zegt",
+        "targetRouteId": "rt_0pzuw37lfo4"
+      },
+      {
+        "id": "req_1pbvj0u5igd",
+        "origin": "component",
+        "componentId": "cmp_1gqfw2iamk9",
+        "transport": "graphql",
+        "hook": {
+          "name": "useQuery",
+          "module": "@apollo/client"
+        },
+        "operation": {
+          "id": "gqo_1kvulfr1cu8",
+          "name": "Todo",
+          "type": "query"
+        },
+        "method": "POST",
+        "url": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "bodyType": {
+          "text": "TodoVars",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1fpq9nx1vnr",
+            "name": "TodoVars"
+          }
+        },
+        "responseType": {
+          "text": "TodoData",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_255hzpa6ygn",
+            "name": "TodoData"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 10,
+            "column": 29,
+            "callee": "useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1tcf1ehf3q2",
+        "targetRouteId": "rt_0pzuw37lfo4"
+      },
+      {
+        "id": "req_16r77ymnxz7",
+        "origin": "component",
+        "componentId": "cmp_1gqfw2iamk9",
+        "transport": "graphql",
+        "hook": {
+          "name": "useMutation",
+          "module": "@apollo/client"
+        },
+        "operation": {
+          "id": "gqo_1a51cvpy10b",
+          "name": "DeleteTodo",
+          "type": "mutation"
+        },
+        "method": "POST",
+        "url": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 22,
+            "column": 29
+          }
+        },
+        "bodyType": {
+          "text": "TodoVars",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1fpq9nx1vnr",
+            "name": "TodoVars"
+          }
+        },
+        "responseType": {
+          "text": "DeleteTodoData",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_23z70ad4x4v",
+            "name": "DeleteTodoData"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 11,
+            "column": 24,
+            "callee": "useMutation"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "010a30cxwko",
+        "targetRouteId": "rt_0pzuw37lfo4"
+      },
+      {
+        "id": "req_0tco1ayy7vx",
+        "origin": "component",
+        "componentId": "cmp_0l3kw3n479w",
+        "transport": "graphql",
+        "hook": {
+          "name": "useQuery",
+          "module": "@apollo/client"
+        },
+        "operation": {
+          "id": "gqo_0hkaj6bexpz",
+          "name": "Todos",
+          "type": "query"
+        },
+        "method": "POST",
+        "url": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "responseType": {
+          "text": "TodosData",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1qf74f1isvg",
+            "name": "TodosData"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoList.tsx",
+            "line": 9,
+            "column": 29,
+            "callee": "useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0raha0x9ykx",
+        "targetRouteId": "rt_0pzuw37lfo4"
+      },
+      {
+        "id": "req_0zshh8iwl6e",
+        "origin": "component",
+        "componentId": "cmp_08pr6kh6ave",
+        "transport": "graphql",
+        "hook": {
+          "name": "useQuery",
+          "module": "@apollo/client"
+        },
+        "operation": {
+          "id": "gqo_1mbfe3txqyi",
+          "name": "Viewer",
+          "type": "query"
+        },
+        "method": "POST",
+        "url": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "responseType": {
+          "text": "ViewerData",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1y0i7pm0ntp",
+            "name": "ViewerData"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/ViewerBadge.tsx",
+            "line": 8,
+            "column": 20,
+            "callee": "useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "2ex01gg2186",
+        "targetRouteId": "rt_0pzuw37lfo4"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_0exqx15wkl8",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "kind": "push",
+        "api": "next",
+        "href": {
+          "text": "`/todos/${data.addTodo.id}`",
+          "confidence": "pattern",
+          "path": "/todos/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 23,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 19,
+          "column": 15
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 19,
+            "column": 15,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_0rsc27vk284"
+      },
+      {
+        "id": "nav_0kgfhs9cobv",
+        "origin": "component",
+        "componentId": "cmp_1gqfw2iamk9",
+        "kind": "push",
+        "api": "next",
+        "href": {
+          "text": "'/'",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 22,
+            "column": 29
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 12,
+          "column": 24
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 11,
+            "column": 24,
+            "callee": "useMutation"
+          },
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 12,
+            "column": 24,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_0h4e5x5madf"
+      },
+      {
+        "id": "nav_0osotk0hz5u",
+        "origin": "component",
+        "componentId": "cmp_0l3kw3n479w",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "`/todos/${todo.id}`",
+          "confidence": "pattern",
+          "path": "/todos/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 15,
+            "column": 11
+          }
+        },
+        "conditional": true,
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 15,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoList.tsx",
+            "line": 15,
+            "column": 11,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_0rsc27vk284"
+      }
+    ],
+    "flows": [
+      {
+        "id": "flw_0rlw68l4cnq",
+        "name": "AddTodoForm submit",
+        "routeId": "rt_0h4e5x5madf",
+        "componentId": "cmp_0r1iugj2rde",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_0h4e5x5madf",
+            "componentId": "cmp_0r1iugj2rde",
+            "event": "onSubmit",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 23,
+              "column": 11
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_1vvhclt0a1p"
+          },
+          {
+            "kind": "query-update",
+            "linkId": "qlk_08g1rmaymmx"
+          },
+          {
+            "kind": "query-update",
+            "linkId": "qlk_09mfpd5fuot"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_0exqx15wkl8",
+            "routeId": "rt_0rsc27vk284"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_1pbvj0u5igd",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_0h4e5x5madf",
+          "rt_0rsc27vk284"
+        ]
+      },
+      {
+        "id": "flw_0he044pvh9y",
+        "name": "Search submit",
+        "routeId": "rt_0ogco80jbuk",
+        "componentId": "cmp_0kv1d6bvioy",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_0ogco80jbuk",
+            "componentId": "cmp_0kv1d6bvioy",
+            "event": "onSubmit",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 19,
+              "column": 13
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0k4apzrnh4p"
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_0ogco80jbuk"
+        ]
+      },
+      {
+        "id": "flw_0v9zuluxxvr",
+        "name": "TodoDetail click",
+        "routeId": "rt_0rsc27vk284",
+        "componentId": "cmp_1gqfw2iamk9",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_0rsc27vk284",
+            "componentId": "cmp_1gqfw2iamk9",
+            "event": "onClick",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 22,
+              "column": 29
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_16r77ymnxz7"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_0kgfhs9cobv",
+            "routeId": "rt_0h4e5x5madf"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0tco1ayy7vx",
+            "onLoad": true
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0zshh8iwl6e",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_0rsc27vk284",
+          "rt_0h4e5x5madf"
+        ]
+      }
+    ],
+    "queryLinks": [
+      {
+        "id": "qlk_08g1rmaymmx",
+        "kind": "refetch",
+        "method": "refetchQueries",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "operation": "Todos",
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 23,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 13,
+          "column": 22
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 13,
+            "column": 22,
+            "callee": "refetchQueries"
+          }
+        ],
+        "fromSiteIds": [
+          "req_1vvhclt0a1p"
+        ],
+        "targetSiteIds": [
+          "req_0tco1ayy7vx"
+        ]
+      },
+      {
+        "id": "qlk_09mfpd5fuot",
+        "kind": "refetch",
+        "method": "refetchQueries",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "operation": "Viewer",
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 23,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 13,
+          "column": 44
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 13,
+            "column": 44,
+            "callee": "refetchQueries"
+          }
+        ],
+        "fromSiteIds": [
+          "req_1vvhclt0a1p"
+        ],
+        "targetSiteIds": [
+          "req_0zshh8iwl6e"
+        ]
+      }
+    ],
+    "graphql": {
+      "endpoint": {
+        "text": "'/api/graphql'",
+        "confidence": "exact",
+        "path": "/api/graphql"
+      },
+      "routeId": "rt_0pzuw37lfo4",
+      "schema": {
+        "source": "file",
+        "path": "schema.graphql",
+        "types": 7
+      },
+      "clients": [
+        {
+          "library": "apollo",
+          "loc": {
+            "file": "src/lib/apollo.ts",
+            "line": 12,
+            "column": 10
+          },
+          "endpoint": {
+            "text": "'/api/graphql'",
+            "confidence": "exact",
+            "path": "/api/graphql"
+          },
+          "persisted": true
+        }
+      ],
+      "operations": [
+        {
+          "id": "gqo_0hkaj6bexpz",
+          "name": "Todos",
+          "type": "query",
+          "source": "tag",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 11,
+            "column": 26
+          },
+          "document": "query Todos {\n  todos {\n    ...TodoFields\n  }\n}",
+          "fragments": [
+            "TodoFields"
+          ],
+          "hashes": [
+            "242c64ec76f4d135f0475a76a413ad941f38d1ab0a24c310621c27b32575c103",
+            "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+          ],
+          "resultType": {
+            "text": "TodosData",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1qf74f1isvg",
+              "name": "TodosData"
+            }
+          },
+          "typesFrom": "code",
+          "siteIds": [
+            "req_0tco1ayy7vx"
+          ]
+        },
+        {
+          "id": "gqo_1kvulfr1cu8",
+          "name": "Todo",
+          "type": "query",
+          "source": "tag",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 20,
+            "column": 25
+          },
+          "document": "query Todo($id: ID!) {\n  todo(id: $id) {\n    ...TodoFields\n    status\n    owner {\n      id\n      name\n    }\n  }\n}",
+          "fragments": [
+            "TodoFields"
+          ],
+          "hashes": [
+            "5d14fcae42e4b3acdc00636f33a9f96dfe46a42ca716512202981dce7610ac0c",
+            "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+          ],
+          "variablesType": {
+            "text": "TodoVars",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1fpq9nx1vnr",
+              "name": "TodoVars"
+            }
+          },
+          "resultType": {
+            "text": "TodoData",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_255hzpa6ygn",
+              "name": "TodoData"
+            }
+          },
+          "typesFrom": "code",
+          "siteIds": [
+            "req_1pbvj0u5igd"
+          ]
+        },
+        {
+          "id": "gqo_1y77gam4ad3",
+          "name": "AddTodo",
+          "type": "mutation",
+          "source": "tag",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 34,
+            "column": 25
+          },
+          "document": "mutation AddTodo($input: AddTodoInput!) {\n  addTodo(input: $input) {\n    ...TodoFields\n  }\n}",
+          "fragments": [
+            "TodoFields"
+          ],
+          "hashes": [
+            "403a2227afb4b543745541660f758fea01111eb4226eee45f3e12029e70fd6ee",
+            "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+          ],
+          "variablesType": {
+            "text": "AddTodoVars",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1bkwuejlfje",
+              "name": "AddTodoVars"
+            }
+          },
+          "resultType": {
+            "text": "AddTodoData",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_0wlmt9r8y2s",
+              "name": "AddTodoData"
+            }
+          },
+          "typesFrom": "code",
+          "siteIds": [
+            "req_1vvhclt0a1p"
+          ]
+        },
+        {
+          "id": "gqo_1a51cvpy10b",
+          "name": "DeleteTodo",
+          "type": "mutation",
+          "source": "tag",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 43,
+            "column": 28
+          },
+          "document": "mutation DeleteTodo($id: ID!) {\n  deleteTodo(id: $id)\n}",
+          "fragments": [],
+          "hashes": [
+            "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+          ],
+          "variablesType": {
+            "text": "TodoVars",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1fpq9nx1vnr",
+              "name": "TodoVars"
+            }
+          },
+          "resultType": {
+            "text": "DeleteTodoData",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_23z70ad4x4v",
+              "name": "DeleteTodoData"
+            }
+          },
+          "typesFrom": "code",
+          "siteIds": [
+            "req_16r77ymnxz7"
+          ]
+        },
+        {
+          "id": "gqo_1mbfe3txqyi",
+          "name": "Viewer",
+          "type": "query",
+          "source": "tag",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 49,
+            "column": 27
+          },
+          "document": "query Viewer {\n  viewer {\n    id\n    name\n    email\n  }\n}",
+          "fragments": [],
+          "hashes": [
+            "56fbab766b819e53754ceceab628634b6a8e327518332d3e9fb33d894bc900ed",
+            "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+          ],
+          "resultType": {
+            "text": "ViewerData",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1y0i7pm0ntp",
+              "name": "ViewerData"
+            }
+          },
+          "typesFrom": "code",
+          "siteIds": [
+            "req_0zshh8iwl6e"
+          ]
+        },
+        {
+          "id": "gqo_1jot47aloch",
+          "name": "Search",
+          "type": "query",
+          "source": "tag",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 59,
+            "column": 23
+          },
+          "document": "query Search($text: String!) {\n  search(text: $text) {\n    __typename\n    ... on Todo {\n      id\n      title\n    }\n    ... on User {\n      id\n      name\n    }\n  }\n}",
+          "fragments": [],
+          "hashes": [
+            "4123128e845156b1c17ee1abdebfad5baac2ddb95dec210a254c9d56d4ab0ef8",
+            "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+          ],
+          "variablesType": {
+            "text": "SearchVars",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1wwzgmtm01j",
+              "name": "SearchVars"
+            }
+          },
+          "resultType": {
+            "text": "SearchData",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_23i4ebffrfm",
+              "name": "SearchData"
+            }
+          },
+          "typesFrom": "code",
+          "siteIds": [
+            "req_0k4apzrnh4p"
+          ]
+        }
+      ],
+      "fragments": [
+        {
+          "id": "gqf_1do6g3oj0ld",
+          "name": "TodoFields",
+          "on": "Todo",
+          "loc": {
+            "file": "src/graphql/todos.ts",
+            "line": 3,
+            "column": 28
+          },
+          "document": "fragment TodoFields on Todo {\n  id\n  title\n  done\n}",
+          "componentIds": []
+        }
+      ]
+    }
+  },
+  "verification": {
+    "sites": {
+      "req_0tco1ayy7vx": {
+        "captures": 3,
+        "lastAt": "2026-10-30T10:33:47.456Z",
+        "lastCaptureId": "cap_mvuu43i8zxe8x14z",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0zshh8iwl6e": {
+        "captures": 3,
+        "lastAt": "2026-10-30T10:33:47.455Z",
+        "lastCaptureId": "cap_mvuu43i72vl0obnn",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1vvhclt0a1p": {
+        "captures": 2,
+        "lastAt": "2026-10-30T10:33:47.425Z",
+        "lastCaptureId": "cap_mvuu43hd6m0julh9",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1pbvj0u5igd": {
+        "captures": 2,
+        "lastAt": "2026-10-30T10:33:48.857Z",
+        "lastCaptureId": "cap_mvuu44l5pxcxf7b8",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_16r77ymnxz7": {
+        "captures": 2,
+        "lastAt": "2026-10-30T10:33:50.384Z",
+        "lastCaptureId": "cap_mvuu45rj48y9efub",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0k4apzrnh4p": {
+        "captures": 2,
+        "lastAt": "2026-10-30T10:33:54.780Z",
+        "lastCaptureId": "cap_mvuu495oo48xvg4a",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 14,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {
+      "flw_0rlw68l4cnq": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      },
+      "flw_0he044pvh9y": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      },
+      "flw_0v9zuluxxvr": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      }
+    },
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvuu414r3jb3juws",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.379Z",
+      "durationMs": 316,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+              }
+            }
+          },
+          "size": 166
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "operation": {
+        "name": "Todos",
+        "hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0tco1ayy7vx",
+        "score": 100,
+        "candidates": [
+          {
+            "siteId": "req_0tco1ayy7vx",
+            "score": 100,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Todos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0tco1ayy7vx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "TodosData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu414il3u15yq1",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.370Z",
+      "durationMs": 342,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+              }
+            }
+          },
+          "size": 167
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "operation": {
+        "name": "Viewer",
+        "hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0zshh8iwl6e",
+        "score": 100,
+        "candidates": [
+          {
+            "siteId": "req_0zshh8iwl6e",
+            "score": 100,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Viewer"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0zshh8iwl6e",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu41dozeaquhqi",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.700Z",
+      "durationMs": 71,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+              }
+            },
+            "query": "query Todos {\n  todos {\n    ...TodoFields\n    __typename\n  }\n}\n\nfragment TodoFields on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          },
+          "size": 317
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "1",
+                  "title": "Write the schema",
+                  "done": true,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          },
+          "size": 240
+        }
+      },
+      "operation": {
+        "name": "Todos",
+        "type": "query",
+        "hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0tco1ayy7vx",
+        "score": 100,
+        "candidates": [
+          {
+            "siteId": "req_0tco1ayy7vx",
+            "score": 100,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Todos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0tco1ayy7vx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "TodosData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu41eao6r3ew8y",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:44.722Z",
+      "durationMs": 78,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+              }
+            },
+            "query": "query Viewer {\n  viewer {\n    id\n    name\n    email\n    __typename\n  }\n}"
+          },
+          "size": 257
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:44 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "viewer": {
+                "id": "u1",
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "__typename": "User"
+              }
+            }
+          },
+          "size": 99
+        }
+      },
+      "operation": {
+        "name": "Viewer",
+        "type": "query",
+        "hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0zshh8iwl6e",
+        "score": 100,
+        "candidates": [
+          {
+            "siteId": "req_0zshh8iwl6e",
+            "score": 100,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Viewer"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0zshh8iwl6e",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43gswo3rzo83",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.404Z",
+      "durationMs": 19,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "AddTodo",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+              }
+            }
+          },
+          "size": 203
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "AddTodo",
+        "hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1vvhclt0a1p",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_1vvhclt0a1p",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "AddTodo"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "AddTodoForm"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1vvhclt0a1p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "AddTodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43hd6m0julh9",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.425Z",
+      "durationMs": 23,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "AddTodo",
+            "variables": {
+              "input": {
+                "title": "Record captures"
+              }
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+              }
+            },
+            "query": "mutation AddTodo($input: AddTodoInput!) {\n  addTodo(input: $input) {\n    ...TodoFields\n    __typename\n  }\n}\n\nfragment TodoFields on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          },
+          "size": 399
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "addTodo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "__typename": "Todo"
+              }
+            }
+          },
+          "size": 90
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "AddTodo",
+        "type": "mutation",
+        "hash": "3f1819d16ee54d56e45ae7998635162e64d71eb45a18c10421f47aed72e9e02e"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1vvhclt0a1p",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_1vvhclt0a1p",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "AddTodo"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "AddTodoForm"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1vvhclt0a1p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "AddTodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "AddTodoData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43i72vl0obnn",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.455Z",
+      "durationMs": 23,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Viewer",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf"
+              }
+            }
+          },
+          "size": 167
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "viewer": {
+                "id": "u1",
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "__typename": "User"
+              }
+            }
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Viewer",
+        "hash": "11989ecb8468c2f61be018171850054bc1968ecc87dd54708dc1b207f7b6cfaf",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0zshh8iwl6e",
+        "score": 95,
+        "candidates": [
+          {
+            "siteId": "req_0zshh8iwl6e",
+            "score": 95,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Viewer"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0zshh8iwl6e",
+        "parts": [
+          {
+            "part": "response",
+            "type": "ViewerData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu43i8zxe8x14z",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:47.456Z",
+      "durationMs": 35,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todos",
+            "variables": {},
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911"
+              }
+            }
+          },
+          "size": 166
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todos": [
+                {
+                  "id": "1",
+                  "title": "Write the schema",
+                  "done": true,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "2",
+                  "title": "Add a route handler",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "3",
+                  "title": "Try a persisted query",
+                  "done": false,
+                  "__typename": "Todo"
+                },
+                {
+                  "id": "4",
+                  "title": "Record captures",
+                  "done": false,
+                  "__typename": "Todo"
+                }
+              ]
+            }
+          },
+          "size": 310
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Todos",
+        "hash": "01222f14ad0e3236e408a6372a7a1d8249955ac5cef1542d8f53b55ed9b94911",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0tco1ayy7vx",
+        "score": 95,
+        "candidates": [
+          {
+            "siteId": "req_0tco1ayy7vx",
+            "score": 95,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Todos"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0tco1ayy7vx",
+        "parts": [
+          {
+            "part": "response",
+            "type": "TodosData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu44kclhtxbxxy",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:48.828Z",
+      "durationMs": 28,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+              }
+            }
+          },
+          "size": 173
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:48 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1pbvj0u5igd",
+        "score": 95,
+        "candidates": [
+          {
+            "siteId": "req_1pbvj0u5igd",
+            "score": 95,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Todo"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/4"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1pbvj0u5igd",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu44l5pxcxf7b8",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:48.857Z",
+      "durationMs": 48,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Todo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+              }
+            },
+            "query": "query Todo($id: ID!) {\n  todo(id: $id) {\n    ...TodoFields\n    status\n    owner {\n      id\n      name\n      __typename\n    }\n    __typename\n  }\n}\n\nfragment TodoFields on Todo {\n  id\n  title\n  done\n  __typename\n}"
+          },
+          "size": 413
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:48 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "todo": {
+                "id": "4",
+                "title": "Record captures",
+                "done": false,
+                "__typename": "Todo",
+                "status": "OPEN",
+                "owner": {
+                  "id": "u1",
+                  "name": "Ada Lovelace",
+                  "__typename": "User"
+                }
+              }
+            }
+          },
+          "size": 165
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "ApolloContext",
+          "ApolloProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T10:33:47.399Z"
+      },
+      "operation": {
+        "name": "Todo",
+        "type": "query",
+        "hash": "0e09449f79c9be377ed88e00b678e281364eebfbe732f99daa5b3f2b049f76bd"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1pbvj0u5igd",
+        "score": 95,
+        "candidates": [
+          {
+            "siteId": "req_1pbvj0u5igd",
+            "score": 95,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Todo"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/4"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1pbvj0u5igd",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu45r1ka2otzj7",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:50.365Z",
+      "durationMs": 17,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "DeleteTodo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+              }
+            }
+          },
+          "size": 179
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:50 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T10:33:50.362Z"
+      },
+      "operation": {
+        "name": "DeleteTodo",
+        "hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_16r77ymnxz7",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_16r77ymnxz7",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "DeleteTodo"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "TodoDetail"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/4"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "click event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_16r77ymnxz7",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "DeleteTodoData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu45rj48y9efub",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:50.384Z",
+      "durationMs": 19,
+      "pageUrl": "http://localhost:3077/todos/4",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "DeleteTodo",
+            "variables": {
+              "id": "4"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+              }
+            },
+            "query": "mutation DeleteTodo($id: ID!) {\n  deleteTodo(id: $id)\n}"
+          },
+          "size": 247
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:50 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "deleteTodo": true
+            }
+          },
+          "size": 28
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Delete\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T10:33:50.362Z"
+      },
+      "operation": {
+        "name": "DeleteTodo",
+        "type": "mutation",
+        "hash": "df3507b3704816b720732c21aad5660fc53324e32318046d72fc0096ec7bc27f"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_16r77ymnxz7",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_16r77ymnxz7",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "DeleteTodo"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "TodoDetail"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/4"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "click event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_16r77ymnxz7",
+        "parts": [
+          {
+            "part": "request",
+            "type": "TodoVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "DeleteTodoData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu4940m1o96g91",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:54.720Z",
+      "durationMs": 52,
+      "pageUrl": "http://localhost:3077/search",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Search",
+            "variables": {
+              "text": "a"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+              }
+            }
+          },
+          "size": 177
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:54 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "errors": [
+              {
+                "message": "PersistedQueryNotFound",
+                "extensions": {
+                  "code": "[REDACTED:string]"
+                }
+              }
+            ]
+          },
+          "size": 99
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Search\"",
+        "componentChain": [
+          "Search",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:33:54.713Z"
+      },
+      "operation": {
+        "name": "Search",
+        "hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7",
+        "persisted": true
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8840:55"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "response.body.errors[0].extensions.code"
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0k4apzrnh4p",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_0k4apzrnh4p",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Search"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "Search"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/search"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0k4apzrnh4p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "SearchVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "SearchData",
+            "status": "skipped",
+            "reason": "GraphQL error: PersistedQueryNotFound",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvuu495oo48xvg4a",
+      "sessionId": "ses_mvuu40vevxuw5bvj",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T10:33:54.780Z",
+      "durationMs": 19,
+      "pageUrl": "http://localhost:3077/search",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/graphql",
+        "headers": {
+          "accept": "*/*",
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "operationName": "Search",
+            "variables": {
+              "text": "a"
+            },
+            "extensions": {
+              "persistedQuery": {
+                "version": 1,
+                "sha256Hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+              }
+            },
+            "query": "query Search($text: String!) {\n  search(text: $text) {\n    __typename\n    ... on Todo {\n      id\n      title\n      __typename\n    }\n    ... on User {\n      id\n      name\n      __typename\n    }\n  }\n}"
+          },
+          "size": 400
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 10:33:54 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "data": {
+              "search": [
+                {
+                  "__typename": "Todo",
+                  "id": "1",
+                  "title": "Write the schema"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "2",
+                  "title": "Add a route handler"
+                },
+                {
+                  "__typename": "Todo",
+                  "id": "3",
+                  "title": "Try a persisted query"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u1",
+                  "name": "Ada Lovelace"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u2",
+                  "name": "Grace Hopper"
+                },
+                {
+                  "__typename": "User",
+                  "id": "u3",
+                  "name": "Alan Turing"
+                }
+              ]
+            }
+          },
+          "size": 364
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Search\"",
+        "componentChain": [
+          "Search",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T10:33:54.713Z"
+      },
+      "operation": {
+        "name": "Search",
+        "type": "query",
+        "hash": "15029ee6b1a77fa90e113d273aec5c628882e954a85592be3fd3b065887fa4e7"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:248:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0n05p23t8blcl._.js:1448:195)",
+        "at http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:7930:13",
+        "at new Subscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17102:40)",
+        "at Observable.subscribe (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17164:16)",
+        "at maybeRetry (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8789:59)",
+        "at Object.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:8797:21)",
+        "at notifySubscription (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17050:26)",
+        "at onNotify (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17090:5)",
+        "at SubscriptionObserver.next (http://localhost:3077/_next/static/chunks/node_modules__pnpm_12lpdkpf8kczx._.js:17131:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0k4apzrnh4p",
+        "score": 135,
+        "candidates": [
+          {
+            "siteId": "req_0k4apzrnh4p",
+            "score": 135,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/graphql"
+              },
+              {
+                "signal": "graphql-operation",
+                "points": 40,
+                "detail": "Search"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "Search"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/search"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0k4apzrnh4p",
+        "parts": [
+          {
+            "part": "request",
+            "type": "SearchVars",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "SearchData",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 14,
+    "included": 14
+  },
+  "redacted": true
+}

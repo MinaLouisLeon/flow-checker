@@ -1,0 +1,21 @@
+# Navigation
+
+## HomePage  app/page.tsx
+link /users/:id -> /users/[id]  event onClick
+
+## DeleteUserButton  components/DeleteUserButton.tsx
+push / -> /  event onClick
+
+# Flows
+
+## DeleteUserButton click  (/users/[id] -> /)
+1. DeleteUserButton onClick on /users/[id]
+2. DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+3. push -> /
+4. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+5. load GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products
+6. load GET ? todosUrl()
+
+## TodoPanel submit  (/)
+1. TodoPanel onSubmit on /
+2. POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos

@@ -1,0 +1,27 @@
+{
+  "name": "@fixtures/graphql-urql",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: urql with gql documents and no operation types (they come from schema.graphql), queries sent as GET, useQuery / useMutation and client.query().toPromise().",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@urql/core": "6.0.3",
+    "graphql": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "urql": "5.0.4"
+  },
+  "devDependencies": {
+    "@integr8-media/flow-checker": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

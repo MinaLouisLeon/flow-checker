@@ -6,10 +6,16 @@ import { join, relative, resolve } from 'node:path'
 import { DEFAULT_PORTS, type FlowCheckerConfig, PACKAGE_NAME } from '@flow-checker/shared'
 import { ts } from 'ts-morph'
 import { ConfigError, findConfigFile, loadConfig } from './config'
+import { checkGraphql } from './graphql'
+import { EDGE_BODY } from './init'
+import { checkPostman } from './postman'
+import { createProgress } from './progress'
 import {
   defaultDevCommand,
   findHook,
+  findMiddlewareFile,
   hookDir,
+  middlewareOnEdge,
   missingGitignoreEntries,
   nextVersion,
   readPackageJson,
@@ -42,17 +48,25 @@ const NEXT_CONFIGS = [
   'next.config.cjs',
 ]
 const ICONS: Record<CheckStatus, string> = { ok: '✓', warn: '!', fail: '✗' }
+/** Checks in a typical run: the bar's total (a project can get a few more or fewer). */
+const TYPICAL_CHECKS = 13
 
 export async function doctorCommand(options: DoctorCommandOptions, io: CliIO): Promise<number> {
   const root = resolve(options.root ?? process.cwd())
-  const checks = await runDoctor({ ...options, root })
   io.out(`flow-checker doctor: ${root}\n`)
-  for (const check of checks) {
+  const progress = createProgress(io, [{ id: 'checks', weight: 1 }])
+  progress.start('checks', 'Running checks…', TYPICAL_CHECKS)
+  let done = 0
+  // Each check's line is printed as soon as it runs; the live line shows how far along it is.
+  const checks = await runDoctor({ ...options, root }, (check) => {
     io.out(`  ${ICONS[check.status]} ${check.name}: ${check.message}`)
     if (check.hint && check.status !== 'ok') {
       for (const line of check.hint.split('\n')) io.out(`      ${line}`)
     }
-  }
+    done++
+    progress.update(done, Math.max(done, TYPICAL_CHECKS))
+  })
+  progress.finish()
   const failed = checks.filter((c) => c.status === 'fail').length
   const warned = checks.filter((c) => c.status === 'warn').length
   io.out('')
@@ -67,10 +81,16 @@ export async function doctorCommand(options: DoctorCommandOptions, io: CliIO): P
 }
 
 /** Runs every check. Later checks are skipped when the project itself can't be found. */
-export async function runDoctor(options: DoctorCommandOptions & { root: string }): Promise<Check[]> {
+export async function runDoctor(
+  options: DoctorCommandOptions & { root: string },
+  onCheck?: (check: Check) => void,
+): Promise<Check[]> {
   let root = options.root
   const checks: Check[] = []
-  const add = (check: Check) => checks.push(check)
+  const add = (check: Check) => {
+    checks.push(check)
+    onCheck?.(check)
+  }
 
   add(checkNode())
 
@@ -237,6 +257,12 @@ export async function runDoctor(options: DoctorCommandOptions & { root: string }
       : undefined,
   })
 
+  const postman = await checkPostman(root, config)
+  if (postman) add(postman)
+
+  const graphql = checkGraphql(root, config)
+  if (graphql) add(graphql)
+
   if (config.capture?.storeRaw) {
     add({
       name: 'Redaction',
@@ -317,6 +343,8 @@ function checkHooks(root: string, appDir: string, next: ReturnType<typeof nextVe
   }
   hook('instrumentation', 'Server hook', 'server')
   hook('instrumentation-client', 'Browser hook', 'client')
+  const middleware = checkMiddleware(root, appDir, next)
+  if (middleware) checks.push(middleware)
 
   // Before 15.3 the browser hook only runs through withFlowChecker() (and before 15, the server
   // hook needs experimental.instrumentationHook, which the wrapper sets).
@@ -337,6 +365,48 @@ function checkHooks(root: string, appDir: string, next: ReturnType<typeof nextVe
     })
   }
   return checks
+}
+
+/**
+ * Middleware (M14): the file name Next expects, and whether its requests are captured. On
+ * Node.js the server hook covers it; on the edge runtime it needs the edge hook.
+ */
+function checkMiddleware(
+  root: string,
+  appDir: string,
+  next: ReturnType<typeof nextVersion>,
+): Check | undefined {
+  const file = findMiddlewareFile(root, appDir)
+  if (!file) return undefined
+  const name = rel(root, file)
+  const proxy = /(^|\/)proxy\.[^/]+$/.test(name)
+  if (proxy && next && next.major < 16) {
+    return {
+      name: 'Middleware',
+      status: 'warn',
+      message: `Next.js ${next.text} doesn't run ${name}`,
+      hint: 'proxy.ts is the Next.js 16 name. Before 16 the file is middleware.ts.',
+    }
+  }
+  if (!middlewareOnEdge(file, next)) {
+    return {
+      name: 'Middleware',
+      status: 'ok',
+      message: `${name} runs on Node.js: the server hook captures its requests`,
+    }
+  }
+  const hook = findHook(hookDir(root, appDir), 'instrumentation')
+  const wired = hook ? readFileSync(hook, 'utf8').includes(`${PACKAGE_NAME}/runtime/edge`) : false
+  return {
+    name: 'Middleware',
+    status: wired ? 'ok' : 'warn',
+    message: wired
+      ? `${name} runs on the edge runtime: its fetch calls are captured (best effort)`
+      : `${name} runs on the edge runtime, and the requests it sends won't be captured`,
+    hint: wired
+      ? undefined
+      : `Add this to register() in ${hook ? rel(root, hook) : 'instrumentation.ts'}:\n\n${EDGE_BODY}`,
+  }
 }
 
 /** Whether `name` can be found in node_modules from the root up (monorepos hoist packages). */

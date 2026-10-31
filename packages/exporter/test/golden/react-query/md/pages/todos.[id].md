@@ -27,9 +27,9 @@
 
 | Request | Trigger | From | Status |
 | --- | --- | --- | --- |
-| [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](#req_0euad6xi67r) | page-load | [`TodoDetail`](../components/TodoDetail.md) | ✓ verified (1 capture) |
+| [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`](#req_27sy7hb0xsq) | page-load | [`TodoDetail`](../components/TodoDetail.md) | ✓ verified (1 capture) |
 
-### <a id="req_0euad6xi67r"></a>`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`
+### <a id="req_27sy7hb0xsq"></a>`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id`
 
 |  |  |
 | --- | --- |
@@ -46,7 +46,7 @@
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `GET http://localhost:4010/todos/3` → 200 OK · 16 ms · 2026-10-28 10:56 UTC · page `/todos/3`
+**Captured** `GET http://localhost:4010/todos/3` → 200 OK · 13 ms · 2026-10-30 01:38 UTC · page `/todos/3`
 
 Response body:
 

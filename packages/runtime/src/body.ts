@@ -113,10 +113,19 @@ export async function readStream(
   let truncated = false
   try {
     for (;;) {
-      const { done, value } = await reader.read()
-      if (done) break
-      chunks.push(value)
-      total += value.byteLength
+      let next: ReadableStreamReadResult<Uint8Array>
+      try {
+        next = await reader.read()
+      } catch (error) {
+        // The app aborted the request after reading what it needed (tRPC's stream link does
+        // this once every result is in). Keep what arrived, marked as cut short.
+        if (total === 0) throw error
+        truncated = true
+        break
+      }
+      if (next.done) break
+      chunks.push(next.value)
+      total += next.value.byteLength
       if (total > maxBytes) {
         truncated = true
         await reader.cancel().catch(() => {})

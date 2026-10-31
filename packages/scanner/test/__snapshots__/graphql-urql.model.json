@@ -1,0 +1,1639 @@
+{
+  "version": 8,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        "dir": "src/app/api",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "graphql",
+              "kind": "static",
+              "name": "graphql"
+            },
+            "dir": "src/app/api/graphql",
+            "files": {
+              "route": "src/app/api/graphql/route.ts"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        "dir": "src/app/todos",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/todos/[id]",
+            "files": {
+              "page": "src/app/todos/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        },
+        "dir": "src/app/users",
+        "files": {
+          "page": "src/app/users/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_2flvqsq9ypc"
+    },
+    {
+      "id": "rt_0pzuw37lfo4",
+      "path": "/api/graphql",
+      "kind": "route-handler",
+      "file": "src/app/api/graphql/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "graphql",
+          "kind": "static",
+          "name": "graphql"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "id": "rt_0rsc27vk284",
+      "path": "/todos/[id]",
+      "kind": "page",
+      "file": "src/app/todos/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1an2304y5ca"
+    },
+    {
+      "id": "rt_1xs1qhs4r3f",
+      "path": "/users",
+      "kind": "page",
+      "file": "src/app/users/page.tsx",
+      "segments": [
+        {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0zsf7mc3ftx"
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 6,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Providers",
+          "resolution": "project",
+          "componentId": "cmp_27t3g1lua9i",
+          "module": "./providers",
+          "loc": {
+            "file": "src/app/layout.tsx",
+            "line": 10,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_2flvqsq9ypc",
+      "name": "HomePage",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "TodoList",
+          "resolution": "project",
+          "componentId": "cmp_0l3kw3n479w",
+          "module": "@/components/TodoList",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        },
+        {
+          "name": "AddTodoForm",
+          "resolution": "project",
+          "componentId": "cmp_0r1iugj2rde",
+          "module": "@/components/AddTodoForm",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_27t3g1lua9i",
+      "name": "Providers",
+      "file": "src/app/providers.tsx",
+      "loc": {
+        "file": "src/app/providers.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Provider",
+          "resolution": "external",
+          "module": "urql",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 9,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1an2304y5ca",
+      "name": "TodoPage",
+      "file": "src/app/todos/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/todos/[id]/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "TodoDetail",
+          "resolution": "project",
+          "componentId": "cmp_1gqfw2iamk9",
+          "module": "@/components/TodoDetail",
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0zsf7mc3ftx",
+      "name": "UsersPage",
+      "file": "src/app/users/page.tsx",
+      "loc": {
+        "file": "src/app/users/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "UserList",
+          "resolution": "project",
+          "componentId": "cmp_20axc0bf4dg",
+          "module": "@/components/UserList",
+          "loc": {
+            "file": "src/app/users/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0r1iugj2rde",
+      "name": "AddTodoForm",
+      "file": "src/components/AddTodoForm.tsx",
+      "loc": {
+        "file": "src/components/AddTodoForm.tsx",
+        "line": 16,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1gqfw2iamk9",
+      "name": "TodoDetail",
+      "file": "src/components/TodoDetail.tsx",
+      "loc": {
+        "file": "src/components/TodoDetail.tsx",
+        "line": 30,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: string }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0l3kw3n479w",
+      "name": "TodoList",
+      "file": "src/components/TodoList.tsx",
+      "loc": {
+        "file": "src/components/TodoList.tsx",
+        "line": 17,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "conditional": true,
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 24,
+            "column": 11
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_20axc0bf4dg",
+      "name": "UserList",
+      "file": "src/components/UserList.tsx",
+      "loc": {
+        "file": "src/components/UserList.tsx",
+        "line": 16,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    }
+  ],
+  "types": [],
+  "requests": [
+    {
+      "id": "req_1ncc9k5xsh8",
+      "origin": "component",
+      "componentId": "cmp_0r1iugj2rde",
+      "transport": "graphql",
+      "hook": {
+        "name": "useMutation",
+        "module": "urql"
+      },
+      "operation": {
+        "id": "gqo_1y77gam4ad3",
+        "name": "AddTodo",
+        "type": "mutation"
+      },
+      "method": "POST",
+      "url": {
+        "text": "'/api/graphql'",
+        "confidence": "exact",
+        "path": "/api/graphql"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 29,
+          "column": 11
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 19,
+          "column": 23,
+          "callee": "useMutation"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "19l1be7h5tn",
+      "targetRouteId": "rt_0pzuw37lfo4",
+      "responseType": {
+        "text": "AddTodoMutation",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "addTodo",
+              "type": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "title",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "bodyType": {
+        "text": "AddTodoMutationVariables",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "input",
+              "type": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "title",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "ownerId",
+                    "type": {
+                      "kind": "union",
+                      "types": [
+                        {
+                          "kind": "primitive",
+                          "name": "string"
+                        },
+                        {
+                          "kind": "primitive",
+                          "name": "null"
+                        }
+                      ]
+                    },
+                    "optional": true
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "req_13zx8cl90id",
+      "origin": "component",
+      "componentId": "cmp_1gqfw2iamk9",
+      "transport": "graphql",
+      "hook": {
+        "name": "useQuery",
+        "module": "urql"
+      },
+      "operation": {
+        "id": "gqo_1kvulfr1cu8",
+        "name": "Todo",
+        "type": "query"
+      },
+      "method": "GET",
+      "url": {
+        "text": "'/api/graphql'",
+        "confidence": "exact",
+        "path": "/api/graphql"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 31,
+          "column": 32,
+          "callee": "useQuery"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0sz7u9kwz3j",
+      "targetRouteId": "rt_0pzuw37lfo4",
+      "responseType": {
+        "text": "TodoQuery",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "todo",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "name": "title",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "name": "done",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "boolean"
+                        }
+                      },
+                      {
+                        "name": "status",
+                        "type": {
+                          "kind": "union",
+                          "types": [
+                            {
+                              "kind": "literal",
+                              "value": "OPEN"
+                            },
+                            {
+                              "kind": "literal",
+                              "value": "DONE"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": "owner",
+                        "type": {
+                          "kind": "object",
+                          "properties": [
+                            {
+                              "name": "name",
+                              "type": {
+                                "kind": "primitive",
+                                "name": "string"
+                              }
+                            },
+                            {
+                              "name": "email",
+                              "type": {
+                                "kind": "primitive",
+                                "name": "string"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "primitive",
+                    "name": "null"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "bodyType": {
+        "text": "TodoQueryVariables",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "req_0pkoq320yzc",
+      "origin": "component",
+      "componentId": "cmp_1gqfw2iamk9",
+      "transport": "graphql",
+      "hook": {
+        "name": "useMutation",
+        "module": "urql"
+      },
+      "operation": {
+        "id": "gqo_25sw1t3mf2n",
+        "name": "ToggleTodo",
+        "type": "mutation"
+      },
+      "method": "POST",
+      "url": {
+        "text": "'/api/graphql'",
+        "confidence": "exact",
+        "path": "/api/graphql"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 41,
+          "column": 29
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 32,
+          "column": 26,
+          "callee": "useMutation"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1bzyewvjsmc",
+      "targetRouteId": "rt_0pzuw37lfo4",
+      "responseType": {
+        "text": "ToggleTodoMutation",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "toggleTodo",
+              "type": {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "name": "done",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "boolean"
+                    }
+                  },
+                  {
+                    "name": "status",
+                    "type": {
+                      "kind": "union",
+                      "types": [
+                        {
+                          "kind": "literal",
+                          "value": "OPEN"
+                        },
+                        {
+                          "kind": "literal",
+                          "value": "DONE"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "bodyType": {
+        "text": "ToggleTodoMutationVariables",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "req_19g4fbnqrgn",
+      "origin": "component",
+      "componentId": "cmp_0l3kw3n479w",
+      "transport": "graphql",
+      "hook": {
+        "name": "useQuery",
+        "module": "urql"
+      },
+      "operation": {
+        "id": "gqo_0hkaj6bexpz",
+        "name": "Todos",
+        "type": "query"
+      },
+      "method": "GET",
+      "url": {
+        "text": "'/api/graphql'",
+        "confidence": "exact",
+        "path": "/api/graphql"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 18,
+          "column": 32,
+          "callee": "useQuery"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "2bxuqw3x4na",
+      "targetRouteId": "rt_0pzuw37lfo4",
+      "responseType": {
+        "text": "TodosQuery",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "todos",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "id",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "title",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "done",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "boolean"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "bodyType": {
+        "text": "TodosQueryVariables",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "status",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "literal",
+                    "value": "OPEN"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": "DONE"
+                  },
+                  {
+                    "kind": "primitive",
+                    "name": "null"
+                  }
+                ]
+              },
+              "optional": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "req_0m0edcldv9l",
+      "origin": "component",
+      "componentId": "cmp_20axc0bf4dg",
+      "transport": "graphql",
+      "hook": {
+        "name": "client.query",
+        "module": "@urql/core"
+      },
+      "operation": {
+        "id": "gqo_1h22cey1h7i",
+        "name": "Users",
+        "type": "query"
+      },
+      "method": "GET",
+      "url": {
+        "text": "'/api/graphql'",
+        "confidence": "exact",
+        "path": "/api/graphql"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/UserList.tsx",
+          "line": 27,
+          "column": 29
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/UserList.tsx",
+          "line": 21,
+          "column": 26,
+          "callee": "client.query"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1ecy83hpujw",
+      "targetRouteId": "rt_0pzuw37lfo4",
+      "responseType": {
+        "text": "UsersQuery",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "users",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "id",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "name",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "email",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_0ovqesmmzup",
+      "origin": "component",
+      "componentId": "cmp_0r1iugj2rde",
+      "kind": "push",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${result.data.addTodo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onSubmit",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 29,
+          "column": 11
+        }
+      },
+      "outcome": "success",
+      "loc": {
+        "file": "src/components/AddTodoForm.tsx",
+        "line": 24,
+        "column": 26
+      },
+      "callStack": [
+        {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 24,
+          "column": 26,
+          "callee": "router.push"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    },
+    {
+      "id": "nav_0xabupry3q1",
+      "origin": "component",
+      "componentId": "cmp_0l3kw3n479w",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 24,
+          "column": 11
+        }
+      },
+      "conditional": true,
+      "loc": {
+        "file": "src/components/TodoList.tsx",
+        "line": 24,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/components/TodoList.tsx",
+          "line": 24,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_1enqdlr0za3",
+      "name": "AddTodoForm submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_0r1iugj2rde",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_0r1iugj2rde",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1ncc9k5xsh8"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_0ovqesmmzup",
+          "routeId": "rt_0rsc27vk284"
+        },
+        {
+          "kind": "request",
+          "siteId": "req_13zx8cl90id",
+          "onLoad": true
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf",
+        "rt_0rsc27vk284"
+      ]
+    },
+    {
+      "id": "flw_1up04upjmns",
+      "name": "TodoDetail click",
+      "routeId": "rt_0rsc27vk284",
+      "componentId": "cmp_1gqfw2iamk9",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0rsc27vk284",
+          "componentId": "cmp_1gqfw2iamk9",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 41,
+            "column": 29
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0pkoq320yzc"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0rsc27vk284"
+      ]
+    },
+    {
+      "id": "flw_1xb1viwmunk",
+      "name": "UserList click",
+      "routeId": "rt_1xs1qhs4r3f",
+      "componentId": "cmp_20axc0bf4dg",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1xs1qhs4r3f",
+          "componentId": "cmp_20axc0bf4dg",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 27,
+            "column": 29
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0m0edcldv9l"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1xs1qhs4r3f"
+      ]
+    }
+  ],
+  "queryLinks": [],
+  "graphql": {
+    "endpoint": {
+      "text": "'/api/graphql'",
+      "confidence": "exact",
+      "path": "/api/graphql"
+    },
+    "routeId": "rt_0pzuw37lfo4",
+    "schema": {
+      "source": "file",
+      "path": "schema.graphql",
+      "types": 7
+    },
+    "clients": [
+      {
+        "library": "urql",
+        "loc": {
+          "file": "src/lib/urql.ts",
+          "line": 5,
+          "column": 10
+        },
+        "endpoint": {
+          "text": "'/api/graphql'",
+          "confidence": "exact",
+          "path": "/api/graphql"
+        },
+        "getForQueries": true
+      }
+    ],
+    "operations": [
+      {
+        "id": "gqo_1y77gam4ad3",
+        "name": "AddTodo",
+        "type": "mutation",
+        "source": "tag",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 7,
+          "column": 25
+        },
+        "document": "mutation AddTodo($input: AddTodoInput!) {\n  addTodo(input: $input) {\n    id\n    title\n  }\n}",
+        "fragments": [],
+        "hashes": [
+          "70534a90ddee64121d76ed7e0ef45698f10d169ed130edf025919ff093832ce7",
+          "af657fd7d7d644f7d9e657f4a27ed7e6253c318706c020b79d1c3754975339c4"
+        ],
+        "variablesType": {
+          "text": "AddTodoMutationVariables",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "title",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "ownerId",
+                      "type": {
+                        "kind": "union",
+                        "types": [
+                          {
+                            "kind": "primitive",
+                            "name": "string"
+                          },
+                          {
+                            "kind": "primitive",
+                            "name": "null"
+                          }
+                        ]
+                      },
+                      "optional": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "resultType": {
+          "text": "AddTodoMutation",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "addTodo",
+                "type": {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "id",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "title",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "typesFrom": "schema",
+        "siteIds": [
+          "req_1ncc9k5xsh8"
+        ]
+      },
+      {
+        "id": "gqo_1kvulfr1cu8",
+        "name": "Todo",
+        "type": "query",
+        "source": "tag",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 5,
+          "column": 19
+        },
+        "document": "query Todo($id: ID!) {\n  todo(id: $id) {\n    id\n    title\n    done\n    status\n    owner {\n      name\n      email\n    }\n  }\n}",
+        "fragments": [],
+        "hashes": [
+          "a37ddd0a6e3fa4e1d7a4c340fc3eca185b45ae72c218bdb0dddf6318570df690",
+          "e14d71176a86e5dd242bef6e7f96d24ccb88a2a71b978dc79d5ed01faff97039"
+        ],
+        "variablesType": {
+          "text": "TodoQueryVariables",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            ]
+          }
+        },
+        "resultType": {
+          "text": "TodoQuery",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "todo",
+                "type": {
+                  "kind": "union",
+                  "types": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "id",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "name": "title",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        },
+                        {
+                          "name": "done",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "boolean"
+                          }
+                        },
+                        {
+                          "name": "status",
+                          "type": {
+                            "kind": "union",
+                            "types": [
+                              {
+                                "kind": "literal",
+                                "value": "OPEN"
+                              },
+                              {
+                                "kind": "literal",
+                                "value": "DONE"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "owner",
+                          "type": {
+                            "kind": "object",
+                            "properties": [
+                              {
+                                "name": "name",
+                                "type": {
+                                  "kind": "primitive",
+                                  "name": "string"
+                                }
+                              },
+                              {
+                                "name": "email",
+                                "type": {
+                                  "kind": "primitive",
+                                  "name": "string"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "kind": "primitive",
+                      "name": "null"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "typesFrom": "schema",
+        "siteIds": [
+          "req_13zx8cl90id"
+        ]
+      },
+      {
+        "id": "gqo_25sw1t3mf2n",
+        "name": "ToggleTodo",
+        "type": "mutation",
+        "source": "tag",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 20,
+          "column": 28
+        },
+        "document": "mutation ToggleTodo($id: ID!) {\n  toggleTodo(id: $id) {\n    id\n    done\n    status\n  }\n}",
+        "fragments": [],
+        "hashes": [
+          "e4904b046cee83a2ee1780ca453a57f6e53252e21d64bebdacc8c1934f4f27c2",
+          "8d5768de8c59da6ff83be610359aa6264a73407021b67d9b117e053e57a7c492"
+        ],
+        "variablesType": {
+          "text": "ToggleTodoMutationVariables",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            ]
+          }
+        },
+        "resultType": {
+          "text": "ToggleTodoMutation",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "toggleTodo",
+                "type": {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "id",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "string"
+                      }
+                    },
+                    {
+                      "name": "done",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "boolean"
+                      }
+                    },
+                    {
+                      "name": "status",
+                      "type": {
+                        "kind": "union",
+                        "types": [
+                          {
+                            "kind": "literal",
+                            "value": "OPEN"
+                          },
+                          {
+                            "kind": "literal",
+                            "value": "DONE"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "typesFrom": "schema",
+        "siteIds": [
+          "req_0pkoq320yzc"
+        ]
+      },
+      {
+        "id": "gqo_0hkaj6bexpz",
+        "name": "Todos",
+        "type": "query",
+        "source": "tag",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 7,
+          "column": 20
+        },
+        "document": "query Todos($status: TodoStatus) {\n  todos(status: $status) {\n    id\n    title\n    done\n  }\n}",
+        "fragments": [],
+        "hashes": [
+          "1076f810d2bcbbc8cd4a6242f8a535ce3384c349769c263e66f1aacd31f34dfc",
+          "43ceb78abc76911c36cef71c64f2c52624c766a0f42b081a7326d0f9ea7b763d"
+        ],
+        "variablesType": {
+          "text": "TodosQueryVariables",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "status",
+                "type": {
+                  "kind": "union",
+                  "types": [
+                    {
+                      "kind": "literal",
+                      "value": "OPEN"
+                    },
+                    {
+                      "kind": "literal",
+                      "value": "DONE"
+                    },
+                    {
+                      "kind": "primitive",
+                      "name": "null"
+                    }
+                  ]
+                },
+                "optional": true
+              }
+            ]
+          }
+        },
+        "resultType": {
+          "text": "TodosQuery",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "todos",
+                "type": {
+                  "kind": "array",
+                  "element": {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "name": "title",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "name": "done",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "boolean"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "typesFrom": "schema",
+        "siteIds": [
+          "req_19g4fbnqrgn"
+        ]
+      },
+      {
+        "id": "gqo_1h22cey1h7i",
+        "name": "Users",
+        "type": "query",
+        "source": "tag",
+        "loc": {
+          "file": "src/components/UserList.tsx",
+          "line": 6,
+          "column": 20
+        },
+        "document": "query Users {\n  users {\n    id\n    name\n    email\n  }\n}",
+        "fragments": [],
+        "hashes": [
+          "c04b74897fa1a09a7422970a70a82a94c910b59b0d3fbee059c15d21a5d5fb9d",
+          "f574f8a26582526d430893090d5bc203ce693b596470869a19c60199763eb733"
+        ],
+        "resultType": {
+          "text": "UsersQuery",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "users",
+                "type": {
+                  "kind": "array",
+                  "element": {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "name": "name",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      },
+                      {
+                        "name": "email",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "typesFrom": "schema",
+        "siteIds": [
+          "req_0m0edcldv9l"
+        ]
+      }
+    ],
+    "fragments": []
+  }
+}

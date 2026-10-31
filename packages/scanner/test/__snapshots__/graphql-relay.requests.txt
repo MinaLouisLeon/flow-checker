@@ -1,0 +1,70 @@
+# Requests
+
+## AddTodoForm  src/components/AddTodoForm.tsx:8
+POST /api/graphql  graphql useMutation  event onSubmit
+  operation: AddTodoFormMutation (mutation)
+  body: AddTodoFormMutation$variables
+  response: AddTodoFormMutation$data
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/AddTodoForm.tsx:11
+
+## TodoDetail  src/components/TodoDetail.tsx:27
+POST /api/graphql  graphql commitMutation  event onClick
+  operation: TodoDetailToggleMutation (mutation)
+  body: TodoDetailToggleMutation$variables
+  response: TodoDetailToggleMutation$data
+  handled by: src/app/api/graphql/route.ts
+  via: commitMutation src/components/TodoDetail.tsx:32
+
+## TodoList  src/components/TodoList.tsx:7
+POST /api/graphql  graphql useLazyLoadQuery  page-load
+  operation: TodoListQuery (query)
+  body: TodoListQuery$variables
+  response: TodoListQuery$data
+  handled by: src/app/api/graphql/route.ts
+  via: useLazyLoadQuery src/components/TodoList.tsx:8
+
+## TodoPage  src/components/TodoPage.tsx:8
+POST /api/graphql  graphql useQueryLoader  effect
+  operation: TodoDetailQuery (query)
+  body: TodoDetailQuery$variables
+  response: TodoDetailQuery$data
+  handled by: src/app/api/graphql/route.ts
+  via: useQueryLoader src/components/TodoPage.tsx:9
+
+## UserList  src/components/UserList.tsx:7
+POST /api/graphql  graphql fetchQuery  event onClick
+  operation: UserListQuery (query)
+  body: UserListQuery$variables
+  response: UserListQuery$data
+  handled by: src/app/api/graphql/route.ts
+  via: fetchQuery src/components/UserList.tsx:12
+
+# GraphQL
+
+endpoint: /api/graphql
+client: relay /api/graphql (persisted)  src/relay/environment.ts:14
+schema: file schema.graphql, 7 types
+manifest: persisted_queries.json, 5 operations
+
+mutation AddTodoFormMutation  tag  1 caller(s)  types: relay  src/components/AddTodoForm.tsx:11
+  variables: AddTodoFormMutation$variables
+  data: AddTodoFormMutation$data
+
+query TodoDetailQuery  tag  1 caller(s)  types: relay  src/components/TodoDetail.tsx:13
+  variables: TodoDetailQuery$variables
+  data: TodoDetailQuery$data
+
+mutation TodoDetailToggleMutation  tag  1 caller(s)  types: relay  src/components/TodoDetail.tsx:33
+  variables: TodoDetailToggleMutation$variables
+  data: TodoDetailToggleMutation$data
+
+query TodoListQuery  tag  1 caller(s)  types: relay  src/components/TodoList.tsx:9
+  fragments: TodoItem_todo
+  data: TodoListQuery$data
+
+query UserListQuery  tag  1 caller(s)  types: relay  src/components/UserList.tsx:14
+  data: UserListQuery$data
+
+fragment TodoItem_todo on Todo  src/components/TodoItem.tsx:9
+  read by: TodoItem

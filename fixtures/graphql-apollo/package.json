@@ -1,0 +1,31 @@
+{
+  "name": "@fixtures/graphql-apollo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: Apollo Client 4 with GraphQL Code Generator's client preset (graphql() documents, fragment masking), BatchHttpLink, useQuery / useSuspenseQuery / useLazyQuery / useMutation / useFragment and client.query.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@apollo/client": "4.3.5",
+    "@graphql-typed-document-node/core": "3.2.0",
+    "graphql": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "7.4.6",
+    "@graphql-codegen/client-preset": "6.2.3",
+    "@integr8-media/flow-checker": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

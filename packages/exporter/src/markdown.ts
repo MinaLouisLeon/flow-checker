@@ -5,6 +5,8 @@
 //   components/<name>.md props, types, requests
 //   types.md             all types with resolved shapes and usages
 //   issues.md            open flags, type mismatches, unmatched captures
+//   middleware.md        middleware / proxy: matcher, routes it runs on, redirects, rewrites, requests
+//   postman.md           the imported Postman collection: its requests, callers, unused endpoints, gaps
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
@@ -16,10 +18,20 @@ import {
   type Flow,
   type FlowStatus,
   type FlowStep,
+  formatQueryKey,
+  type GraphqlInfo,
+  type GraphqlOperation,
   isVerified,
+  type MatcherCondition,
+  type MiddlewareMatcher,
   type ModelIndex,
   mismatchField,
   type Navigation,
+  type PostmanContract,
+  type PostmanRequest,
+  type PostmanSource,
+  queryLinkTarget,
+  queryLinkVerb,
   type RecordedFlow,
   type RecordedStep,
   type RequestSite,
@@ -27,13 +39,26 @@ import {
   requestLabel,
   type ScanNote,
   type SiteTypeCheck,
+  type SseEndpoint,
+  type Trpc,
   type TypeRef,
   triggerText,
   typeRefs,
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
-import { type DocNames, docNames, ISSUES, README, RECORDED, TYPES } from './names'
+import {
+  type DocNames,
+  docNames,
+  GRAPHQL,
+  ISSUES,
+  MIDDLEWARE,
+  POSTMAN,
+  README,
+  RECORDED,
+  TRPC,
+  TYPES,
+} from './names'
 import { declaration, prettyShape } from './shape'
 
 /** Generated files: path (forward slashes, relative to the output folder) → content. */
@@ -90,6 +115,10 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   }
   const recorded = data.flows?.recorded ?? []
   if (recorded.length > 0) files[RECORDED] = recordedDoc(ctx, recorded)
+  if (model.middleware) files[MIDDLEWARE] = middlewareDoc(ctx)
+  if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
+  if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
+  if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -164,6 +193,63 @@ function readme(ctx: Ctx): string {
           (route.methods ?? []).join(', ') || '?',
           code(route.file),
           String(index.handlerRequests.get(route.id)?.length ?? 0),
+        ]),
+      ),
+    )
+  }
+  const mw = model.middleware
+  if (mw) {
+    const conditional = mw.routes.filter((r) => r.conditional).length
+    const redirects = model.navigations.filter((n) => n.origin === 'middleware').length
+    const parts = [
+      `runs on ${plural(mw.routes.length, 'route')}${conditional > 0 ? ` (${conditional} only for some requests)` : ''}`,
+      plural(redirects, 'redirect'),
+      plural(mw.rewrites.length, 'rewrite'),
+      plural(index.middlewareRequests.length, 'request'),
+    ]
+    sections.push('## Middleware', `${link(code(mw.file), from, MIDDLEWARE)}: ${parts.join(', ')}.`)
+  }
+  if (model.postman) {
+    sections.push(
+      '## Postman collection',
+      `${link(text(model.postman.collection.name), from, POSTMAN)}: ${postmanCounts(ctx, model.postman)}.`,
+    )
+  }
+  if (model.trpc) {
+    sections.push('## tRPC', `${link(code(model.trpc.endpoint), from, TRPC)}: ${trpcCounts(model.trpc)}.`)
+  }
+  if (model.graphql) {
+    const endpoint = model.graphql.endpoint ? urlText(model.graphql.endpoint) : 'GraphQL'
+    sections.push('## GraphQL', `${link(code(endpoint), from, GRAPHQL)}: ${graphqlCounts(model.graphql)}.`)
+  }
+  const streams = model.streams ?? []
+  if (streams.length > 0) {
+    sections.push(
+      '## Event streams',
+      table(
+        ['Route handler', 'Events', 'Opened by'],
+        streams.map((s) => {
+          const route = ctx.index.routes.get(s.routeId)
+          return [
+            route ? `${s.method} ${routeLink(ctx, route, from)}` : code(s.routeId),
+            streamEventNames(s),
+            String(s.siteIds.length),
+          ]
+        }),
+        ['left', 'left', 'right'],
+      ),
+    )
+  }
+  const sockets = model.requests.filter((s) => s.socket)
+  if (sockets.length > 0) {
+    sections.push(
+      '## WebSockets',
+      table(
+        ['Socket', 'API', 'Messages'],
+        sockets.map((s) => [
+          siteLink(ctx, s, from),
+          s.socket?.api === 'socket.io' ? 'socket.io' : 'WebSocket',
+          socketMessageNames(s),
         ]),
       ),
     )
@@ -348,6 +434,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
         .join('\n'),
     flows.length > 0 && '## Flows',
     flows.length > 0 && flows.map((f) => `- ${flowLink(ctx, f, from)}`).join('\n'),
+    ...routeMiddleware(ctx, route, from),
     '## Requests',
     sites.length === 0 ? 'This page sends no requests the scan found.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
@@ -364,6 +451,8 @@ function handlerDoc(ctx: Ctx, route: Route, from: string): string {
       ['File', code(route.file)],
       ['Methods', (route.methods ?? []).join(', ') || undefined],
     ]),
+    ...routeMiddleware(ctx, route, from),
+    ...handlerStreams(ctx, route, from),
     '## Called by',
     callers.length === 0
       ? 'No request in the app calls it (it may be called from outside).'
@@ -375,6 +464,432 @@ function handlerDoc(ctx: Ctx, route: Route, from: string): string {
     sends.length === 0 ? 'None found.' : requestTable(ctx, sends, from),
     ...sends.map((s) => requestSection(ctx, s, from, 3)),
   ])
+}
+
+// --- Middleware (M14) -----------------------------------------------------------------------
+
+/** On a page or handler doc: whether the middleware runs, its redirects away and rewrites to it. */
+function routeMiddleware(ctx: Ctx, route: Route, from: string): (string | false)[] {
+  const mw = ctx.model.middleware
+  if (!mw) return []
+  const runs = ctx.index.middlewareRoutes.get(route.id)
+  const redirects = ctx.index.middlewareRedirects.get(route.id) ?? []
+  const rewrites = ctx.index.rewritesTo.get(route.id) ?? []
+  if (!runs && rewrites.length === 0) return []
+  const file = link(code(mw.file), from, MIDDLEWARE)
+  const intro = runs
+    ? runs.conditional
+      ? `${file} runs here only for some requests (${conditionalReason(mw)}).`
+      : `${file} runs before every request to this route.`
+    : `${file} rewrites other paths to this route.`
+  const lines: string[] = []
+  for (const nav of redirects) {
+    const target = nav.targetRouteId ? ctx.index.routes.get(nav.targetRouteId) : undefined
+    const to = target ? routeLink(ctx, target, from) : code(urlText(nav.href))
+    lines.push(`- Redirects to ${to}${nav.condition ? ` if ${code(nav.condition)}` : ''}`)
+  }
+  for (const rw of rewrites) {
+    lines.push(
+      `- Answers ${code(rewriteFrom(rw.from))} (rewrite)${rw.condition ? ` if ${code(rw.condition)}` : ''}`,
+    )
+  }
+  return ['## Middleware', intro, lines.length > 0 && lines.join('\n')]
+}
+
+function conditionalReason(mw: NonNullable<AppModel['middleware']>): string {
+  if (mw.matcherText !== undefined) return 'the matcher could not be read'
+  return 'see the matcher'
+}
+
+function rewriteFrom(from: { kind: 'prefix' | 'exact'; path: string } | undefined): string {
+  return from ? `${from.path}${from.kind === 'prefix' ? '/*' : ''}` : 'every path it runs on'
+}
+
+function middlewareMatcherText(m: MiddlewareMatcher): string {
+  const cond = (word: string, list: MatcherCondition[] | undefined) =>
+    list?.map((c) => `${word} ${c.type} ${c.key}${c.value !== undefined ? `=${c.value}` : ''}`) ?? []
+  const extra = [...cond('has', m.has), ...cond('missing', m.missing)]
+  return `${code(m.source)}${extra.length > 0 ? ` (${extra.join(', ')})` : ''}`
+}
+
+function middlewareDoc(ctx: Ctx): string {
+  const { model, index } = ctx
+  const mw = model.middleware
+  if (!mw) return ''
+  const from = MIDDLEWARE
+  const redirects = model.navigations.filter((n) => n.origin === 'middleware')
+  const routeOf = (id: string | undefined) => (id ? index.routes.get(id) : undefined)
+  const routeText = (id: string | undefined) => {
+    const route = routeOf(id)
+    return route ? routeLink(ctx, route, from) : '—'
+  }
+  const sites = index.middlewareRequests
+  return doc([
+    `# Middleware ${code(mw.file)}`,
+    link('← Overview', from, README),
+    facts([
+      ['File', code(`${mw.loc.file}:${mw.loc.line}`)],
+      ['Convention', mw.convention === 'proxy' ? '`proxy` (Next.js 16+)' : '`middleware`'],
+      ['Export', mw.exportName ? code(mw.exportName) : undefined],
+      ['Made with', mw.factory ? `${code(mw.factory.name)} from ${code(mw.factory.module)}` : undefined],
+      [
+        'Matcher',
+        mw.matcherText !== undefined
+          ? `could not be read: ${code(mw.matcherText)}`
+          : mw.matchers.length === 0
+            ? 'every request'
+            : mw.matchers.map(middlewareMatcherText).join(', '),
+      ],
+      [
+        'Locales',
+        mw.i18n
+          ? `${mw.i18n.locales.map(code).join(', ')}${mw.i18n.defaultLocale ? ` (default ${code(mw.i18n.defaultLocale)})` : ''}`
+          : undefined,
+      ],
+    ]),
+    '## Runs on',
+    mw.routes.length === 0
+      ? 'No route in the app matches.'
+      : table(
+          ['Route', 'Kind', 'When'],
+          mw.routes.map((r) => [
+            routeText(r.routeId),
+            routeOf(r.routeId)?.kind === 'route-handler' ? 'route handler' : 'page',
+            r.conditional ? 'some requests' : 'every request',
+          ]),
+        ),
+    redirects.length > 0 && '## Redirects',
+    redirects.length > 0 &&
+      table(
+        ['To', 'From', 'If', 'Source'],
+        redirects.map((nav) => [
+          nav.targetRouteId ? routeText(nav.targetRouteId) : code(urlText(nav.href)),
+          // The pages it runs on, or the path it checks when no page has that path.
+          (nav.sourceRouteIds ?? []).map((id) => routeText(id)).join(', ') ||
+            (nav.from ? code(rewriteFrom(nav.from)) : '—'),
+          nav.condition ? code(nav.condition) : '—',
+          code(`${nav.loc.file}:${nav.loc.line}`),
+        ]),
+      ),
+    mw.rewrites.length > 0 && '## Rewrites',
+    mw.rewrites.length > 0 &&
+      table(
+        ['Path', 'Answered by', 'If', 'Source'],
+        mw.rewrites.map((rw) => [
+          code(rewriteFrom(rw.from)),
+          rw.targetRouteId ? routeText(rw.targetRouteId) : code(urlText(rw.href)),
+          rw.condition ? code(rw.condition) : '—',
+          code(`${rw.loc.file}:${rw.loc.line}`),
+        ]),
+      ),
+    '## Requests',
+    sites.length === 0 ? 'The middleware sends no requests the scan found.' : requestTable(ctx, sites, from),
+    ...sites.map((s) => requestSection(ctx, s, from, 3)),
+  ])
+}
+
+// --- Postman collection (M15) -------------------------------------------------------------------
+
+function postmanSourceText(source: PostmanSource): string {
+  if (source.kind === 'cloud') return `Postman cloud${source.id ? ` (${code(source.id)})` : ''}`
+  const what = source.kind === 'folder' ? 'collection folder' : 'file'
+  return source.path ? `${what} ${code(source.path)}` : what
+}
+
+/** Request sites with a flag from the collection. */
+function postmanSites(ctx: Ctx, kind: 'not-in-collection' | 'contract-mismatch'): RequestSite[] {
+  return ctx.model.requests.filter((s) => s.flags.some((f) => f.kind === kind))
+}
+
+function postmanCounts(ctx: Ctx, contract: PostmanContract): string {
+  const total = contract.requests.length
+  const used = contract.requests.filter((r) => r.siteIds.length > 0).length
+  return [
+    `${used} of ${plural(total, 'request')} called by the app`,
+    plural(total - used, 'unused endpoint'),
+    `${plural(postmanSites(ctx, 'not-in-collection').length, 'request')} in the code not in the collection`,
+    plural(postmanSites(ctx, 'contract-mismatch').length, 'contract mismatch', 'contract mismatches'),
+  ].join(', ')
+}
+
+function postmanDoc(ctx: Ctx, contract: PostmanContract): string {
+  const from = POSTMAN
+  const requests = contract.requests
+  const unused = requests.filter((r) => r.siteIds.length === 0)
+  const missing = postmanSites(ctx, 'not-in-collection')
+  const mismatched = postmanSites(ctx, 'contract-mismatch')
+  // Grouped by folder, in collection order.
+  const folders = new Map<string, PostmanRequest[]>()
+  for (const r of requests) {
+    const key = r.folder.join(' / ')
+    const list = folders.get(key)
+    if (list) list.push(r)
+    else folders.set(key, [r])
+  }
+  const requestRef = (r: PostmanRequest) =>
+    `[${text(r.name)}](#${anchorId(r.id)}) ${code(`${r.method} ${postmanPath(r)}`)}${r.folder.length > 0 ? ` (${text(r.folder.join(' / '))})` : ''}`
+  return doc([
+    `# Postman collection: ${text(contract.collection.name)}`,
+    link('← Overview', from, README),
+    facts([
+      ['Collection', `${text(contract.collection.name)} · ${postmanSourceText(contract.collection.source)}`],
+      [
+        'Environment',
+        contract.environment
+          ? `${text(contract.environment.name)} · ${postmanSourceText(contract.environment.source)}`
+          : undefined,
+      ],
+      ['Imported', time(contract.importedAt)],
+      ['Summary', postmanCounts(ctx, contract)],
+    ]),
+    'The collection is the API contract: each request in the code is matched to a collection request by method and URL, or by its names and method when the scan could not resolve the URL. Types marked "from Postman examples" come from the saved responses, not the code.',
+    '## Requests',
+    requests.length === 0 && 'The collection has no requests.',
+    ...[...folders].flatMap(([folder, list]) => [
+      `### ${folder ? text(folder) : 'Not in a folder'}`,
+      ...list.map((r) => postmanRequestSection(ctx, r, from)),
+    ]),
+    `## Unused endpoints (${unused.length})`,
+    unused.length === 0
+      ? 'Every collection request is called by the app.'
+      : `No request in the code calls these.\n\n${unused.map((r) => `- ${requestRef(r)}`).join('\n')}`,
+    `## Requests not in the collection (${missing.length})`,
+    missing.length === 0
+      ? "Every request the scan matched to the collection's APIs is in it."
+      : `Requests in the code the collection has no request for.\n\n${table(
+          ['Request', 'From', 'Status'],
+          missing.map((s) => [siteLink(ctx, s, from), ownerText(ctx, s, from), statusText(ctx, s)]),
+        )}`,
+    `## Contract mismatches (${mismatched.length})`,
+    mismatched.length === 0
+      ? "No type in the code disagrees with the collection's examples."
+      : `Types in the code that don't fit the collection's saved examples.\n\n${mismatched
+          .flatMap((s) =>
+            s.flags
+              .filter((f) => f.kind === 'contract-mismatch')
+              .map((f) => `- ${siteLink(ctx, s, from)}: ${text(f.message)}`),
+          )
+          .join('\n')}`,
+  ])
+}
+
+// --- tRPC (M16) ----------------------------------------------------------------------------
+
+function trpcCounts(trpc: Trpc): string {
+  const called = trpc.procedures.filter((p) => p.siteIds.length > 0).length
+  return `${called} of ${plural(trpc.procedures.length, 'procedure')} called by the app`
+}
+
+/** Procedure anchors use the path, so links from requests survive re-scans. */
+function trpcAnchor(path: string): string {
+  return `procedure-${path}`
+}
+
+function trpcDoc(ctx: Ctx, trpc: Trpc): string {
+  const from = TRPC
+  const route = trpc.routeId ? ctx.index.routes.get(trpc.routeId) : undefined
+  const unused = trpc.procedures.filter((p) => p.siteIds.length === 0)
+  const resolverRequests = (path: string) =>
+    ctx.model.requests.filter((s) => s.transport !== 'trpc' && s.procedure?.path === path)
+  return doc([
+    '# tRPC',
+    link('← Overview', from, README),
+    facts([
+      ['Endpoint', code(trpc.endpoint)],
+      ['Served by', route ? routeLink(ctx, route, from) : 'no route handler found'],
+      [
+        'Router',
+        trpc.router
+          ? `${code(trpc.router.name)} · ${code(`${trpc.router.loc.file}:${trpc.router.loc.line}`)}`
+          : undefined,
+      ],
+      ['Summary', trpcCounts(trpc)],
+    ]),
+    'Each procedure call in the code is a request to the endpoint. Batched calls (`/api/trpc/a,b?batch=1`) are recorded as one capture per procedure.',
+    '## Procedures',
+    trpc.procedures.length === 0 && 'The router was not found, so the procedures are unknown.',
+    ...trpc.procedures.map((p) => {
+      const callers = p.siteIds
+        .map((id) => ctx.index.requests.get(id))
+        .filter((s): s is RequestSite => Boolean(s))
+      const sends = resolverRequests(p.path)
+      return doc([
+        `### ${anchor(trpcAnchor(p.path))}${code(p.path)}`,
+        facts([
+          ['Type', p.type],
+          ['Defined at', code(`${p.loc.file}:${p.loc.line}`)],
+          [
+            'Called by',
+            callers.length === 0
+              ? 'nothing in the code'
+              : callers.map((s) => `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}`).join('<br>'),
+          ],
+          ['Sends', sends.length > 0 ? sends.map((s) => siteLink(ctx, s, from)).join('<br>') : undefined],
+        ]),
+        p.inputType && `**Input** ${typeBlock(ctx, p.inputType, from)}`,
+        p.outputType && `**Output** ${typeBlock(ctx, p.outputType, from)}`,
+      ]).trimEnd()
+    }),
+    `## Procedures no request calls (${unused.length})`,
+    unused.length === 0
+      ? 'The app calls every procedure.'
+      : unused.map((p) => `- [${code(p.path)}](#${anchorId(trpcAnchor(p.path))}) (${p.type})`).join('\n'),
+  ])
+}
+
+// --- GraphQL (M17) -------------------------------------------------------------------------
+
+function graphqlCounts(graphql: GraphqlInfo): string {
+  const sent = graphql.operations.filter((o) => o.siteIds.length > 0).length
+  return `${sent} of ${plural(graphql.operations.length, 'operation')} sent by the app`
+}
+
+/** Operation anchors use the name, so links from requests survive re-scans. */
+function graphqlAnchor(op: Pick<GraphqlOperation, 'name' | 'id'>): string {
+  return `operation-${op.name || op.id}`
+}
+
+const TYPES_FROM: Record<NonNullable<GraphqlOperation['typesFrom']>, string> = {
+  code: 'type arguments in the code',
+  codegen: 'GraphQL Code Generator',
+  relay: 'the Relay compiler',
+  schema: 'the schema file',
+  introspection: 'live introspection',
+}
+
+function graphqlDoc(ctx: Ctx, graphql: GraphqlInfo): string {
+  const from = GRAPHQL
+  const route = graphql.routeId ? ctx.index.routes.get(graphql.routeId) : undefined
+  const unused = graphql.operations.filter((o) => o.siteIds.length === 0)
+  const schema = graphql.schema
+  const schemaText = schema
+    ? `${schema.source === 'file' ? code(schema.path ?? '') : `introspection of ${code(schema.url ?? '')}`}${
+        schema.error ? ` (could not be read: ${text(schema.error)})` : ` · ${plural(schema.types, 'type')}`
+      }`
+    : 'none'
+  const components = (ids: string[]) =>
+    ids
+      .map((id) => ctx.index.components.get(id)?.name ?? id)
+      .map((n) => code(n))
+      .join(', ')
+  return doc([
+    '# GraphQL',
+    link('← Overview', from, README),
+    facts([
+      ['Endpoint', graphql.endpoint ? code(urlText(graphql.endpoint)) : 'not found'],
+      ['Served by', route ? routeLink(ctx, route, from) : undefined],
+      [
+        'Clients',
+        graphql.clients.length > 0
+          ? graphql.clients
+              .map((c) => {
+                const features = [
+                  c.batching && 'batching',
+                  c.persisted && 'persisted queries',
+                  c.getForQueries && 'GET queries',
+                ]
+                  .filter(Boolean)
+                  .join(', ')
+                return `${c.library}${features ? ` (${features})` : ''} · ${code(`${c.loc.file}:${c.loc.line}`)}`
+              })
+              .join('<br>')
+          : undefined,
+      ],
+      ['Schema', schemaText],
+      [
+        'Persisted queries',
+        graphql.manifest
+          ? `${code(graphql.manifest.path)} · ${plural(graphql.manifest.operations, 'entry', 'entries')}`
+          : undefined,
+      ],
+      ['Summary', graphqlCounts(graphql)],
+    ]),
+    'Every operation goes to the same endpoint, so requests are matched by operation name (or persisted query id). Batched requests are recorded as one capture per operation.',
+    '## Operations',
+    graphql.operations.length === 0 && 'No GraphQL documents were found.',
+    ...graphql.operations.map((op) => {
+      const callers = op.siteIds
+        .map((id) => ctx.index.requests.get(id))
+        .filter((s): s is RequestSite => Boolean(s))
+      return doc([
+        `### ${anchor(graphqlAnchor(op))}${code(op.name || '(anonymous)')}`,
+        facts([
+          ['Type', op.type],
+          ['Defined at', code(`${op.loc.file}:${op.loc.line}`)],
+          ['Fragments', op.fragments.length > 0 ? op.fragments.map((f) => code(f)).join(', ') : undefined],
+          ['Types from', op.typesFrom ? TYPES_FROM[op.typesFrom] : undefined],
+          [
+            'Sent by',
+            callers.length === 0
+              ? 'nothing in the code'
+              : callers.map((s) => `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}`).join('<br>'),
+          ],
+          [
+            'Schema errors',
+            op.errors && op.errors.length > 0 ? op.errors.map((e) => text(e)).join('<br>') : undefined,
+          ],
+        ]),
+        block('graphql', op.document),
+        op.variablesType && `**Variables** ${typeBlock(ctx, op.variablesType, from)}`,
+        op.resultType && `**Data** ${typeBlock(ctx, op.resultType, from)}`,
+      ]).trimEnd()
+    }),
+    graphql.fragments.length > 0 && '## Fragments',
+    graphql.fragments.length > 0 &&
+      table(
+        ['Fragment', 'On', 'Read by', 'Defined at'],
+        graphql.fragments.map((f) => [
+          code(f.name),
+          code(f.on),
+          f.componentIds.length > 0 ? components(f.componentIds) : '',
+          code(`${f.loc.file}:${f.loc.line}`),
+        ]),
+      ),
+    `## Operations no request sends (${unused.length})`,
+    unused.length === 0
+      ? 'The app sends every operation.'
+      : unused
+          .map((o) => `- [${code(o.name || '(anonymous)')}](#${anchorId(graphqlAnchor(o))}) (${o.type})`)
+          .join('\n'),
+  ])
+}
+
+/** Path and query of a collection request; the host comes from the environment. */
+function postmanPath(r: PostmanRequest): string {
+  const url = r.url
+  return url.path ? `${url.path}${url.query ? `?${url.query}` : ''}` : url.text
+}
+
+function postmanRequestSection(ctx: Ctx, r: PostmanRequest, from: string): string {
+  const callers = r.siteIds
+    .map((id) => ctx.index.requests.get(id))
+    .filter((s): s is RequestSite => Boolean(s))
+  const resolved = urlText(r.url)
+  // `200 OK` already says its status; other names get it added.
+  const examples = r.examples.map(
+    (e) =>
+      `${text(e.name)}${e.status !== undefined && !e.name.startsWith(String(e.status)) ? ` (${e.status})` : ''}`,
+  )
+  const caller = (s: RequestSite) => {
+    const byCode = s.contract?.requestId === r.id && s.contract.by === 'code'
+    return `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}${byCode ? ' (matched by name and method)' : ''}`
+  }
+  return doc([
+    `#### ${anchor(r.id)}${text(r.name)}`,
+    facts([
+      ['Request', code(`${r.method} ${r.url.text}`)],
+      ['URL', resolved !== r.url.text ? code(resolved) : undefined],
+      [
+        'Unresolved variables',
+        r.unresolved?.length ? r.unresolved.map((v) => code(`{{${v}}}`)).join(', ') : undefined,
+      ],
+      ['Called by', callers.length === 0 ? 'nothing in the code' : callers.map(caller).join('<br>')],
+      ['Examples', examples.join(', ') || undefined],
+    ]),
+    r.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
+    r.bodyType && `**Request body** ${typeBlock(ctx, r.bodyType, from)}`,
+    r.responseType && `**Response** (from the examples) ${typeBlock(ctx, r.responseType, from)}`,
+  ]).trimEnd()
 }
 
 /** Nested list of components, with links to their docs. */
@@ -497,10 +1012,14 @@ function requestSection(
   const first = site.callStack[0]
   const target = site.targetRouteId ? ctx.index.routes.get(site.targetRouteId) : undefined
   const hook = site.hook ? ` · ${code(`${site.hook.name}${site.hook.key ? `(${site.hook.key})` : ''}`)}` : ''
+  const queryKey = site.queryKey ? ` · key ${code(formatQueryKey(site.queryKey))}` : ''
   const url =
     site.url && site.transport !== 'server-action'
-      ? `${code(urlText(site.url))}${site.url.confidence === 'exact' ? '' : ` (${site.url.confidence})`}`
+      ? `${code(urlText(site.url))}${urlConfidence(site.url.confidence)}`
       : undefined
+  const contract = site.contract
+    ? `${link(text(site.contract.name), from, POSTMAN, anchorId(site.contract.requestId))}${site.contract.by === 'code' ? ' · matched by name and method, URL from the collection' : ''}`
+    : undefined
   const check = ctx.data.verification?.sites[site.id]?.typeCheck
   const next = (site.chain ?? [])
     .map((id) => ctx.index.requests.get(id))
@@ -515,30 +1034,79 @@ function requestSection(
       ['Trigger', triggerText(site.trigger)],
       [
         'Transport',
-        `${site.transport}${site.client ? ` (${code(`${site.client.module}#${site.client.name}`)})` : ''}${hook}`,
+        `${site.transport}${site.client ? ` (${code(`${site.client.module}#${site.client.name}`)})` : ''}${hook}${queryKey}`,
       ],
       ['URL', url],
+      ['Postman', contract],
+      [
+        site.transport === 'trpc' ? 'tRPC' : 'In procedure',
+        site.procedure
+          ? `${link(code(site.procedure.path), from, TRPC, anchorId(trpcAnchor(site.procedure.path)))} (${site.procedure.type})`
+          : undefined,
+      ],
+      [
+        'GraphQL',
+        site.operation
+          ? `${link(code(site.operation.name || '(anonymous)'), from, GRAPHQL, anchorId(graphqlAnchor(site.operation)))} (${site.operation.type})`
+          : undefined,
+      ],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
+      [
+        'Stream',
+        site.stream
+          ? `${site.stream.api === 'event-source' ? 'EventSource' : 'streamed fetch'}${site.stream.withCredentials ? ' · with credentials' : ''}`
+          : undefined,
+      ],
+      [
+        'Socket',
+        site.socket
+          ? [
+              site.socket.api === 'socket.io' ? 'socket.io' : 'WebSocket',
+              site.socket.namespace ? `namespace ${code(site.socket.namespace)}` : '',
+              site.socket.protocols ? `protocols ${site.socket.protocols.map(code).join(', ')}` : '',
+            ]
+              .filter(Boolean)
+              .join(' · ')
+          : undefined,
+      ],
       [
         'Call path',
         site.callStack.length > 1 ? site.callStack.map((f) => code(f.callee)).join(' → ') : undefined,
       ],
     ]),
     site.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
-    site.bodyType && `**Request body** ${typeBlock(ctx, site.bodyType, from)}`,
-    site.responseType && `**Response** ${typeBlock(ctx, site.responseType, from)}`,
-    check && check.mismatches.length > 0 && typeCheckTable(check),
+    site.bodyType && `**Request body**${typeSource(site.bodyType)} ${typeBlock(ctx, site.bodyType, from)}`,
+    site.responseType &&
+      `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,
+    ...(site.stream ? siteEvents(ctx, site.stream, from) : []),
+    ...(site.socket ? siteSocketMessages(ctx, site.socket, from) : []),
+    check && check.mismatches.length > 0 && typeCheckTable(check, !!site.socket),
     examples(ctx, site),
     next.length > 0 && `**Leads to** ${next.map((s) => code(requestLabel(s))).join(', ')}:`,
     ...next.filter((s) => !inner.has(s.id)).map((s) => requestSection(ctx, s, from, level + 1, inner)),
   ]).trimEnd()
 }
 
-function typeCheckTable(check: SiteTypeCheck): string {
+/** `pattern` and `unknown` as they are; `postman` says where the URL came from. */
+function urlConfidence(confidence: NonNullable<RequestSite['url']>['confidence']): string {
+  if (confidence === 'exact') return ''
+  return confidence === 'postman' ? ' (from Postman)' : ` (${confidence})`
+}
+
+/** Marks a type the code doesn't declare, taken from the collection's saved examples. */
+function typeSource(ref: TypeRef): string {
+  return ref.source === 'postman' ? ' (from Postman examples)' : ''
+}
+
+function typeCheckTable(check: SiteTypeCheck, socket = false): string {
   return `**Type check**: ${check.mismatched} of ${plural(check.checked, 'checked capture')} didn't match.\n\n${table(
     ['Part', 'Field', 'Problem', 'Expected', 'Captured', 'Captures'],
     check.mismatches.map((m) => [
-      m.part === 'response' ? 'response' : 'request body',
+      m.part === 'message'
+        ? `${m.direction === 'out' ? 'sent' : socket ? 'received' : 'event'} ${code(m.event ?? 'message')}`
+        : m.part === 'response'
+          ? 'response'
+          : 'request body',
       code(mismatchField(m.path)),
       m.kind,
       m.expected ? code(m.expected) : '',
@@ -573,8 +1141,100 @@ function example(c: ExportCapture, total: number): string {
   if (req) lines.push(`Request body:\n\n${req}`)
   const res = c.response ? bodyText(c.response.body) : undefined
   if (res) lines.push(`Response body:\n\n${res}`)
+  if (c.stream) lines.push(messagesText(c))
   if (c.redactedPaths.length > 0) lines.push(`Masked: ${c.redactedPaths.map(code).join(', ')}`)
   return lines.join('\n\n')
+}
+
+// --- Event streams (M18) --------------------------------------------------------------------
+
+/** Messages shown per captured stream before the rest are counted. */
+const MAX_MESSAGES = 10
+
+function streamEventNames(s: SseEndpoint): string {
+  if (s.events.length === 0) return 'not found'
+  return s.events.map((e) => code(e.name)).join(', ')
+}
+
+/** The events a site listens to, each with its data type. */
+function siteEvents(ctx: Ctx, stream: NonNullable<RequestSite['stream']>, from: string): string[] {
+  if (stream.events.length === 0) return ['**Events**: none found in the code.']
+  return stream.events.map((e) => {
+    const notes = [
+      e.typeFrom === 'handler' ? 'type from the route handler' : '',
+      e.listened ? '' : 'sent by the route handler, not listened to',
+    ].filter(Boolean)
+    const head = `**Event ${code(e.name)}**${notes.length > 0 ? ` (${notes.join('; ')})` : ''}`
+    return e.dataType ? `${head} ${typeBlock(ctx, e.dataType, from)}` : `${head}: no data type.`
+  })
+}
+
+// --- WebSockets (M19) ------------------------------------------------------------------------
+
+function socketMessageNames(site: RequestSite): string {
+  const messages = site.socket?.messages ?? []
+  if (messages.length === 0) return 'not found'
+  return messages.map((m) => `${m.direction === 'out' ? '↑' : '↓'} ${code(m.name)}`).join(', ')
+}
+
+/** The messages a socket sends and receives, each with its data type. */
+function siteSocketMessages(ctx: Ctx, socket: NonNullable<RequestSite['socket']>, from: string): string[] {
+  if (socket.messages.length === 0) return ['**Messages**: none found in the code.']
+  return socket.messages.map((m) => {
+    const head = `**${m.direction === 'out' ? 'Sends' : 'Receives'} ${code(m.name)}**`
+    return m.dataType ? `${head} ${typeBlock(ctx, m.dataType, from)}` : `${head}: no data type.`
+  })
+}
+
+/** A route handler that answers with an event stream: the events it sends. */
+function handlerStreams(ctx: Ctx, route: Route, from: string): (string | false)[] {
+  const streams = (ctx.model.streams ?? []).filter((s) => s.routeId === route.id)
+  return streams.flatMap((s) => [
+    `## Event stream (${s.method})`,
+    s.events.length === 0
+      ? 'Answers with `text/event-stream`; the events it writes could not be read.'
+      : table(
+          ['Event', 'Data', 'Where'],
+          s.events.map((e) => [
+            code(e.name),
+            e.dataType ? code(e.dataType.text) : 'fixed text',
+            e.loc ? code(`${e.loc.file}:${e.loc.line}`) : '',
+          ]),
+        ),
+    s.events
+      .filter((e) => e.dataType)
+      .map((e) => `**${code(e.name)}** ${typeBlock(ctx, e.dataType as TypeRef, from)}`)
+      .join('\n\n'),
+  ])
+}
+
+/**
+ * The connection state and the first messages of a captured stream. WebSocket messages (M19)
+ * are marked `↑` (sent) or `↓` (received).
+ */
+function messagesText(c: ExportCapture): string {
+  const stream = c.stream
+  if (!stream) return ''
+  const socket = c.transport === 'websocket'
+  const messages = c.messages ?? []
+  const shown = messages.slice(0, MAX_MESSAGES).map((m) => {
+    const data =
+      m.body?.kind === 'json'
+        ? JSON.stringify(m.body.value)
+        : m.body?.kind === 'text'
+          ? m.body.value
+          : m.body?.kind === 'binary'
+            ? `(binary, ${m.size} bytes)`
+            : m.body
+              ? ''
+              : '(data not kept)'
+    const arrow = socket ? (m.direction === 'out' ? '↑ ' : '↓ ') : ''
+    return `${arrow}${m.event ?? 'message'}: ${data}`
+  })
+  const more = stream.count > shown.length ? `\n… ${stream.count - shown.length} more` : ''
+  const close = stream.closeCode !== undefined ? `, close code ${stream.closeCode}` : ''
+  const head = `Messages: ${stream.count} ${socket ? 'sent and received' : 'received'}, ${stream.state}${close}${stream.truncated ? ' (some not kept)' : ''}`
+  return shown.length > 0 ? `${head}\n\n${block('text', cut(shown.join('\n')) + more)}` : `${head}.`
 }
 
 function bodyText(body: CapturedBody): string | undefined {
@@ -709,6 +1369,11 @@ function stepText(ctx: Ctx, step: FlowStep, from: string): string {
       const where = route ? routeLink(ctx, route, from) : nav ? code(urlText(nav.href)) : '?'
       return `${nav?.kind ?? 'navigate'} → ${where}`
     }
+    case 'query-update': {
+      const link = ctx.index.queryLinks.get(step.linkId)
+      if (!link) return `Cache update ${code(step.linkId)}`
+      return `${code(link.method)} ${code(queryLinkTarget(link))}`
+    }
   }
 }
 
@@ -731,6 +1396,16 @@ function stepDetail(ctx: Ctx, step: FlowStep): string {
       return nav
         ? `${nav.outcome ? `on ${nav.outcome} · ` : ''}${code(`${nav.loc.file}:${nav.loc.line}`)}`
         : ''
+    }
+    case 'query-update': {
+      const link = ctx.index.queryLinks.get(step.linkId)
+      if (!link) return ''
+      const hits = link.targetSiteIds.map((id) => ctx.index.requests.get(id)).filter((s) => !!s)
+      const refetch =
+        hits.length > 0
+          ? `${queryLinkVerb(link.kind)} ${hits.map((s) => code(requestLabel(s))).join(', ')} · `
+          : ''
+      return `${refetch}${code(`${link.loc.file}:${link.loc.line}`)}`
     }
   }
 }
@@ -787,6 +1462,12 @@ function sequence(ctx: Ctx, flow: Flow): string {
           const to = step.routeId ? pageOf(step.routeId) : participant('nav:?', nav ? urlText(nav.href) : '?')
           lines.push(`${indent}${current}->>${to}: ${mermaid(nav?.kind ?? 'navigate')}`)
           current = to
+          break
+        }
+        case 'query-update': {
+          const link = ctx.index.queryLinks.get(step.linkId)
+          const key = link ? queryLinkTarget(link) : 'all queries'
+          lines.push(`${indent}Note over ${current}: ${mermaid(`${link?.method ?? 'cache update'} ${key}`)}`)
           break
         }
       }
@@ -1072,6 +1753,7 @@ function siteLink(ctx: Ctx, site: RequestSite, from: string): string {
 function siteHome(ctx: Ctx, site: RequestSite, seen = new Set<string>()): string | undefined {
   if (site.origin === 'component' && site.componentId) return ctx.names.component(site.componentId)
   if (site.origin === 'route-handler' && site.routeId) return ctx.names.route(site.routeId)
+  if (site.origin === 'middleware') return MIDDLEWARE
   const caller = ctx.callers.get(site.id)
   if (!caller || seen.has(caller.id)) return undefined
   return siteHome(ctx, caller, new Set([...seen, site.id]))
@@ -1084,6 +1766,8 @@ function ownerText(ctx: Ctx, site: RequestSite, from: string): string {
     const route = ctx.index.routes.get(site.routeId)
     return `${site.handlerMethod ?? '?'} ${route ? routeLink(ctx, route, from) : '?'}`
   }
+  if (site.origin === 'middleware')
+    return from === MIDDLEWARE ? 'middleware' : link('middleware', from, MIDDLEWARE)
   return `server action ${code(site.serverAction?.name ?? '?')}`
 }
 

@@ -8,6 +8,7 @@
 // Run after `pnpm build`:
 //   node scripts/perf/bench.mjs [features=200] [--json]
 // Budgets (fails when exceeded): FLOW_CHECKER_BUDGET_SCAN_MS, _RESCAN_MS, _API_MS.
+// FLOW_CHECKER_CLI=<path to cli.js> measures another build instead of packages/flow-checker/dist.
 import { spawn, spawnSync } from 'node:child_process'
 import { appendFileSync, mkdtempSync, rmSync } from 'node:fs'
 import { createServer } from 'node:net'
@@ -16,7 +17,8 @@ import { join, resolve } from 'node:path'
 import { generateApp } from './generate-app.mjs'
 
 const repo = resolve(import.meta.dirname, '..', '..')
-const cli = join(repo, 'packages', 'flow-checker', 'dist', 'cli.js')
+// FLOW_CHECKER_CLI: another build's cli.js, to compare (e.g. a published version).
+const cli = process.env.FLOW_CHECKER_CLI ?? join(repo, 'packages', 'flow-checker', 'dist', 'cli.js')
 const args = process.argv.slice(2)
 const features = Number(args.find((a) => /^\d+$/.test(a)) ?? 200)
 const json = args.includes('--json')

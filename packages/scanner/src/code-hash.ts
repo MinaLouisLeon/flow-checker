@@ -1,7 +1,7 @@
 // Code hash of a request site (M9, docs/PLAN.md 6.7): what has to change for captures taken
 // before to be out of date. Built from the code along the call path, as tokens, so whitespace,
 // comments and line numbers don't count.
-import { contentHash, type RequestSite } from '@flow-checker/shared'
+import { contentHash, formatQueryKey, type RequestSite } from '@flow-checker/shared'
 import { Node as N, type Node, ts } from 'ts-morph'
 
 export interface HashFrame {
@@ -30,6 +30,8 @@ export function siteHash(
     site.hook ? `${site.hook.module}:${site.hook.name}:${site.hook.key ?? ''}` : '',
     site.serverAction?.name ?? '',
   ]
+  // Keys often come from a key factory in another file, which is not on the call path.
+  if (site.queryKey) parts.push(formatQueryKey(site.queryKey))
   frames.forEach((frame, i) => {
     const code = i === 0 ? originCode(frame) : frame.scope
     parts.push(relFile(code), tokens(code))

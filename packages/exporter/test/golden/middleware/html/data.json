@@ -1,0 +1,2167 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "middleware",
+  "model": {
+    "version": 8,
+    "project": {
+      "appDir": "app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "app",
+      "files": {
+        "layout": "app/layout.tsx",
+        "page": "app/page.tsx"
+      },
+      "children": [
+        {
+          "segment": {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          "dir": "app/api",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "health",
+                "kind": "static",
+                "name": "health"
+              },
+              "dir": "app/api/health",
+              "files": {
+                "route": "app/api/health/route.ts"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "segment": {
+            "raw": "dashboard",
+            "kind": "static",
+            "name": "dashboard"
+          },
+          "dir": "app/dashboard",
+          "files": {
+            "page": "app/dashboard/page.tsx"
+          },
+          "children": [
+            {
+              "segment": {
+                "raw": "settings",
+                "kind": "static",
+                "name": "settings"
+              },
+              "dir": "app/dashboard/settings",
+              "files": {
+                "page": "app/dashboard/settings/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "segment": {
+            "raw": "login",
+            "kind": "static",
+            "name": "login"
+          },
+          "dir": "app/login",
+          "files": {
+            "page": "app/login/page.tsx"
+          },
+          "children": []
+        },
+        {
+          "segment": {
+            "raw": "products",
+            "kind": "static",
+            "name": "products"
+          },
+          "dir": "app/products",
+          "files": {
+            "page": "app/products/page.tsx"
+          },
+          "children": []
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_12v7saiyoj2",
+        "path": "/",
+        "kind": "page",
+        "file": "app/page.tsx",
+        "segments": [],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_0ku4o3jpe9o"
+      },
+      {
+        "id": "rt_0gx4j1riymk",
+        "path": "/api/health",
+        "kind": "route-handler",
+        "file": "app/api/health/route.ts",
+        "segments": [
+          {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          {
+            "raw": "health",
+            "kind": "static",
+            "name": "health"
+          }
+        ],
+        "layoutChain": [],
+        "methods": [
+          "GET"
+        ]
+      },
+      {
+        "id": "rt_0cs0esrbng7",
+        "path": "/dashboard",
+        "kind": "page",
+        "file": "app/dashboard/page.tsx",
+        "segments": [
+          {
+            "raw": "dashboard",
+            "kind": "static",
+            "name": "dashboard"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_23rukepv8uh"
+      },
+      {
+        "id": "rt_19fnqh7vbsp",
+        "path": "/dashboard/settings",
+        "kind": "page",
+        "file": "app/dashboard/settings/page.tsx",
+        "segments": [
+          {
+            "raw": "dashboard",
+            "kind": "static",
+            "name": "dashboard"
+          },
+          {
+            "raw": "settings",
+            "kind": "static",
+            "name": "settings"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_005b14gxu7r"
+      },
+      {
+        "id": "rt_0ppgd03xd7c",
+        "path": "/login",
+        "kind": "page",
+        "file": "app/login/page.tsx",
+        "segments": [
+          {
+            "raw": "login",
+            "kind": "static",
+            "name": "login"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_06ayjhu9gff"
+      },
+      {
+        "id": "rt_0pkd6801g1s",
+        "path": "/products",
+        "kind": "page",
+        "file": "app/products/page.tsx",
+        "segments": [
+          {
+            "raw": "products",
+            "kind": "static",
+            "name": "products"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "app/layout.tsx",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        ],
+        "componentId": "cmp_23k37s13z1d"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_23rukepv8uh",
+        "name": "DashboardPage",
+        "file": "app/dashboard/page.tsx",
+        "loc": {
+          "file": "app/dashboard/page.tsx",
+          "line": 6,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "app/dashboard/page.tsx",
+              "line": 16,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_005b14gxu7r",
+        "name": "SettingsPage",
+        "file": "app/dashboard/settings/page.tsx",
+        "loc": {
+          "file": "app/dashboard/settings/page.tsx",
+          "line": 5,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_2dznycb4aq7",
+        "name": "RootLayout",
+        "file": "app/layout.tsx",
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 6,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 11,
+              "column": 11
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_06ayjhu9gff",
+        "name": "LoginPage",
+        "file": "app/login/page.tsx",
+        "loc": {
+          "file": "app/login/page.tsx",
+          "line": 1,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0ku4o3jpe9o",
+        "name": "HomePage",
+        "file": "app/page.tsx",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 3,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_23k37s13z1d",
+        "name": "ProductsPage",
+        "file": "app/products/page.tsx",
+        "loc": {
+          "file": "app/products/page.tsx",
+          "line": 5,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [],
+        "usedTypes": []
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_0857a9l1j3p",
+        "name": "User",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/user.ts",
+          "line": 1,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "role",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "literal",
+                    "value": "admin"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": "member"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_21gfaviyj48",
+        "name": "Settings",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/user.ts",
+          "line": 8,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "theme",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "locale",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "digest",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "primitive",
+                    "name": "string"
+                  },
+                  {
+                    "kind": "primitive",
+                    "name": "null"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_2dct2hpocpn",
+        "name": "Product",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "types/user.ts",
+          "line": 14,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "price",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "stock",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_02gshaf9oil",
+        "origin": "component",
+        "componentId": "cmp_23rukepv8uh",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/users`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/users"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "responseType": {
+          "text": "User[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_0857a9l1j3p",
+              "name": "User"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/dashboard/page.tsx",
+            "line": 7,
+            "column": 23,
+            "callee": "getUsers"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 5,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "0tajhd1rpr0"
+      },
+      {
+        "id": "req_0q6t9lmdld7",
+        "origin": "component",
+        "componentId": "cmp_005b14gxu7r",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/settings`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/settings"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "responseType": {
+          "text": "Settings",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_21gfaviyj48",
+            "name": "Settings"
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/dashboard/settings/page.tsx",
+            "line": 6,
+            "column": 26,
+            "callee": "getSettings"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 10,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "185q2zdnkoq"
+      },
+      {
+        "id": "req_263u38ocrza",
+        "origin": "component",
+        "componentId": "cmp_23k37s13z1d",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/products`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/products"
+        },
+        "trigger": {
+          "kind": "server-render"
+        },
+        "responseType": {
+          "text": "Product[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_2dct2hpocpn",
+              "name": "Product"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/products/page.tsx",
+            "line": 6,
+            "column": 26,
+            "callee": "getProducts"
+          },
+          {
+            "file": "lib/api.ts",
+            "line": 15,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1gl1lr8u45w"
+      },
+      {
+        "id": "req_0pdaq2dj6vz",
+        "origin": "middleware",
+        "transport": "fetch",
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}/me`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/me"
+        },
+        "trigger": {
+          "kind": "middleware"
+        },
+        "responseType": {
+          "text": "User",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0857a9l1j3p",
+            "name": "User"
+          }
+        },
+        "callStack": [
+          {
+            "file": "proxy.ts",
+            "line": 24,
+            "column": 22,
+            "callee": "getSessionUser"
+          },
+          {
+            "file": "lib/session.ts",
+            "line": 6,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1if1t89fmj3"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_0qux1qj0vcm",
+        "origin": "component",
+        "componentId": "cmp_23rukepv8uh",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/dashboard/settings\"",
+          "confidence": "exact",
+          "path": "/dashboard/settings"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/dashboard/page.tsx",
+            "line": 16,
+            "column": 7
+          }
+        },
+        "loc": {
+          "file": "app/dashboard/page.tsx",
+          "line": 16,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "app/dashboard/page.tsx",
+            "line": 16,
+            "column": 7,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_19fnqh7vbsp"
+      },
+      {
+        "id": "nav_23ohd71fojm",
+        "origin": "component",
+        "componentId": "cmp_2dznycb4aq7",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/\"",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 11
+          }
+        },
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 11,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_12v7saiyoj2"
+      },
+      {
+        "id": "nav_0sqcj8ecfc8",
+        "origin": "component",
+        "componentId": "cmp_2dznycb4aq7",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/dashboard\"",
+          "confidence": "exact",
+          "path": "/dashboard"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 40
+          }
+        },
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 11,
+          "column": 40
+        },
+        "callStack": [
+          {
+            "file": "app/layout.tsx",
+            "line": 11,
+            "column": 40,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_0cs0esrbng7"
+      },
+      {
+        "id": "nav_0uo8t0kwbru",
+        "origin": "component",
+        "componentId": "cmp_2dznycb4aq7",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/shop\"",
+          "confidence": "exact",
+          "path": "/shop"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/layout.tsx",
+            "line": 12,
+            "column": 11
+          }
+        },
+        "loc": {
+          "file": "app/layout.tsx",
+          "line": 12,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "app/layout.tsx",
+            "line": 12,
+            "column": 11,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_0pkd6801g1s"
+      },
+      {
+        "id": "nav_034yhq0fgtl",
+        "origin": "component",
+        "componentId": "cmp_0ku4o3jpe9o",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "\"/login\"",
+          "confidence": "exact",
+          "path": "/login"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        },
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 7,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "app/page.tsx",
+            "line": 7,
+            "column": 7,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_0ppgd03xd7c"
+      },
+      {
+        "id": "nav_0yqz79dmhek",
+        "origin": "middleware",
+        "kind": "permanent-redirect",
+        "api": "next",
+        "href": {
+          "text": "url",
+          "confidence": "exact",
+          "path": "/"
+        },
+        "trigger": {
+          "kind": "middleware"
+        },
+        "from": {
+          "kind": "exact",
+          "path": "/old-home"
+        },
+        "loc": {
+          "file": "proxy.ts",
+          "line": 16,
+          "column": 12
+        },
+        "callStack": [
+          {
+            "file": "proxy.ts",
+            "line": 16,
+            "column": 12,
+            "callee": "NextResponse.redirect"
+          }
+        ],
+        "targetRouteId": "rt_12v7saiyoj2",
+        "sourceRouteIds": []
+      },
+      {
+        "id": "nav_2by4yws1w5m",
+        "origin": "middleware",
+        "kind": "redirect",
+        "api": "next",
+        "href": {
+          "text": "new URL('/dashboard', request.url)",
+          "confidence": "exact",
+          "path": "/dashboard"
+        },
+        "trigger": {
+          "kind": "middleware"
+        },
+        "from": {
+          "kind": "exact",
+          "path": "/login"
+        },
+        "loc": {
+          "file": "proxy.ts",
+          "line": 20,
+          "column": 37
+        },
+        "callStack": [
+          {
+            "file": "proxy.ts",
+            "line": 20,
+            "column": 37,
+            "callee": "NextResponse.redirect"
+          }
+        ],
+        "targetRouteId": "rt_0cs0esrbng7",
+        "sourceRouteIds": [
+          "rt_0ppgd03xd7c"
+        ]
+      },
+      {
+        "id": "nav_2ez8xp8x3st",
+        "origin": "middleware",
+        "kind": "redirect",
+        "api": "next",
+        "href": {
+          "text": "new URL('/login', request.url)",
+          "confidence": "exact",
+          "path": "/login"
+        },
+        "trigger": {
+          "kind": "middleware"
+        },
+        "condition": "!token",
+        "loc": {
+          "file": "proxy.ts",
+          "line": 23,
+          "column": 22
+        },
+        "callStack": [
+          {
+            "file": "proxy.ts",
+            "line": 23,
+            "column": 22,
+            "callee": "NextResponse.redirect"
+          }
+        ],
+        "targetRouteId": "rt_0ppgd03xd7c",
+        "sourceRouteIds": [
+          "rt_0cs0esrbng7",
+          "rt_19fnqh7vbsp"
+        ]
+      },
+      {
+        "id": "nav_0bco97iutwt",
+        "origin": "middleware",
+        "kind": "redirect",
+        "api": "next",
+        "href": {
+          "text": "new URL('/login?expired=1', request.url)",
+          "confidence": "exact",
+          "path": "/login",
+          "query": "expired=1"
+        },
+        "trigger": {
+          "kind": "middleware"
+        },
+        "condition": "token && !user",
+        "loc": {
+          "file": "proxy.ts",
+          "line": 27,
+          "column": 22
+        },
+        "callStack": [
+          {
+            "file": "proxy.ts",
+            "line": 27,
+            "column": 22,
+            "callee": "NextResponse.redirect"
+          }
+        ],
+        "targetRouteId": "rt_0ppgd03xd7c",
+        "sourceRouteIds": [
+          "rt_0cs0esrbng7",
+          "rt_19fnqh7vbsp"
+        ]
+      }
+    ],
+    "flows": [],
+    "queryLinks": [],
+    "middleware": {
+      "file": "proxy.ts",
+      "convention": "proxy",
+      "exportName": "proxy",
+      "loc": {
+        "file": "proxy.ts",
+        "line": 5,
+        "column": 1
+      },
+      "matchers": [
+        {
+          "source": "/dashboard/:path*"
+        },
+        {
+          "source": "/shop/:path*"
+        },
+        {
+          "source": "/old-home"
+        },
+        {
+          "source": "/login",
+          "has": [
+            {
+              "type": "cookie",
+              "key": "session"
+            }
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "routeId": "rt_0cs0esrbng7"
+        },
+        {
+          "routeId": "rt_19fnqh7vbsp"
+        },
+        {
+          "routeId": "rt_0ppgd03xd7c",
+          "conditional": true
+        }
+      ],
+      "rewrites": [
+        {
+          "id": "rw_03umd6et8fr",
+          "href": {
+            "text": "new URL('/products', request.url)",
+            "confidence": "exact",
+            "path": "/products"
+          },
+          "from": {
+            "kind": "prefix",
+            "path": "/shop"
+          },
+          "loc": {
+            "file": "proxy.ts",
+            "line": 10,
+            "column": 44
+          },
+          "targetRouteId": "rt_0pkd6801g1s"
+        }
+      ]
+    }
+  },
+  "verification": {
+    "sites": {
+      "req_263u38ocrza": {
+        "captures": 1,
+        "lastAt": "2026-10-30T02:42:47.558Z",
+        "lastCaptureId": "cap_mvudae12lsfdpnnd",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0pdaq2dj6vz": {
+        "captures": 4,
+        "lastAt": "2026-10-30T02:43:00.377Z",
+        "lastCaptureId": "cap_mvudanx56kxbq21g",
+        "typeCheck": {
+          "checked": 3,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_02gshaf9oil": {
+        "captures": 2,
+        "lastAt": "2026-10-30T02:43:00.433Z",
+        "lastCaptureId": "cap_mvudanypkqyx2t3p",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0q6t9lmdld7": {
+        "captures": 1,
+        "lastAt": "2026-10-30T02:42:58.793Z",
+        "lastCaptureId": "cap_mvudamp5otwly1xi",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 8,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {},
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvudae12lsfdpnnd",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:42:47.558Z",
+      "durationMs": 36,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:42:47 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/shop"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getProducts (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__064he5hqkoizo._.js:79:17)",
+        "at async ProductsPage (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__064he5hqkoizo._.js:18:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getProducts",
+          "file": "lib/api.ts",
+          "line": 15,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "app/products/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_263u38ocrza",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_263u38ocrza",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /products"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "ProductsPage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getProducts"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/shop"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_263u38ocrza",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudai0ksviv4a9c",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:42:52.724Z",
+      "durationMs": 6,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 401,
+        "statusText": "Unauthorized",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:42:52 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "error": "Not signed in"
+          },
+          "size": 25
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at getSessionUser (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:22:23)",
+        "at proxy (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:60:183)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:615:26",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:637",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:318"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getSessionUser",
+          "file": "lib/session.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "proxy",
+          "file": "proxy.ts",
+          "line": 24,
+          "column": 36
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0pdaq2dj6vz",
+        "score": 150,
+        "candidates": [
+          {
+            "siteId": "req_0pdaq2dj6vz",
+            "score": 150,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /me"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "middleware",
+                "points": 20,
+                "detail": "runs on /dashboard"
+              },
+              {
+                "signal": "middleware",
+                "points": 30,
+                "detail": "sent from middleware"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getSessionUser"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0pdaq2dj6vz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "skipped",
+            "reason": "Error response (401) is not checked against the success type.",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudak0rs0wg1wio",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:42:55.323Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:42:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at getSessionUser (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:22:23)",
+        "at proxy (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:60:183)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:615:26",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:637",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:318"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getSessionUser",
+          "file": "lib/session.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "proxy",
+          "file": "proxy.ts",
+          "line": 24,
+          "column": 36
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0pdaq2dj6vz",
+        "score": 150,
+        "candidates": [
+          {
+            "siteId": "req_0pdaq2dj6vz",
+            "score": 150,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /me"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "middleware",
+                "points": 20,
+                "detail": "runs on /dashboard"
+              },
+              {
+                "signal": "middleware",
+                "points": 30,
+                "detail": "sent from middleware"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getSessionUser"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0pdaq2dj6vz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudakesy09e0ykf",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:42:55.829Z",
+      "durationMs": 18,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:42:55 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__064he5hqkoizo._.js:67:17)",
+        "at async DashboardPage (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__004dbl4-3740d._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "DashboardPage",
+          "file": "app/dashboard/page.tsx",
+          "line": 7,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_02gshaf9oil",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_02gshaf9oil",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "DashboardPage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/dashboard"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_02gshaf9oil",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudamha4ic7f9wh",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:42:58.510Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:42:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard/settings?_rsc=oLJ3GhguZ9Y853hq"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at getSessionUser (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:22:23)",
+        "at proxy (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:60:183)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:615:26",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:637",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:318"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getSessionUser",
+          "file": "lib/session.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "proxy",
+          "file": "proxy.ts",
+          "line": 24,
+          "column": 36
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0pdaq2dj6vz",
+        "score": 150,
+        "candidates": [
+          {
+            "siteId": "req_0pdaq2dj6vz",
+            "score": 150,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /me"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "middleware",
+                "points": 20,
+                "detail": "runs on /dashboard/settings"
+              },
+              {
+                "signal": "middleware",
+                "points": 30,
+                "detail": "sent from middleware"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getSessionUser"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0pdaq2dj6vz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudamp5otwly1xi",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:42:58.793Z",
+      "durationMs": 14,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:42:58 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard/settings?_rsc=oLJ3GhguZ9Y853hq"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getSettings (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__064he5hqkoizo._.js:73:17)",
+        "at async SettingsPage (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__04al6a5m4wo-p._.js:18:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getSettings",
+          "file": "lib/api.ts",
+          "line": 10,
+          "column": 15
+        },
+        {
+          "fn": "SettingsPage",
+          "file": "app/dashboard/settings/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0q6t9lmdld7",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_0q6t9lmdld7",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /settings"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "SettingsPage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getSettings"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/dashboard/settings"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0q6t9lmdld7",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Settings",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudanx56kxbq21g",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:43:00.377Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/me",
+        "headers": {
+          "authorization": "[REDACTED:string]"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:43:00 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at getSessionUser (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:22:23)",
+        "at proxy (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1y0o1bujbsk3z._.js:60:183)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:615:26",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:637",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\1ghd_next_1z-co0m1haear._.js:8103:318"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "request.headers.authorization"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getSessionUser",
+          "file": "lib/session.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "proxy",
+          "file": "proxy.ts",
+          "line": 24,
+          "column": 36
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0pdaq2dj6vz",
+        "score": 150,
+        "candidates": [
+          {
+            "siteId": "req_0pdaq2dj6vz",
+            "score": 150,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /me"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "middleware",
+                "points": 20,
+                "detail": "runs on /dashboard"
+              },
+              {
+                "signal": "middleware",
+                "points": 30,
+                "detail": "sent from middleware"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getSessionUser"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0pdaq2dj6vz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvudanypkqyx2t3p",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T02:43:00.433Z",
+      "durationMs": 23,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 02:43:00 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/dashboard"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:245:19)",
+        "at baseCapture (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\[root-of-the-server]__1pvyadq4dd5jb._.js:680:197)",
+        "at dedupeFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at async getUsers (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__064he5hqkoizo._.js:67:17)",
+        "at async DashboardPage (<repo>\\fixtures\\middleware\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__004dbl4-3740d._.js:20:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getUsers",
+          "file": "lib/api.ts",
+          "line": 5,
+          "column": 15
+        },
+        {
+          "fn": "DashboardPage",
+          "file": "app/dashboard/page.tsx",
+          "line": 7,
+          "column": 17
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_02gshaf9oil",
+        "score": 145,
+        "candidates": [
+          {
+            "siteId": "req_02gshaf9oil",
+            "score": 145,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "stack-source",
+                "points": 50,
+                "detail": "2 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 20,
+                "detail": "DashboardPage"
+              },
+              {
+                "signal": "stack-name",
+                "points": 5,
+                "detail": "getUsers"
+              },
+              {
+                "signal": "route",
+                "points": 25,
+                "detail": "/dashboard"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_02gshaf9oil",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 8,
+    "included": 8
+  },
+  "redacted": true
+}

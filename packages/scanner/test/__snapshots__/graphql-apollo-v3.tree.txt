@@ -1,0 +1,41 @@
+# Route tree
+
+src/app [layout, page]
+├─ api
+│  └─ graphql [route]
+├─ search [page]
+└─ todos
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/api/graphql  route GET,POST  src/app/api/graphql/route.ts
+/search  page  src/app/search/page.tsx
+/todos/[id]  page  src/app/todos/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:6
+└─ Providers  client (use client)  src/app/providers.tsx:7
+   └─ ApolloProvider  external @apollo/client
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+HomePage  server  src/app/page.tsx:5
+├─ ViewerBadge  client (use client)  src/components/ViewerBadge.tsx:7
+├─ TodoList  client (use client)  src/components/TodoList.tsx:8
+│  └─ Link  external next/link  [conditional]
+└─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:9
+
+## /search  src/app/search/page.tsx
+layouts: src/app/layout.tsx
+SearchPage  server  src/app/search/page.tsx:3
+└─ Search  client (use client)  src/components/Search.tsx:8
+
+## /todos/[id]  src/app/todos/[id]/page.tsx
+layouts: src/app/layout.tsx
+TodoPage  server  src/app/todos/[id]/page.tsx:3
+└─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:8

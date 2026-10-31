@@ -17,6 +17,10 @@ export interface CaptureConfig {
   maxBodyBytes?: number
   /** URL globs never captured. */
   ignore?: string[]
+  /** Event stream (SSE) messages kept per connection. Later ones are only counted. Default: 200. */
+  maxMessages?: number
+  /** Messages larger than this are kept without their data. Default: 64_000. */
+  maxMessageBytes?: number
 }
 
 /**
@@ -32,6 +36,49 @@ export interface ApiClientConfig {
    * matches calling the default import itself (`ofetch(url)`).
    */
   methods: string[]
+}
+
+/** A Postman collection or environment in Postman's cloud, fetched with an API key (M15). */
+export interface PostmanCloudSource {
+  /** Collection or environment id (or uid). */
+  id: string
+  /** Env variable that holds the Postman API key. Default: `POSTMAN_API_KEY`. Never stored. */
+  apiKeyEnv?: string
+}
+
+/** A Postman collection used as the API contract, a types source and for URL resolution (M15). */
+export interface PostmanConfig {
+  /**
+   * A v2.1 JSON export (`api.postman_collection.json`), a git-native v3 YAML folder
+   * (`postman/collections/my-api`), or a cloud collection (`{ id, apiKeyEnv }`). Paths are
+   * relative to the project root.
+   */
+  collection: string | PostmanCloudSource
+  /** Environment for `{{variables}}`: a JSON export, a v3 YAML file, or a cloud environment. */
+  environment?: string | PostmanCloudSource
+}
+
+/** GraphQL (M17): where operation types come from when the code doesn't have them. */
+export interface GraphqlConfig {
+  /**
+   * The schema: SDL (`.graphql` / `.gql`) or an introspection result (`.json`), relative to the
+   * project root. Default: the `schema` of `relay.config.json` or of the codegen config, else
+   * `schema.graphql` in the root or `src/`.
+   */
+  schema?: string
+  /**
+   * Asks a running endpoint for its schema (dev only, when there is no schema file). The result
+   * is cached in `.flow-checker/cache/`. Header values `env:NAME` are read from that variable.
+   */
+  introspection?: { url: string; headers?: Record<string, string> }
+  /**
+   * Persisted query manifest that maps ids to documents: codegen's `persisted-documents.json`,
+   * Apollo's `persisted-query-manifest.json` or Relay's `persisted_queries.json`. Default: found
+   * by those names in the root (or the Relay config's `persistConfig.file`).
+   */
+  persistedQueries?: string
+  /** Where operations are sent, when the client setup doesn't say (`/api/graphql`, a full URL). */
+  endpoint?: string
 }
 
 /** Default `include`: every file under the project root. */
@@ -66,6 +113,10 @@ export interface FlowCheckerConfig {
     /** Nesting depth of anonymous types before expansion stops. Default: 6. */
     maxDepth?: number
   }
+  /** Postman collection to check the code against (`flow-checker postman import`). */
+  postman?: PostmanConfig
+  /** GraphQL schema, live introspection and persisted queries (M17). */
+  graphql?: GraphqlConfig
   /** Default export folders: Markdown (default `docs/flow`) and the static site (`.flow-checker/site`). */
   export?: { md?: string; html?: string }
 }

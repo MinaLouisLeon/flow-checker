@@ -5,8 +5,11 @@ import type {
   Component,
   ComponentRef,
   Flow,
+  MiddlewareRewrite,
+  MiddlewareRoute,
   NamedType,
   Navigation,
+  QueryLink,
   RequestSite,
   Route,
   TypeShape,
@@ -36,6 +39,7 @@ export type NoteKind =
   | 'unresolved-type'
   | 'missing-page-component'
   | 'request'
+  | 'middleware'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -74,6 +78,22 @@ export interface ModelIndex {
   flowsByRoute: Map<string, Flow[]>
   /** Page-to-page navigation edges (from the page whose own tree has the link or call). */
   navEdges: { source: string; target: string; kinds: Navigation['kind'][] }[]
+  /** React Query cache links (M13). */
+  queryLinks: Map<string, QueryLink>
+  /** Site id -> cache links that run after it (its mutation callbacks, or a server prefetch). */
+  linksFrom: Map<string, QueryLink[]>
+  /** Site id -> cache links that hit it (invalidations of its key, hydration). */
+  linksTo: Map<string, QueryLink[]>
+  /** Component id -> cache links called in it. */
+  linksByComponent: Map<string, QueryLink[]>
+  /** Route id -> how the middleware runs on it (M14). Absent: it doesn't. */
+  middlewareRoutes: Map<string, MiddlewareRoute>
+  /** Route id -> middleware redirects that can send a request for it elsewhere. */
+  middlewareRedirects: Map<string, Navigation[]>
+  /** Route id -> middleware rewrites that make it answer other paths. */
+  rewritesTo: Map<string, MiddlewareRewrite[]>
+  /** Requests sent by the middleware. */
+  middlewareRequests: RequestSite[]
 }
 
 export function buildIndex(model: AppModel): ModelIndex {
@@ -164,6 +184,8 @@ export function buildIndex(model: AppModel): ModelIndex {
     if (!target) continue
     if (nav.componentId) {
       for (const source of sourcesOf(nav.componentId)) addEdge(source, target, nav.kind)
+    } else if (nav.origin === 'middleware') {
+      for (const source of nav.sourceRouteIds ?? []) addEdge(source, target, nav.kind)
     } else if (nav.serverAction) {
       const name = nav.serverAction.name
       for (const site of model.requests) {
@@ -172,6 +194,26 @@ export function buildIndex(model: AppModel): ModelIndex {
         for (const source of sourcesOf(site.componentId)) addEdge(source, target, nav.kind)
       }
     }
+  }
+
+  const linksFrom = new Map<string, QueryLink[]>()
+  const linksTo = new Map<string, QueryLink[]>()
+  const linksByComponent = new Map<string, QueryLink[]>()
+  for (const link of model.queryLinks) {
+    for (const id of link.fromSiteIds) push(linksFrom, id, link)
+    for (const id of link.targetSiteIds) push(linksTo, id, link)
+    if (link.componentId) push(linksByComponent, link.componentId, link)
+  }
+
+  const middlewareRoutes = new Map((model.middleware?.routes ?? []).map((r) => [r.routeId, r]))
+  const middlewareRedirects = new Map<string, Navigation[]>()
+  for (const nav of model.navigations) {
+    if (nav.origin === 'middleware')
+      for (const id of nav.sourceRouteIds ?? []) push(middlewareRedirects, id, nav)
+  }
+  const rewritesTo = new Map<string, MiddlewareRewrite[]>()
+  for (const rewrite of model.middleware?.rewrites ?? []) {
+    if (rewrite.targetRouteId) push(rewritesTo, rewrite.targetRouteId, rewrite)
   }
 
   return {
@@ -191,6 +233,14 @@ export function buildIndex(model: AppModel): ModelIndex {
     flows: new Map(model.flows.map((f) => [f.id, f])),
     flowsByRoute,
     navEdges: [...edges.values()],
+    queryLinks: new Map(model.queryLinks.map((l) => [l.id, l])),
+    linksFrom,
+    linksTo,
+    linksByComponent,
+    middlewareRoutes,
+    middlewareRedirects,
+    rewritesTo,
+    middlewareRequests: model.requests.filter((s) => s.origin === 'middleware'),
   }
 }
 
@@ -315,6 +365,14 @@ function scanNotes(model: AppModel): ScanNote[] {
         requestId: site.id,
       })
     }
+  }
+  const mw = model.middleware
+  if (mw?.matcherText !== undefined) {
+    notes.push({
+      kind: 'middleware',
+      message: `config.matcher in ${mw.file} could not be read (${mw.matcherText}), so it may or may not run on each route`,
+      file: mw.file,
+    })
   }
   for (const t of model.types) {
     if (!hasUnresolved(t.shape)) continue

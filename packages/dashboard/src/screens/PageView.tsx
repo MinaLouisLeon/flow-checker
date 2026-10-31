@@ -1,8 +1,9 @@
-import type { ComponentRef, RequestSite, Route } from '@flow-checker/shared'
+import type { ComponentRef, QueryLink, RequestSite, Route } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
+import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
-import { RequestList } from '../RequestView'
+import { QueryLinkList, RequestList } from '../RequestView'
 import { href } from '../router'
 import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 import { ComponentPanel } from './ComponentPanel'
@@ -26,6 +27,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
   const requests = pageRequests(index, routeId)
   const onLoad = requests.filter((s) => LOAD_TRIGGERS.has(s.trigger.kind))
   const onEvent = requests.filter((s) => !LOAD_TRIGGERS.has(s.trigger.kind))
+  const links = pageLinks(index, routeId)
 
   return (
     <div className="screen screen-split">
@@ -90,6 +92,8 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
           )}
         </Section>
 
+        <MiddlewareSection index={index} routeId={routeId} />
+
         <Section title="Page-load requests" aside={<span className="count">{onLoad.length}</span>}>
           <RequestList sites={onLoad} empty="Nothing is fetched when this page loads." open={false} />
         </Section>
@@ -97,6 +101,12 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         {onEvent.length > 0 && (
           <Section title="Requests on interaction" aside={<span className="count">{onEvent.length}</span>}>
             <RequestList sites={onEvent} empty="" open={false} />
+          </Section>
+        )}
+
+        {links.length > 0 && (
+          <Section title="Query cache" aside={<span className="count">{links.length}</span>}>
+            <QueryLinkList links={links} />
           </Section>
         )}
 
@@ -153,6 +163,13 @@ function pageRequests(index: ModelIndex, routeId: string): RequestSite[] {
   )
 }
 
+/** React Query cache calls made by the page's components (M13). */
+function pageLinks(index: ModelIndex, routeId: string): QueryLink[] {
+  return index.model.queryLinks.filter(
+    (l) => l.componentId && (index.routesOf.get(l.componentId) ?? []).includes(routeId),
+  )
+}
+
 function RouteHandlerView({ route, index }: { route: Route; index: ModelIndex }) {
   const sends = index.handlerRequests.get(route.id) ?? []
   const callers = index.handlerCallers.get(route.id) ?? []
@@ -172,6 +189,8 @@ function RouteHandlerView({ route, index }: { route: Route; index: ModelIndex })
       <div className="page-file">
         <SourceLink file={route.file} />
       </div>
+
+      <MiddlewareSection index={index} routeId={route.id} />
 
       <Section title="Called from" aside={<span className="count">{callers.length}</span>}>
         {callers.length === 0 ? (

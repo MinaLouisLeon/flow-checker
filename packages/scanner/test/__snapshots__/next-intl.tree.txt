@@ -13,6 +13,17 @@ src/app
 /[locale]/login  page  src/app/[locale]/login/page.tsx
 /[locale]/verify  page  src/app/[locale]/verify/page.tsx
 
+# Middleware
+
+src/proxy.ts  proxy  export default  (from next-intl/middleware createMiddleware)
+matcher: /((?!api|_next|_vercel|.*\..*).*)
+locales: en, ar (default en)
+runs on:
+  /[locale]  page
+  /[locale]/dashboard  page
+  /[locale]/login  page
+  /[locale]/verify  page
+
 # Layouts
 
 LocaleLayout  server  src/app/[locale]/layout.tsx:11

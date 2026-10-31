@@ -1,0 +1,4864 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-29T12:00:00.000Z",
+  "toolVersion": "0.0.0-test",
+  "projectName": "trpc-v10",
+  "model": {
+    "version": 8,
+    "project": {
+      "appDir": "src/app",
+      "tsconfig": "tsconfig.json",
+      "nextConfig": "next.config.ts",
+      "nextVersion": "16.4.3"
+    },
+    "routeTree": {
+      "segment": {
+        "raw": "",
+        "kind": "static",
+        "name": ""
+      },
+      "dir": "src/app",
+      "files": {
+        "layout": "src/app/layout.tsx",
+        "page": "src/app/page.tsx"
+      },
+      "children": [
+        {
+          "segment": {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          "dir": "src/app/api",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "trpc",
+                "kind": "static",
+                "name": "trpc"
+              },
+              "dir": "src/app/api/trpc",
+              "files": {},
+              "children": [
+                {
+                  "segment": {
+                    "raw": "[trpc]",
+                    "kind": "dynamic",
+                    "name": "trpc"
+                  },
+                  "dir": "src/app/api/trpc/[trpc]",
+                  "files": {
+                    "route": "src/app/api/trpc/[trpc]/route.ts"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "segment": {
+            "raw": "feed",
+            "kind": "static",
+            "name": "feed"
+          },
+          "dir": "src/app/feed",
+          "files": {
+            "page": "src/app/feed/page.tsx"
+          },
+          "children": []
+        },
+        {
+          "segment": {
+            "raw": "todos",
+            "kind": "static",
+            "name": "todos"
+          },
+          "dir": "src/app/todos",
+          "files": {},
+          "children": [
+            {
+              "segment": {
+                "raw": "[id]",
+                "kind": "dynamic",
+                "name": "id"
+              },
+              "dir": "src/app/todos/[id]",
+              "files": {
+                "page": "src/app/todos/[id]/page.tsx"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "routes": [
+      {
+        "id": "rt_0h4e5x5madf",
+        "path": "/",
+        "kind": "page",
+        "file": "src/app/page.tsx",
+        "segments": [],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_2flvqsq9ypc"
+      },
+      {
+        "id": "rt_044xcwxfqfa",
+        "path": "/api/trpc/[trpc]",
+        "kind": "route-handler",
+        "file": "src/app/api/trpc/[trpc]/route.ts",
+        "segments": [
+          {
+            "raw": "api",
+            "kind": "static",
+            "name": "api"
+          },
+          {
+            "raw": "trpc",
+            "kind": "static",
+            "name": "trpc"
+          },
+          {
+            "raw": "[trpc]",
+            "kind": "dynamic",
+            "name": "trpc"
+          }
+        ],
+        "layoutChain": [],
+        "methods": [
+          "GET",
+          "POST"
+        ]
+      },
+      {
+        "id": "rt_1tdwfn30x0d",
+        "path": "/feed",
+        "kind": "page",
+        "file": "src/app/feed/page.tsx",
+        "segments": [
+          {
+            "raw": "feed",
+            "kind": "static",
+            "name": "feed"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_1k3yzyunwvi"
+      },
+      {
+        "id": "rt_0rsc27vk284",
+        "path": "/todos/[id]",
+        "kind": "page",
+        "file": "src/app/todos/[id]/page.tsx",
+        "segments": [
+          {
+            "raw": "todos",
+            "kind": "static",
+            "name": "todos"
+          },
+          {
+            "raw": "[id]",
+            "kind": "dynamic",
+            "name": "id"
+          }
+        ],
+        "layoutChain": [
+          {
+            "kind": "layout",
+            "file": "src/app/layout.tsx",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        ],
+        "componentId": "cmp_1an2304y5ca"
+      }
+    ],
+    "components": [
+      {
+        "id": "cmp_1k3yzyunwvi",
+        "name": "FeedPage",
+        "file": "src/app/feed/page.tsx",
+        "loc": {
+          "file": "src/app/feed/page.tsx",
+          "line": 3,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "TodoFeed",
+            "resolution": "project",
+            "componentId": "cmp_29l7iip59g0",
+            "module": "@/components/TodoFeed",
+            "loc": {
+              "file": "src/app/feed/page.tsx",
+              "line": 4,
+              "column": 10
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_17dqv782ua7",
+        "name": "RootLayout",
+        "file": "src/app/layout.tsx",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 6,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "Providers",
+            "resolution": "project",
+            "componentId": "cmp_27t3g1lua9i",
+            "module": "./providers",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_2flvqsq9ypc",
+        "name": "HomePage",
+        "file": "src/app/page.tsx",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 25
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "HealthBadge",
+            "resolution": "project",
+            "componentId": "cmp_0w9fnv1w48d",
+            "module": "@/components/HealthBadge",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 10,
+              "column": 7
+            }
+          },
+          {
+            "name": "TodoList",
+            "resolution": "project",
+            "componentId": "cmp_0l3kw3n479w",
+            "module": "@/components/TodoList",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          },
+          {
+            "name": "AddTodoForm",
+            "resolution": "project",
+            "componentId": "cmp_0r1iugj2rde",
+            "module": "@/components/AddTodoForm",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 12,
+              "column": 7
+            }
+          },
+          {
+            "name": "UserList",
+            "resolution": "project",
+            "componentId": "cmp_20axc0bf4dg",
+            "module": "@/components/UserList",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 13,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_27t3g1lua9i",
+        "name": "Providers",
+        "file": "src/app/providers.tsx",
+        "loc": {
+          "file": "src/app/providers.tsx",
+          "line": 8,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "trpc.Provider",
+            "resolution": "external",
+            "module": "@/utils/trpc",
+            "loc": {
+              "file": "src/app/providers.tsx",
+              "line": 12,
+              "column": 5
+            }
+          },
+          {
+            "name": "QueryClientProvider",
+            "resolution": "external",
+            "module": "@tanstack/react-query",
+            "loc": {
+              "file": "src/app/providers.tsx",
+              "line": 13,
+              "column": 7
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ children: ReactNode }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "children",
+                "type": {
+                  "kind": "external",
+                  "name": "ReactNode",
+                  "module": "react"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_1an2304y5ca",
+        "name": "TodoPage",
+        "file": "src/app/todos/[id]/page.tsx",
+        "loc": {
+          "file": "src/app/todos/[id]/page.tsx",
+          "line": 3,
+          "column": 31
+        },
+        "kind": "server",
+        "clientBoundary": false,
+        "children": [
+          {
+            "name": "TodoDetail",
+            "resolution": "project",
+            "componentId": "cmp_1gqfw2iamk9",
+            "module": "@/components/TodoDetail",
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ params: Promise<{ id: string }> }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "params",
+                "type": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "object",
+                      "properties": [
+                        {
+                          "name": "id",
+                          "type": {
+                            "kind": "primitive",
+                            "name": "string"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_0r1iugj2rde",
+        "name": "AddTodoForm",
+        "file": "src/components/AddTodoForm.tsx",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 7,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0w9fnv1w48d",
+        "name": "HealthBadge",
+        "file": "src/components/HealthBadge.tsx",
+        "loc": {
+          "file": "src/components/HealthBadge.tsx",
+          "line": 5,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_1gqfw2iamk9",
+        "name": "TodoDetail",
+        "file": "src/components/TodoDetail.tsx",
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 5,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": [],
+        "propsType": {
+          "text": "{ id: number }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cmp_29l7iip59g0",
+        "name": "TodoFeed",
+        "file": "src/components/TodoFeed.tsx",
+        "loc": {
+          "file": "src/components/TodoFeed.tsx",
+          "line": 5,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_0l3kw3n479w",
+        "name": "TodoList",
+        "file": "src/components/TodoList.tsx",
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 6,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [
+          {
+            "name": "Link",
+            "resolution": "external",
+            "module": "next/link",
+            "conditional": true,
+            "loc": {
+              "file": "src/components/TodoList.tsx",
+              "line": 13,
+              "column": 11
+            }
+          }
+        ],
+        "usedTypes": []
+      },
+      {
+        "id": "cmp_20axc0bf4dg",
+        "name": "UserList",
+        "file": "src/components/UserList.tsx",
+        "loc": {
+          "file": "src/components/UserList.tsx",
+          "line": 5,
+          "column": 17
+        },
+        "kind": "client",
+        "clientBoundary": true,
+        "children": [],
+        "usedTypes": []
+      }
+    ],
+    "types": [
+      {
+        "id": "typ_0fc96ucq8sd",
+        "name": "Todo",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 1,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "userId",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_1ztzqbb553r",
+        "name": "TodoPage",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/todo.ts",
+          "line": 8,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "items",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "ref",
+                  "typeId": "typ_0fc96ucq8sd",
+                  "name": "Todo"
+                }
+              }
+            },
+            {
+              "name": "nextCursor",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "primitive",
+                    "name": "number"
+                  },
+                  {
+                    "kind": "primitive",
+                    "name": "null"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "typ_25sov0zzv45",
+        "name": "User",
+        "declarationKind": "interface",
+        "definedAt": {
+          "file": "src/types/user.ts",
+          "line": 1,
+          "column": 18
+        },
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "email",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "role",
+              "type": {
+                "kind": "union",
+                "types": [
+                  {
+                    "kind": "literal",
+                    "value": "admin"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": "member"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "id": "req_0sfrr3m6hv2",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "transport": "trpc",
+        "hook": {
+          "name": "useMutation",
+          "module": "@trpc/react-query"
+        },
+        "procedure": {
+          "path": "todo.add",
+          "type": "mutation"
+        },
+        "method": "POST",
+        "url": {
+          "text": "/api/trpc/todo.add",
+          "confidence": "exact",
+          "path": "/api/trpc/todo.add"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 24,
+            "column": 11
+          }
+        },
+        "bodyType": {
+          "text": "z.input<typeof NewTodoSchema>",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "title",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 15,
+            "callee": "trpc.todo.add.useMutation"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "25zmrj4iik3",
+        "targetRouteId": "rt_044xcwxfqfa",
+        "chain": [
+          "req_2ah5o8jjwsr"
+        ]
+      },
+      {
+        "id": "req_1bu2fw37bk8",
+        "origin": "component",
+        "componentId": "cmp_0w9fnv1w48d",
+        "transport": "trpc",
+        "hook": {
+          "name": "useQuery",
+          "module": "@trpc/react-query"
+        },
+        "procedure": {
+          "path": "ping",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "/api/trpc/ping",
+          "confidence": "exact",
+          "path": "/api/trpc/ping"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "responseType": {
+          "text": "{ ok: true; at: string; }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "ok",
+                "type": {
+                  "kind": "literal",
+                  "value": true
+                }
+              },
+              {
+                "name": "at",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            ]
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/HealthBadge.tsx",
+            "line": 6,
+            "column": 16,
+            "callee": "trpc.ping.useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1kqgvceu7jy",
+        "targetRouteId": "rt_044xcwxfqfa"
+      },
+      {
+        "id": "req_0i7plnzsuv7",
+        "origin": "component",
+        "componentId": "cmp_1gqfw2iamk9",
+        "transport": "trpc",
+        "hook": {
+          "name": "useQuery",
+          "module": "@trpc/react-query"
+        },
+        "procedure": {
+          "path": "todo.byId",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "/api/trpc/todo.byId",
+          "confidence": "exact",
+          "path": "/api/trpc/todo.byId"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "bodyType": {
+          "text": "{ id: number }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 7,
+            "column": 16,
+            "callee": "trpc.todo.byId.useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "09dp68k3kqw",
+        "targetRouteId": "rt_044xcwxfqfa",
+        "chain": [
+          "req_19v0zzhv2k5"
+        ]
+      },
+      {
+        "id": "req_02es5n58ro4",
+        "origin": "component",
+        "componentId": "cmp_1gqfw2iamk9",
+        "transport": "trpc",
+        "procedure": {
+          "path": "todo.toggle",
+          "type": "mutation"
+        },
+        "method": "POST",
+        "url": {
+          "text": "/api/trpc/todo.toggle",
+          "confidence": "exact",
+          "path": "/api/trpc/todo.toggle"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 19,
+            "column": 29
+          }
+        },
+        "bodyType": {
+          "text": "{ id: number; done: boolean }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "id",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "done",
+                "type": {
+                  "kind": "primitive",
+                  "name": "boolean"
+                }
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 11,
+            "column": 11,
+            "callee": "client.todo.toggle.mutate"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "2gife37h9xo",
+        "targetRouteId": "rt_044xcwxfqfa",
+        "chain": [
+          "req_0n9qb5iqo86"
+        ]
+      },
+      {
+        "id": "req_1c78i0tgtyn",
+        "origin": "component",
+        "componentId": "cmp_29l7iip59g0",
+        "transport": "trpc",
+        "hook": {
+          "name": "useInfiniteQuery",
+          "module": "@trpc/react-query"
+        },
+        "procedure": {
+          "path": "todo.feed",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "/api/trpc/todo.feed",
+          "confidence": "exact",
+          "path": "/api/trpc/todo.feed"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "bodyType": {
+          "text": "{ limit: number; cursor?: number | null }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "limit",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              },
+              {
+                "name": "cursor",
+                "type": {
+                  "kind": "union",
+                  "types": [
+                    {
+                      "kind": "primitive",
+                      "name": "number"
+                    },
+                    {
+                      "kind": "primitive",
+                      "name": "null"
+                    }
+                  ]
+                },
+                "optional": true
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "TodoPage",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_1ztzqbb553r",
+            "name": "TodoPage"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoFeed.tsx",
+            "line": 6,
+            "column": 16,
+            "callee": "trpc.todo.feed.useInfiniteQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "100pcyt1lli",
+        "targetRouteId": "rt_044xcwxfqfa",
+        "chain": [
+          "req_2flmlyku854"
+        ]
+      },
+      {
+        "id": "req_17wtkw08tco",
+        "origin": "component",
+        "componentId": "cmp_0l3kw3n479w",
+        "transport": "trpc",
+        "hook": {
+          "name": "useQuery",
+          "module": "@trpc/react-query"
+        },
+        "procedure": {
+          "path": "todo.list",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "/api/trpc/todo.list",
+          "confidence": "exact",
+          "path": "/api/trpc/todo.list"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "bodyType": {
+          "text": "{ userId?: number } | undefined",
+          "shape": {
+            "kind": "union",
+            "types": [
+              {
+                "kind": "object",
+                "properties": [
+                  {
+                    "name": "userId",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    },
+                    "optional": true
+                  }
+                ]
+              },
+              {
+                "kind": "primitive",
+                "name": "undefined"
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Todo[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_0fc96ucq8sd",
+              "name": "Todo"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoList.tsx",
+            "line": 7,
+            "column": 17,
+            "callee": "trpc.todo.list.useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1tp675izvuz",
+        "targetRouteId": "rt_044xcwxfqfa",
+        "chain": [
+          "req_0omiq0w94p9"
+        ]
+      },
+      {
+        "id": "req_1sz2hauuhmt",
+        "origin": "component",
+        "componentId": "cmp_20axc0bf4dg",
+        "transport": "trpc",
+        "hook": {
+          "name": "useQuery",
+          "module": "@trpc/react-query"
+        },
+        "procedure": {
+          "path": "user.list",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "/api/trpc/user.list",
+          "confidence": "exact",
+          "path": "/api/trpc/user.list"
+        },
+        "trigger": {
+          "kind": "page-load"
+        },
+        "responseType": {
+          "text": "User[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_25sov0zzv45",
+              "name": "User"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/components/UserList.tsx",
+            "line": 6,
+            "column": 27,
+            "callee": "trpc.user.list.useQuery"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "2g6hxbj1789",
+        "targetRouteId": "rt_044xcwxfqfa",
+        "chain": [
+          "req_0v7l7pp65e3"
+        ]
+      },
+      {
+        "id": "req_0omiq0w94p9",
+        "origin": "route-handler",
+        "routeId": "rt_044xcwxfqfa",
+        "handlerMethod": "GET",
+        "transport": "fetch",
+        "procedure": {
+          "path": "todo.list",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/todos"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "responseType": {
+          "text": "Todo[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_0fc96ucq8sd",
+              "name": "Todo"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/server/routers/todo.ts",
+            "line": 15,
+            "column": 14,
+            "callee": "listTodos"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 16,
+            "column": 32,
+            "callee": "api"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "105i9q8hbqd"
+      },
+      {
+        "id": "req_19v0zzhv2k5",
+        "origin": "route-handler",
+        "routeId": "rt_044xcwxfqfa",
+        "handlerMethod": "GET",
+        "transport": "fetch",
+        "procedure": {
+          "path": "todo.byId",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/todos/:id"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/server/routers/todo.ts",
+            "line": 17,
+            "column": 82,
+            "callee": "getTodo"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 17,
+            "column": 40,
+            "callee": "api"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "20w3gtzyp6k"
+      },
+      {
+        "id": "req_2ah5o8jjwsr",
+        "origin": "route-handler",
+        "routeId": "rt_044xcwxfqfa",
+        "handlerMethod": "POST",
+        "transport": "fetch",
+        "procedure": {
+          "path": "todo.add",
+          "type": "mutation"
+        },
+        "method": "POST",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/todos"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "bodyType": {
+          "text": "{ title: string; userId: number }",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "title",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              },
+              {
+                "name": "userId",
+                "type": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/server/routers/todo.ts",
+            "line": 20,
+            "column": 35,
+            "callee": "createTodo"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 19,
+            "column": 3,
+            "callee": "api"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "00dzi1g6q5c"
+      },
+      {
+        "id": "req_0n9qb5iqo86",
+        "origin": "route-handler",
+        "routeId": "rt_044xcwxfqfa",
+        "handlerMethod": "POST",
+        "transport": "fetch",
+        "procedure": {
+          "path": "todo.toggle",
+          "type": "mutation"
+        },
+        "method": "PATCH",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "pattern",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/todos/:id"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "bodyType": {
+          "text": "Partial<Pick<Todo, 'done' | 'title'>>",
+          "shape": {
+            "kind": "object",
+            "properties": [
+              {
+                "name": "title",
+                "type": {
+                  "kind": "primitive",
+                  "name": "string"
+                },
+                "optional": true
+              },
+              {
+                "name": "done",
+                "type": {
+                  "kind": "primitive",
+                  "name": "boolean"
+                },
+                "optional": true
+              }
+            ]
+          }
+        },
+        "responseType": {
+          "text": "Todo",
+          "shape": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/server/routers/todo.ts",
+            "line": 23,
+            "column": 30,
+            "callee": "patchTodo"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 21,
+            "column": 3,
+            "callee": "api"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1xsmcucsd5u"
+      },
+      {
+        "id": "req_2flmlyku854",
+        "origin": "route-handler",
+        "routeId": "rt_044xcwxfqfa",
+        "handlerMethod": "GET",
+        "transport": "fetch",
+        "procedure": {
+          "path": "todo.feed",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/todos"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "responseType": {
+          "text": "Todo[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_0fc96ucq8sd",
+              "name": "Todo"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/server/routers/todo.ts",
+            "line": 27,
+            "column": 25,
+            "callee": "listTodos"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 16,
+            "column": 32,
+            "callee": "api"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "1gbevkiqbh0"
+      },
+      {
+        "id": "req_0v7l7pp65e3",
+        "origin": "route-handler",
+        "routeId": "rt_044xcwxfqfa",
+        "handlerMethod": "GET",
+        "transport": "fetch",
+        "procedure": {
+          "path": "user.list",
+          "type": "query"
+        },
+        "method": "GET",
+        "url": {
+          "text": "`${API_URL}${path}`",
+          "confidence": "exact",
+          "base": "http://localhost:4010",
+          "baseEnv": "API_URL",
+          "path": "/users"
+        },
+        "trigger": {
+          "kind": "route-handler"
+        },
+        "responseType": {
+          "text": "User[]",
+          "shape": {
+            "kind": "array",
+            "element": {
+              "kind": "ref",
+              "typeId": "typ_25sov0zzv45",
+              "name": "User"
+            }
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/server/routers/user.ts",
+            "line": 5,
+            "column": 37,
+            "callee": "listUsers"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 22,
+            "column": 32,
+            "callee": "api"
+          },
+          {
+            "file": "src/server/upstream.ts",
+            "line": 7,
+            "column": 21,
+            "callee": "fetch"
+          }
+        ],
+        "status": "verified",
+        "flags": [],
+        "hash": "2cpwold0qd7"
+      }
+    ],
+    "navigations": [
+      {
+        "id": "nav_1s8ead7kycc",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "kind": "push",
+        "api": "next",
+        "href": {
+          "text": "`/todos/${todo.id}`",
+          "confidence": "pattern",
+          "path": "/todos/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 24,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 14,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 15,
+            "callee": "trpc.todo.add.useMutation"
+          },
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 14,
+            "column": 7,
+            "callee": "router.push"
+          }
+        ],
+        "targetRouteId": "rt_0rsc27vk284"
+      },
+      {
+        "id": "nav_1hul1fqfq0u",
+        "origin": "component",
+        "componentId": "cmp_0l3kw3n479w",
+        "kind": "link",
+        "api": "next",
+        "href": {
+          "text": "`/todos/${todo.id}`",
+          "confidence": "pattern",
+          "path": "/todos/:id"
+        },
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 13,
+            "column": 11
+          }
+        },
+        "conditional": true,
+        "loc": {
+          "file": "src/components/TodoList.tsx",
+          "line": 13,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoList.tsx",
+            "line": 13,
+            "column": 11,
+            "callee": "<Link>"
+          }
+        ],
+        "targetRouteId": "rt_0rsc27vk284"
+      }
+    ],
+    "flows": [
+      {
+        "id": "flw_2d90p1jpr4f",
+        "name": "AddTodoForm submit",
+        "routeId": "rt_0h4e5x5madf",
+        "componentId": "cmp_0r1iugj2rde",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_0h4e5x5madf",
+            "componentId": "cmp_0r1iugj2rde",
+            "event": "onSubmit",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 24,
+              "column": 11
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0sfrr3m6hv2"
+          },
+          {
+            "kind": "query-update",
+            "linkId": "qlk_13zrbaaotzf"
+          },
+          {
+            "kind": "navigate",
+            "navigationId": "nav_1s8ead7kycc",
+            "routeId": "rt_0rsc27vk284"
+          },
+          {
+            "kind": "request",
+            "siteId": "req_0i7plnzsuv7",
+            "onLoad": true
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_0h4e5x5madf",
+          "rt_0rsc27vk284"
+        ]
+      },
+      {
+        "id": "flw_0gmke3e8pov",
+        "name": "TodoDetail click",
+        "routeId": "rt_0rsc27vk284",
+        "componentId": "cmp_1gqfw2iamk9",
+        "steps": [
+          {
+            "kind": "interaction",
+            "routeId": "rt_0rsc27vk284",
+            "componentId": "cmp_1gqfw2iamk9",
+            "event": "onClick",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 19,
+              "column": 29
+            }
+          },
+          {
+            "kind": "request",
+            "siteId": "req_02es5n58ro4"
+          },
+          {
+            "kind": "query-update",
+            "linkId": "qlk_0w9254loc1u"
+          }
+        ],
+        "branches": [],
+        "routeIds": [
+          "rt_0rsc27vk284"
+        ]
+      }
+    ],
+    "queryLinks": [
+      {
+        "id": "qlk_13zrbaaotzf",
+        "kind": "invalidate",
+        "method": "invalidate",
+        "origin": "component",
+        "componentId": "cmp_0r1iugj2rde",
+        "procedure": "todo.list",
+        "trigger": {
+          "kind": "event",
+          "event": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 24,
+            "column": 11
+          }
+        },
+        "outcome": "success",
+        "loc": {
+          "file": "src/components/AddTodoForm.tsx",
+          "line": 13,
+          "column": 7
+        },
+        "callStack": [
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 15,
+            "callee": "trpc.todo.add.useMutation"
+          },
+          {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 13,
+            "column": 7,
+            "callee": "utils.todo.list.invalidate"
+          }
+        ],
+        "fromSiteIds": [
+          "req_0sfrr3m6hv2"
+        ],
+        "targetSiteIds": [
+          "req_17wtkw08tco"
+        ]
+      },
+      {
+        "id": "qlk_0w9254loc1u",
+        "kind": "invalidate",
+        "method": "invalidate",
+        "origin": "component",
+        "componentId": "cmp_1gqfw2iamk9",
+        "procedure": "todo.byId",
+        "trigger": {
+          "kind": "event",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 19,
+            "column": 29
+          }
+        },
+        "loc": {
+          "file": "src/components/TodoDetail.tsx",
+          "line": 12,
+          "column": 11
+        },
+        "callStack": [
+          {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 12,
+            "column": 11,
+            "callee": "utils.todo.byId.invalidate"
+          }
+        ],
+        "fromSiteIds": [],
+        "targetSiteIds": [
+          "req_0i7plnzsuv7"
+        ]
+      }
+    ],
+    "trpc": {
+      "endpoint": "/api/trpc",
+      "routeId": "rt_044xcwxfqfa",
+      "router": {
+        "name": "appRouter",
+        "loc": {
+          "file": "src/server/root.ts",
+          "line": 6,
+          "column": 14
+        }
+      },
+      "procedures": [
+        {
+          "id": "trp_0hm8t8f1h1g",
+          "path": "ping",
+          "type": "query",
+          "loc": {
+            "file": "src/server/routers/health.ts",
+            "line": 5,
+            "column": 25
+          },
+          "outputType": {
+            "text": "{ ok: true; at: string; }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "ok",
+                  "type": {
+                    "kind": "literal",
+                    "value": true
+                  }
+                },
+                {
+                  "name": "at",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "siteIds": [
+            "req_1bu2fw37bk8"
+          ]
+        },
+        {
+          "id": "trp_0st3b2kut4p",
+          "path": "todo.add",
+          "type": "mutation",
+          "loc": {
+            "file": "src/server/routers/todo.ts",
+            "line": 20,
+            "column": 6
+          },
+          "inputType": {
+            "text": "z.input<typeof NewTodoSchema>",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "title",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "outputType": {
+            "text": "Todo",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_0fc96ucq8sd",
+              "name": "Todo"
+            }
+          },
+          "siteIds": [
+            "req_0sfrr3m6hv2"
+          ]
+        },
+        {
+          "id": "trp_24rm6udlvl4",
+          "path": "todo.byId",
+          "type": "query",
+          "loc": {
+            "file": "src/server/routers/todo.ts",
+            "line": 17,
+            "column": 61
+          },
+          "inputType": {
+            "text": "{ id: number }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                }
+              ]
+            }
+          },
+          "outputType": {
+            "text": "Todo",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_0fc96ucq8sd",
+              "name": "Todo"
+            }
+          },
+          "siteIds": [
+            "req_0i7plnzsuv7"
+          ]
+        },
+        {
+          "id": "trp_1xqkrwnfr6b",
+          "path": "todo.feed",
+          "type": "query",
+          "loc": {
+            "file": "src/server/routers/todo.ts",
+            "line": 26,
+            "column": 6
+          },
+          "inputType": {
+            "text": "{ limit: number; cursor?: number | null }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "limit",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                },
+                {
+                  "name": "cursor",
+                  "type": {
+                    "kind": "union",
+                    "types": [
+                      {
+                        "kind": "primitive",
+                        "name": "number"
+                      },
+                      {
+                        "kind": "primitive",
+                        "name": "null"
+                      }
+                    ]
+                  },
+                  "optional": true
+                }
+              ]
+            }
+          },
+          "outputType": {
+            "text": "TodoPage",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_1ztzqbb553r",
+              "name": "TodoPage"
+            }
+          },
+          "siteIds": [
+            "req_1c78i0tgtyn"
+          ]
+        },
+        {
+          "id": "trp_22qrdw3xywn",
+          "path": "todo.list",
+          "type": "query",
+          "loc": {
+            "file": "src/server/routers/todo.ts",
+            "line": 14,
+            "column": 6
+          },
+          "inputType": {
+            "text": "{ userId?: number } | undefined",
+            "shape": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "object",
+                  "properties": [
+                    {
+                      "name": "userId",
+                      "type": {
+                        "kind": "primitive",
+                        "name": "number"
+                      },
+                      "optional": true
+                    }
+                  ]
+                },
+                {
+                  "kind": "primitive",
+                  "name": "undefined"
+                }
+              ]
+            }
+          },
+          "outputType": {
+            "text": "Todo[]",
+            "shape": {
+              "kind": "array",
+              "element": {
+                "kind": "ref",
+                "typeId": "typ_0fc96ucq8sd",
+                "name": "Todo"
+              }
+            }
+          },
+          "siteIds": [
+            "req_17wtkw08tco"
+          ]
+        },
+        {
+          "id": "trp_1af5a8eekm5",
+          "path": "todo.toggle",
+          "type": "mutation",
+          "loc": {
+            "file": "src/server/routers/todo.ts",
+            "line": 23,
+            "column": 6
+          },
+          "inputType": {
+            "text": "{ id: number; done: boolean }",
+            "shape": {
+              "kind": "object",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                },
+                {
+                  "name": "done",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "boolean"
+                  }
+                }
+              ]
+            }
+          },
+          "outputType": {
+            "text": "Todo",
+            "shape": {
+              "kind": "ref",
+              "typeId": "typ_0fc96ucq8sd",
+              "name": "Todo"
+            }
+          },
+          "siteIds": [
+            "req_02es5n58ro4"
+          ]
+        },
+        {
+          "id": "trp_1y0lqp4khd6",
+          "path": "user.list",
+          "type": "query",
+          "loc": {
+            "file": "src/server/routers/user.ts",
+            "line": 5,
+            "column": 25
+          },
+          "outputType": {
+            "text": "User[]",
+            "shape": {
+              "kind": "array",
+              "element": {
+                "kind": "ref",
+                "typeId": "typ_25sov0zzv45",
+                "name": "User"
+              }
+            }
+          },
+          "siteIds": [
+            "req_1sz2hauuhmt"
+          ]
+        }
+      ]
+    }
+  },
+  "verification": {
+    "sites": {
+      "req_1bu2fw37bk8": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:03.751Z",
+        "lastCaptureId": "cap_mvumno5jj4bb8m58-0",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_17wtkw08tco": {
+        "captures": 2,
+        "lastAt": "2026-10-30T07:05:08.646Z",
+        "lastCaptureId": "cap_mvumnrxi3h6vw2xb",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1sz2hauuhmt": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:03.751Z",
+        "lastCaptureId": "cap_mvumno5jj4bb8m58-2",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0sfrr3m6hv2": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:08.561Z",
+        "lastCaptureId": "cap_mvumnrv52kj8ixhq",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0i7plnzsuv7": {
+        "captures": 2,
+        "lastAt": "2026-10-30T07:05:11.829Z",
+        "lastCaptureId": "cap_mvumnudx5x9v6si1",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_02es5n58ro4": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:11.789Z",
+        "lastCaptureId": "cap_mvumnuctpa0hkdri",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_1c78i0tgtyn": {
+        "captures": 2,
+        "lastAt": "2026-10-30T07:05:16.255Z",
+        "lastCaptureId": "cap_mvumnxsvcd733f6y",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0omiq0w94p9": {
+        "captures": 2,
+        "lastAt": "2026-10-30T07:05:08.667Z",
+        "lastCaptureId": "cap_mvumnry3kqtmxjsh",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0v7l7pp65e3": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:05.859Z",
+        "lastCaptureId": "cap_mvumnps3k1bkly4w",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_2ah5o8jjwsr": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:08.616Z",
+        "lastCaptureId": "cap_mvumnrwo5tmnpraq",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_19v0zzhv2k5": {
+        "captures": 2,
+        "lastAt": "2026-10-30T07:05:11.847Z",
+        "lastCaptureId": "cap_mvumnuefoejak9ca",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_0n9qb5iqo86": {
+        "captures": 1,
+        "lastAt": "2026-10-30T07:05:11.820Z",
+        "lastCaptureId": "cap_mvumnudo9h3rr0ez",
+        "typeCheck": {
+          "checked": 1,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      },
+      "req_2flmlyku854": {
+        "captures": 2,
+        "lastAt": "2026-10-30T07:05:16.285Z",
+        "lastCaptureId": "cap_mvumnxtpano0s52u",
+        "typeCheck": {
+          "checked": 2,
+          "mismatched": 0,
+          "mismatches": []
+        }
+      }
+    },
+    "counts": {
+      "matched": 19,
+      "ambiguous": 0,
+      "unmatched": 0,
+      "manual": 0
+    }
+  },
+  "flows": {
+    "flows": {
+      "flw_2d90p1jpr4f": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      },
+      "flw_0gmke3e8pov": {
+        "status": "unconfirmed",
+        "source": "inferred",
+        "runs": 0,
+        "branches": []
+      }
+    },
+    "recorded": []
+  },
+  "captures": [
+    {
+      "id": "cap_mvumno5jj4bb8m58-0",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:03.751Z",
+      "durationMs": 2148,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/ping",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "ok": true,
+            "at": "2026-10-30T07:05:05.857Z"
+          }
+        }
+      },
+      "procedure": {
+        "path": "ping",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvumno5jj4bb8m58",
+          "index": 0,
+          "size": 3
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1bu2fw37bk8",
+        "score": 80,
+        "candidates": [
+          {
+            "siteId": "req_1bu2fw37bk8",
+            "score": 80,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/ping"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "ping"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1bu2fw37bk8",
+        "parts": [
+          {
+            "part": "response",
+            "type": "{ ok: true; at: string; }",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumno5jj4bb8m58-1",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:03.751Z",
+      "durationMs": 2148,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.list",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ]
+        }
+      },
+      "procedure": {
+        "path": "todo.list",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvumno5jj4bb8m58",
+          "index": 1,
+          "size": 3
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_17wtkw08tco",
+        "score": 80,
+        "candidates": [
+          {
+            "siteId": "req_17wtkw08tco",
+            "score": 80,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/todo.list"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.list"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_17wtkw08tco",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ userId?: number } | undefined",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumno5jj4bb8m58-2",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:03.751Z",
+      "durationMs": 2148,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/user.list",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ]
+        }
+      },
+      "procedure": {
+        "path": "user.list",
+        "type": "query",
+        "batch": {
+          "id": "cap_mvumno5jj4bb8m58",
+          "index": 2,
+          "size": 3
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1sz2hauuhmt",
+        "score": 80,
+        "candidates": [
+          {
+            "siteId": "req_1sz2hauuhmt",
+            "score": 80,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/user.list"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "user.list"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1sz2hauuhmt",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnrv52kj8ixhq",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:08.561Z",
+      "durationMs": 65,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/trpc/todo.add",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Record captures"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:08 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "TRPCProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:05:08.557Z"
+      },
+      "procedure": {
+        "path": "todo.add",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0sfrr3m6hv2",
+        "score": 115,
+        "candidates": [
+          {
+            "siteId": "req_0sfrr3m6hv2",
+            "score": 115,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/trpc/todo.add"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.add"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "AddTodoForm"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "submit event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0sfrr3m6hv2",
+        "parts": [
+          {
+            "part": "request",
+            "type": "z.input<typeof NewTodoSchema>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnrxi3h6vw2xb",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:08.646Z",
+      "durationMs": 30,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.list",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:08 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Record captures"
+            }
+          ]
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "TRPCProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:05:08.557Z"
+      },
+      "procedure": {
+        "path": "todo.list",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_17wtkw08tco",
+        "score": 75,
+        "candidates": [
+          {
+            "siteId": "req_17wtkw08tco",
+            "score": 75,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/todo.list"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.list"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_17wtkw08tco",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ userId?: number } | undefined",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnt61bkau9xdn",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:10.249Z",
+      "durationMs": 49,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.byId",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:10 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "submit",
+        "target": "form \"Add\"",
+        "componentChain": [
+          "AddTodoForm",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "QueryClientProvider",
+          "TRPCProvider",
+          "Providers",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext"
+        ],
+        "at": "2026-10-30T07:05:08.557Z"
+      },
+      "procedure": {
+        "path": "todo.byId",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0i7plnzsuv7",
+        "score": 75,
+        "candidates": [
+          {
+            "siteId": "req_0i7plnzsuv7",
+            "score": 75,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/todo.byId"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.byId"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/3"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0i7plnzsuv7",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnuctpa0hkdri",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:11.789Z",
+      "durationMs": 38,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3077/api/trpc/todo.toggle",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "done": true
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:11 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T07:05:11.784Z"
+      },
+      "procedure": {
+        "path": "todo.toggle",
+        "type": "mutation"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_02es5n58ro4",
+        "score": 115,
+        "candidates": [
+          {
+            "siteId": "req_02es5n58ro4",
+            "score": 115,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /api/trpc/todo.toggle"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.toggle"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "TodoDetail"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/3"
+              },
+              {
+                "signal": "trigger",
+                "points": 10,
+                "detail": "click event"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_02es5n58ro4",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number; done: boolean }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnudx5x9v6si1",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:11.829Z",
+      "durationMs": 25,
+      "pageUrl": "http://localhost:3077/todos/3",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.byId",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:11 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Mark done\"",
+        "componentChain": [
+          "TodoDetail",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext"
+        ],
+        "at": "2026-10-30T07:05:11.784Z"
+      },
+      "procedure": {
+        "path": "todo.byId",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0i7plnzsuv7",
+        "score": 105,
+        "candidates": [
+          {
+            "siteId": "req_0i7plnzsuv7",
+            "score": 105,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/todo.byId"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.byId"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "TodoDetail"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/todos/3"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0i7plnzsuv7",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ id: number }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnvxisj4kkyp2",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:13.830Z",
+      "durationMs": 46,
+      "pageUrl": "http://localhost:3077/feed",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.feed",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "limit": 1
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:13 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "items": [
+              {
+                "id": 1,
+                "userId": 1,
+                "title": "Write the first program",
+                "done": true
+              }
+            ],
+            "nextCursor": 1
+          }
+        }
+      },
+      "query": {
+        "kind": "query",
+        "key": [
+          [
+            "todo",
+            "feed"
+          ],
+          {
+            "input": {
+              "limit": 1
+            },
+            "type": "infinite"
+          }
+        ]
+      },
+      "procedure": {
+        "path": "todo.feed",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1c78i0tgtyn",
+        "score": 90,
+        "candidates": [
+          {
+            "siteId": "req_1c78i0tgtyn",
+            "score": 90,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/todo.feed"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.feed"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/feed"
+              },
+              {
+                "signal": "trigger",
+                "points": 5,
+                "detail": "page-load"
+              },
+              {
+                "signal": "query-key",
+                "points": 10,
+                "detail": "todo.feed"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1c78i0tgtyn",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ limit: number; cursor?: number | null }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoPage",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnxsvcd733f6y",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:16.255Z",
+      "durationMs": 37,
+      "pageUrl": "http://localhost:3077/feed",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:3077/api/trpc/todo.feed",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "limit": 1,
+            "cursor": 1
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:16 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked",
+          "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "items": [
+              {
+                "id": 2,
+                "userId": 2,
+                "title": "Break Enigma",
+                "done": false
+              }
+            ],
+            "nextCursor": 2
+          }
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"More\"",
+        "componentChain": [
+          "TodoFeed",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "NavigationPromisesContext",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter"
+        ],
+        "at": "2026-10-30T07:05:16.246Z"
+      },
+      "procedure": {
+        "path": "todo.feed",
+        "type": "query"
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:465:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_1f1ms1_0m63lp._.js:1244:195)",
+        "at fetchHTTPResponse (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1lwvdbgm8gvjr._.js:3990:32)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_1c78i0tgtyn",
+        "score": 105,
+        "candidates": [
+          {
+            "siteId": "req_1c78i0tgtyn",
+            "score": 105,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /api/trpc/todo.feed"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 20,
+                "detail": "todo.feed"
+              },
+              {
+                "signal": "component",
+                "points": 30,
+                "detail": "TodoFeed"
+              },
+              {
+                "signal": "route",
+                "points": 15,
+                "detail": "/feed"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_1c78i0tgtyn",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ limit: number; cursor?: number | null }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "TodoPage",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnps9vgg8i8be",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:05.865Z",
+      "durationMs": 25,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/ping,todo.list,user.list?batch=1&input=%7B%7D",
+        "captureId": "cap_mvumno5jj4bb8m58"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at listTodos (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:183:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:86:220",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "listTodos",
+          "file": "src/server/upstream.ts",
+          "line": 16,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 15,
+          "column": 23
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0omiq0w94p9",
+        "score": 225,
+        "candidates": [
+          {
+            "siteId": "req_0omiq0w94p9",
+            "score": 225,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/ping,todo.list,user.list"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 15,
+                "detail": "in todo.list"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, listTodos"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0omiq0w94p9",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnps3k1bkly4w",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:05.859Z",
+      "durationMs": 22,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/ping,todo.list,user.list?batch=1&input=%7B%7D",
+        "captureId": "cap_mvumno5jj4bb8m58"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at listUsers (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:193:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:126:355",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "listUsers",
+          "file": "src/server/upstream.ts",
+          "line": 22,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/user.ts",
+          "line": 5,
+          "column": 46
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0v7l7pp65e3",
+        "score": 225,
+        "candidates": [
+          {
+            "siteId": "req_0v7l7pp65e3",
+            "score": 225,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /users"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/ping,todo.list,user.list"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 15,
+                "detail": "in user.list"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, listUsers"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0v7l7pp65e3",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnrwo5tmnpraq",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:08.616Z",
+      "durationMs": 6,
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "title": "Record captures",
+            "userId": 1
+          },
+          "size": 38
+        }
+      },
+      "response": {
+        "status": 201,
+        "statusText": "Created",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:08 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          },
+          "size": 58
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/api/trpc/todo.add?batch=1",
+        "captureId": "cap_mvumnrv52kj8ixhq"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at createTodo (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:185:29)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:90:391",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "createTodo",
+          "file": "src/server/upstream.ts",
+          "line": 19,
+          "column": 3
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 20,
+          "column": 45
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_2ah5o8jjwsr",
+        "score": 240,
+        "candidates": [
+          {
+            "siteId": "req_2ah5o8jjwsr",
+            "score": 240,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "POST /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in POST /api/trpc/todo.add"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.add"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, createTodo"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_2ah5o8jjwsr",
+        "parts": [
+          {
+            "part": "request",
+            "type": "{ title: string; userId: number }",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnry3kqtmxjsh",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:08.667Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:08 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": false,
+              "title": "Record captures"
+            }
+          ],
+          "size": 182
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.list?batch=1&input=%7B%7D",
+        "captureId": "cap_mvumnrxi3h6vw2xb"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at listTodos (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:183:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:86:220",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "listTodos",
+          "file": "src/server/upstream.ts",
+          "line": 16,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 15,
+          "column": 23
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0omiq0w94p9",
+        "score": 240,
+        "candidates": [
+          {
+            "siteId": "req_0omiq0w94p9",
+            "score": 240,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/todo.list"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.list"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, listTodos"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0omiq0w94p9",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnt760v95hfc3",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:10.290Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:10 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": false,
+            "title": "Record captures"
+          },
+          "size": 58
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.byId?batch=1&input=%7B%220%22%3A%7B%22id%22%3A3%7D%7D",
+        "captureId": "cap_mvumnt61bkau9xdn"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at getTodo (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:184:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:89:194",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "getTodo",
+          "file": "src/server/upstream.ts",
+          "line": 17,
+          "column": 40
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 17,
+          "column": 89
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_19v0zzhv2k5",
+        "score": 235,
+        "candidates": [
+          {
+            "siteId": "req_19v0zzhv2k5",
+            "score": 235,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /todos/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/todo.byId"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.byId"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, getTodo"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_19v0zzhv2k5",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnudo9h3rr0ez",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:11.820Z",
+      "durationMs": 3,
+      "request": {
+        "method": "PATCH",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "done": true
+          },
+          "size": 13
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:11 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          },
+          "size": 57
+        }
+      },
+      "parent": {
+        "method": "POST",
+        "url": "/api/trpc/todo.toggle?batch=1",
+        "captureId": "cap_mvumnuctpa0hkdri"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:4999:24)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at patchTodo (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:189:32)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:97:199",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "patchTodo",
+          "file": "src/server/upstream.ts",
+          "line": 21,
+          "column": 3
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 23,
+          "column": 39
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_0n9qb5iqo86",
+        "score": 235,
+        "candidates": [
+          {
+            "siteId": "req_0n9qb5iqo86",
+            "score": 235,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "PATCH /todos/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in POST /api/trpc/todo.toggle"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.toggle"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, patchTodo"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_0n9qb5iqo86",
+        "parts": [
+          {
+            "part": "request",
+            "type": "Partial<Pick<Todo, 'done' | 'title'>>",
+            "status": "ok",
+            "mismatches": []
+          },
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnuefoejak9ca",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:11.847Z",
+      "durationMs": 2,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/3",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:11 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 3,
+            "userId": 1,
+            "done": true,
+            "title": "Record captures"
+          },
+          "size": 57
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.byId?batch=1&input=%7B%220%22%3A%7B%22id%22%3A3%7D%7D",
+        "captureId": "cap_mvumnudx5x9v6si1"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at getTodo (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:184:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:89:194",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "getTodo",
+          "file": "src/server/upstream.ts",
+          "line": 17,
+          "column": 40
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 17,
+          "column": 89
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_19v0zzhv2k5",
+        "score": 235,
+        "candidates": [
+          {
+            "siteId": "req_19v0zzhv2k5",
+            "score": 235,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 35,
+                "detail": "GET /todos/:id"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/todo.byId"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.byId"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, getTodo"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_19v0zzhv2k5",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnvyg9sdd0rwy",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:13.864Z",
+      "durationMs": 10,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:13 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": true,
+              "title": "Record captures"
+            }
+          ],
+          "size": 181
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.feed?batch=1&input=%7B%220%22%3A%7B%22limit%22%3A1%7D%7D",
+        "captureId": "cap_mvumnvxisj4kkyp2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at listTodos (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:183:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:104:195",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "listTodos",
+          "file": "src/server/upstream.ts",
+          "line": 16,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 27,
+          "column": 34
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_2flmlyku854",
+        "score": 240,
+        "candidates": [
+          {
+            "siteId": "req_2flmlyku854",
+            "score": 240,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/todo.feed"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.feed"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, listTodos"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_2flmlyku854",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvumnxtpano0s52u",
+      "sessionId": "ses_mvumnny0w667ue13",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-10-30T07:05:16.285Z",
+      "durationMs": 3,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Fri, 30 Oct 2026 07:05:16 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            },
+            {
+              "id": 3,
+              "userId": 1,
+              "done": true,
+              "title": "Record captures"
+            }
+          ],
+          "size": 181
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/trpc/todo.feed?batch=1&input=%7B%220%22%3A%7B%22limit%22%3A1%2C%22cursor%22%3A1%7D%7D",
+        "captureId": "cap_mvumnxsvcd733f6y"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:449:19)",
+        "at baseCapture (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1zc0mc92q39ml._.js:886:197)",
+        "at dedupeFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6120:24)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:6407:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:7590:72)",
+        "at fetch (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\ssr\\1ghd_next_dist_esm_server_16ivsqr08ek2p._.js:5711:317)",
+        "at api (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:172:23)",
+        "at listTodos (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:183:23)",
+        "at <repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ozposeo27r5s._.js:104:195",
+        "at resolveMiddleware (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1125:36)",
+        "at callRecursive (<repo>\\fixtures\\trpc-v10\\.next\\dev\\server\\chunks\\1_rp_@trpc_server_dist_0zaw-55nmn1br._.js:1155:38)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "api",
+          "file": "src/server/upstream.ts",
+          "line": 7,
+          "column": 21
+        },
+        {
+          "fn": "listTodos",
+          "file": "src/server/upstream.ts",
+          "line": 16,
+          "column": 32
+        },
+        {
+          "file": "src/server/routers/todo.ts",
+          "line": 27,
+          "column": 34
+        }
+      ],
+      "match": {
+        "status": "matched",
+        "by": "auto",
+        "siteId": "req_2flmlyku854",
+        "score": 240,
+        "candidates": [
+          {
+            "siteId": "req_2flmlyku854",
+            "score": 240,
+            "evidence": [
+              {
+                "signal": "url",
+                "points": 40,
+                "detail": "GET /todos"
+              },
+              {
+                "signal": "url",
+                "points": 5,
+                "detail": "same base URL"
+              },
+              {
+                "signal": "route",
+                "points": 40,
+                "detail": "in GET /api/trpc/todo.feed"
+              },
+              {
+                "signal": "trpc-procedure",
+                "points": 30,
+                "detail": "in todo.feed"
+              },
+              {
+                "signal": "stack-source",
+                "points": 75,
+                "detail": "3 frame(s) on the call path"
+              },
+              {
+                "signal": "stack-name",
+                "points": 10,
+                "detail": "api, listTodos"
+              },
+              {
+                "signal": "parent",
+                "points": 40,
+                "detail": "next hop of the browser request"
+              }
+            ]
+          }
+        ]
+      },
+      "typeCheck": {
+        "siteId": "req_2flmlyku854",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "captureCounts": {
+    "total": 19,
+    "included": 19
+  },
+  "redacted": true
+}

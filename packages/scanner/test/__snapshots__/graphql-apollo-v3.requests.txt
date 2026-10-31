@@ -1,0 +1,88 @@
+# Requests
+
+## AddTodoForm  src/components/AddTodoForm.tsx:9
+POST /api/graphql  graphql useMutation  event onSubmit
+  operation: AddTodo (mutation)
+  body: AddTodoVars
+  response: AddTodoData
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/AddTodoForm.tsx:12
+
+## Search  src/components/Search.tsx:8
+POST /api/graphql  graphql useLazyQuery  event onSubmit
+  operation: Search (query)
+  body: SearchVars
+  response: SearchData
+  handled by: src/app/api/graphql/route.ts
+  via: useLazyQuery src/components/Search.tsx:10
+
+## TodoDetail  src/components/TodoDetail.tsx:8
+POST /api/graphql  graphql useQuery  page-load
+  operation: Todo (query)
+  body: TodoVars
+  response: TodoData
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/TodoDetail.tsx:10
+POST /api/graphql  graphql useMutation  event onClick
+  operation: DeleteTodo (mutation)
+  body: TodoVars
+  response: DeleteTodoData
+  handled by: src/app/api/graphql/route.ts
+  via: useMutation src/components/TodoDetail.tsx:11
+
+## TodoList  src/components/TodoList.tsx:8
+POST /api/graphql  graphql useQuery  page-load
+  operation: Todos (query)
+  response: TodosData
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/TodoList.tsx:9
+
+## ViewerBadge  src/components/ViewerBadge.tsx:7
+POST /api/graphql  graphql useQuery  page-load
+  operation: Viewer (query)
+  response: ViewerData
+  handled by: src/app/api/graphql/route.ts
+  via: useQuery src/components/ViewerBadge.tsx:8
+
+# GraphQL
+
+endpoint: /api/graphql
+client: apollo /api/graphql (persisted)  src/lib/apollo.ts:12
+schema: file schema.graphql, 7 types
+
+query Todos  tag  1 caller(s)  types: code  src/graphql/todos.ts:11
+  fragments: TodoFields
+  data: TodosData
+
+query Todo  tag  1 caller(s)  types: code  src/graphql/todos.ts:20
+  fragments: TodoFields
+  variables: TodoVars
+  data: TodoData
+
+mutation AddTodo  tag  1 caller(s)  types: code  src/graphql/todos.ts:34
+  fragments: TodoFields
+  variables: AddTodoVars
+  data: AddTodoData
+
+mutation DeleteTodo  tag  1 caller(s)  types: code  src/graphql/todos.ts:43
+  variables: TodoVars
+  data: DeleteTodoData
+
+query Viewer  tag  1 caller(s)  types: code  src/graphql/todos.ts:49
+  data: ViewerData
+
+query Search  tag  1 caller(s)  types: code  src/graphql/todos.ts:59
+  variables: SearchVars
+  data: SearchData
+
+fragment TodoFields on Todo  src/graphql/todos.ts:3
+
+# Query cache links
+
+refetch GraphQL Todos  refetchQueries  AddTodoForm  event onSubmit  success  src/components/AddTodoForm.tsx:13
+  after: POST /api/graphql
+  hits: POST /api/graphql  (TodoList)
+
+refetch GraphQL Viewer  refetchQueries  AddTodoForm  event onSubmit  success  src/components/AddTodoForm.tsx:13
+  after: POST /api/graphql
+  hits: POST /api/graphql  (ViewerBadge)

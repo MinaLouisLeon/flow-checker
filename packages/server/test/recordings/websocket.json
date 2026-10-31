@@ -1,0 +1,511 @@
+{
+  "fixture": "websocket",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mvv1jd9qvgy9hmq9",
+      "sessionId": "ses_mvv1jd1ti5u9d9mo",
+      "origin": "browser",
+      "transport": "websocket",
+      "timestamp": "2026-10-30T14:01:37.262Z",
+      "durationMs": 9,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "ws://localhost:4011/live",
+        "headers": {
+          "sec-websocket-protocol": "ticker.v1"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "stream": {
+        "state": "closed",
+        "count": 0,
+        "bytes": 0,
+        "closeCode": 1006
+      },
+      "messages": [],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:884:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:1749:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:2013:29)",
+        "at Ticker.useEffect (http://localhost:3077/_next/static/chunks/_0g8kct7n17w22._.js:87:24)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "Ticker.useEffect",
+          "file": "components/Ticker.tsx",
+          "line": 15,
+          "column": 16
+        }
+      ]
+    },
+    {
+      "id": "cap_mvv1jd9w87jpqx70",
+      "sessionId": "ses_mvv1jd1ti5u9d9mo",
+      "origin": "browser",
+      "transport": "websocket",
+      "timestamp": "2026-10-30T14:01:37.268Z",
+      "durationMs": 323,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "ws://localhost:4011/live",
+        "headers": {
+          "sec-websocket-protocol": "ticker.v1"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 101,
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "stream": {
+        "state": "closed",
+        "count": 4,
+        "bytes": 184,
+        "protocol": "ticker.v1",
+        "closeCode": 1000,
+        "closeReason": "enough quotes"
+      },
+      "messages": [
+        {
+          "direction": "out",
+          "at": "2026-10-30T14:01:37.285Z",
+          "size": 46,
+          "body": {
+            "kind": "json",
+            "value": {
+              "type": "subscribe",
+              "symbols": [
+                "ACME",
+                "BETA"
+              ]
+            },
+            "size": 46
+          }
+        },
+        {
+          "direction": "in",
+          "at": "2026-10-30T14:01:37.400Z",
+          "size": 45,
+          "body": {
+            "kind": "json",
+            "value": {
+              "type": "quote",
+              "symbol": "ACME",
+              "price": 12.5
+            },
+            "size": 45
+          }
+        },
+        {
+          "direction": "in",
+          "at": "2026-10-30T14:01:37.501Z",
+          "size": 46,
+          "body": {
+            "kind": "json",
+            "value": {
+              "type": "quote",
+              "symbol": "ACME",
+              "price": 12.75
+            },
+            "size": 46
+          }
+        },
+        {
+          "direction": "in",
+          "at": "2026-10-30T14:01:37.589Z",
+          "size": 47,
+          "body": {
+            "kind": "json",
+            "value": {
+              "type": "quote",
+              "symbol": "BETA",
+              "price": "9.10"
+            },
+            "size": 47
+          }
+        }
+      ],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:884:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:1749:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:2013:29)",
+        "at Ticker.useEffect (http://localhost:3077/_next/static/chunks/_0g8kct7n17w22._.js:87:24)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "Ticker.useEffect",
+          "file": "components/Ticker.tsx",
+          "line": 15,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0utndx9wfnl",
+        "parts": [
+          {
+            "part": "message",
+            "event": "message",
+            "direction": "out",
+            "type": "Subscribe",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "message",
+            "type": "Quote",
+            "status": "mismatch",
+            "messages": 3,
+            "mismatches": [
+              {
+                "kind": "wrong-type",
+                "path": "messages[message].body.price",
+                "expected": "number",
+                "actual": "string \"9.10\""
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvv1jfgfpq2c0227",
+      "sessionId": "ses_mvv1jd1ti5u9d9mo",
+      "origin": "browser",
+      "transport": "websocket",
+      "timestamp": "2026-10-30T14:01:40.095Z",
+      "durationMs": 7,
+      "pageUrl": "http://localhost:3077/",
+      "request": {
+        "method": "GET",
+        "url": "ws://localhost:4011/echo",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 101,
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "interaction": {
+        "type": "click",
+        "target": "button \"Ping\"",
+        "componentChain": [
+          "Ping",
+          "SegmentViewNode",
+          "LayoutRouterContext",
+          "InnerLayoutRouter",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "LoadingBoundary",
+          "ErrorBoundary",
+          "InnerScrollHandler",
+          "ScrollHandler",
+          "RenderFromTemplateContext",
+          "TemplateContext",
+          "SegmentStateProvider",
+          "OuterLayoutRouter",
+          "SegmentViewNode",
+          "__next_root_layout_boundary__",
+          "RedirectErrorBoundary",
+          "RedirectBoundary",
+          "HTTPAccessFallbackErrorBoundary",
+          "HTTPAccessFallbackBoundary",
+          "DevRootHTTPAccessFallbackBoundary",
+          "AppDevOverlayErrorBoundary",
+          "HotReload",
+          "LayoutRouterContext",
+          "AppRouterContext",
+          "GlobalLayoutRouterContext",
+          "SearchParamsContext",
+          "PathnameContext"
+        ],
+        "at": "2026-10-30T14:01:40.093Z"
+      },
+      "stream": {
+        "state": "closed",
+        "count": 2,
+        "bytes": 14,
+        "closeCode": 1005
+      },
+      "messages": [
+        {
+          "direction": "out",
+          "at": "2026-10-30T14:01:40.100Z",
+          "size": 4,
+          "body": {
+            "kind": "text",
+            "value": "ping",
+            "size": 4
+          }
+        },
+        {
+          "direction": "in",
+          "at": "2026-10-30T14:01:40.100Z",
+          "size": 10,
+          "body": {
+            "kind": "text",
+            "value": "pong: ping",
+            "size": 10
+          }
+        }
+      ],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:884:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:1749:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:2013:29)",
+        "at ping (http://localhost:3077/_next/static/chunks/_0g8kct7n17w22._.js:21:24)",
+        "at executeDispatch (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10214:13)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at processDispatchQueue (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10240:41)",
+        "at http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10518:13",
+        "at batchedUpdates$1 (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:2066:44)",
+        "at dispatchEventForPluginEventSystem (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:10316:9)",
+        "at dispatchEvent (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:12975:37)",
+        "at dispatchDiscreteEvent (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:12957:64)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ping",
+          "file": "components/Ping.tsx",
+          "line": 11,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1pacrdimeqg",
+        "parts": [
+          {
+            "part": "message",
+            "event": "message",
+            "direction": "out",
+            "type": "\"ping\"",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mvv1jh0ssxwsxfa5",
+      "sessionId": "ses_mvv1jd1ti5u9d9mo",
+      "origin": "browser",
+      "transport": "websocket",
+      "timestamp": "2026-10-30T14:01:42.124Z",
+      "durationMs": 12,
+      "pageUrl": "http://localhost:3077/chat",
+      "request": {
+        "method": "GET",
+        "url": "ws://localhost:4011/socket.io/?EIO=4&transport=websocket",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "stream": {
+        "state": "closed",
+        "count": 0,
+        "bytes": 0,
+        "socketIo": true,
+        "closeCode": 1006
+      },
+      "messages": [],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:884:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:1749:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:2013:29)",
+        "at WS.createSocket (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:1667:81)",
+        "at WS.doOpen (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:1589:28)",
+        "at WS.open (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:992:14)",
+        "at Socket._open (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:513:19)",
+        "at new Socket (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:473:14)",
+        "at Manager.open (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:2680:23)",
+        "at new Manager (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:2619:37)",
+        "at lookup (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:2545:25)",
+        "at Chat.useEffect (http://localhost:3077/_next/static/chunks/fixtures_websocket_1qbvs4y5f1xl9._.js:27:289)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "Chat.useEffect",
+          "file": "components/Chat.tsx",
+          "line": 16,
+          "column": 27
+        }
+      ]
+    },
+    {
+      "id": "cap_mvv1jh11qkecx9f4",
+      "sessionId": "ses_mvv1jd1ti5u9d9mo",
+      "origin": "browser",
+      "transport": "websocket",
+      "timestamp": "2026-10-30T14:01:42.133Z",
+      "durationMs": 243,
+      "pageUrl": "http://localhost:3077/chat",
+      "request": {
+        "method": "GET",
+        "url": "ws://localhost:4011/socket.io/?EIO=4&transport=websocket",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 101,
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "stream": {
+        "state": "closed",
+        "count": 3,
+        "bytes": 162,
+        "socketIo": true,
+        "closeCode": 1005
+      },
+      "messages": [
+        {
+          "direction": "in",
+          "event": "joined",
+          "at": "2026-10-30T14:01:42.154Z",
+          "size": 53,
+          "body": {
+            "kind": "json",
+            "value": {
+              "user": "ada",
+              "token": "[REDACTED:string]"
+            },
+            "size": 53
+          }
+        },
+        {
+          "direction": "out",
+          "event": "chat",
+          "at": "2026-10-30T14:01:42.302Z",
+          "size": 35,
+          "body": {
+            "kind": "json",
+            "value": {
+              "text": "hello sockets"
+            },
+            "size": 35
+          }
+        },
+        {
+          "direction": "in",
+          "event": "chat",
+          "at": "2026-10-30T14:01:42.308Z",
+          "size": 74,
+          "body": {
+            "kind": "json",
+            "value": {
+              "id": 1,
+              "user": "ada",
+              "text": "hello sockets",
+              "at": 1793368902303
+            },
+            "size": 74
+          }
+        }
+      ],
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:884:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:1749:195)",
+        "at track (http://localhost:3077/_next/static/chunks/_20qj0m-8srgnb._.js:2013:29)",
+        "at WS.createSocket (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:1667:81)",
+        "at WS.doOpen (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:1589:28)",
+        "at WS.open (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:992:14)",
+        "at Socket._open (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:513:19)",
+        "at new Socket (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:473:14)",
+        "at Manager.open (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:2680:23)",
+        "at new Manager (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:2619:37)",
+        "at lookup (http://localhost:3077/_next/static/chunks/node_modules__pnpm_1ww6j4izljawe._.js:2542:14)",
+        "at Chat.useEffect (http://localhost:3077/_next/static/chunks/fixtures_websocket_1qbvs4y5f1xl9._.js:27:289)"
+      ],
+      "redacted": true,
+      "redactedPaths": [
+        "messages[0].body.token"
+      ],
+      "sourceStack": [
+        {
+          "fn": "Chat.useEffect",
+          "file": "components/Chat.tsx",
+          "line": 16,
+          "column": 27
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1go4wbvvrlb",
+        "parts": [
+          {
+            "part": "message",
+            "event": "joined",
+            "type": "Joined",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "chat",
+            "type": "ChatMessage",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          },
+          {
+            "part": "message",
+            "event": "chat",
+            "direction": "out",
+            "type": "Draft",
+            "status": "ok",
+            "messages": 1,
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}

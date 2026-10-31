@@ -1,0 +1,14 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/products"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      [
+        { "id": 1, "name": "Keyboard", "price": 49.9, "stock": 12 },
+        { "id": 2, "name": "Mouse", "price": 19.5, "stock": 0 }
+      ]

@@ -14,6 +14,7 @@
     "@flow-checker/shared": "workspace:*"
   },
   "devDependencies": {
+    "@flow-checker/postman": "workspace:*",
     "@flow-checker/scanner": "workspace:*",
     "@flow-checker/server": "workspace:*"
   }

@@ -1,0 +1,15 @@
+# Navigation
+
+## HomePage  app/page.tsx
+link /jobs/7 -> /jobs/[id]  event onClick
+link /chat -> /chat  event onClick
+
+# Flows
+
+## Chat submit  (/chat)
+1. Chat onSubmit on /chat
+2. POST /api/chat
+
+## JobProgress click  (/jobs/[id])
+1. JobProgress onClick on /jobs/[id]
+2. GET /api/jobs/:id/progress

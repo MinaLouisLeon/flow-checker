@@ -4,19 +4,29 @@
 // It does nothing unless the app was started by flow-checker (which sets NEXT_PUBLIC_FLOW_CHECKER),
 // never in production builds, and it never throws into the app.
 import type { Capture, CapturedBody, Interaction, SessionEvent } from '@flow-checker/shared'
-import { callerStack, headersToObject, readStream, requestBody, textBody } from './body'
+import { byteLength, callerStack, headersToObject, readStream, requestBody, textBody } from './body'
+import { splitGraphqlCapture } from './graphql'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
+import { createQueryTracker, findQueryClient } from './query'
 import { compileRules, redactCapture } from './redact'
+import { isSocketIoUrl, parseSocketIoFrame } from './socket'
+import { isEventStream, readEventStream, recordStream, type StreamRecorder } from './stream'
+import { splitTrpcCapture } from './trpc'
 
 export type { RuntimeConfig } from './options'
 
 const INSTALLED = Symbol.for('flow-checker.client')
 const SESSION_KEY = 'flow-checker:session'
+/** How often to look for the app's QueryClient until it shows up, and for how long. */
+const QUERY_CLIENT_POLL_MS = 300
+const QUERY_CLIENT_POLLS = 100
 /** Interactions older than this are not linked to a request. */
 const INTERACTION_WINDOW_MS = 5000
 const FLUSH_MS = 400
 const MAX_QUEUE = 200
-const OWN_FRAMES = /flowChecker|flow-checker[\\/_]dist|runtime[-_]client/
+const OWN_FRAMES = /flowChecker|FlowChecker|flow-checker[\\/_]dist|runtime[-_]client/
+/** A stack frame in code that has no source URL (`eval`ed by a dev tool) or comes from a browser extension. */
+const INJECTED_FRAME = /, <anonymous>:\d+:\d+\)$|(chrome|moz|safari-web)-extension:\/\//
 
 type Global = typeof globalThis & { [INSTALLED]?: boolean }
 
@@ -79,7 +89,16 @@ function start(config: RuntimeConfig) {
     else if (!timer) timer = setTimeout(flush, FLUSH_MS)
   }
 
+  /** Event streams and WebSockets still open (M18, M19): closed when the page goes away, so their last messages are sent. */
+  const openStreams = new Set<StreamRecorder>()
+
   const flushOnExit = () => {
+    for (const stream of openStreams) {
+      try {
+        stream.end('closed')
+      } catch {}
+    }
+    openStreams.clear()
     if (captures.length === 0 && events.length === 0) return
     const body = payload()
     try {
@@ -99,10 +118,35 @@ function start(config: RuntimeConfig) {
 
   const pushCapture = (capture: Capture) => {
     try {
-      const out = redactCapture(capture, rules, options.storeRaw)
-      captures.push(out)
-      pushEvent({ kind: 'capture', at: capture.timestamp, captureId: capture.id })
+      // A batched tRPC request becomes one capture per procedure (M16), a batched GraphQL
+      // request one per operation (M17).
+      for (const piece of splitTrpcCapture(capture).flatMap(splitGraphqlCapture)) {
+        captures.push(redactCapture(piece, rules, options.storeRaw))
+        pushEvent({ kind: 'capture', at: piece.timestamp, captureId: piece.id })
+      }
     } catch {}
+  }
+
+  /** An event stream capture (M18): sent when it opens, then updated with new messages until it ends. */
+  const streamRecorder = (capture: Capture, started: number): StreamRecorder => {
+    const recorder = recordStream(
+      capture,
+      options,
+      (update, first) => {
+        try {
+          if (first) {
+            pushCapture(update)
+            return
+          }
+          captures.push(redactCapture(update, rules, options.storeRaw))
+          schedule()
+        } catch {}
+        if (recorder.ended) openStreams.delete(recorder)
+      },
+      () => performance.now() - started,
+    )
+    openStreams.add(recorder)
+    return recorder
   }
 
   // --- Interactions and navigation ----------------------------------------------------------
@@ -153,6 +197,45 @@ function start(config: RuntimeConfig) {
   }
   window.addEventListener('popstate', () => onNavigation('pop'))
 
+  // --- React Query --------------------------------------------------------------------------
+
+  // The QueryClient lives in React state, so it can only be found once React has rendered.
+  const queries = createQueryTracker()
+  // A failed lookup is reused only by requests sent in the same task. A time window is not safe:
+  // React can commit the QueryClientProvider right after a failed lookup, and the queries it
+  // mounts send their requests a few ms later (lost keys on Next 15 in the matrix).
+  let lookedUpThisTask = false
+  const lookForQueryClient = () => {
+    try {
+      if (queries.ready) return
+      if (!lookedUpThisTask) {
+        lookedUpThisTask = true
+        setTimeout(() => {
+          lookedUpThisTask = false
+        }, 0)
+      }
+      const client = findQueryClient([
+        document,
+        document.documentElement,
+        document.body,
+        document.getElementById('__next'),
+      ])
+      if (client) queries.instrument(client)
+    } catch {}
+  }
+  let polls = 0
+  const poll = setInterval(() => {
+    lookForQueryClient()
+    if (queries.ready || ++polls >= QUERY_CLIENT_POLLS) clearInterval(poll)
+  }, QUERY_CLIENT_POLL_MS)
+  /** The query or mutation sending the current request. Looks for the client first, once per task. */
+  const currentQuery = () => {
+    if (queries.ready) return queries.current()
+    if (!lookedUpThisTask) lookForQueryClient()
+    // Found just now: the query that sends this request started before it could be wrapped.
+    return queries.ready ? (queries.current() ?? queries.guess()) : undefined
+  }
+
   // --- Request filtering --------------------------------------------------------------------
 
   const shouldCapture = (url: URL, headers: Record<string, string>): boolean => {
@@ -181,6 +264,8 @@ function start(config: RuntimeConfig) {
       redactedPaths: [],
     }
     if (action) capture.serverAction = { id: action }
+    const query = currentQuery()
+    if (query) capture.query = query
     const interaction = currentInteraction()
     if (interaction) capture.interaction = interaction
     return capture
@@ -224,21 +309,35 @@ function start(config: RuntimeConfig) {
     try {
       const response = await nativeFetch(input, init)
       current.durationMs = Math.round(performance.now() - started)
-      void finishFetch(current, response.clone(), bodyPromise)
+      void finishFetch(current, response.clone(), bodyPromise, started)
       return response
     } catch (error) {
       current.durationMs = Math.round(performance.now() - started)
       current.error = errorText(error)
-      void finishFetch(current, undefined, bodyPromise)
+      void finishFetch(current, undefined, bodyPromise, started)
       throw error
     }
   }
 
-  const finishFetch = async (capture: Capture, response?: Response, bodyPromise?: Promise<CapturedBody>) => {
+  const finishFetch = async (
+    capture: Capture,
+    response: Response | undefined,
+    bodyPromise: Promise<CapturedBody> | undefined,
+    started: number,
+  ) => {
     try {
       if (bodyPromise) capture.request.body = await bodyPromise.catch(() => ({ kind: 'binary' }) as const)
       if (response) {
         const headers = headersToObject(response.headers)
+        if (isEventStream(headers['content-type']) && response.ok) {
+          // A streamed response (M18): its messages are recorded as they arrive.
+          capture.response = { status: response.status, headers, body: { kind: 'none' } }
+          if (response.statusText) capture.response.statusText = response.statusText
+          const recorder = streamRecorder(capture, started)
+          recorder.open()
+          await readEventStream(response.body, recorder)
+          return
+        }
         const length = Number(headers['content-length'])
         capture.response = {
           status: response.status,
@@ -324,6 +423,220 @@ function start(config: RuntimeConfig) {
         if (xhr.statusText) capture.response.statusText = xhr.statusText
       }
       pushCapture(capture)
+    } catch {}
+  }
+
+  // --- EventSource (M18) --------------------------------------------------------------------
+
+  const NativeEventSource = window.EventSource
+  if (typeof NativeEventSource === 'function') {
+    const listen = EventTarget.prototype.addEventListener
+    /** Per EventSource: its recorder and the event names already recorded. */
+    const tracked = new WeakMap<EventSource, { recorder: StreamRecorder; names: Set<string> }>()
+
+    const track = (source: EventSource, url: string | URL) => {
+      const target = new URL(String(url), location.href)
+      const headers = { accept: 'text/event-stream' }
+      if (!shouldCapture(target, headers)) return
+      const started = performance.now()
+      const capture = baseCapture(randomId('cap'), 'GET', target, headers)
+      capture.transport = 'eventsource'
+      const recorder = streamRecorder(capture, started)
+      const state = { recorder, names: new Set<string>() }
+      tracked.set(source, state)
+      let opened = false
+      listen.call(source, 'open', () => {
+        try {
+          if (opened) {
+            recorder.reconnect()
+            return
+          }
+          opened = true
+          // EventSource doesn't expose the response: it only opens on a 200 event stream.
+          capture.response = {
+            status: 200,
+            headers: { 'content-type': 'text/event-stream' },
+            body: { kind: 'none' },
+          }
+          recorder.open()
+        } catch {}
+      })
+      listen.call(source, 'error', () => {
+        try {
+          // CONNECTING: it will reconnect on its own. CLOSED: it gave up.
+          if (source.readyState !== NativeEventSource.CLOSED) return
+          recorder.end(
+            opened ? 'closed' : 'error',
+            opened ? undefined : 'The event stream could not be opened',
+          )
+        } catch {}
+      })
+      watch(source, 'message')
+    }
+
+    /** Records events with this name. Named events only reach listeners for their name. */
+    const watch = (source: EventSource, name: string) => {
+      const state = tracked.get(source)
+      if (!state || name === 'open' || name === 'error' || state.names.has(name)) return
+      state.names.add(name)
+      listen.call(source, name, (event: Event) => {
+        try {
+          const message = event as MessageEvent
+          state.recorder.message({
+            event: name,
+            ...(message.lastEventId ? { id: message.lastEventId } : {}),
+            data: typeof message.data === 'string' ? message.data : String(message.data),
+          })
+        } catch {}
+      })
+    }
+
+    class FlowCheckerEventSource extends NativeEventSource {
+      constructor(url: string | URL, init?: EventSourceInit) {
+        super(url, init)
+        try {
+          track(this, url)
+        } catch {}
+      }
+
+      override close(): void {
+        try {
+          tracked.get(this)?.recorder.end('closed')
+        } catch {}
+        super.close()
+      }
+    }
+    // Overloaded in the DOM types, so it is set on the prototype rather than overridden.
+    Object.defineProperty(FlowCheckerEventSource.prototype, 'addEventListener', {
+      configurable: true,
+      writable: true,
+      value: function flowCheckerAddEventListener(this: EventSource, ...args: unknown[]) {
+        try {
+          watch(this, String(args[0]))
+        } catch {}
+        return (listen as (...a: unknown[]) => void).apply(this, args)
+      },
+    })
+    try {
+      window.EventSource = FlowCheckerEventSource
+    } catch {}
+  }
+
+  // --- WebSocket (M19) ----------------------------------------------------------------------
+
+  const NativeWebSocket = window.WebSocket
+  if (typeof NativeWebSocket === 'function') {
+    const listen = EventTarget.prototype.addEventListener
+    /** Per WebSocket: records a message, `in` (received) or `out` (sent); `closing` once the app closes it. */
+    const tracked = new WeakMap<
+      WebSocket,
+      { record: (direction: 'in' | 'out', data: unknown) => void; closing: boolean }
+    >()
+
+    const track = (socket: WebSocket, url: string | URL, protocols?: string | string[]) => {
+      // Dev tools that inject code into the page (Console Ninja, browser extensions) open
+      // sockets of their own, from code without a source URL.
+      if (
+        callerStack(OWN_FRAMES)
+          .slice(0, 6)
+          .some((frame) => INJECTED_FRAME.test(frame))
+      )
+        return
+      // Relative and http(s) URLs are allowed; they connect over ws(s).
+      const target = new URL(String(url), location.href)
+      if (target.protocol === 'http:') target.protocol = 'ws:'
+      if (target.protocol === 'https:') target.protocol = 'wss:'
+      const asHttp = new URL(target.href.replace(/^ws/, 'http'))
+      if (!shouldCapture(asHttp, {})) return
+      const started = performance.now()
+      const headers: Record<string, string> = {}
+      const asked = typeof protocols === 'string' ? [protocols] : (protocols ?? [])
+      if (asked.length > 0) headers['sec-websocket-protocol'] = asked.join(', ')
+      const capture = baseCapture(randomId('cap'), 'GET', target, headers)
+      capture.transport = 'websocket'
+      const recorder = streamRecorder(capture, started)
+      const stream = capture.stream
+      const socketIo = isSocketIoUrl(target)
+      if (stream && socketIo) stream.socketIo = true
+      /** socket.io binary events: their attachments come next, in frames of their own. */
+      let attachments = 0
+
+      const record = (direction: 'in' | 'out', data: unknown) => {
+        if (typeof data !== 'string') {
+          if (socketIo && attachments > 0) {
+            attachments--
+            return
+          }
+          recorder.message({ direction, binary: true, size: binarySize(data) })
+          return
+        }
+        if (!socketIo) {
+          recorder.message({ direction, data })
+          return
+        }
+        const event = parseSocketIoFrame(data)
+        if (!event) return
+        attachments = event.attachments ?? 0
+        recorder.message({ direction, event: event.name, value: event.value, size: byteLength(data) })
+      }
+      const state = { record, closing: false }
+      tracked.set(socket, state)
+
+      let opened = false
+      listen.call(socket, 'open', () => {
+        try {
+          opened = true
+          capture.response = { status: 101, headers: {}, body: { kind: 'none' } }
+          if (stream && socket.protocol) stream.protocol = socket.protocol
+          recorder.open()
+        } catch {}
+      })
+      listen.call(socket, 'message', (event: Event) => {
+        try {
+          state.record('in', (event as MessageEvent).data)
+        } catch {}
+      })
+      listen.call(socket, 'close', (event: Event) => {
+        try {
+          const close = event as CloseEvent
+          if (stream) {
+            stream.closeCode = close.code
+            if (close.reason) stream.closeReason = close.reason
+          }
+          // 1006: the connection dropped (or never opened) without a close frame. Closed by the
+          // app before it opened (React strict mode's first mount): not a failure.
+          if (!opened && state.closing) recorder.end('closed')
+          else if (!opened) recorder.end('error', 'The WebSocket could not be opened')
+          else if (close.code === 1006) recorder.end('error', 'The connection was lost (code 1006)')
+          else recorder.end('closed')
+        } catch {}
+      })
+    }
+
+    class FlowCheckerWebSocket extends NativeWebSocket {
+      constructor(url: string | URL, protocols?: string | string[]) {
+        super(url, protocols)
+        try {
+          track(this, url, protocols)
+        } catch {}
+      }
+
+      override send(data: Parameters<WebSocket['send']>[0]): void {
+        // Sent first: a send that throws (still connecting) sent nothing.
+        super.send(data)
+        try {
+          tracked.get(this)?.record('out', data)
+        } catch {}
+      }
+
+      override close(code?: number, reason?: string): void {
+        const state = tracked.get(this)
+        if (state) state.closing = true
+        super.close(code, reason)
+      }
+    }
+    try {
+      window.WebSocket = FlowCheckerWebSocket
     } catch {}
   }
 
@@ -422,4 +735,12 @@ function fiberName(type: unknown, depth = 0): string | undefined {
     if (t.type) return fiberName(t.type, depth + 1) // memo
   }
   return undefined
+}
+
+/** Size of binary WebSocket data. */
+function binarySize(data: unknown): number {
+  if (data instanceof Blob) return data.size
+  if (data instanceof ArrayBuffer) return data.byteLength
+  if (ArrayBuffer.isView(data)) return data.byteLength
+  return 0
 }

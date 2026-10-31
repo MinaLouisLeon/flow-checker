@@ -19,6 +19,7 @@
     "hono": "catalog:"
   },
   "devDependencies": {
+    "@flow-checker/postman": "workspace:*",
     "@flow-checker/scanner": "workspace:*"
   }
 }

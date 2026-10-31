@@ -1,0 +1,13 @@
+# Types
+
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+Providers  src/app/providers.tsx:7
+  props: { children: ReactNode }
+TodoPage  src/app/todos/[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+TodoDetail  src/components/TodoDetail.tsx:30
+  props: { id: string }

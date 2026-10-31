@@ -18,6 +18,8 @@ export default defineConfig({
     redact: { headers: [], keys: [], patterns: [] },
     maxBodyBytes: 256_000,
     ignore: [],
+    maxMessages: 200,
+    maxMessageBytes: 64_000,
   },
   types: { maxDepth: 6 },
   export: { md: 'docs/flow', html: '.flow-checker/site' },
@@ -117,21 +119,23 @@ These requests show the transport `api-client` with the module and name. Capture
 
 What the runtime records while you test.
 
-| Field             | Default   | Meaning                                                                                                                          |
-| ----------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `storeRaw`        | `false`   | `true` saves captures **unmasked**. For local debugging only: the CLI warns at startup, and exports still redact unless `--raw`. |
-| `redact.headers`  | see below | Extra header names to mask (case-insensitive).                                                                                   |
-| `redact.keys`     | see below | Extra body keys to mask at any depth (case-insensitive), in JSON bodies, form data and query strings.                            |
-| `redact.patterns` | see below | Extra `RegExp`s. Matching parts of any string value are masked.                                                                  |
-| `maxBodyBytes`    | `256000`  | Larger bodies are cut off (and skipped by the type check).                                                                       |
-| `ignore`          | see below | Extra URL globs that are never captured. `*` matches anything. A glob is matched against the path and the full URL.              |
+| Field             | Default   | Meaning                                                                                                                               |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `storeRaw`        | `false`   | `true` saves captures **unmasked**. For local debugging only: the CLI warns at startup, and exports still redact unless `--raw`.      |
+| `redact.headers`  | see below | Extra header names to mask (case-insensitive).                                                                                        |
+| `redact.keys`     | see below | Extra body keys to mask at any depth (case-insensitive), in JSON bodies, form data and query strings.                                 |
+| `redact.patterns` | see below | Extra `RegExp`s. Matching parts of any string value are masked.                                                                       |
+| `maxBodyBytes`    | `256000`  | Larger bodies are cut off (and skipped by the type check).                                                                            |
+| `ignore`          | see below | Extra URL globs that are never captured. `*` matches anything. A glob is matched against the path and the full URL.                   |
+| `maxMessages`     | `200`     | Event stream (SSE) and WebSocket messages kept per connection. Later ones are only counted, and the capture is marked truncated.      |
+| `maxMessageBytes` | `64000`   | Event stream and WebSocket messages larger than this are kept without their data (size and time only), and skipped by the type check. |
 
 Your values are **added to** the defaults, never replace them:
 
 - headers: `authorization`, `cookie`, `set-cookie`, `x-api-key`, `proxy-authorization`
 - keys: `password`, `pass`, `token`, `accessToken`, `refreshToken`, `secret`, `otp`, `code`, `cvv`, `cardNumber`, `ssn`
 - patterns: JWTs, `Bearer …` tokens, and 13–19 digit card numbers that pass the Luhn check
-- ignore: Next.js internals (`/_next/*`, `/__nextjs*`, `/__webpack*`), `/favicon.ico`, images, fonts, CSS, source maps, Next telemetry and the npm registry
+- ignore: Next.js internals (`/_next/*`, `/__nextjs*`, `/__webpack*`), `/favicon.ico`, images, fonts, CSS, source maps, Next telemetry, the npm registry and socket.io's HTTP long-polling (`*/socket.io/?*transport=polling*`)
 
 Masked strings become `"[REDACTED:string]"`, numbers `0` and booleans `false`, so captures keep their shape and the type check still works. Each capture lists what was masked in `redactedPaths`.
 
@@ -151,6 +155,53 @@ Folders `flow-checker export` (with neither `--md` nor `--html`) and the dashboa
 | `html` | `.flow-checker/site` |
 
 Each export folder gets a `.flow-checker-export.json` listing the files it wrote. The next export replaces those files and nothing else. A folder that has other files and no such list is refused unless `--force`.
+
+### `postman`
+
+A Postman collection to check the code against (the API contract). See `flow-checker postman import` in the README.
+
+```ts
+postman: {
+  collection: 'postman/collections/My API',     // v3 YAML folder
+  // collection: 'api.postman_collection.json',  // or a v2.1 JSON export
+  // collection: { id: '12345-abcd…', apiKeyEnv: 'POSTMAN_API_KEY' }, // or a cloud collection
+  environment: 'postman/environments/dev.yaml',  // optional: values for {{variables}}
+},
+```
+
+| Field         | Meaning                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `collection`  | A v2.1 JSON export, a git-native v3 YAML collection folder (`postman/collections/<name>`), or `{ id, apiKeyEnv }` for a collection in Postman's cloud. Paths are relative to the project root. |
+| `environment` | Optional. An environment JSON export, a v3 YAML environment file, or `{ id, apiKeyEnv }`. Its values win over collection variables.                                                            |
+
+`apiKeyEnv` names the environment variable that holds your Postman API key (default `POSTMAN_API_KEY`). The key is only read from there, never written anywhere. Local files are read on every scan; cloud collections are fetched when `flow-checker dev` starts and by `flow-checker postman import`, and otherwise come from the last import in `.flow-checker/postman/` (gitignored). If a source can't be read, the last import is used with a warning.
+
+Only what the check needs is kept: method, URL, folder, saved example bodies and the request's JSON body, redacted with the `capture.redact` rules. Headers, auth and scripts are dropped, and only variables a URL uses are kept (never `secret` ones or names the redaction rules mask).
+
+### `graphql`
+
+Where GraphQL operation types come from when the code has none (no codegen, Relay compiler or type arguments), and how persisted queries map to operations. All fields are optional.
+
+```ts
+graphql: {
+  schema: 'schema.graphql',                      // SDL (.graphql / .gql) or an introspection result (.json)
+  introspection: {                               // used when there is no schema file
+    url: 'http://localhost:4000/graphql',
+    headers: { Authorization: 'env:GQL_TOKEN' }, // env:NAME is read from that variable
+  },
+  persistedQueries: 'persisted-documents.json',  // id -> document manifest
+  endpoint: '/api/graphql',                      // when the client setup doesn't say
+},
+```
+
+| Field              | Meaning                                                                                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema`           | Relative to the project root. Default: the `schema` of `relay.config.json` or of the codegen config (`codegen.ts`, `.graphqlrc.yml`, ...), else `schema.graphql`, `schema.gql`, `src/schema.graphql` or `schema.json`.                         |
+| `introspection`    | Asks a running endpoint for its schema on `flow-checker dev` and `scan`. The result is cached in `.flow-checker/cache/` (gitignored) and used when the endpoint can't be reached. Header values `env:NAME` are only read from the environment. |
+| `persistedQueries` | codegen's `persisted-documents.json`, Apollo's `persisted-query-manifest.json` or Relay's `persisted_queries.json`. Default: found by those names in the root, or the Relay config's `persistConfig.file`.                                     |
+| `endpoint`         | A path (`/api/graphql`) or full URL. Default: from `new ApolloClient()` / `HttpLink`, urql's `createClient()`, Relay's `Network.create()`, or a route handler whose path ends in `/graphql`.                                                   |
+
+When the endpoint is your own app (a route handler), it isn't running yet when `dev` starts: the first start has no introspection result. Run `flow-checker scan` once while the app runs (or use a schema file); later starts use the cache.
 
 ## Next.js config: `withFlowChecker()`
 
