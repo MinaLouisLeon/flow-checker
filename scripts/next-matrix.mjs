@@ -4,16 +4,23 @@
 //
 //   doctor  → no failed check
 //   scan    → the page, route handler and its three requests are found, plus the middleware
-//             (`middleware.ts` before 16, `proxy.ts` from 16): its matcher, redirect and fetch
+//             (`middleware.ts` before 16, `proxy.ts` from 16): its matcher, redirect and fetch;
+//             and the v0.2.0 sites: a React Query query with its key, two tRPC procedures, a
+//             urql GraphQL operation, an EventSource, a native WebSocket, and the Postman
+//             collection matched to the code
 //   dev     → a page-load server fetch, a click-triggered browser fetch and the route handler's
 //             upstream fetch are captured, matched to their sites and linked (two-hop chain); the
-//             middleware's fetch is captured and matched (edge runtime before 16, Node.js on 16)
+//             middleware's fetch is captured and matched (edge runtime before 16, Node.js on 16);
+//             the query is matched by key, the tRPC batch is split per procedure, the GraphQL
+//             capture is matched and type-checked, and the event stream's and socket's messages
+//             are captured and matched
 //
 // Run after `pnpm build` (needs network for npm and Playwright's Chromium):
 //   node scripts/next-matrix.mjs                 # every version below
 //   node scripts/next-matrix.mjs 14.2 15.5       # only these
 //   node scripts/next-matrix.mjs --keep          # keep the temporary apps for debugging
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { createServer as createNetServer } from 'node:net'
@@ -114,6 +121,14 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
       `@types/react@${reactTypes}`,
       `@types/react-dom@${reactTypes}`,
       '@types/node@22',
+      // v0.2.0 libraries, at the versions the fixtures use.
+      '@tanstack/react-query@5.105.0',
+      '@trpc/server@11.22.1',
+      '@trpc/client@11.22.1',
+      'zod@4.6.7',
+      'urql@5.0.4',
+      '@urql/core@6.0.3',
+      'graphql@16.14.2',
     ],
     app,
   )
@@ -132,6 +147,11 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
       "const { withFlowChecker } = require('@integr8-media/flow-checker/next')\n\nmodule.exports = withFlowChecker({})\n",
     )
   }
+  // The Postman contract (M15), added to the config init wrote.
+  writeFileSync(
+    join(app, 'flow-checker.config.ts'),
+    "import { defineConfig } from '@integr8-media/flow-checker/config'\n\nexport default defineConfig({ postman: { collection: 'api.postman_collection.json' } })\n",
+  )
 
   const [port, appPort] = [await freePort(), await freePort()]
   const ports = ['--port', String(port), '--app-port', String(appPort)]
@@ -150,6 +170,17 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     'matcher: /, /old',
     'redirect / -> /  middleware',
     '/flags  fetch  middleware',
+    // v0.2.0: React Query key, tRPC procedures, GraphQL operation, SSE events, socket messages.
+    "fetch useQuery(['todos', 'list'])",
+    'procedure: greet (query)',
+    'procedure: count (query)',
+    'operation: Notes (query)',
+    'schema: file schema.graphql, 2 types',
+    'event tick: Tick',
+    'sends message: Ping',
+    'receives message: Echo',
+    // Postman: /api/todos is in the collection, /api/archive is called by nothing.
+    'Postman "Matrix API": 1 of 2 collection requests called',
   ]
   for (const expected of expectations) {
     if (!scan.includes(expected)) throw new Error(`scan is missing "${expected}":\n${scan}`)
@@ -157,7 +188,12 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   console.log('  scan ok')
 
   // dev: dashboard + the app with capture on.
-  const env = { ...process.env, UPSTREAM_URL: upstream, NEXT_TELEMETRY_DISABLED: '1' }
+  const env = {
+    ...process.env,
+    UPSTREAM_URL: upstream,
+    NEXT_PUBLIC_WS_URL: `${upstream.replace('http', 'ws')}/echo`,
+    NEXT_TELEMETRY_DISABLED: '1',
+  }
   delete env.FLOW_CHECKER
   const dev = spawn(process.execPath, [cli, 'dev', '--no-open', '--no-watch', ...ports], {
     cwd: app,
@@ -189,11 +225,21 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
       await page.getByRole('button', { name: 'Say hello' }).click()
       await page.getByText('Hello from upstream').waitFor({ timeout: 60_000 })
       const captures = await waitForCaptures(dashboard, ingests)
+      // v0.2.0 transports: the page loads the query, GraphQL, the event stream and the socket.
+      await page.getByText('Matrix todo').waitFor({ timeout: 60_000 })
+      await page.getByText('1 notes').waitFor({ timeout: 60_000 })
+      await page.getByText('Ticks: 3').waitFor({ timeout: 60_000 })
+      await page.getByText('Echo: echo: ping').waitFor({ timeout: 60_000 })
+      await page.getByRole('button', { name: 'Call tRPC' }).click()
+      await page.getByText('Hi matrix (3)').waitFor({ timeout: 60_000 })
+      const transports = await waitForTransports(dashboard)
       // The middleware redirects /old to the home page.
       await page.goto(`${appUrl}/old`)
       await page.waitForURL(`${appUrl}/`)
       const flags = await waitForMiddleware(dashboard)
-      console.log(`  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches)`)
+      console.log(
+        `  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches, ${transports})`,
+      )
     } finally {
       await page.close()
     }
@@ -220,6 +266,45 @@ function waitForCaptures(dashboard, ingests) {
     const list = await (await fetch(`${dashboard}/api/captures`)).json().catch(() => [])
     error.message += `\nBrowser /ingest responses: ${ingests.join(', ') || 'none'}`
     error.message += `\nCaptured:\n${list.map((c) => `  ${c.origin} ${c.method} ${c.url.slice(0, 120)} parent=${c.parentCaptureId ?? '-'} match=${c.match?.status ?? '-'}`).join('\n') || '  nothing'}`
+    throw error
+  })
+}
+
+/**
+ * v0.2.0 captures, each matched: the React Query request (by its key), both procedures of the
+ * tRPC batch (split), the GraphQL operation, the event stream's messages and the socket's.
+ */
+function waitForTransports(dashboard) {
+  const get = async (path) => (await fetch(`${dashboard}${path}`)).json()
+  const matched = (c) => c?.match?.status === 'matched'
+  /** The full capture's winning evidence, e.g. `query-key`. */
+  const signals = async (c) =>
+    (await get(`/api/captures/${c.id}`)).capture?.match?.candidates?.[0]?.evidence?.map((e) => e.signal) ?? []
+  const checks = {
+    'react-query': async (list) => {
+      const c = list.find((x) => x.origin === 'browser' && x.url.endsWith('/api/todos'))
+      return c && (await signals(c)).includes('query-key') ? c : undefined
+    },
+    'trpc greet': async (list) => list.find((c) => c.procedure === 'greet'),
+    'trpc count': async (list) => list.find((c) => c.procedure === 'count'),
+    graphql: async (list) => list.find((c) => c.operation === 'Notes' && c.typeCheck === 'ok'),
+    sse: async (list) => list.find((c) => c.transport === 'eventsource' && c.stream?.count >= 3),
+    websocket: async (list) => list.find((c) => c.transport === 'websocket' && c.stream?.count >= 2),
+  }
+  const missing = async (list) => {
+    const out = []
+    for (const [name, check] of Object.entries(checks)) if (!matched(await check(list))) out.push(name)
+    return out
+  }
+  return waitFor(
+    async () =>
+      (await missing(await get('/api/captures'))).length ? undefined : Object.keys(checks).join(', '),
+    'React Query, tRPC, GraphQL, SSE and WebSocket captures, matched',
+    30_000,
+  ).catch(async (error) => {
+    const list = await get('/api/captures').catch(() => [])
+    error.message += `\nMissing: ${(await missing(list).catch(() => [])).join(', ')}`
+    error.message += `\nCaptured:\n${list.map((c) => `  ${c.origin} ${c.transport} ${c.method} ${c.url.slice(0, 100)} ${c.procedure ?? c.operation ?? ''} stream=${c.stream?.count ?? '-'} match=${c.match?.status ?? '-'} types=${c.typeCheck ?? '-'}`).join('\n') || '  nothing'}`
     throw error
   })
 }
@@ -284,7 +369,12 @@ function writeApp(dir, proxy) {
   )
 }
 `,
-    'app/page.tsx': `import { Hello } from '@/components/Hello'
+    'app/page.tsx': `import { EchoSocket } from '@/components/Echo'
+import { Hello } from '@/components/Hello'
+import { Notes } from '@/components/Notes'
+import { Ticks } from '@/components/Ticks'
+import { Todos } from '@/components/Todos'
+import { Trpc } from '@/components/Trpc'
 
 interface PageData {
   title: string
@@ -303,6 +393,11 @@ export default async function Home() {
     <main>
       <h1>{data.title}</h1>
       <Hello />
+      <Todos />
+      <Trpc />
+      <Notes />
+      <Ticks />
+      <EchoSocket />
     </main>
   )
 }
@@ -339,6 +434,215 @@ export async function GET() {
 }
 `,
     'next.config.js': 'module.exports = {}\n',
+    // --- v0.2.0 transports (M13, M15–M19), all rendered on the home page ---
+    // React Query (M13): a query whose key is captured with its request.
+    'components/Todos.tsx': `'use client'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+
+interface Todo {
+  id: number
+  title: string
+}
+
+function TodoList() {
+  const { data } = useQuery({
+    queryKey: ['todos', 'list'],
+    queryFn: async (): Promise<Todo[]> => (await fetch('/api/todos')).json(),
+  })
+  return <ul>{data?.map((t) => <li key={t.id}>{t.title}</li>)}</ul>
+}
+
+export function Todos() {
+  const [client] = useState(() => new QueryClient())
+  return (
+    <QueryClientProvider client={client}>
+      <TodoList />
+    </QueryClientProvider>
+  )
+}
+`,
+    'app/api/todos/route.ts': `export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  return Response.json([{ id: 1, title: 'Matrix todo' }])
+}
+`,
+    // tRPC (M16): two procedures called together, sent as one batched request.
+    'server/trpc.ts': `import { initTRPC } from '@trpc/server'
+import { z } from 'zod'
+
+const t = initTRPC.create()
+
+export const appRouter = t.router({
+  greet: t.procedure.input(z.object({ name: z.string() })).query(({ input }) => ({ text: \`Hi \${input.name}\` })),
+  count: t.procedure.query(() => ({ total: 3 })),
+})
+
+export type AppRouter = typeof appRouter
+`,
+    'app/api/trpc/[trpc]/route.ts': `import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import { appRouter } from '@/server/trpc'
+
+const handler = (req: Request) =>
+  fetchRequestHandler({ endpoint: '/api/trpc', req, router: appRouter, createContext: () => ({}) })
+
+export { handler as GET, handler as POST }
+`,
+    'components/Trpc.tsx': `'use client'
+import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import { useState } from 'react'
+import type { AppRouter } from '@/server/trpc'
+
+const trpc = createTRPCClient<AppRouter>({ links: [httpBatchLink({ url: '/api/trpc' })] })
+
+export function Trpc() {
+  const [text, setText] = useState('')
+  async function onClick() {
+    const [greet, count] = await Promise.all([trpc.greet.query({ name: 'matrix' }), trpc.count.query()])
+    setText(\`\${greet.text} (\${count.total})\`)
+  }
+  return (
+    <div>
+      <button type="button" onClick={onClick}>
+        Call tRPC
+      </button>
+      <p>{text}</p>
+    </div>
+  )
+}
+`,
+    // GraphQL (M17): an untyped urql query, typed from schema.graphql.
+    'schema.graphql': 'type Query {\n  notes: [Note!]!\n}\n\ntype Note {\n  id: ID!\n  text: String!\n}\n',
+    'app/api/graphql/route.ts': `export const dynamic = 'force-dynamic'
+
+const notes = [{ id: '1', text: 'Matrix note' }]
+
+export async function GET() {
+  return Response.json({ data: { notes } })
+}
+
+export async function POST() {
+  return Response.json({ data: { notes } })
+}
+`,
+    'components/Notes.tsx': `'use client'
+import { useEffect, useState } from 'react'
+import { cacheExchange, createClient, fetchExchange, gql, Provider, useQuery } from 'urql'
+
+const client = createClient({ url: '/api/graphql', exchanges: [cacheExchange, fetchExchange] })
+
+const NotesQuery = gql\`
+  query Notes {
+    notes {
+      id
+      text
+    }
+  }
+\`
+
+function NoteList() {
+  const [{ data }] = useQuery({ query: NotesQuery })
+  return <p>{data ? \`\${data.notes.length} notes\` : ''}</p>
+}
+
+// Client only: the relative URL can't be fetched during server rendering.
+export function Notes() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  return mounted ? (
+    <Provider value={client}>
+      <NoteList />
+    </Provider>
+  ) : null
+}
+`,
+    // Server-sent events (M18): a route handler that writes three named events.
+    'app/api/events/route.ts': `export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream({
+    async start(controller) {
+      for (let n = 1; n <= 3; n++) {
+        controller.enqueue(encoder.encode(\`event: tick\\ndata: \${JSON.stringify({ n })}\\n\\n\`))
+        await new Promise((r) => setTimeout(r, 200))
+      }
+      controller.close()
+    },
+  })
+  return new Response(stream, { headers: { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' } })
+}
+`,
+    'components/Ticks.tsx': `'use client'
+import { useEffect, useState } from 'react'
+
+interface Tick {
+  n: number
+}
+
+export function Ticks() {
+  const [n, setN] = useState(0)
+  useEffect(() => {
+    const source = new EventSource('/api/events')
+    source.addEventListener('tick', (e) => {
+      const tick = JSON.parse((e as MessageEvent).data) as Tick
+      setN(tick.n)
+      if (tick.n === 3) source.close()
+    })
+    return () => source.close()
+  }, [])
+  return <p>Ticks: {n}</p>
+}
+`,
+    // WebSockets (M19): a native socket to the script's echo server.
+    'components/Echo.tsx': `'use client'
+import { useEffect, useState } from 'react'
+
+interface Ping {
+  text: string
+}
+
+interface Echo {
+  text: string
+}
+
+export function EchoSocket() {
+  const [text, setText] = useState('')
+  useEffect(() => {
+    const ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL ?? '')
+    const ping: Ping = { text: 'ping' }
+    ws.onopen = () => ws.send(JSON.stringify(ping))
+    ws.onmessage = (e) => {
+      const echo = JSON.parse(e.data) as Echo
+      setText(echo.text)
+    }
+    return () => ws.close()
+  }, [])
+  return <p>Echo: {text}</p>
+}
+`,
+    // Postman (M15): the contract. /api/todos is called, /api/archive isn't.
+    'api.postman_collection.json': JSON.stringify(
+      {
+        info: {
+          name: 'Matrix API',
+          schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
+        },
+        item: [
+          {
+            name: 'List todos',
+            request: { method: 'GET', url: { raw: '/api/todos', path: ['api', 'todos'] } },
+          },
+          {
+            name: 'Archive',
+            request: { method: 'GET', url: { raw: '/api/archive', path: ['api', 'archive'] } },
+          },
+        ],
+      },
+      null,
+      2,
+    ),
     // Middleware: Next 16 calls it proxy.ts (Node.js runtime); before that middleware.ts (edge).
     [proxy ? 'proxy.ts' : 'middleware.ts']: `import { NextResponse, type NextRequest } from 'next/server'
 
@@ -375,9 +679,53 @@ function startUpstream() {
         res.end('{}')
       }
     })
+    server.on('upgrade', echoSocket)
     server.listen(0, '127.0.0.1', () =>
       done({ url: `http://127.0.0.1:${server.address().port}`, close: () => server.close() }),
     )
+  })
+}
+
+/**
+ * A WebSocket echo server, just enough for the app's socket: answers each text message
+ * `{ text }` with `{ text: 'echo: <text>' }` and replies to a close. Short frames only.
+ */
+function echoSocket(req, socket) {
+  const accept = createHash('sha1')
+    .update(`${req.headers['sec-websocket-key']}258EAFA5-E914-47DA-95CA-C5AB0DC85B11`)
+    .digest('base64')
+  socket.on('error', () => {})
+  socket.write(
+    `HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: ${accept}\r\n\r\n`,
+  )
+  const frame = (opcode, payload) => Buffer.concat([Buffer.from([0x80 | opcode, payload.length]), payload])
+  let buffer = Buffer.alloc(0)
+  socket.on('data', (chunk) => {
+    buffer = Buffer.concat([buffer, chunk])
+    while (buffer.length >= 2) {
+      const opcode = buffer[0] & 0x0f
+      let length = buffer[1] & 0x7f
+      let offset = 2
+      if (length === 126) {
+        if (buffer.length < 4) return
+        length = buffer.readUInt16BE(2)
+        offset = 4
+      }
+      // Browsers always mask what they send.
+      const mask = buffer.subarray(offset, offset + 4)
+      offset += 4
+      if (buffer.length < offset + length) return
+      const payload = Buffer.from(buffer.subarray(offset, offset + length)).map((b, i) => b ^ mask[i % 4])
+      buffer = buffer.subarray(offset + length)
+      if (opcode === 8) {
+        socket.end(frame(8, payload))
+        return
+      }
+      if (opcode === 1) {
+        const { text } = JSON.parse(payload.toString('utf8'))
+        socket.write(frame(1, Buffer.from(JSON.stringify({ text: `echo: ${text}` }))))
+      }
+    }
   })
 }
 

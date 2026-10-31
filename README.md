@@ -23,6 +23,7 @@ Published as [`@integr8-media/flow-checker`](https://www.npmjs.com/package/@inte
 | `packages/server`       | Tool server: API, WebSocket, ingest, matcher, store                                        |
 | `packages/dashboard`    | React + Vite dashboard UI                                                                  |
 | `packages/exporter`     | Markdown and static HTML export                                                            |
+| `packages/postman`      | Postman collection import (v2.1 JSON, v3 YAML, cloud) and the contract check               |
 | `fixtures/*`            | Small Next.js 16 apps used as test inputs, one per pattern ([details](fixtures/README.md)) |
 
 Internal packages (`@flow-checker/*`) are private and source-only. Other packages import their TypeScript directly, and `tsup` bundles them into `@integr8-media/flow-checker` at build time.
@@ -47,7 +48,7 @@ node scripts/perf/bench.mjs [features]   # after pnpm build: scan, re-scan and A
 ## Releasing
 
 1. Update the version in `packages/flow-checker/package.json` and the [changelog](packages/flow-checker/CHANGELOG.md), and merge to `main`.
-2. Tag it: `git tag v0.1.0 && git push origin v0.1.0`.
+2. Tag it: `git tag v0.2.0 && git push origin v0.2.0`.
 3. The [Release workflow](.github/workflows/release.yml) runs every check, then publishes to npm with provenance. It needs the `NPM_TOKEN` secret (or npm trusted publishing) and an `npm` environment.
 
 The repo tooling is pinned to TypeScript 6.x because TypeScript 7 (the native compiler) has no stable JavaScript API yet, and tsup's declaration build needs one. The scanner uses `ts-morph`, which ships its own compiler.

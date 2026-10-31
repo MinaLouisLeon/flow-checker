@@ -3286,7 +3286,12 @@ function isFunctionLike(node: Node | undefined): node is FunctionLike {
 /** The function behind a declaration: `function f`, `const f = () => ...`, `{ f() {} }`, `useCallback(fn)`. */
 function functionOf(decl: Node | undefined): Node | undefined {
   if (!decl) return undefined
-  if (N.isFunctionDeclaration(decl)) return decl.getBody() ? decl : decl.getImplementation()
+  if (N.isFunctionDeclaration(decl)) {
+    if (decl.getBody()) return decl
+    // Declaration files have no implementations, and looking one up scans every statement in
+    // the file by name (all of lib.dom.d.ts for `fetch`).
+    return decl.getSourceFile().isDeclarationFile() ? undefined : decl.getImplementation()
+  }
   if (isFunctionLike(decl)) return decl
   if (N.isVariableDeclaration(decl) || N.isPropertyAssignment(decl)) {
     const written = decl.getInitializer()

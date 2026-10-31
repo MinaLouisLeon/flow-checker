@@ -68,26 +68,26 @@ re-run them on their own before assuming a regression.
 
 ## Milestones
 
-| #   | Milestone                                         | Status  |
-| --- | ------------------------------------------------- | ------- |
-| M0  | Setup: monorepo, builds, Vitest, fixtures         | Done    |
-| M1  | Routes + components scan                          | Done    |
-| M2  | Request sites                                     | Done    |
-| M3  | Types (TypeShape IR, zod `z.infer`)               | Done    |
-| M4  | Dashboard (read-only)                             | Done    |
-| M5  | Runtime capture, `init`, ingest, redaction        | Done    |
-| M6  | Matching + verification                           | Done    |
-| M7  | Flows: navigation, inferred flows, recording      | Done    |
-| M8  | Type comparison of captures vs. types             | Done    |
-| M9  | Watch + incremental re-scan                       | Done    |
-| M10 | Export: Markdown + static HTML                    | Done    |
-| M11 | Public release v0.1.0 (docs, doctor, Next matrix) | Done    |
-| M12 | CLI progress output                               | Done    |
-| M13 | React Query APIs, keys and cache links            | Done    |
-| M14 | Middleware / proxy                                | Done    |
-| M15 | Postman collection import                         | Done    |
-| M16 | tRPC                                              | Done    |
-| M17 | GraphQL                                           | Done    |
-| M18 | SSE                                               | Done    |
-| M19 | WebSockets                                        | Done    |
-| M20 | Release v0.2.0                                    | Planned |
+| #   | Milestone                                         | Status |
+| --- | ------------------------------------------------- | ------ |
+| M0  | Setup: monorepo, builds, Vitest, fixtures         | Done   |
+| M1  | Routes + components scan                          | Done   |
+| M2  | Request sites                                     | Done   |
+| M3  | Types (TypeShape IR, zod `z.infer`)               | Done   |
+| M4  | Dashboard (read-only)                             | Done   |
+| M5  | Runtime capture, `init`, ingest, redaction        | Done   |
+| M6  | Matching + verification                           | Done   |
+| M7  | Flows: navigation, inferred flows, recording      | Done   |
+| M8  | Type comparison of captures vs. types             | Done   |
+| M9  | Watch + incremental re-scan                       | Done   |
+| M10 | Export: Markdown + static HTML                    | Done   |
+| M11 | Public release v0.1.0 (docs, doctor, Next matrix) | Done   |
+| M12 | CLI progress output                               | Done   |
+| M13 | React Query APIs, keys and cache links            | Done   |
+| M14 | Middleware / proxy                                | Done   |
+| M15 | Postman collection import                         | Done   |
+| M16 | tRPC                                              | Done   |
+| M17 | GraphQL                                           | Done   |
+| M18 | SSE                                               | Done   |
+| M19 | WebSockets                                        | Done   |
+| M20 | Release v0.2.0                                    | Ready  |
