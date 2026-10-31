@@ -15,6 +15,7 @@ import {
   useClearCaptures,
   useFlows,
   useRecording,
+  useServerCapture,
 } from '../api'
 import { useData } from '../context'
 import { GraphqlCaptureFact } from '../GraphqlView'
@@ -77,6 +78,7 @@ export function LiveScreen({
   const enabled = Boolean(meta.capture)
   const exported = meta.exported
   const captures = useCaptures(enabled)
+  const serverCapture = useServerCapture(enabled && !exported)
   const status = live ?? 'connecting'
   const clear = useClearCaptures()
 
@@ -163,6 +165,13 @@ export function LiveScreen({
           )}
         </div>
         {captures.error && <div className="banner banner-error">{captures.error.message}</div>}
+        {serverCapture.data?.state === 'missing' && (
+          <div className="banner banner-warn" role="alert" data-testid="server-capture-banner">
+            Server capture isn't running: run <code>flow-checker doctor</code>. Your app answered{' '}
+            <code>{serverCapture.data.request ?? 'a route handler'}</code>, but no server-side request was
+            captured.
+          </div>
+        )}
         {all.length === 0 ? (
           <Empty>
             No requests captured yet. Use your app

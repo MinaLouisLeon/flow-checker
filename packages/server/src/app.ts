@@ -10,6 +10,7 @@ import {
   type ExportData,
   IngestBatchSchema,
   type ScanEvent,
+  type ServerCaptureStatus,
 } from '@flow-checker/shared'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
@@ -17,6 +18,7 @@ import { streamSSE } from 'hono/streaming'
 import { FlowTracker } from './flows'
 import { OverridesFile } from './overrides'
 import type { ScanFeed } from './scan-feed'
+import { ServerCaptureWatch } from './server-capture'
 import { buildSnapshot, collectSnapshot } from './snapshot'
 import type { CaptureStore } from './store'
 import { Verifier } from './verify'
@@ -33,6 +35,13 @@ export interface CaptureOptions {
   token: string
   /** Resolved capture settings. Captures are redacted again on arrival unless `storeRaw`. */
   options: RuntimeCaptureOptions
+  /**
+   * Called once when browser requests reach route handlers but no server capture follows (M22):
+   * the server hook most likely never ran.
+   */
+  onServerCaptureMissing?: (status: ServerCaptureStatus) => void
+  /** How long to wait for that server capture. Default: 10 s. */
+  serverCaptureWaitMs?: number
 }
 
 export interface AppOptions {
@@ -110,6 +119,14 @@ export function createApp(options: AppOptions): Hono {
     options.capture && overrides
       ? new FlowTracker({ model, store: options.capture.store, overrides })
       : undefined
+  const serverCapture = options.capture
+    ? new ServerCaptureWatch({
+        model,
+        store: options.capture.store,
+        waitMs: options.capture.serverCaptureWaitMs,
+        onMissing: options.capture.onServerCaptureMissing,
+      })
+    : undefined
   // With capture on, sites matched by a capture are served as `verified`, and flows carry the
   // names you gave them.
   const served = () => {
@@ -138,6 +155,7 @@ export function createApp(options: AppOptions): Hono {
     scannedAt = new Date().toISOString()
     verifier?.setModel(next, info.changedAt)
     flows?.setModel(next)
+    serverCapture?.setModel(next)
     const event: ScanEvent = {
       scannedAt,
       ...(info.durationMs !== undefined ? { durationMs: Math.round(info.durationMs) } : {}),
@@ -227,6 +245,7 @@ export function createApp(options: AppOptions): Hono {
   })
 
   if (options.capture && verifier && flows) mountCapture(app, options.capture, verifier, flows)
+  if (serverCapture) app.get('/api/server-capture', (c) => c.json(serverCapture.status()))
 
   // Live feed for the dashboard: `scan` when the model changed (M9). With capture on, also a
   // `capture` event per new or re-matched capture, `verification` when site statuses may have
@@ -258,6 +277,7 @@ export function createApp(options: AppOptions): Hono {
           flows.subscribe(() => later('flows', () => flows.summary())),
         )
       }
+      if (serverCapture) stops.push(serverCapture.subscribe((status) => send('server-capture', status)))
       const unsubscribe = () => {
         for (const stop of stops.splice(0)) stop()
         for (const timer of timers.values()) clearTimeout(timer)

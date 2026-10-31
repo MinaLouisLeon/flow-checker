@@ -8,6 +8,10 @@
   - The selected item opens beside the list, and the filters stay in the URL.
   - Each part of the cards' detail line (`117 server`, `106 on events`...) opens the matching filtered list. The Requests card also counts requests with an unknown trigger.
 - Links to a request (the overview's to-do list, Live, flows, the GraphQL / tRPC / SSE / WebSocket / Postman sections) open the request on its own instead of the component that sends it.
+- **Server hook placement.** The flow-checker blocks must be the first statements of `register()` in `instrumentation.ts`, outside any `if`. Pasted inside an existing condition (`if (process.env.NODE_ENV === 'production')`), they never ran under `next dev` and server capture silently stayed off.
+  - `doctor` now reads `register()` (a function, an arrow or function expression, `export { setup as register }`, or a re-export from another project file) and fails when a block is inside an `if` / `else`, `switch`, loop, `try`, a ternary or `&&`, a nested callback, after other code or an early `return`, or when `register` isn't `async`. It names the line and prints the lines to move. Each block (Node.js and edge) is checked on its own.
+  - `init` edits an existing `register()` instead of asking you to: it puts the blocks first, makes `register` `async` when needed (`void` becomes `Promise<void>`), gives an `() => init()` arrow a body, and moves misplaced blocks when run again. Shapes it can't edit (a re-export from another file) still get a note.
+  - `dev` warns at start when the server hook is misplaced, and again, once, when your app answers route handlers that send requests but no server-side request is captured within 10 s. Live shows the same warning as a banner.
 
 ## 0.2.1
 

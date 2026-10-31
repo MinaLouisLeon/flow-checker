@@ -8,6 +8,7 @@ import {
   type FlowsSummary,
   type RecordedFlow,
   type ScanEvent,
+  type ServerCaptureStatus,
   summarizeCapture,
   type VerificationSummary,
 } from '@flow-checker/shared'
@@ -188,6 +189,19 @@ export function useVerification(enabled: boolean) {
   })
 }
 
+const SERVER_CAPTURE_KEY = ['server-capture']
+
+/** Whether server capture runs (M22). Updated by the live feed. Not part of an export. */
+export function useServerCapture(enabled: boolean) {
+  return useQuery({
+    queryKey: SERVER_CAPTURE_KEY,
+    queryFn: (): Promise<ServerCaptureStatus> | ServerCaptureStatus =>
+      embedded() ? { state: 'waiting' } : getJson<ServerCaptureStatus>('api/server-capture'),
+    enabled,
+    staleTime: Number.POSITIVE_INFINITY,
+  })
+}
+
 /** Captures matched to one request site, newest first. */
 export function useSiteCaptures(siteId: string, enabled: boolean) {
   return useQuery({
@@ -327,6 +341,13 @@ export function useLiveFeed(enabled: boolean): LiveStatus {
       void client.invalidateQueries({ queryKey: CAPTURES_KEY })
       void client.invalidateQueries({ queryKey: VERIFICATION_KEY })
       void client.invalidateQueries({ queryKey: FLOWS_KEY })
+      void client.invalidateQueries({ queryKey: SERVER_CAPTURE_KEY })
+    })
+    source.addEventListener('server-capture', (event) => {
+      client.setQueryData(
+        SERVER_CAPTURE_KEY,
+        JSON.parse((event as MessageEvent<string>).data) as ServerCaptureStatus,
+      )
     })
     source.addEventListener('scan', (event) => {
       client.setQueryData(LAST_SCAN_KEY, JSON.parse((event as MessageEvent<string>).data) as ScanEvent)
