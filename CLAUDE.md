@@ -9,6 +9,9 @@
 - The fixtures run Next.js 16, which differs from older training data. Check
   `fixtures/<app>/node_modules/next/dist/docs/` before writing Next-specific code.
 - Never commit, push or open PRs unless the user says so in the current session; leave changes in the working tree.
+- Before reporting a milestone (or any change) as finished, run the full `pnpm check` (repo-wide `biome check .`,
+  which also formats Markdown, every package's typecheck, tests, build, fixture typechecks, package and config checks).
+  Linting or typechecking only the touched folders is not enough.
 - When a milestone is finished, update the milestone tables in this file's import (`AGENTS.md`), the list below and
   `MEMORY.md`.
 
