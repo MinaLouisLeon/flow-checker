@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "trpc-v10",
   "model": {
-    "version": 8,
+    "version": 9,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -2164,7 +2164,8 @@
       "matched": 19,
       "ambiguous": 0,
       "unmatched": 0,
-      "manual": 0
+      "manual": 0,
+      "thirdParty": 0
     }
   },
   "flows": {
@@ -3591,11 +3592,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0omiq0w94p9",
-        "score": 225,
+        "score": 195,
         "candidates": [
           {
             "siteId": "req_0omiq0w94p9",
-            "score": 225,
+            "score": 195,
             "evidence": [
               {
                 "signal": "url",
@@ -3619,7 +3620,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 45,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -3741,11 +3742,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0v7l7pp65e3",
-        "score": 225,
+        "score": 205,
         "candidates": [
           {
             "siteId": "req_0v7l7pp65e3",
-            "score": 225,
+            "score": 205,
             "evidence": [
               {
                 "signal": "url",
@@ -3769,7 +3770,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -3888,11 +3889,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_2ah5o8jjwsr",
-        "score": 240,
+        "score": 220,
         "candidates": [
           {
             "siteId": "req_2ah5o8jjwsr",
-            "score": 240,
+            "score": 220,
             "evidence": [
               {
                 "signal": "url",
@@ -3916,7 +3917,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4050,11 +4051,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0omiq0w94p9",
-        "score": 240,
+        "score": 210,
         "candidates": [
           {
             "siteId": "req_0omiq0w94p9",
-            "score": 240,
+            "score": 210,
             "evidence": [
               {
                 "signal": "url",
@@ -4078,7 +4079,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 45,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4192,11 +4193,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_19v0zzhv2k5",
-        "score": 235,
+        "score": 215,
         "candidates": [
           {
             "siteId": "req_19v0zzhv2k5",
-            "score": 235,
+            "score": 215,
             "evidence": [
               {
                 "signal": "url",
@@ -4220,7 +4221,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4338,11 +4339,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0n9qb5iqo86",
-        "score": 235,
+        "score": 215,
         "candidates": [
           {
             "siteId": "req_0n9qb5iqo86",
-            "score": 235,
+            "score": 215,
             "evidence": [
               {
                 "signal": "url",
@@ -4366,7 +4367,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4486,11 +4487,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_19v0zzhv2k5",
-        "score": 235,
+        "score": 215,
         "candidates": [
           {
             "siteId": "req_19v0zzhv2k5",
-            "score": 235,
+            "score": 215,
             "evidence": [
               {
                 "signal": "url",
@@ -4514,7 +4515,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4642,11 +4643,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_2flmlyku854",
-        "score": 240,
+        "score": 210,
         "candidates": [
           {
             "siteId": "req_2flmlyku854",
-            "score": 240,
+            "score": 210,
             "evidence": [
               {
                 "signal": "url",
@@ -4670,7 +4671,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 45,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4798,11 +4799,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_2flmlyku854",
-        "score": 240,
+        "score": 210,
         "candidates": [
           {
             "siteId": "req_2flmlyku854",
-            "score": 240,
+            "score": 210,
             "evidence": [
               {
                 "signal": "url",
@@ -4826,7 +4827,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 45,
                 "detail": "3 frame(s) on the call path"
               },
               {

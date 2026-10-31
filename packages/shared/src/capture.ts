@@ -286,7 +286,7 @@ export interface CaptureSummary {
   /** Nearest component from the interaction, if any. */
   component?: string
   redacted: boolean
-  match?: Pick<CaptureMatch, 'status' | 'by' | 'siteId' | 'score'>
+  match?: Pick<CaptureMatch, 'status' | 'by' | 'siteId' | 'score' | 'thirdParty'>
   /** Result of comparing the bodies with the matched site's types. */
   typeCheck?: TypeCheckStatus
   /** Taken before the matched site's code last changed (M9). Set by the tool server. */
@@ -320,6 +320,7 @@ export function summarizeCapture(c: Capture): CaptureSummary {
       by: c.match.by,
       siteId: c.match.siteId,
       score: c.match.score,
+      ...(c.match.thirdParty ? { thirdParty: true } : {}),
     },
     typeCheck: c.typeCheck && typeCheckStatus(c.typeCheck),
   }

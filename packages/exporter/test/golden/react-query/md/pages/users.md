@@ -104,7 +104,7 @@ Response body:
 | Status | ✓ verified (2 captures) |
 | From | [`UserList`](../components/UserList.md) · `src/components/UserList.tsx:11` |
 | Trigger | page-load |
-| Transport | fetch · `useQueries(userKeys.todos(user.id))` · key `['todos', 'list', { userId: :userId }]` |
+| Transport | fetch · `useQueries(userKeys.todos(user.id))` · key `['todos', 'list', { userId: :id }]` |
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId` (pattern) |
 | Call path | `useQueries` → `fetchUserTodos` → `http` → `fetch` |
 

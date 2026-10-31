@@ -128,6 +128,7 @@ export class Matcher {
   private readonly trpcEndpoints: string[]
   /** GraphQL operation id -> its persisted query ids (M17). */
   private readonly graphqlHashes: Map<string, string[]>
+  private readonly locSites: Map<string, number>
 
   constructor(model: AppModel) {
     this.sites = indexSites(model)
@@ -135,6 +136,11 @@ export class Matcher {
     this.middleware = model.middleware
     this.trpcEndpoints = model.trpc ? [model.trpc.endpoint] : []
     this.graphqlHashes = new Map((model.graphql?.operations ?? []).map((o) => [o.id, o.hashes]))
+    this.locSites = new Map()
+    for (const info of this.sites) {
+      for (const key of new Set(info.locs.map((l) => `${l.file}:${l.line}`)))
+        this.locSites.set(key, (this.locSites.get(key) ?? 0) + 1)
+    }
   }
 
   hasSite(id: string): boolean {
@@ -168,6 +174,7 @@ export class Matcher {
       fromMiddleware: capture.origin === 'server' && fromMiddleware(capture, context, this.middleware),
       trpcParent: parentUrl ? parseTrpcUrl(parentUrl, { endpoints: this.trpcEndpoints })?.paths : undefined,
       graphqlHashes: this.graphqlHashes,
+      locSites: this.locSites,
     }
     for (const info of this.sites) {
       const evidence = scoreSite(info, capture, context, scoring)
@@ -191,7 +198,14 @@ export class Matcher {
 
     const [best, second] = top
     if (!best || best.score < MATCH_THRESHOLD) {
-      return { status: 'unmatched', by: 'auto', score: best?.score ?? 0, candidates: top }
+      const thirdParty = isThirdParty(capture, context)
+      return {
+        status: 'unmatched',
+        by: 'auto',
+        score: best?.score ?? 0,
+        candidates: thirdParty ? [] : top,
+        ...(thirdParty ? { thirdParty } : {}),
+      }
     }
     if (second && best.score - second.score < MATCH_MARGIN) {
       return { status: 'ambiguous', by: 'auto', score: best.score, candidates: top }
@@ -209,6 +223,8 @@ interface Scoring {
   trpcParent: string[] | undefined
   /** GraphQL operation id -> persisted query ids (M17). */
   graphqlHashes: Map<string, string[]>
+  /** `file:line` -> how many sites have it on their call path. */
+  locSites: Map<string, number>
 }
 
 /** Next runs middleware / proxy through its web adapter, on the edge and on Node.js. */
@@ -390,14 +406,20 @@ function scoreSite(
   // --- Evidence -----------------------------------------------------------------------------
 
   // Source-mapped frames on the site's call path. Shared wrappers match several sites, so the
-  // more frames match, the more it counts.
+  // more frames match, the more it counts. A line many sites pass through (the app's `request()`
+  // helper) says little about which one sent the request.
   let lineHits = 0
+  let linePoints = 0
   let fileHit: string | undefined
   for (const frame of context.frames) {
-    if (info.locs.some((loc) => loc.file === frame.file && Math.abs(loc.line - frame.line) <= 1)) lineHits++
-    else if (!fileHit && info.files.has(frame.file)) fileHit = frame.file
+    const hit = info.locs.find((loc) => loc.file === frame.file && Math.abs(loc.line - frame.line) <= 1)
+    if (hit) {
+      lineHits++
+      const sharedBy = scoring.locSites.get(`${hit.file}:${hit.line}`) ?? 1
+      linePoints += sharedBy <= 1 ? 25 : sharedBy <= 3 ? 15 : 5
+    } else if (!fileHit && info.files.has(frame.file)) fileHit = frame.file
   }
-  if (lineHits > 0) add('stack-source', Math.min(75, 25 * lineHits), `${lineHits} frame(s) on the call path`)
+  if (lineHits > 0) add('stack-source', Math.min(75, linePoints), `${lineHits} frame(s) on the call path`)
   else if (fileHit) add('stack-source', 10, `frame in ${fileHit}`)
 
   const names = capture.stack.map(frameName).filter((n): n is string => Boolean(n))
@@ -462,6 +484,35 @@ function scoreSite(
   }
 
   return evidence
+}
+
+/**
+ * A browser request another site's script sent to its own servers (a sign-in or analytics SDK):
+ * it goes to another origin than the page, no project frame is on its stack, and a script from
+ * another origin is.
+ */
+export function isThirdParty(capture: Capture, context: MatchContext): boolean {
+  if (capture.origin !== 'browser' || context.frames.length > 0 || !capture.pageUrl) return false
+  let page: string
+  let target: string
+  try {
+    page = new URL(capture.pageUrl).origin
+    target = new URL(capture.request.url).origin
+  } catch {
+    return false
+  }
+  if (page === target) return false
+  return capture.stack.some((line) => {
+    const url =
+      /\((https?:\/\/[^)\s]+?)(?::\d+){1,2}\)\s*$/.exec(line)?.[1] ??
+      /at (https?:\/\/\S+?)(?::\d+){1,2}$/.exec(line)?.[1]
+    if (!url) return false
+    try {
+      return new URL(url).origin !== page
+    } catch {
+      return false
+    }
+  })
 }
 
 /** Whether some operation has this persisted id (then a site with another operation is ruled out). */

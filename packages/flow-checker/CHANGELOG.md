@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+Fixes found by running 0.2.0 on a large real app (a 54-page Next.js 16 app with its own `request()` wrapper). Models saved by 0.2 still load.
+
+- **URLs through helpers.** A URL built by a project function (`proxyUrl(endpoint)`) is followed into it, including ternaries the scan can decide (`AUTH_ENDPOINTS.includes(endpoint) ? '/api/auth…' : '/api…'`, `===` checks, `url.includes('?')`), `.toUpperCase()` / `.toLowerCase()` / `.trim()`, and helpers that add an optional query (`withCursor(url, cursor)` with several returns, `cursor ? '/x?cursor=…' : '/x'`). On that app, unresolved URLs went from 728 of 857 sites to 35.
+- **One site per call through a wrapper.** When a call into a wrapper reaches `fetch` on several branches (a multipart branch and the normal one) and they send the same request, it is one site: the branch not guarded by an `if` is kept. Duplicate sites (and their warnings) are gone.
+- **Mutation triggers through custom hooks.** `mutate` / `mutateAsync` handed out by a custom hook (`return { save: mutation.mutate }`, inside a returned `useCallback`, or wrapped as `guard(mutation.mutate)`) is followed to where the hook's caller uses it. A mutation is never a page-load request: one that can't be placed is `unknown`. Router calls and requests in a function a custom hook returns are placed the same way.
+- **Components.** Aliases of library components (`const Form = FormProvider`, `const Dialog = DialogPrimitive.Root`) are external; compound components (`Card.Header = CardHeader`, or `{ Header: CardHeader }`) resolve to their component; a component passed in as a prop (`({ as: Tag }) => <Tag />`) is a new `prop` reference instead of "could not be traced".
+- **Matching.** Stack frames in code many sites share (the app's request helper) count for little, so a site with an unknown URL no longer wins on them alone. A request another site's script sends to its own servers (a Google sign-in SDK) is marked `third-party` instead of "the scanner probably missed it", and left out of the unmatched count and of recorded flows.
+- **Dashboard.**
+  - The overview lists one note per request with everything the scan couldn't resolve about it.
+  - Pages show where they redirect while rendering ("Leaves this page", with the pages a pattern can go to). They keep their own requests apart from those their layouts send on every page, and fold the same request sent from several places into one row that says where from.
+  - The route map lays out many sibling pages in a grid of columns by route group, opens at a readable zoom, counts each page's own components, drops the stacked edge labels, and hides layout links and middleware redirects behind a toggle.
+  - Live: server hops show which feature they were made for (`LatestPosts › GET /api/[...proxy]`), and the toolbar wraps instead of running into the side panel.
+  - Recorded flows put the page load first and are named after the pages they went through when no name is given. An unwalked flow says "not walked yet". The route tree leaves out folders with no route files.
+- `.flow-checker/model.json` is now version 9. Version 1–8 files still load.
+
 ## 0.2.0
 
 React Query in depth, middleware, Postman collections as the API contract, tRPC, GraphQL, server-sent events and WebSockets, plus progress output for every command. Models saved by 0.1 still load.

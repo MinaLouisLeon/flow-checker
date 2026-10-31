@@ -1,4 +1,11 @@
-import type { Capture, CapturedBody, CaptureSummary, MatchSignal, RequestSite } from '@flow-checker/shared'
+import {
+  type Capture,
+  type CapturedBody,
+  type CaptureSummary,
+  type MatchSignal,
+  type RequestSite,
+  summarizeCapture,
+} from '@flow-checker/shared'
 import { useState } from 'react'
 import {
   type LiveStatus,
@@ -46,6 +53,8 @@ const SIGNAL_LABEL: Record<MatchSignal, string> = {
 
 function fitsFilter(c: CaptureSummary, filter: MatchFilter): boolean {
   if (filter === 'mismatch') return c.typeCheck === 'mismatch'
+  // Third-party requests are not scanner gaps: they stay out of "Unmatched".
+  if (c.match?.thirdParty) return false
   return (c.match?.status ?? 'unmatched') === filter
 }
 
@@ -82,9 +91,10 @@ export function LiveScreen({
   const all = captures.data ?? []
   const counts: Record<MatchFilter, number> = { matched: 0, ambiguous: 0, unmatched: 0, mismatch: 0 }
   for (const c of all) {
-    counts[c.match?.status ?? 'unmatched']++
+    if (!c.match?.thirdParty) counts[c.match?.status ?? 'unmatched']++
     if (c.typeCheck === 'mismatch') counts.mismatch++
   }
+  const byId = new Map(all.map((c) => [c.id, c]))
   const list = all.filter((c) => {
     if (filter && !fitsFilter(c, filter)) return false
     const site = c.match?.siteId ? index.requests.get(c.match.siteId) : undefined
@@ -172,7 +182,14 @@ export function LiveScreen({
         ) : (
           <ul className="list capture-list">
             {list.map((c) => (
-              <CaptureRow key={c.id} capture={c} selected={c.id === captureId} q={q} filter={filter} />
+              <CaptureRow
+                key={c.id}
+                capture={c}
+                parent={c.parentCaptureId ? byId.get(c.parentCaptureId) : undefined}
+                selected={c.id === captureId}
+                q={q}
+                filter={filter}
+              />
             ))}
           </ul>
         )}
@@ -191,11 +208,14 @@ export function LiveScreen({
 
 function CaptureRow({
   capture: c,
+  parent,
   selected,
   q,
   filter,
 }: {
   capture: CaptureSummary
+  /** The browser request a server hop was made for. */
+  parent?: CaptureSummary
   selected: boolean
   q: string
   filter?: MatchFilter
@@ -216,7 +236,7 @@ function CaptureRow({
       </a>
       <span className="spacer" />
       {c.component && <span className="muted capture-component">{c.component}</span>}
-      <MatchBadge match={c.match} />
+      <MatchBadge match={c.match} parent={parent} />
       <TypeCheckBadge status={c.typeCheck} quiet />
       <StaleBadge stale={c.stale} />
       <StatusBadge status={c.status} error={c.error} />
@@ -347,7 +367,13 @@ function CaptureDetailView({ captureId, q }: { captureId: string; q: string }) {
         <Section title="Server requests it caused">
           <ul className="list">
             {children.map((child) => (
-              <CaptureRow key={child.id} capture={child} selected={false} q={q} />
+              <CaptureRow
+                key={child.id}
+                capture={child}
+                parent={summarizeCapture(c)}
+                selected={false}
+                q={q}
+              />
             ))}
           </ul>
         </Section>
@@ -414,7 +440,8 @@ function RecordControl() {
       className="record-control"
       onSubmit={(event) => {
         event.preventDefault()
-        recording.mutate(name || 'Recorded flow', { onSuccess: () => setName('') })
+        // An empty name is filled in from the pages the recording goes through.
+        recording.mutate(name, { onSuccess: () => setName('') })
       }}
     >
       <input
@@ -430,14 +457,30 @@ function RecordControl() {
   )
 }
 
-function MatchBadge({ match }: { match: CaptureSummary['match'] }) {
+function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?: CaptureSummary }) {
   const { index } = useData()
   if (match?.status === 'matched' && match.siteId) {
     const site = index.requests.get(match.siteId)
+    // A shared route handler (e.g. a catch-all proxy) says little: name the feature that called it.
+    const parentSite = parent?.match?.siteId ? index.requests.get(parent.match.siteId) : undefined
+    const via = site?.origin === 'route-handler' && parentSite ? parentSite : undefined
+    const title = site ? siteLabel(site, index) : match.siteId
     return (
-      <Badge tone="ok" title={site ? siteLabel(site, index) : match.siteId}>
-        ✓ {site ? siteOwner(site, index) : 'matched'}
+      <Badge tone="ok" title={via ? `${title}, for ${siteLabel(via, index)}` : title}>
+        ✓{' '}
+        {via
+          ? `${siteOwner(via, index)} › ${site ? siteOwner(site, index) : ''}`
+          : site
+            ? siteOwner(site, index)
+            : 'matched'}
         {match.by === 'manual' ? ' (you)' : ''}
+      </Badge>
+    )
+  }
+  if (match?.thirdParty) {
+    return (
+      <Badge tone="muted" title="Sent by another site's script (an SDK), not by your code">
+        third-party
       </Badge>
     )
   }
@@ -493,6 +536,11 @@ function MatchPanel({ capture }: { capture: Capture }) {
         <p>
           <Badge tone="warn">? ambiguous</Badge> Several request sites fit about equally well. Pick the right
           one below.
+        </p>
+      ) : match.thirdParty ? (
+        <p>
+          <Badge tone="muted">third-party</Badge> Sent by another site's script (an SDK) to its own servers.
+          No project code is on its stack, so the scanner didn't miss anything.
         </p>
       ) : (
         <p>

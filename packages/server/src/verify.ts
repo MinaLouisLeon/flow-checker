@@ -189,11 +189,12 @@ export class Verifier {
   }
 
   summary(): VerificationSummary {
-    const counts = { matched: 0, ambiguous: 0, unmatched: 0, manual: 0 }
+    const counts = { matched: 0, ambiguous: 0, unmatched: 0, manual: 0, thirdParty: 0 }
     for (const capture of this.store.all()) {
       const match = capture.match
       if (!match) continue
-      counts[match.status]++
+      if (match.thirdParty) counts.thirdParty++
+      else counts[match.status]++
       if (match.by === 'manual') counts.manual++
     }
     return { sites: this.siteVerification(), counts }

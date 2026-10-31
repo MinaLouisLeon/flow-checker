@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "bff",
   "model": {
-    "version": 8,
+    "version": 9,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -998,7 +998,8 @@
       "matched": 10,
       "ambiguous": 0,
       "unmatched": 0,
-      "manual": 0
+      "manual": 0,
+      "thirdParty": 0
     }
   },
   "flows": {
@@ -1796,11 +1797,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0pmni454dyo",
-        "score": 180,
+        "score": 170,
         "candidates": [
           {
             "siteId": "req_0pmni454dyo",
-            "score": 180,
+            "score": 170,
             "evidence": [
               {
                 "signal": "url",
@@ -1819,7 +1820,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 40,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -1936,11 +1937,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0pmni454dyo",
-        "score": 180,
+        "score": 170,
         "candidates": [
           {
             "siteId": "req_0pmni454dyo",
-            "score": 180,
+            "score": 170,
             "evidence": [
               {
                 "signal": "url",
@@ -1959,7 +1960,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 40,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2074,11 +2075,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_02nrpzzew80",
-        "score": 180,
+        "score": 170,
         "candidates": [
           {
             "siteId": "req_02nrpzzew80",
-            "score": 180,
+            "score": 170,
             "evidence": [
               {
                 "signal": "url",
@@ -2097,7 +2098,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 40,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2212,11 +2213,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1t6ibh8o0so",
-        "score": 175,
+        "score": 165,
         "candidates": [
           {
             "siteId": "req_1t6ibh8o0so",
-            "score": 175,
+            "score": 165,
             "evidence": [
               {
                 "signal": "url",
@@ -2235,7 +2236,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 40,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2344,11 +2345,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1t6ibh8o0so",
-        "score": 175,
+        "score": 165,
         "candidates": [
           {
             "siteId": "req_1t6ibh8o0so",
-            "score": 175,
+            "score": 165,
             "evidence": [
               {
                 "signal": "url",
@@ -2367,7 +2368,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 40,
                 "detail": "2 frame(s) on the call path"
               },
               {

@@ -125,6 +125,12 @@ export function Overview() {
                 </a>
               </li>
             )}
+            {(counts.thirdParty ?? 0) > 0 && (
+              <li className="muted">
+                {counts.thirdParty} sent by other sites' scripts (SDKs such as sign-in or analytics), not your
+                code.
+              </li>
+            )}
           </ul>
         )}
       </Section>
