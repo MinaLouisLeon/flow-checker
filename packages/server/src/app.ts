@@ -9,6 +9,7 @@ import {
   diffModels,
   type ExportData,
   IngestBatchSchema,
+  matchedSiteIds,
   type ScanEvent,
   type ServerCaptureStatus,
 } from '@flow-checker/shared'
@@ -434,7 +435,7 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
     const id = c.req.param('id')
     const list = store
       .all()
-      .filter((item) => item.match?.status === 'matched' && item.match.siteId === id)
+      .filter((item) => matchedSiteIds(item.match).includes(id))
       .map((item) => verifier.summarize(item))
       .reverse()
     return c.json(list)

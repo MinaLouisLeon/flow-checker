@@ -45,6 +45,16 @@ browser GET localhost:4010/users
   → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
 browser GET localhost:4010/users/2
   → ambiguous -
+browser GET localhost:4010/settings
+  → matched SettingsBadge · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+    + SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+browser GET localhost:4010/users
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/todos
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/settings
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+    + SettingsBadge · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
 
 ## react-query-v4
 browser GET localhost:4010/todos
@@ -73,6 +83,16 @@ browser GET localhost:4010/users
   → matched UserList · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
 browser DELETE localhost:4010/users/2
   → matched UserList · DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+browser GET localhost:4010/settings
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+    + SettingsBadge · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+browser GET localhost:4010/users
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+browser GET localhost:4010/todos
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos
+browser GET localhost:4010/settings
+  → matched SettingsPanel · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
+    + SettingsBadge · GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings
 
 ## server-actions
 server GET localhost:4010/products (in GET /products)

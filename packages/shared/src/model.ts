@@ -401,12 +401,14 @@ export type Flag = z.infer<typeof FlagSchema>
 
 /**
  * One segment of a query key. `static`: a literal or constant. `param`: a value only known at
- * runtime (`:id`), matches any one segment. `object`: `{ status: 'open', page: :page }`.
- * `rest`: a spread the scanner could not resolve, matches any number of segments.
+ * runtime (`:id`), matches any one segment. With `unknown` (M24) it is a value the scanner could
+ * not read (a library constant, a module value it can't follow): never treated as "any value"
+ * when linking cache calls. `object`: `{ status: 'open', page: :page }`. `rest`: a spread the
+ * scanner could not resolve, matches any number of segments.
  */
 export type QueryKeyPart =
   | { kind: 'static'; value: string | number | boolean | null }
-  | { kind: 'param'; name: string }
+  | { kind: 'param'; name: string; unknown?: boolean }
   | { kind: 'object'; entries: { key: string; value: QueryKeyPart }[] }
   | { kind: 'rest'; text: string }
 
@@ -416,7 +418,7 @@ export const QueryKeyPartSchema: z.ZodType<QueryKeyPart> = z.lazy(() =>
       kind: z.literal('static'),
       value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
     }),
-    z.object({ kind: z.literal('param'), name: z.string() }),
+    z.object({ kind: z.literal('param'), name: z.string(), unknown: z.boolean().optional() }),
     z.object({
       kind: z.literal('object'),
       entries: z.array(z.object({ key: z.string(), value: QueryKeyPartSchema })),
@@ -1046,7 +1048,8 @@ export const AppModelSchema = z.object({
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
    * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
    * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams,
-   * version 7 (before M19) no WebSockets, version 8 no `prop` component references.
+   * version 7 (before M19) no WebSockets, version 8 no `prop` component references, version 9
+   * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`).
    */
   version: z
     .union([
@@ -1058,6 +1061,7 @@ export const AppModelSchema = z.object({
       z.literal(6),
       z.literal(7),
       z.literal(8),
+      z.literal(9),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

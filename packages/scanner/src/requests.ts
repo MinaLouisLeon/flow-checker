@@ -48,7 +48,10 @@ import {
 } from '@flow-checker/shared'
 import {
   type ArrowFunction,
+  type BindingElement,
   type CallExpression,
+  type EnumDeclaration,
+  type EnumMember,
   type FunctionDeclaration,
   type FunctionExpression,
   type JsxAttribute,
@@ -330,6 +333,11 @@ interface Walk {
   frames: Frame[]
   /** Functions on the current path, so recursion terminates. */
   active: Set<Node>
+  /**
+   * Functions walked as a query or mutation function. An inline one passed to a project hook
+   * (`useList({ queryFn: () => getFeed() })`) is not walked again where it is written.
+   */
+  hookFns?: Set<Node>
 }
 
 interface Found {
@@ -955,6 +963,10 @@ export class RequestScanner {
   /** Visits every call in `node`, which is inside the function `scope`. */
   #walk(node: Node, scope: Node, env: Env, w: Walk) {
     node.forEachDescendant((d, traversal) => {
+      if (w.hookFns?.has(d)) {
+        traversal.skip()
+        return
+      }
       if (N.isJsxOpeningElement(d) || N.isJsxSelfClosingElement(d)) this.#link(d, scope, env, w)
       if (N.isJsxAttribute(d)) {
         this.#jsxAttribute(d, scope, env, w)
@@ -1821,6 +1833,8 @@ export class RequestScanner {
   #runHook(call: CallExpression, anchor: Node, def: HookDef, args: HookArgs, scope: Node, w: Walk) {
     const fn = args.fn ? this.#functionValue(args.fn.node, args.fn.env) : undefined
     if (!fn || w.active.has(fn) || w.frames.length >= MAX_DEPTH) return
+    w.hookFns ??= new Set()
+    w.hookFns.add(fn)
 
     const keyNode = args.key?.node
     const parts = def.rq && args.key ? this.#queryKey(args.key.node, args.key.env) : undefined
@@ -1831,7 +1845,7 @@ export class RequestScanner {
       scope,
       hook: {
         def,
-        ...(keyNode ? { key: oneLine(keyNode.getText()) } : {}),
+        ...(keyNode ? { key: oneLine(this.#writtenKey(keyNode, args.key?.env ?? EMPTY_ENV).getText()) } : {}),
         ...(typeArg && !def.multi ? { typeArg } : {}),
         ...(parts ? { parts } : {}),
       },
@@ -1848,6 +1862,25 @@ export class RequestScanner {
     // What runs after the mutation: navigation, cache updates (and requests) in its callbacks.
     const options = args.options
     if (def.kind === 'mutation' && options) this.#mutationCallbacks(options, frame, anchor, w)
+  }
+
+  /**
+   * The key as the caller wrote it: through a project hook's parameters (`useList({ queryKey })`
+   * shows the caller's `[QueryKeys.feed]`), but not through constants or factories.
+   */
+  #writtenKey(node: Node, env: Env): Node {
+    let current = node
+    let scope = env
+    for (let i = 0; i < 10; i++) {
+      if (!N.isIdentifier(current)) break
+      const decl = declarationOf(current)
+      if (!decl || !(N.isParameterDeclaration(decl) || N.isBindingElement(decl))) break
+      const r = this.#resolve(current, scope)
+      if (!r.node || r.node === current) break
+      current = r.node
+      scope = r.env
+    }
+    return current
   }
 
   /**
@@ -1952,13 +1985,26 @@ export class RequestScanner {
     if (N.isTrueLiteral(node) || N.isFalseLiteral(node))
       return { kind: 'static', value: N.isTrueLiteral(node) }
     if (N.isNullLiteral(node)) return { kind: 'static', value: null }
+    if (N.isEnumMember(node)) {
+      const value = enumValue(node)
+      if (value !== undefined) return { kind: 'static', value }
+      return { kind: 'param', name: node.getName(), unknown: true }
+    }
     if (N.isTemplateExpression(node)) {
       const str = this.#str(node, r.env)
       if (str?.parts.every((p) => 'text' in p)) {
         return { kind: 'static', value: str.parts.map((p) => ('text' in p ? p.text : '')).join('') }
       }
       const name = str?.parts.map((p) => ('text' in p ? p.text : `:${p.hole}`)).join('')
-      return { kind: 'param', name: name?.replace(/^:/, '') || holeName(expr) }
+      // `page-${n}` keeps its text; a lone hole (`${id}`) is just the name.
+      const plain = name && /^:[\w$]+$/.test(name) ? name.slice(1) : name
+      // A hole the scanner can't read (a library value) makes the whole segment unknown.
+      const unreadable = node
+        .getTemplateSpans()
+        .some(
+          (span) => !this.#str(span.getExpression(), r.env) && this.#unreadable(span.getExpression(), r.env),
+        )
+      return { kind: 'param', name: plain || holeName(expr), ...(unreadable ? { unknown: true } : {}) }
     }
     if (N.isObjectLiteralExpression(node) && depth < 8) {
       const entries: { key: string; value: QueryKeyPart }[] = []
@@ -1973,11 +2019,50 @@ export class RequestScanner {
       }
       return { kind: 'object', entries }
     }
-    // Only known at runtime: named after the value as written where it is passed in.
-    return {
-      kind: 'param',
-      name: holeName(N.isIdentifier(node) || N.isPropertyAccessExpression(node) ? node : expr),
+    // Only known at runtime: named after the value as written where it is passed in. A value the
+    // scanner can't read at all (a library constant, a module value it can't follow) is `unknown`:
+    // it is never treated as "any value" when linking cache calls.
+    const name = holeName(N.isIdentifier(node) || N.isPropertyAccessExpression(node) ? node : expr)
+    return this.#unreadable(node, r.env) ? { kind: 'param', name, unknown: true } : { kind: 'param', name }
+  }
+
+  /**
+   * Whether a value the scanner couldn't evaluate is unreadable rather than a runtime value.
+   * Runtime values come from inside a function: parameters, destructured names, local
+   * variables (`todo.id`, `params.slug`, `searchParams.get('q')`). Anything rooted outside one
+   * (an import from a package, a module constant it can't follow, an enum member without a
+   * constant value) or the result of calling a function is unreadable.
+   */
+  #unreadable(expr: Node, env: Env): boolean {
+    let node = skipWrappers(this.#resolve(expr, env).node ?? expr)
+    for (let i = 0; i < 20; i++) {
+      if (N.isPropertyAccessExpression(node) || N.isElementAccessExpression(node)) {
+        node = skipWrappers(node.getExpression())
+        continue
+      }
+      if (N.isCallExpression(node)) {
+        const callee = skipWrappers(node.getExpression())
+        // `String(id)`, `encodeURIComponent(slug)`: the value of their argument.
+        const arg = node.getArguments()[0]
+        if (N.isIdentifier(callee) && /^(String|Number|encodeURIComponent|encodeURI)$/.test(callee.getText()))
+          return arg ? this.#unreadable(arg, env) : true
+        // `searchParams.get('q')`, `user.name.trim()`: a method of a runtime value.
+        if (N.isPropertyAccessExpression(callee)) {
+          node = skipWrappers(callee.getExpression())
+          continue
+        }
+        // `useParams()`, `getId()` called while the code runs; at module level it is a constant.
+        return !node.getFirstAncestor((a) => isFunctionLike(a))
+      }
+      break
     }
+    if (node.getKind() === ts.SyntaxKind.ThisKeyword) return false
+    if (!N.isIdentifier(node)) return !node.getFirstAncestor((a) => isFunctionLike(a))
+    const decl = declarationOf(node)
+    if (!decl || !isProject(decl)) return true
+    if (N.isParameterDeclaration(decl) || N.isBindingElement(decl)) return false
+    if (N.isVariableDeclaration(decl)) return !decl.getFirstAncestor((a) => isFunctionLike(a))
+    return true
   }
 
   /**
@@ -3032,9 +3117,64 @@ export class RequestScanner {
         node = initializer
         continue
       }
+      // `function useList({ queryKey, queryFn })`, `const { queryKey } = options`.
+      if (decl && N.isBindingElement(decl)) {
+        const value = this.#bindingValue(decl, scope)
+        if (!value) break
+        if (!value.node) return value
+        node = value.node
+        scope = value.env
+        continue
+      }
       break
     }
     return { node, env: scope }
+  }
+
+  /**
+   * The value a destructured name takes: the property (or element) of what the pattern
+   * destructures, a parameter's argument or a `const`'s initializer, or the default written in
+   * the pattern when the property is absent.
+   */
+  #bindingValue(element: BindingElement, env: Env, depth = 0): Resolved | undefined {
+    if (depth > MAX_DEPTH || element.getDotDotDotToken()) return undefined
+    const pattern = element.getParent()
+    const holder = pattern.getParent()
+    let source: Resolved | undefined
+    if (N.isParameterDeclaration(holder)) {
+      const binding = env.get(holder)
+      if (!binding) return undefined
+      const init = holder.getInitializer()
+      source = binding.expr
+        ? { node: binding.expr, env: binding.env }
+        : init
+          ? { node: init, env }
+          : undefined
+    } else if (N.isVariableDeclaration(holder)) {
+      const init = holder.getInitializer()
+      if (!init || !isConst(holder)) return undefined
+      source = { node: init, env }
+    } else if (N.isBindingElement(holder)) {
+      source = this.#bindingValue(holder, env, depth + 1)
+    }
+    const fallback = element.getInitializer()
+    const orDefault = (): Resolved | undefined => (fallback ? { node: fallback, env } : undefined)
+    if (!source?.node) return source && !fallback ? { node: undefined, env } : orDefault()
+    if (N.isObjectBindingPattern(pattern)) {
+      const nameNode = element.getPropertyNameNode() ?? element.getNameNode()
+      const prop = this.#prop(source.node, source.env, propertyName(nameNode))
+      if (prop === 'unknown') return undefined
+      if (prop === 'absent' || !prop.node) return orDefault() ?? { node: undefined, env }
+      return prop
+    }
+    const list = this.#evaluate(source.node, source.env)
+    const array = list.node ? skipWrappers(list.node) : undefined
+    if (!array || !N.isArrayLiteralExpression(array)) return undefined
+    const elements = array.getElements()
+    const index = pattern.getElements().indexOf(element)
+    if (elements.slice(0, index + 1).some((e) => N.isSpreadElement(e))) return undefined
+    const item = elements[index]
+    return item ? { node: item, env: list.env } : (orDefault() ?? { node: undefined, env })
   }
 
   /** A property of an object value, through spreads (`{ ...init, method }`) and parameters. */
@@ -3057,6 +3197,12 @@ export class RequestScanner {
       const a = this.#str(yes.node, yes.env)
       const b = this.#str(no.node, no.env)
       return a && b && strText(a) === strText(b) ? yes : 'unknown'
+    }
+    // `QueryKeys.feed` on an enum: the member, read by `#keyPart` and `#str`.
+    const enumDecl = enumOf(value)
+    if (enumDecl) {
+      const member = enumDecl.getMember(name)
+      return member ? { node: member, env: EMPTY_ENV } : 'absent'
     }
     if (!N.isObjectLiteralExpression(r.node)) return 'unknown'
     const properties = r.node.getProperties()
@@ -3108,6 +3254,10 @@ export class RequestScanner {
       return { parts: [{ text: node.getLiteralValue() }] }
     }
     if (N.isNumericLiteral(node)) return { parts: [{ text: String(node.getLiteralValue()) }] }
+    if (N.isEnumMember(node)) {
+      const value = enumValue(node)
+      return value === undefined ? undefined : { parts: [{ text: String(value) }] }
+    }
     if (N.isTemplateExpression(node)) {
       let out: Str = { parts: [{ text: node.getHead().getLiteralText() }] }
       for (const span of node.getTemplateSpans()) {
@@ -3823,8 +3973,9 @@ function bind(fn: Node, args: Node[], env: Env): Env {
 
 function bindParams(fn: FunctionLike, values: Binding[]): Env {
   const out = new Map<Node, Binding>()
+  // Destructured parameters are bound too: `#bindingValue` reads their names from the argument.
   fn.getParameters().forEach((param, i) => {
-    if (param.isRestParameter() || !N.isIdentifier(param.getNameNode())) return
+    if (param.isRestParameter()) return
     out.set(param, values[i] ?? { expr: undefined, env: EMPTY_ENV })
   })
   return out
@@ -3842,6 +3993,23 @@ function declarationOf(identifier: Node): Node | undefined {
   }
   const resolved = unalias(symbol)
   return resolved.getValueDeclaration() ?? resolved.getDeclarations()[0]
+}
+
+/** The enum an identifier names (`QueryKeys` in `QueryKeys.feed`), also through imports and re-exports. */
+function enumOf(node: Node): EnumDeclaration | undefined {
+  if (!N.isIdentifier(node)) return undefined
+  const decl = declarationOf(node)
+  return decl && N.isEnumDeclaration(decl) ? decl : undefined
+}
+
+/** An enum member's constant value: `feed = 'feed'`, or the number of an auto-numbered member. */
+function enumValue(member: EnumMember): string | number | undefined {
+  try {
+    const value = member.getValue()
+    return typeof value === 'string' || typeof value === 'number' ? value : undefined
+  } catch {
+    return undefined
+  }
 }
 
 function isConst(decl: Node): boolean {

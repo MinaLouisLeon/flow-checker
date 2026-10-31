@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -18,6 +18,18 @@
       "page": "src/app/page.tsx"
     },
     "children": [
+      {
+        "segment": {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        },
+        "dir": "src/app/settings",
+        "files": {
+          "page": "src/app/settings/page.tsx"
+        },
+        "children": []
+      },
       {
         "segment": {
           "raw": "todos",
@@ -70,6 +82,27 @@
         }
       ],
       "componentId": "cmp_1bn0u7kkfdm"
+    },
+    {
+      "id": "rt_14nb5m1ywic",
+      "path": "/settings",
+      "kind": "page",
+      "file": "src/app/settings/page.tsx",
+      "segments": [
+        {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_12h7lqgksec"
     },
     {
       "id": "rt_0rsc27vk284",
@@ -241,6 +274,43 @@
       }
     },
     {
+      "id": "cmp_12h7lqgksec",
+      "name": "SettingsPage",
+      "file": "src/app/settings/page.tsx",
+      "loc": {
+        "file": "src/app/settings/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "SettingsBadge",
+          "resolution": "project",
+          "componentId": "cmp_1ln0r85hq1r",
+          "module": "@/components/SettingsBadge",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        },
+        {
+          "name": "SettingsPanel",
+          "resolution": "project",
+          "componentId": "cmp_0xxl3asjm3d",
+          "module": "@/components/SettingsPanel",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
       "id": "cmp_1an2304y5ca",
       "name": "TodoPage",
       "file": "src/app/todos/[id]/page.tsx",
@@ -346,6 +416,34 @@
       "usedTypes": []
     },
     {
+      "id": "cmp_1ln0r85hq1r",
+      "name": "SettingsBadge",
+      "file": "src/components/SettingsBadge.tsx",
+      "loc": {
+        "file": "src/components/SettingsBadge.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0xxl3asjm3d",
+      "name": "SettingsPanel",
+      "file": "src/components/SettingsPanel.tsx",
+      "loc": {
+        "file": "src/components/SettingsPanel.tsx",
+        "line": 13,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
       "id": "cmp_1gqfw2iamk9",
       "name": "TodoDetail",
       "file": "src/components/TodoDetail.tsx",
@@ -442,6 +540,60 @@
             "type": {
               "kind": "primitive",
               "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0ccr3ev5sff",
+      "name": "Settings",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/settings.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "theme",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "light"
+                },
+                {
+                  "kind": "literal",
+                  "value": "dark"
+                }
+              ]
+            }
+          },
+          {
+            "name": "locale",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "digest",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                },
+                {
+                  "kind": "primitive",
+                  "name": "null"
+                }
+              ]
             }
           }
         ]
@@ -724,6 +876,269 @@
       "status": "inferred",
       "flags": [],
       "hash": "0in91s1jq0r"
+    },
+    {
+      "id": "req_092dy6av59n",
+      "origin": "component",
+      "componentId": "cmp_1ln0r85hq1r",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[QueryKey.Settings]"
+      },
+      "queryKey": [
+        {
+          "kind": "static",
+          "value": "settings"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0ccr3ev5sff",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsBadge.tsx",
+          "line": 9,
+          "column": 20,
+          "callee": "useApiQuery"
+        },
+        {
+          "file": "src/hooks/useApiQuery.ts",
+          "line": 6,
+          "column": 10,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/settings.ts",
+          "line": 4,
+          "column": 36,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0t75rfubtpd"
+    },
+    {
+      "id": "req_1psqg80jksx",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[QueryKey.Settings]"
+      },
+      "queryKey": [
+        {
+          "kind": "static",
+          "value": "settings"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0ccr3ev5sff",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 15,
+          "column": 30,
+          "callee": "useApiQuery"
+        },
+        {
+          "file": "src/hooks/useApiQuery.ts",
+          "line": 6,
+          "column": 10,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/settings.ts",
+          "line": 4,
+          "column": 36,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1z7wuv1xlqn"
+    },
+    {
+      "id": "req_01zlsrjrncf",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[SCOPES.users, STATS]"
+      },
+      "queryKey": [
+        {
+          "kind": "static",
+          "value": "users"
+        },
+        {
+          "kind": "static",
+          "value": "stats"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_25sov0zzv45",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 16,
+          "column": 32,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/users.ts",
+          "line": 12,
+          "column": 33,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0nqhf9okwec"
+    },
+    {
+      "id": "req_1dhqpyygtma",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[version, 'todos']"
+      },
+      "queryKey": [
+        {
+          "kind": "param",
+          "name": "version",
+          "unknown": true
+        },
+        {
+          "kind": "static",
+          "value": "todos"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 17,
+          "column": 32,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 25,
+          "column": 33,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/todos.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "057i6q53s1o"
     },
     {
       "id": "req_27sy7hb0xsq",
@@ -1572,6 +1987,84 @@
       ]
     },
     {
+      "id": "qlk_1rvooe7b5wm",
+      "kind": "invalidate",
+      "method": "invalidateQueries",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "key": [
+        {
+          "kind": "static",
+          "value": "settings"
+        }
+      ],
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 24,
+          "column": 29
+        }
+      },
+      "loc": {
+        "file": "src/components/SettingsPanel.tsx",
+        "line": 24,
+        "column": 44
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 24,
+          "column": 44,
+          "callee": "queryClient.invalidateQueries"
+        }
+      ],
+      "fromSiteIds": [],
+      "targetSiteIds": [
+        "req_092dy6av59n",
+        "req_1psqg80jksx"
+      ]
+    },
+    {
+      "id": "qlk_07u5gkdzn4n",
+      "kind": "invalidate",
+      "method": "invalidateQueries",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "key": [
+        {
+          "kind": "param",
+          "name": "version",
+          "unknown": true
+        }
+      ],
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 27,
+          "column": 29
+        }
+      },
+      "loc": {
+        "file": "src/components/SettingsPanel.tsx",
+        "line": 27,
+        "column": 44
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 27,
+          "column": 44,
+          "callee": "queryClient.invalidateQueries"
+        }
+      ],
+      "fromSiteIds": [],
+      "targetSiteIds": []
+    },
+    {
       "id": "qlk_1azky8vbgl3",
       "kind": "set-data",
       "method": "setQueryData",
@@ -1720,6 +2213,7 @@
       ],
       "fromSiteIds": [],
       "targetSiteIds": [
+        "req_01zlsrjrncf",
         "req_0ka937821vy",
         "req_1g8keamimjw"
       ]
@@ -1760,6 +2254,7 @@
       ],
       "fromSiteIds": [],
       "targetSiteIds": [
+        "req_01zlsrjrncf",
         "req_0m4arr015hb",
         "req_0ka937821vy",
         "req_1g8keamimjw"
@@ -1795,6 +2290,10 @@
       ],
       "fromSiteIds": [],
       "targetSiteIds": [
+        "req_092dy6av59n",
+        "req_1psqg80jksx",
+        "req_01zlsrjrncf",
+        "req_1dhqpyygtma",
         "req_1di2bq7b96m",
         "req_0m4arr015hb",
         "req_0ht2fssv0ja",

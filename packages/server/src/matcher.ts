@@ -20,6 +20,7 @@ import {
   type RequestSite,
   routePathRegex,
   servedPaths,
+  urlText,
 } from '@flow-checker/shared'
 import { type ServerActionInfo, sameSourceFile } from './actions'
 import { type SourceFrame, shortName } from './stack'
@@ -124,6 +125,7 @@ export interface MatchContext {
 export class Matcher {
   private readonly sites: SiteInfo[]
   private readonly siteIds: Set<string>
+  private readonly byId: Map<string, RequestSite>
   private readonly middleware: Middleware | undefined
   private readonly trpcEndpoints: string[]
   /** GraphQL operation id -> its persisted query ids (M17). */
@@ -133,6 +135,7 @@ export class Matcher {
   constructor(model: AppModel) {
     this.sites = indexSites(model)
     this.siteIds = new Set(model.requests.map((s) => s.id))
+    this.byId = new Map(model.requests.map((s) => [s.id, s]))
     this.middleware = model.middleware
     this.trpcEndpoints = model.trpc ? [model.trpc.endpoint] : []
     this.graphqlHashes = new Map((model.graphql?.operations ?? []).map((o) => [o.id, o.hashes]))
@@ -207,10 +210,26 @@ export class Matcher {
         ...(thirdParty ? { thirdParty } : {}),
       }
     }
+    // Components that mount the same query share one cache entry and so one request (M24): it
+    // verifies all of them, also when something points at one (a refetch from its button).
+    const bestSite = this.byId.get(best.siteId)
+    const same = bestSite?.queryKey
+      ? candidates.filter((c) => c !== best && sameQuery(bestSite, this.byId.get(c.siteId)))
+      : []
     if (second && best.score - second.score < MATCH_MARGIN) {
-      return { status: 'ambiguous', by: 'auto', score: best.score, candidates: top }
+      const tied = candidates.filter((c) => c !== best && best.score - c.score < MATCH_MARGIN)
+      if (!tied.every((c) => same.includes(c))) {
+        return { status: 'ambiguous', by: 'auto', score: best.score, candidates: top }
+      }
     }
-    return { status: 'matched', by: 'auto', siteId: best.siteId, score: best.score, candidates: top }
+    return {
+      status: 'matched',
+      by: 'auto',
+      siteId: best.siteId,
+      ...(same.length > 0 ? { sharedWith: same.map((c) => c.siteId) } : {}),
+      score: best.score,
+      candidates: top,
+    }
   }
 }
 
@@ -519,6 +538,33 @@ export function isThirdParty(capture: Capture, context: MatchContext): boolean {
 function hashIsKnown(hashes: Map<string, string[]>, hash: string): boolean {
   for (const list of hashes.values()) if (list.includes(hash)) return true
   return false
+}
+
+/**
+ * Whether two sites are the same React Query query mounted in different places: the same key,
+ * method and URL, and the same query function (the call path below the hook is the same code).
+ * React Query sends one request for them, so a capture can't (and needn't) pick one.
+ */
+export function sameQuery(a: RequestSite, b: RequestSite | undefined): boolean {
+  if (!b || !a.queryKey || !b.queryKey || !a.hook || !b.hook) return false
+  // Mounted queries only: `queryClient.prefetchQuery()` and the like run once, when called.
+  const mounts = (name: string) => name.startsWith('use') && name !== 'useMutation'
+  if (!mounts(a.hook.name) || !mounts(b.hook.name)) return false
+  if (formatQueryKey(a.queryKey) !== formatQueryKey(b.queryKey)) return false
+  if (a.method !== b.method || (a.url ? urlText(a.url) : '') !== (b.url ? urlText(b.url) : '')) return false
+  const below = (site: RequestSite) => {
+    const name = site.hook?.name ?? ''
+    let at = -1
+    site.callStack.forEach((f, i) => {
+      if (f.callee === name || f.callee.endsWith(`.${name}`)) at = i
+    })
+    return site.callStack
+      .slice(at + 1)
+      .map((f) => `${f.file}:${f.line}:${f.column}`)
+      .join('>')
+  }
+  const path = below(a)
+  return path !== '' && path === below(b)
 }
 
 /** Matched beats ambiguous beats unmatched; then the higher score. */

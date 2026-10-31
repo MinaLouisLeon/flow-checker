@@ -32,7 +32,7 @@ Takes no props.
 
 **Response** `User[]` (see [`User`](../types.md#typ_25sov0zzv45))
 
-**Captured** `GET http://localhost:4010/users` → 200 OK · 33 ms · 2026-10-30 01:38 UTC
+**Captured** `GET http://localhost:4010/users` → 200 OK · 30 ms · 2026-10-31 22:51 UTC
 
 Response body:
 

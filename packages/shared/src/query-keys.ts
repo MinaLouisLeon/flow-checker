@@ -16,7 +16,9 @@ function formatPart(part: QueryKeyPart): string {
     case 'static':
       return typeof part.value === 'string' ? `'${part.value}'` : String(part.value)
     case 'param':
-      // A template with holes (`page-${n}`) keeps its text: `page-:n`.
+      // A template with holes (`page-${n}`) keeps its text: `page-:n`. A value the scanner
+      // couldn't read is marked `?`: `?libKey`.
+      if (part.unknown) return `?${part.name}`
       return /^[\w$]+$/.test(part.name) ? `:${part.name}` : `\`${part.name}\``
     case 'rest':
       return `...${part.text}`
@@ -29,23 +31,42 @@ function formatPart(part: QueryKeyPart): string {
 
 /**
  * Whether a cache call's key (`filter`) hits a query key, both as parsed from code. Like React
- * Query, the filter is a prefix unless `exact`. A `param` on either side may be any value, so it
- * matches; objects match when every entry of the filter's object matches. An unresolved spread
- * in the filter hits everything from there on; one in the query key is never hit.
+ * Query, the filter is a prefix unless `exact`. A runtime `param` on either side may be any
+ * value, so it matches; objects match when every entry of the filter's object matches.
+ *
+ * Segments the scanner could not read are never wildcards (M24). In the filter, an unresolved
+ * spread or an `unknown` segment ends the part that counts: the known prefix before it is
+ * matched, and a filter with no known first segment hits nothing. In the query key they are
+ * never hit. A first segment that is only known at runtime says nothing about which queries a
+ * key means, so it doesn't link either.
  */
 export function queryKeyHits(filter: readonly QueryKeyPart[], key: readonly QueryKeyPart[], exact = false) {
   for (let i = 0; i < filter.length; i++) {
     const f = filter[i] as QueryKeyPart
-    if (f.kind === 'rest') return true
+    if (f.kind === 'rest' || isUnknownPart(f)) return i > 0
     const k = key[i]
-    // A query key part the scanner could not resolve: it may or may not be hit, so it isn't.
-    if (!k || k.kind === 'rest') return false
+    if (!k || k.kind === 'rest' || isUnknownPart(k)) return false
+    if (i === 0 && (f.kind === 'param' || k.kind === 'param')) return false
     if (!partsMatch(f, k)) return false
   }
   return !exact || filter.length === key.length
 }
 
+/**
+ * A cache call's key that can't link to anything: its first segment is a spread, a value the
+ * scanner couldn't read, or one only known at runtime. Shown as "key not known".
+ */
+export function isUnknownKey(key: readonly QueryKeyPart[] | undefined): boolean {
+  const first = key?.[0]
+  return !!first && (first.kind === 'rest' || first.kind === 'param')
+}
+
+function isUnknownPart(part: QueryKeyPart): boolean {
+  return part.kind === 'param' && part.unknown === true
+}
+
 function partsMatch(f: QueryKeyPart, k: QueryKeyPart): boolean {
+  if (isUnknownPart(k)) return false
   if (f.kind === 'param' || k.kind === 'param' || f.kind === 'rest' || k.kind === 'rest') return true
   if (f.kind === 'static' && k.kind === 'static') return f.value === k.value
   if (f.kind === 'object' && k.kind === 'object') {

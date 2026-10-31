@@ -3,6 +3,7 @@
 import {
   formatQueryKey,
   hasCaptures,
+  isUnknownKey,
   type QueryLink,
   queryLinkTarget,
   type RequestSite,
@@ -436,7 +437,10 @@ export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[
   )
 }
 
-/** The queries a cache call hits: a few, then "+N more". A call with no key hits every query. */
+/**
+ * The queries a cache call hits: a few, then "+N more". A call with no key hits every query; one
+ * whose key starts with a value the scanner can't read hits none it can name (M24).
+ */
 function QueryTargets({ link }: { link: QueryLink }) {
   const { index } = useData()
   const targets = link.targetSiteIds.map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
@@ -447,7 +451,9 @@ function QueryTargets({ link }: { link: QueryLink }) {
       {hitsEveryQuery(link)
         ? 'every query'
         : targets.length === 0
-          ? 'no scanned query'
+          ? isUnknownKey(link.key)
+            ? 'key not known'
+            : 'no scanned query'
           : shown.map((t, i) => (
               <span key={t.id}>
                 {i > 0 && ', '}

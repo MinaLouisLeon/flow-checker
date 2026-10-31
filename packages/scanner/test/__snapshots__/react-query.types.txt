@@ -2,6 +2,8 @@
 
 TodoDetailProps  interface  src/components/TodoDetail.tsx:8
   { id: number }
+Settings  interface  src/types/settings.ts:1
+  { theme: "light" | "dark"; locale: string; digest: string | null }
 Todo  interface  src/types/todo.ts:1
   { id: number; userId: number; title: string; done: boolean }
 NewTodo  type-alias  src/types/todo.ts:8

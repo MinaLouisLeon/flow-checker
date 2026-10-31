@@ -49,7 +49,7 @@
 { id: number; userId: number; title: string; done: boolean }
 ```
 
-**Captured** `GET http://localhost:4010/todos/3` → 200 OK · 13 ms · 2026-10-30 01:38 UTC · page `/todos/3`
+**Captured** `GET http://localhost:4010/todos/3` → 200 OK · 11 ms · 2026-10-31 22:51 UTC · page `/todos/3`
 
 Response body:
 

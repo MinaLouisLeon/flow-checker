@@ -31,6 +31,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M21 | Components/Requests   | List logic is pure in `dashboard/src/lists.ts`; `siteHref()` opens the request page, `ownerHref()` the component.        |
 | M22 | Server hook placement | `cli/server-hook.ts` is shared by doctor, init and dev; the rule is shape-only (any wrapper around the blocks fails).    |
 | M23 | Dashboard fixes       | Lists that grow with the app use `CappedList` / `useCapped` (5, then "+N more"); request bodies render once opened.      |
+| M24 | React Query keys      | Model version 10. Unreadable key segments are `param` + `unknown`; shared queries are `matched` with `sharedWith`.       |
 
 ## Gotchas
 
@@ -240,3 +241,20 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   the Playwright spec (`e2e/dashboard-limits.spec.ts`, which rewrites an export's `data.js`) can use it.
 - Playwright scrolls an element into view before clicking it; to test that a toggle keeps the scroll position, click
   it from script (`locator.evaluate((b) => b.click())`).
+
+## M24 — React Query keys (branch `feat/m24-react-query-keys`)
+
+- Enum members resolve in `#prop` (the member node), then `#keyPart` / `#str` read `EnumMember.getValue()`. `as const`
+  objects already worked through `skipWrappers`.
+- "Unknown" vs runtime key segments is decided by where the value's root is declared: inside a function = runtime
+  (`:id`), outside (package import, module value, module-level call) = unknown (`?name`). A runtime param as a cache
+  call's first segment also links nothing.
+- Destructured parameters are bound (`bindParams` keeps patterns; `#resolve` follows a `BindingElement` through
+  `#bindingValue`). Anything reading `env` by `ParameterDeclaration` still works: identifiers in a pattern resolve to
+  their `BindingElement`, never to the parameter.
+- A project call's arguments are walked in place after `#enter` (`#call` returns false): an inline `queryFn` passed to
+  a project hook was walked twice. `Walk.hookFns` skips functions already walked as a query/mutation function.
+- Use `matchedSiteIds(match)` (shared) wherever captures are counted or listed per site: a shared match verifies
+  several sites. `sameQuery()` only covers `use*` hooks; imperative `queryClient` calls stay separate.
+- Changing a fixture file can change a site `hash` (the formatter turned `<T,>` into `<T>` in a `.ts` file): update
+  the model snapshot after `biome check --write`.

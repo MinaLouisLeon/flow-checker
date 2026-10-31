@@ -1,6 +1,6 @@
 // Plain-text rendering of request sites: used by `flow-checker scan --requests` and snapshot tests.
 import type { AppModel, QueryLink, RequestSite, RequestUrl, Trigger } from './model'
-import { formatQueryKey, queryLinkTarget } from './query-keys'
+import { formatQueryKey, isUnknownKey, queryLinkTarget } from './query-keys'
 
 export function formatRequests(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -140,7 +140,8 @@ export function formatRequests(model: AppModel): string {
         const owner = target?.componentId ? components.get(target.componentId)?.name : undefined
         out.push(`  hits: ${target ? requestText(target) : id}${owner ? `  (${owner})` : ''}`)
       }
-      if (link.targetSiteIds.length === 0) out.push('  hits: (no scanned query)')
+      if (link.targetSiteIds.length === 0)
+        out.push(isUnknownKey(link.key) ? '  hits: (key not known)' : '  hits: (no scanned query)')
     }
   }
   return `${out.join('\n')}\n`
