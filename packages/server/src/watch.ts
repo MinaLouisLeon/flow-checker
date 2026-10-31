@@ -2,7 +2,8 @@
 // Bursts of events (a save that writes several files, a branch switch) arrive as one batch.
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
-import { relative } from 'node:path'
+import { stat } from 'node:fs/promises'
+import { join, relative } from 'node:path'
 import { watch } from 'chokidar'
 
 /** Absolute paths, grouped like the scanner's `FileChanges`. */
@@ -62,6 +63,7 @@ export function isWatched(root: string, path: string, isFile: boolean | undefine
 export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
   const { root } = options
   const debounceMs = options.debounceMs ?? 40
+  const startedAt = Date.now()
   const pending = new Map<string, 'add' | 'change' | 'unlink'>()
   let lastEvent = new Date()
   // Content hash of each file as last reported. Some file systems (macOS FSEvents) send a second
@@ -110,7 +112,8 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
   watcher.on('error', () => {})
 
   return new Promise((resolve) => {
-    watcher.once('ready', () =>
+    watcher.once('ready', async () => {
+      if (process.platform === 'darwin') await seedRecentFiles(watcher.getWatched(), startedAt, reported)
       resolve({
         close: async () => {
           if (timer) clearTimeout(timer)
@@ -118,9 +121,38 @@ export function watchProject(options: WatchOptions): Promise<ProjectWatcher> {
           reported.clear()
           await watcher.close()
         },
-      }),
-    )
+      })
+    })
   })
+}
+
+/** Files written this long before watching starts may still get a late event (macOS FSEvents). */
+const RECENT_MS = 10_000
+
+/**
+ * macOS FSEvents can deliver `change` events after `ready` for writes made just before watching
+ * started. Recording the hash of files written shortly before the start lets `flush` drop those,
+ * since their content didn't change. Files written after the start are left out so an edit made
+ * during the initial walk is still reported; older files are skipped to keep start-up cheap.
+ */
+async function seedRecentFiles(
+  watched: Record<string, string[]>,
+  startedAt: number,
+  reported: Map<string, string>,
+): Promise<void> {
+  const paths = Object.entries(watched).flatMap(([dir, names]) => names.map((name) => join(dir, name)))
+  await Promise.all(
+    paths.map(async (path) => {
+      try {
+        const info = await stat(path)
+        if (!info.isFile() || info.mtimeMs < startedAt - RECENT_MS || info.mtimeMs >= startedAt) return
+        const hash = contentHash(path)
+        if (hash !== undefined && !reported.has(path)) reported.set(path, hash)
+      } catch {
+        // Gone or unreadable: nothing to seed.
+      }
+    }),
+  )
 }
 
 /** SHA-1 of a file's content, or undefined when it can't be read (a directory, a race). */

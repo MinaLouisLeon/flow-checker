@@ -61,7 +61,8 @@ describe('watchProject', { timeout: 20_000 }, () => {
     }
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
     try {
-      // macOS FSEvents can drop or merge writes made right after the watcher reports ready.
+      // Give macOS FSEvents time to deliver late events for the setup writes above; the watcher must
+      // not report those as edits.
       await sleep(200)
       writeFileSync(join(root, 'app', 'page.tsx'), 'export default function Page() { return <main /> }\n')
       writeFileSync(join(root, 'app', 'new.ts'), 'export const fresh = 1\n')
