@@ -59,6 +59,13 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await expect(page.locator('main')).toContainText('LoginForm submit')
   await expect(page.getByRole('button', { name: 'Rename' })).toHaveCount(0)
 
+  // The component and request lists (M21) read the embedded data too.
+  await page.locator('.nav a', { hasText: 'Requests' }).click()
+  await page.locator('.request-list a.row-link', { hasText: '/auth/login' }).click()
+  await expect(page.locator('.split-side')).toContainText('LoginForm')
+  await page.locator('.nav a', { hasText: 'Components' }).click()
+  await expect(page.locator('.component-list')).toContainText('VerifyOtpForm')
+
   expect(errors).toEqual([])
 })
 

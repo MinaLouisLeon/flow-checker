@@ -1,11 +1,42 @@
 // Hash routing: works from the tool server and from a static export folder alike.
+import type { Component, RequestSite } from '@flow-checker/shared'
 import { useEffect, useState } from 'react'
+import {
+  COMPONENT_HAS,
+  COMPONENT_KINDS,
+  COMPONENT_SORTS,
+  type ComponentHas,
+  type ComponentSort,
+  REQUEST_STATUSES,
+  REQUEST_WHEN,
+  type RequestWhen,
+  TRANSPORTS,
+} from './lists'
 
 export type Screen =
   | { name: 'overview' }
   | { name: 'map'; view: 'graph' | 'tree'; q: string }
   | { name: 'page'; routeId: string; componentId?: string }
   | { name: 'component'; componentId: string }
+  /** Component list (M21); `componentId` is the one shown beside it. */
+  | {
+      name: 'components'
+      componentId?: string
+      q: string
+      kind?: Component['kind']
+      has?: ComponentHas
+      sort?: ComponentSort
+    }
+  /** Request site list (M21); `siteId` is the one shown beside it. */
+  | {
+      name: 'requests'
+      siteId?: string
+      q: string
+      status?: RequestSite['status']
+      when?: RequestWhen
+      transport?: RequestSite['transport']
+      flagged?: boolean
+    }
   | { name: 'types'; typeId?: string; q: string }
   | { name: 'live'; captureId?: string; q: string; filter?: MatchFilter }
   /** `flowId` is an inferred flow id, or a recorded flow id (`rec_...`, `var_...`). */
@@ -35,6 +66,25 @@ export function parseHash(hash: string): Screen {
     case 'component':
       if (!parts[1]) break
       return { name: 'component', componentId: parts[1] }
+    case 'components':
+      return {
+        name: 'components',
+        componentId: parts[1],
+        q: params.get('q') ?? '',
+        kind: oneOf(COMPONENT_KINDS, params.get('kind')),
+        has: oneOf(COMPONENT_HAS, params.get('has')),
+        sort: oneOf(COMPONENT_SORTS, params.get('sort')),
+      }
+    case 'requests':
+      return {
+        name: 'requests',
+        siteId: parts[1],
+        q: params.get('q') ?? '',
+        status: oneOf(REQUEST_STATUSES, params.get('status')),
+        when: oneOf(REQUEST_WHEN, params.get('when')),
+        transport: oneOf(TRANSPORTS, params.get('transport')),
+        flagged: params.get('flags') === '1' || undefined,
+      }
     case 'types':
       return { name: 'types', typeId: parts[1], q: params.get('q') ?? '' }
     case 'flows':
@@ -50,6 +100,11 @@ export function parseHash(hash: string): Screen {
       }
   }
   return { name: 'not-found' }
+}
+
+/** The value when it is one of the allowed ones, else undefined (hand-edited or old URLs). */
+function oneOf<T extends string>(allowed: readonly T[], value: string | null): T | undefined {
+  return allowed.find((a) => a === value)
 }
 
 /** Builds a `#/...` link for a screen. */
@@ -69,6 +124,24 @@ export function href(screen: Screen): string {
       return withQuery(`/page/${encodeURIComponent(screen.routeId)}`, { c: screen.componentId })
     case 'component':
       return `#/component/${encodeURIComponent(screen.componentId)}`
+    case 'components':
+      return withQuery(
+        screen.componentId ? `/components/${encodeURIComponent(screen.componentId)}` : '/components',
+        {
+          q: screen.q,
+          kind: screen.kind,
+          has: screen.has,
+          sort: screen.sort === 'name' ? undefined : screen.sort,
+        },
+      )
+    case 'requests':
+      return withQuery(screen.siteId ? `/requests/${encodeURIComponent(screen.siteId)}` : '/requests', {
+        q: screen.q,
+        status: screen.status,
+        when: screen.when,
+        transport: screen.transport,
+        flags: screen.flagged ? '1' : undefined,
+      })
     case 'types':
       return withQuery(screen.typeId ? `/types/${encodeURIComponent(screen.typeId)}` : '/types', {
         q: screen.q,

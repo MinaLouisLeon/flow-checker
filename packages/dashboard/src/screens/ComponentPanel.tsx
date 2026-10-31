@@ -4,7 +4,16 @@ import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
 import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 
-export function ComponentPanel({ componentId, routeId }: { componentId: string; routeId?: string }) {
+export function ComponentPanel({
+  componentId,
+  routeId,
+  componentHref,
+}: {
+  componentId: string
+  routeId?: string
+  /** Where links to other components go. Default: the page view, or the component's own screen. */
+  componentHref?: (id: string) => string
+}) {
   const { index } = useData()
   const component = index.components.get(componentId)
   if (!component) {
@@ -18,8 +27,12 @@ export function ComponentPanel({ componentId, routeId }: { componentId: string; 
   const parents = index.renderedBy.get(component.id) ?? []
   const routeIds = index.routesOf.get(component.id) ?? []
   const notes = index.notes.filter((n) => n.componentId === component.id)
-  const link = (id: string) =>
-    routeId ? href({ name: 'page', routeId, componentId: id }) : href({ name: 'component', componentId: id })
+  const link =
+    componentHref ??
+    ((id: string) =>
+      routeId
+        ? href({ name: 'page', routeId, componentId: id })
+        : href({ name: 'component', componentId: id }))
 
   return (
     <div className="panel">

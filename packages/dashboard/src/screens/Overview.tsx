@@ -2,6 +2,7 @@ import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import { GraphqlSection } from '../GraphqlView'
+import { COMPONENT_KINDS, countWhen, REQUEST_WHEN, type RequestWhen } from '../lists'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
@@ -30,12 +31,7 @@ export function Overview() {
   const pages = model.routes.filter((r) => r.kind === 'page')
   const handlers = model.routes.filter((r) => r.kind === 'route-handler')
   const byKind = (kind: string) => model.components.filter((c) => c.kind === kind).length
-  const clientRequests = model.requests.filter((s) => s.origin === 'component')
-  const onLoad = clientRequests.filter((s) =>
-    ['server-render', 'page-load', 'effect'].includes(s.trigger.kind),
-  ).length
-  const onEvent = clientRequests.filter((s) => s.trigger.kind === 'event').length
-  const serverHops = model.requests.length - clientRequests.length
+  const when = countWhen(model.requests)
   const verified = model.requests.filter(isVerified).length
   const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
   // Postman flags get their own section below, not the generic "could not resolve" group.
@@ -54,13 +50,21 @@ export function Overview() {
         <Stat
           label="Components"
           value={model.components.length}
-          detail={`${byKind('server')} server · ${byKind('client')} client · ${byKind('shared')} shared`}
+          link={href({ name: 'components', q: '' })}
+          details={COMPONENT_KINDS.map((kind) => ({
+            text: `${byKind(kind)} ${kind}`,
+            link: href({ name: 'components', q: '', kind }),
+          }))}
         />
         <Stat label="Types" value={model.types.length} link={href({ name: 'types', q: '' })} />
         <Stat
           label="Requests"
           value={model.requests.length}
-          detail={`${onLoad} on load · ${onEvent} on events · ${serverHops} server-side`}
+          link={href({ name: 'requests', q: '' })}
+          details={REQUEST_WHEN.filter((w) => w !== 'unknown' || when.unknown > 0).map((w) => ({
+            text: `${when[w]} ${WHEN_TEXT[w]}`,
+            link: href({ name: 'requests', q: '', when: w }),
+          }))}
         />
         <Stat
           label="Flows"
@@ -170,17 +174,46 @@ export function Overview() {
   )
 }
 
+const WHEN_TEXT: Record<RequestWhen, string> = {
+  load: 'on load',
+  event: 'on events',
+  server: 'server-side',
+  unknown: 'unknown trigger',
+}
+
 function Stat({
   label,
   value,
   detail,
+  details,
   link,
 }: {
   label: string
   value: number | string
   detail?: string
+  /** Parts of the detail line, each opening its own filtered list. */
+  details?: { text: string; link: string }[]
   link?: string
 }) {
+  if (details) {
+    // Links can't nest, so the number and label are one link and each detail part another.
+    return (
+      <div className="stat stat-split">
+        <a className="stat-main" href={link}>
+          <span className="stat-value">{value}</span>
+          <span className="stat-label">{label}</span>
+        </a>
+        <span className="stat-detail">
+          {details.map((d, i) => (
+            <span key={d.text}>
+              {i > 0 && ' · '}
+              <a href={d.link}>{d.text}</a>
+            </span>
+          ))}
+        </span>
+      </div>
+    )
+  }
   const content = (
     <>
       <span className="stat-value">{value}</span>
@@ -228,12 +261,14 @@ function NoteGroups({ notes }: { notes: ScanNote[] }) {
 }
 
 function NoteLink({ note }: { note: ScanNote }) {
-  const target = note.routeId
-    ? href({ name: 'page', routeId: note.routeId })
-    : note.componentId
-      ? href({ name: 'component', componentId: note.componentId })
-      : note.typeId
-        ? href({ name: 'types', typeId: note.typeId, q: '' })
-        : undefined
+  const target = note.requestId
+    ? href({ name: 'requests', siteId: note.requestId, q: '' })
+    : note.routeId
+      ? href({ name: 'page', routeId: note.routeId })
+      : note.componentId
+        ? href({ name: 'component', componentId: note.componentId })
+        : note.typeId
+          ? href({ name: 'types', typeId: note.typeId, q: '' })
+          : undefined
   return target ? <a href={target}>{note.message}</a> : <span>{note.message}</span>
 }

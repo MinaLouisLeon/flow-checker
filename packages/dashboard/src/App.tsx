@@ -5,12 +5,14 @@ import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { ComponentPanel } from './screens/ComponentPanel'
+import { ComponentsScreen } from './screens/ComponentsScreen'
 import { ExportScreen } from './screens/ExportScreen'
 import { FlowsScreen } from './screens/FlowsScreen'
 import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
+import { RequestsScreen } from './screens/RequestsScreen'
 import { TypesScreen } from './screens/TypesScreen'
 import { Empty } from './ui'
 
@@ -22,7 +24,9 @@ const NAV: {
   needsExport?: boolean
 }[] = [
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
-  { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page', 'component'] },
+  { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page'] },
+  { label: 'Components', screen: { name: 'components', q: '' }, match: ['components', 'component'] },
+  { label: 'Requests', screen: { name: 'requests', q: '' }, match: ['requests'] },
   { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
@@ -151,6 +155,10 @@ function ScreenView({ screen }: { screen: Screen }) {
           <ComponentPanel componentId={screen.componentId} />
         </div>
       )
+    case 'components':
+      return <ComponentsScreen {...screen} />
+    case 'requests':
+      return <RequestsScreen {...screen} />
     case 'types':
       return <TypesScreen typeId={screen.typeId} q={screen.q} />
     case 'flows':

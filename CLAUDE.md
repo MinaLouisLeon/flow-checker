@@ -18,6 +18,8 @@ M0 setup · M1 routes + components · M2 request sites · M3 types · M4 dashboa
 M6 matching + verification · M7 flows · M8 type comparison · M9 watch + incremental re-scan · M10 export ·
 M11 public release v0.1.0 · M12 CLI progress output · M13 React Query keys and cache links ·
 M14 middleware / proxy · M15 Postman collection import · M16 tRPC · M17 GraphQL · M18 SSE ·
-M19 WebSockets · M20 release v0.2.0 (branch `feat/release-v0.2.0`; published when `v0.2.0` is tagged).
+M19 WebSockets · M20 release v0.2.0 (published; 0.2.1 followed with scan-accuracy fixes) ·
+M21 Components and Requests screens (branch `feat/m21-components-requests-screens`).
 
-Next: tag `v0.2.0` to publish; no milestone after M20 is planned yet.
+Next: M22 server hook placement check, then M23–M26 for v0.2.2 (see `docs/PLAN.md`, "v0.2.2 milestones").
+Fixes must target code patterns, not the app they were found on.

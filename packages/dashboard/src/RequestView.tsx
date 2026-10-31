@@ -12,6 +12,7 @@ import {
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import { GraphqlFact } from './GraphqlView'
+import { groupSame, siteOwner } from './lists'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
@@ -55,19 +56,15 @@ export function siteLabel(site: RequestSite, index: ModelIndex): string {
   return `${siteOwner(site, index)} · ${site.method ?? '?'} ${target}`
 }
 
-/** The component, route handler or server action a site runs in. */
-export function siteOwner(site: RequestSite, index: ModelIndex): string {
-  if (site.componentId) return index.components.get(site.componentId)?.name ?? 'component'
-  if (site.origin === 'route-handler' && site.routeId) {
-    return `${site.handlerMethod ?? ''} ${index.routes.get(site.routeId)?.path ?? 'route handler'}`.trim()
-  }
-  if (site.origin === 'server-action') return `action ${site.serverAction?.name ?? '?'}`
-  if (site.origin === 'middleware') return `middleware ${index.model.middleware?.file ?? ''}`.trim()
-  return site.origin
+export { siteOwner }
+
+/** Screen that shows the site: the request on its own, in the request list (M21). */
+export function siteHref(site: RequestSite): string {
+  return href({ name: 'requests', siteId: site.id, q: '' })
 }
 
-/** Screen that shows the site: its component, or the route handler's page. */
-export function siteHref(site: RequestSite): string | undefined {
+/** Screen that shows where a site runs: its component, or the route handler's page. */
+export function ownerHref(site: RequestSite): string | undefined {
   if (site.componentId) return href({ name: 'component', componentId: site.componentId })
   if (site.routeId) return href({ name: 'page', routeId: site.routeId })
   return undefined
@@ -138,20 +135,6 @@ export function RequestList({
   )
 }
 
-/** Sites that send the same request (method, URL, trigger), in first-seen order. */
-function groupSame(sites: RequestSite[]): RequestSite[][] {
-  const groups = new Map<string, RequestSite[]>()
-  for (const site of sites) {
-    const target =
-      site.transport === 'server-action' ? site.serverAction?.name : site.url && urlText(site.url)
-    const key = `${site.method ?? '?'} ${target ?? '?'} ${site.transport} ${triggerLabel(site.trigger)}`
-    const group = groups.get(key)
-    if (group) group.push(site)
-    else groups.set(key, [site])
-  }
-  return [...groups.values()]
-}
-
 export function RequestSummary({ site }: { site: RequestSite }) {
   return (
     <span className="request-summary">
@@ -169,7 +152,35 @@ export function RequestSummary({ site }: { site: RequestSite }) {
   )
 }
 
-function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; owner?: boolean }) {
+/** How it is sent, what starts it, its flags and its verification status. */
+export function SiteBadges({ site }: { site: RequestSite }) {
+  return (
+    <>
+      <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
+        {site.transport === 'server-action'
+          ? 'server action'
+          : site.client
+            ? `${site.client.module} · ${site.client.name}`
+            : site.transport}
+        {site.hook ? ` · ${site.hook.name}` : ''}
+      </Badge>
+      <Badge
+        tone={site.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
+        title={TRIGGER_TITLE[site.trigger.kind]}
+      >
+        {triggerLabel(site.trigger)}
+      </Badge>
+      {site.flags.length > 0 && (
+        <Badge tone="warn" title={site.flags.map((f) => f.message).join('\n')}>
+          ⚠ {site.flags.length}
+        </Badge>
+      )}
+      <SiteStatusBadge site={site} />
+    </>
+  )
+}
+
+export function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; owner?: boolean }) {
   const { index } = useData()
   const target = site.targetRouteId ? index.routes.get(site.targetRouteId) : undefined
   const chain = (site.chain ?? []).map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
@@ -180,26 +191,7 @@ function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; 
         <RequestSummary site={site} />
         {owner && <span className="muted request-owner">from {siteOwner(site, index)}</span>}
         <span className="spacer" />
-        <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
-          {site.transport === 'server-action'
-            ? 'server action'
-            : site.client
-              ? `${site.client.module} · ${site.client.name}`
-              : site.transport}
-          {site.hook ? ` · ${site.hook.name}` : ''}
-        </Badge>
-        <Badge
-          tone={site.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
-          title={TRIGGER_TITLE[site.trigger.kind]}
-        >
-          {triggerLabel(site.trigger)}
-        </Badge>
-        {site.flags.length > 0 && (
-          <Badge tone="warn" title={site.flags.map((f) => f.message).join('\n')}>
-            ⚠ {site.flags.length}
-          </Badge>
-        )}
-        <SiteStatusBadge site={site} />
+        <SiteBadges site={site} />
       </summary>
 
       <div className="request-body">
