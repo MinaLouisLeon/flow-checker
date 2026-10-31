@@ -36,11 +36,14 @@ describe('seedRecentFiles', () => {
     const root = mkdtempSync(join(tmpdir(), 'flow-checker-seed-'))
     dirs.push(root)
     const startedAt = Math.floor(Date.now() / 1000) * 1000 - 5_000
-    const at = (ms: number) => new Date(ms)
+    // Times go in as seconds (a Date would drop the fraction). Setting them is only accurate to about
+    // a microsecond and truncates (libuv computes nanoseconds as `(time - sec) * 1e9`), so start + 1 ms
+    // can land at start + 0.999999 ms. Offsets stay clear of whole milliseconds.
+    const at = (ms: number) => ms / 1000
     for (const [name, mtime] of [
       ['same-ms.ts', startedAt + 0.4],
       ['before.ts', startedAt - 2_000],
-      ['after.ts', startedAt + 1],
+      ['after.ts', startedAt + 5],
       ['old.ts', startedAt - 60_000],
     ] as const) {
       writeFileSync(join(root, name), `export const x = '${name}'\n`)
