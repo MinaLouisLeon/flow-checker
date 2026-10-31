@@ -30,7 +30,9 @@ describe('isWatched', () => {
   })
 })
 
-describe('watchProject', () => {
+// The tests wait up to 10 s for file events (slow on busy CI runners, macOS especially), so they need
+// more than vitest's default 5 s timeout.
+describe('watchProject', { timeout: 20_000 }, () => {
   it('reports added, changed and removed source files', async () => {
     const root = mkdtempSync(join(tmpdir(), 'flow-checker-watcher-'))
     dirs.push(root)
@@ -59,6 +61,8 @@ describe('watchProject', () => {
     }
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
     try {
+      // macOS FSEvents can drop or merge writes made right after the watcher reports ready.
+      await sleep(200)
       writeFileSync(join(root, 'app', 'page.tsx'), 'export default function Page() { return <main /> }\n')
       writeFileSync(join(root, 'app', 'new.ts'), 'export const fresh = 1\n')
       unlinkSync(join(root, 'app', 'old.ts'))
@@ -66,7 +70,7 @@ describe('watchProject', () => {
       writeFileSync(join(root, 'notes.md'), '# not code\n')
       // Events can be slow on a busy machine: wait for the three expected ones, then a little
       // longer to catch anything that should have been ignored.
-      const deadline = Date.now() + 5000
+      const deadline = Date.now() + 10_000
       while (collect() < 3 && Date.now() < deadline) {
         await new Promise<void>((resolve) => {
           notify = resolve
@@ -96,10 +100,11 @@ describe('watchProject', () => {
     const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
     const reportedPaths = () => batches.flatMap((b) => [...b.changed, ...b.added])
     const waitForBatch = async () => {
-      const deadline = Date.now() + 5000
+      const deadline = Date.now() + 10_000
       while (batches.length === 0 && Date.now() < deadline) await sleep(50)
     }
     try {
+      await sleep(200)
       // A real edit is reported.
       writeFileSync(file, 'export default function Page() { return <main /> }\n')
       await waitForBatch()
