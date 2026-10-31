@@ -78,6 +78,8 @@ test('a navigation in a shared hook is one row', async ({ page }) => {
 test('a route handler lists what it sends first, then callers by URL, folded by line', async ({ page }) => {
   await open(page, '#/map?view=handlers')
   await page.locator('.handler-list a', { hasText: SYNTHETIC.handlerPath }).click()
+  // allTextContents() doesn't wait: wait for the handler screen before reading its headings.
+  await expect(page.locator('.section h2', { hasText: 'Called from' })).toBeVisible()
   const titles = await page.locator('.section h2').allTextContents()
   expect(titles.indexOf('Requests it sends')).toBeLessThan(titles.indexOf('Called from'))
 
