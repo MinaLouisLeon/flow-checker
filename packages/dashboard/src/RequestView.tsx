@@ -81,22 +81,75 @@ export function RequestList({
   sites,
   empty,
   open,
+  owners,
 }: {
   sites: RequestSite[]
   empty: string
   /** Expand the details. Default: when there are three or fewer. */
   open?: boolean
+  /**
+   * Lists from several components (a page): show where each request is sent from, and fold the
+   * same request sent from several places into one row.
+   */
+  owners?: boolean
 }) {
+  const { index } = useData()
   if (sites.length === 0) return <Empty>{empty}</Empty>
+  const groups = owners ? groupSame(sites) : sites.map((s) => [s])
   return (
     <ul className="requests">
-      {sites.map((site) => (
-        <li key={site.id}>
-          <RequestItem site={site} open={open ?? sites.length <= 3} />
-        </li>
-      ))}
+      {groups.map((group) => {
+        const first = group[0] as RequestSite
+        if (group.length === 1)
+          return (
+            <li key={first.id}>
+              <RequestItem site={first} open={open ?? sites.length <= 3} owner={owners} />
+            </li>
+          )
+        const names = [...new Set(group.map((s) => siteOwner(s, index)))]
+        return (
+          <li key={first.id}>
+            <details className="request request-group">
+              <summary>
+                <RequestSummary site={first} />
+                <span className="muted request-owner" title={names.join(', ')}>
+                  from {names.length === 1 ? names[0] : `${names.length} places`}
+                </span>
+                <span className="spacer" />
+                <Badge tone="neutral" title={`Sent from ${group.length} places in the code`}>
+                  ×{group.length}
+                </Badge>
+                <Badge tone={first.trigger.kind === 'unknown' ? 'warn' : 'neutral'}>
+                  {triggerLabel(first.trigger)}
+                </Badge>
+              </summary>
+              <ul className="requests">
+                {group.map((site) => (
+                  <li key={site.id}>
+                    <RequestItem site={site} open={false} owner />
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </li>
+        )
+      })}
     </ul>
   )
+}
+
+/** Sites that send the same request (method, URL, trigger), in first-seen order. */
+function groupSame(sites: RequestSite[]): RequestSite[][] {
+  const groups = new Map<string, RequestSite[]>()
+  for (const site of sites) {
+    const target =
+      site.transport === 'server-action' ? site.serverAction?.name : site.url && urlText(site.url)
+    const key = `${site.method ?? '?'} ${target ?? '?'} ${site.transport} ${triggerLabel(site.trigger)}`
+    const group = groups.get(key)
+    if (group) group.push(site)
+    else groups.set(key, [site])
+  }
+  return [...groups.values()]
 }
 
 export function RequestSummary({ site }: { site: RequestSite }) {
@@ -116,7 +169,7 @@ export function RequestSummary({ site }: { site: RequestSite }) {
   )
 }
 
-function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
+function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; owner?: boolean }) {
   const { index } = useData()
   const target = site.targetRouteId ? index.routes.get(site.targetRouteId) : undefined
   const chain = (site.chain ?? []).map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
@@ -125,6 +178,7 @@ function RequestItem({ site, open }: { site: RequestSite; open: boolean }) {
     <details className="request" open={open}>
       <summary>
         <RequestSummary site={site} />
+        {owner && <span className="muted request-owner">from {siteOwner(site, index)}</span>}
         <span className="spacer" />
         <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
           {site.transport === 'server-action'

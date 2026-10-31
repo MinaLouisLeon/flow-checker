@@ -64,6 +64,11 @@ export function RefBadges({ site: r }: { site: ComponentRef }) {
           ⚠ unresolved
         </Badge>
       )}
+      {r.resolution === 'prop' && (
+        <Badge tone="muted" title="Passed in by the parent, e.g. an `as` prop">
+          from props
+        </Badge>
+      )}
     </>
   )
 }

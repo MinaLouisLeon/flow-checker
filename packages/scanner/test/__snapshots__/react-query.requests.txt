@@ -33,7 +33,7 @@ GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch useQuery(userKey
   response: User[]
   via: useQuery src/components/UserList.tsx:9 > http src/services/users.ts:12 > fetch src/services/todos.ts:8
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  fetch useQueries(userKeys.todos(user.id))  page-load
-  key: ['todos', 'list', { userId: :userId }]
+  key: ['todos', 'list', { userId: :id }]
   response: Todo[]
   via: useQueries src/components/UserList.tsx:11 > fetchUserTodos src/components/UserList.tsx:13 > http src/services/users.ts:16 > fetch src/services/todos.ts:8
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch ensureQueryData(userKeys.detail(id))  event onClick

@@ -126,6 +126,21 @@ describe('scan notes', () => {
           status: 'inferred',
           flags: [{ kind: 'dynamic-url', message: 'The URL could not be resolved: url' }],
         },
+        {
+          id: 'req_2',
+          origin: 'component',
+          componentId: 'cmp_page',
+          transport: 'fetch',
+          url: { text: 'url', confidence: 'unknown' },
+          trigger: { kind: 'unknown' },
+          callStack: [{ ...loc, callee: 'fetch' }],
+          status: 'inferred',
+          flags: [
+            { kind: 'dynamic-url', message: 'The URL could not be resolved: url' },
+            { kind: 'unknown-method', message: 'The HTTP method could not be resolved.' },
+            { kind: 'unknown-trigger', message: 'Could not find what starts this request.' },
+          ],
+        },
       ],
       navigations: [],
       flows: [],
@@ -136,6 +151,7 @@ describe('scan notes', () => {
       'unresolved-component',
       'unresolved-type',
       'request',
+      'request',
     ])
     expect(index.notes[1]?.message).toContain('<Mystery>')
     expect(index.notes[3]).toMatchObject({
@@ -143,6 +159,10 @@ describe('scan notes', () => {
       componentId: 'cmp_page',
       requestId: 'req_1',
     })
+    // Every gap of one request is one note.
+    expect(index.notes[4]?.message).toBe(
+      '? ? url: The URL could not be resolved: url · The HTTP method could not be resolved · Could not find what starts this request',
+    )
   })
 })
 
@@ -205,6 +225,17 @@ describe('graph layout', () => {
     // Every node has its own position.
     const positions = new Set(graph.nodes.map((n) => `${n.x},${n.y}`))
     expect(positions.size).toBe(routes.length)
+  })
+
+  it('wraps many leaf pages under one route into grid columns', () => {
+    const leaves = Array.from({ length: 20 }, (_, i) => route(`/p${String(i).padStart(2, '0')}`))
+    const graph = layoutRoutes([route('/'), route('/a'), route('/a/b'), ...leaves])
+    const xs = new Set(graph.nodes.filter((n) => n.route.path.startsWith('/p')).map((n) => n.x))
+    // 20 leaves at 8 per column: 3 columns, not one column of 20.
+    expect(xs.size).toBe(3)
+    const positions = new Set(graph.nodes.map((n) => `${n.x},${n.y}`))
+    expect(positions.size).toBe(graph.nodes.length)
+    expect(graph.edges.filter((e) => e.grid)).toHaveLength(12)
   })
 
   it('prefers a plain page over a slot at the same path', () => {

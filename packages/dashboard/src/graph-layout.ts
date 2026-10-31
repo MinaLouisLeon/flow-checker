@@ -13,6 +13,8 @@ export interface GraphEdge {
   source: string
   target: string
   kind: 'hierarchy'
+  /** The child sits in a later grid column, next to its parent: the map leaves the edge out. */
+  grid?: boolean
 }
 
 export interface RouteGraph {
@@ -68,22 +70,52 @@ export function layoutRoutes(routes: Route[]): RouteGraph {
   }
 
   const nodes: GraphNode[] = []
+  const gridded = new Set<string>()
   let row = 0
+  const columnX = (column: number) => column * (NODE_WIDTH + COLUMN_GAP)
+  const rowY = (r: number) => r * (NODE_HEIGHT + ROW_GAP)
   // Leaves take the next row. A parent sits centered on its first and last child.
   const place = (route: Route, depth: number): number => {
     const kids = children.get(route.id) ?? []
     let y: number
     if (kids.length === 0) {
-      y = row * (NODE_HEIGHT + ROW_GAP)
+      y = rowY(row)
       row++
     } else {
-      const ys = kids.map((k) => place(k, depth + 1))
-      y = ((ys[0] ?? 0) + (ys[ys.length - 1] ?? 0)) / 2
+      const hasKids = (r: Route) => (children.get(r.id)?.length ?? 0) > 0
+      const ys = kids.filter(hasKids).map((k) => place(k, depth + 1))
+      const leaves = kids.filter((k) => !hasKids(k))
+      if (leaves.length > ROWS_PER_COLUMN) {
+        // Many pages under one route (e.g. everything under `/[locale]`): a grid of columns, by
+        // route group, instead of one very tall column.
+        leaves.sort((a, b) => groupOf(a).localeCompare(groupOf(b)) || a.path.localeCompare(b.path))
+        const start = row
+        leaves.forEach((leaf, i) => {
+          const column = Math.floor(i / ROWS_PER_COLUMN)
+          const leafY = rowY(start + (i % ROWS_PER_COLUMN))
+          nodes.push({ route: leaf, x: columnX(depth + 1 + column), y: leafY })
+          if (column > 0) gridded.add(leaf.id)
+          ys.push(leafY)
+        })
+        row = start + ROWS_PER_COLUMN
+      } else {
+        for (const leaf of leaves) ys.push(place(leaf, depth + 1))
+      }
+      y = (Math.min(...ys) + Math.max(...ys)) / 2
     }
-    nodes.push({ route, x: depth * (NODE_WIDTH + COLUMN_GAP), y })
+    nodes.push({ route, x: columnX(depth), y })
     return y
   }
   for (const root of roots) place(root, 0)
 
+  for (const edge of edges) if (gridded.has(edge.target)) edge.grid = true
   return { nodes, edges }
+}
+
+/** Pages per grid column when a route has many leaf pages. */
+const ROWS_PER_COLUMN = 8
+
+/** The route group a page is in, e.g. `(dashboard)`, for ordering the grid. */
+function groupOf(route: Route): string {
+  return route.segments.find((s) => s.kind === 'group')?.raw ?? ''
 }

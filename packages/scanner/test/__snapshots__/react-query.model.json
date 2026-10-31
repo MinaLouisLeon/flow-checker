@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -1014,7 +1014,7 @@
               "key": "userId",
               "value": {
                 "kind": "param",
-                "name": "userId"
+                "name": "id"
               }
             }
           ]
@@ -1071,7 +1071,7 @@
       ],
       "status": "inferred",
       "flags": [],
-      "hash": "0ch2k1z3b15"
+      "hash": "0r8ixkjp9rm"
     },
     {
       "id": "req_0ka937821vy",

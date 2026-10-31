@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "react-query",
   "model": {
-    "version": 8,
+    "version": 9,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -1019,7 +1019,7 @@
                 "key": "userId",
                 "value": {
                   "kind": "param",
-                  "name": "userId"
+                  "name": "id"
                 }
               }
             ]
@@ -1076,7 +1076,7 @@
         ],
         "status": "verified",
         "flags": [],
-        "hash": "0ch2k1z3b15"
+        "hash": "0r8ixkjp9rm"
       },
       {
         "id": "req_0ka937821vy",
@@ -1906,7 +1906,8 @@
       "matched": 13,
       "ambiguous": 2,
       "unmatched": 0,
-      "manual": 0
+      "manual": 0,
+      "thirdParty": 0
     }
   },
   "flows": {
@@ -2024,11 +2025,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1di2bq7b96m",
-        "score": 165,
+        "score": 145,
         "candidates": [
           {
             "siteId": "req_1di2bq7b96m",
-            "score": 165,
+            "score": 145,
             "evidence": [
               {
                 "signal": "url",
@@ -2042,7 +2043,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 30,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2069,7 +2070,7 @@
           },
           {
             "siteId": "req_0ht2fssv0ja",
-            "score": 120,
+            "score": 100,
             "evidence": [
               {
                 "signal": "url",
@@ -2083,7 +2084,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 25,
+                "points": 5,
                 "detail": "1 frame(s) on the call path"
               },
               {
@@ -2099,7 +2100,7 @@
               {
                 "signal": "query-key",
                 "points": 45,
-                "detail": "['todos', 'list', { userId: :userId }]"
+                "detail": "['todos', 'list', { userId: :id }]"
               }
             ]
           }
@@ -2233,11 +2234,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_2bvpz71hbm1",
-        "score": 200,
+        "score": 180,
         "candidates": [
           {
             "siteId": "req_2bvpz71hbm1",
-            "score": 200,
+            "score": 180,
             "evidence": [
               {
                 "signal": "url",
@@ -2251,7 +2252,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -2423,11 +2424,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1di2bq7b96m",
-        "score": 190,
+        "score": 170,
         "candidates": [
           {
             "siteId": "req_1di2bq7b96m",
-            "score": 190,
+            "score": 170,
             "evidence": [
               {
                 "signal": "url",
@@ -2441,7 +2442,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 30,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2468,7 +2469,7 @@
           },
           {
             "siteId": "req_0ht2fssv0ja",
-            "score": 115,
+            "score": 95,
             "evidence": [
               {
                 "signal": "url",
@@ -2482,7 +2483,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 25,
+                "points": 5,
                 "detail": "1 frame(s) on the call path"
               },
               {
@@ -2493,7 +2494,7 @@
               {
                 "signal": "query-key",
                 "points": 45,
-                "detail": "['todos', 'list', { userId: :userId }]"
+                "detail": "['todos', 'list', { userId: :id }]"
               }
             ]
           }
@@ -2620,11 +2621,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1ybk9xw63lt",
-        "score": 155,
+        "score": 135,
         "candidates": [
           {
             "siteId": "req_1ybk9xw63lt",
-            "score": 155,
+            "score": 135,
             "evidence": [
               {
                 "signal": "url",
@@ -2638,7 +2639,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 30,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2811,11 +2812,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1di2bq7b96m",
-        "score": 160,
+        "score": 140,
         "candidates": [
           {
             "siteId": "req_1di2bq7b96m",
-            "score": 160,
+            "score": 140,
             "evidence": [
               {
                 "signal": "url",
@@ -2829,7 +2830,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 30,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -2851,7 +2852,7 @@
           },
           {
             "siteId": "req_0ht2fssv0ja",
-            "score": 115,
+            "score": 95,
             "evidence": [
               {
                 "signal": "url",
@@ -2865,7 +2866,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 25,
+                "points": 5,
                 "detail": "1 frame(s) on the call path"
               },
               {
@@ -2876,7 +2877,7 @@
               {
                 "signal": "query-key",
                 "points": 45,
-                "detail": "['todos', 'list', { userId: :userId }]"
+                "detail": "['todos', 'list', { userId: :id }]"
               }
             ]
           }
@@ -3006,11 +3007,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_27sy7hb0xsq",
-        "score": 160,
+        "score": 140,
         "candidates": [
           {
             "siteId": "req_27sy7hb0xsq",
-            "score": 160,
+            "score": 140,
             "evidence": [
               {
                 "signal": "url",
@@ -3024,7 +3025,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -3141,11 +3142,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0m4arr015hb",
-        "score": 165,
+        "score": 135,
         "candidates": [
           {
             "siteId": "req_0m4arr015hb",
-            "score": 165,
+            "score": 135,
             "evidence": [
               {
                 "signal": "url",
@@ -3159,7 +3160,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 20,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -3291,11 +3292,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0ht2fssv0ja",
-        "score": 213,
+        "score": 193,
         "candidates": [
           {
             "siteId": "req_0ht2fssv0ja",
-            "score": 213,
+            "score": 193,
             "evidence": [
               {
                 "signal": "url",
@@ -3314,7 +3315,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -3340,13 +3341,13 @@
               {
                 "signal": "query-key",
                 "points": 45,
-                "detail": "['todos', 'list', { userId: :userId }]"
+                "detail": "['todos', 'list', { userId: :id }]"
               }
             ]
           },
           {
             "siteId": "req_1di2bq7b96m",
-            "score": 50,
+            "score": 30,
             "evidence": [
               {
                 "signal": "url",
@@ -3360,7 +3361,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 25,
+                "points": 5,
                 "detail": "1 frame(s) on the call path"
               },
               {
@@ -3481,11 +3482,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0ht2fssv0ja",
-        "score": 213,
+        "score": 193,
         "candidates": [
           {
             "siteId": "req_0ht2fssv0ja",
-            "score": 213,
+            "score": 193,
             "evidence": [
               {
                 "signal": "url",
@@ -3504,7 +3505,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 55,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -3530,13 +3531,13 @@
               {
                 "signal": "query-key",
                 "points": 45,
-                "detail": "['todos', 'list', { userId: :userId }]"
+                "detail": "['todos', 'list', { userId: :id }]"
               }
             ]
           },
           {
             "siteId": "req_1di2bq7b96m",
-            "score": 50,
+            "score": 30,
             "evidence": [
               {
                 "signal": "url",
@@ -3550,7 +3551,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 25,
+                "points": 5,
                 "detail": "1 frame(s) on the call path"
               },
               {
@@ -3672,11 +3673,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_1g8keamimjw",
-        "score": 195,
+        "score": 180,
         "candidates": [
           {
             "siteId": "req_1g8keamimjw",
-            "score": 195,
+            "score": 180,
             "evidence": [
               {
                 "signal": "url",
@@ -3690,7 +3691,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 60,
                 "detail": "4 frame(s) on the call path"
               },
               {
@@ -3717,7 +3718,7 @@
           },
           {
             "siteId": "req_0ka937821vy",
-            "score": 175,
+            "score": 160,
             "evidence": [
               {
                 "signal": "url",
@@ -3731,7 +3732,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 60,
                 "detail": "4 frame(s) on the call path"
               },
               {
@@ -3951,7 +3952,7 @@
           },
           {
             "siteId": "req_1g8keamimjw",
-            "score": 215,
+            "score": 200,
             "evidence": [
               {
                 "signal": "url",
@@ -3965,7 +3966,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 60,
                 "detail": "4 frame(s) on the call path"
               },
               {
@@ -4128,11 +4129,11 @@
       "match": {
         "status": "ambiguous",
         "by": "auto",
-        "score": 225,
+        "score": 185,
         "candidates": [
           {
             "siteId": "req_0ka937821vy",
-            "score": 225,
+            "score": 185,
             "evidence": [
               {
                 "signal": "url",
@@ -4146,7 +4147,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 35,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4178,7 +4179,7 @@
           },
           {
             "siteId": "req_1g8keamimjw",
-            "score": 215,
+            "score": 175,
             "evidence": [
               {
                 "signal": "url",
@@ -4192,7 +4193,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 35,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4346,11 +4347,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_0m4arr015hb",
-        "score": 190,
+        "score": 160,
         "candidates": [
           {
             "siteId": "req_0m4arr015hb",
-            "score": 190,
+            "score": 160,
             "evidence": [
               {
                 "signal": "url",
@@ -4364,7 +4365,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 50,
+                "points": 20,
                 "detail": "2 frame(s) on the call path"
               },
               {
@@ -4527,11 +4528,11 @@
       "match": {
         "status": "ambiguous",
         "by": "auto",
-        "score": 225,
+        "score": 185,
         "candidates": [
           {
             "siteId": "req_0ka937821vy",
-            "score": 225,
+            "score": 185,
             "evidence": [
               {
                 "signal": "url",
@@ -4545,7 +4546,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 35,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4577,7 +4578,7 @@
           },
           {
             "siteId": "req_1g8keamimjw",
-            "score": 215,
+            "score": 175,
             "evidence": [
               {
                 "signal": "url",
@@ -4591,7 +4592,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 75,
+                "points": 35,
                 "detail": "3 frame(s) on the call path"
               },
               {
@@ -4694,11 +4695,11 @@
         "status": "matched",
         "by": "auto",
         "siteId": "req_2a0uqvzh6dw",
-        "score": 100,
+        "score": 80,
         "candidates": [
           {
             "siteId": "req_2a0uqvzh6dw",
-            "score": 100,
+            "score": 80,
             "evidence": [
               {
                 "signal": "url",
@@ -4712,7 +4713,7 @@
               },
               {
                 "signal": "stack-source",
-                "points": 25,
+                "points": 5,
                 "detail": "1 frame(s) on the call path"
               },
               {

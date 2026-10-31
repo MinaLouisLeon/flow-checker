@@ -13,7 +13,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { isVerified as isSiteVerified } from '@flow-checker/shared'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
 import { href, replaceScreen } from '../router'
@@ -55,21 +55,22 @@ export function MapScreen({ view, q }: { view: 'graph' | 'tree'; q: string }) {
 
 function RouteGraphView({ q }: { q: string }) {
   const { index } = useData()
+  const [showShared, setShowShared] = useState(false)
+  const hasSharedEdges = index.navEdges.some((e) => e.shared)
   const { nodes, edges } = useMemo(() => {
     const graph = layoutRoutes(index.model.routes)
+    // Counts are the page's own tree: the layouts' components and notes are the same on every
+    // page under them, so they would make every page look alike.
     const notesByRoute = new Map<string, number>()
     for (const note of index.notes) {
-      const routeIds = note.routeId
-        ? [note.routeId]
-        : note.componentId
-          ? (index.routesOf.get(note.componentId) ?? [])
-          : []
-      for (const id of routeIds) notesByRoute.set(id, (notesByRoute.get(id) ?? 0) + 1)
+      if (note.routeId) notesByRoute.set(note.routeId, (notesByRoute.get(note.routeId) ?? 0) + 1)
+      else if (note.componentId) {
+        for (const [routeId, tree] of index.pageTree)
+          if (tree.has(note.componentId)) notesByRoute.set(routeId, (notesByRoute.get(routeId) ?? 0) + 1)
+      }
     }
     const componentCount = new Map<string, number>()
-    for (const [, routeIds] of index.routesOf) {
-      for (const id of routeIds) componentCount.set(id, (componentCount.get(id) ?? 0) + 1)
-    }
+    for (const [routeId, tree] of index.pageTree) componentCount.set(routeId, tree.size)
     // Requests per route: from its components, or sent by its route handler.
     const routeRequests = new Map<string, { total: number; verified: number }>()
     const count = (routeId: string, verified: boolean) => {
@@ -99,28 +100,33 @@ function RouteGraphView({ q }: { q: string }) {
     }))
     const positions = new Map(graph.nodes.map((n) => [n.route.id, { x: n.x, y: n.y }]))
     const edges: Edge[] = [
-      ...graph.edges.map((e) => ({
-        id: e.id,
-        source: e.source,
-        target: e.target,
-        sourceHandle: 'out',
-        targetHandle: 'in',
-        className: 'edge-hierarchy',
-      })),
-      // Links, router calls and redirects between pages (M7).
-      ...index.navEdges.map((e) => ({
-        id: `nav:${e.source}->${e.target}`,
-        source: e.source,
-        target: e.target,
-        type: 'smoothstep',
-        ...navHandles(positions.get(e.source), positions.get(e.target)),
-        className: `edge-nav${e.kinds.some((k) => k !== 'link') ? ' edge-nav-code' : ''}`,
-        markerEnd: { type: MarkerType.ArrowClosed },
-        label: e.kinds.filter((k) => k !== 'link').join(', ') || undefined,
-      })),
+      // Pages in later grid columns sit next to their parent already; edges to them crossed the grid.
+      ...graph.edges
+        .filter((e) => !e.grid)
+        .map((e) => ({
+          id: e.id,
+          source: e.source,
+          target: e.target,
+          sourceHandle: 'out',
+          targetHandle: 'in',
+          className: 'edge-hierarchy',
+        })),
+      // Links, router calls and redirects between pages (M7). The line style tells them apart
+      // (see the legend): text labels piled up on busy maps.
+      ...index.navEdges
+        .filter((e) => showShared || !e.shared)
+        .map((e) => ({
+          id: `nav:${e.source}->${e.target}`,
+          source: e.source,
+          target: e.target,
+          type: 'smoothstep',
+          ...navHandles(positions.get(e.source), positions.get(e.target)),
+          className: `edge-nav${e.kinds.some((k) => k !== 'link') ? ' edge-nav-code' : ''}${e.shared ? ' edge-nav-shared' : ''}`,
+          markerEnd: { type: MarkerType.ArrowClosed },
+        })),
     ]
     return { nodes, edges }
-  }, [index])
+  }, [index, showShared])
 
   const shown = useMemo(
     () =>
@@ -144,8 +150,10 @@ function RouteGraphView({ q }: { q: string }) {
           nodesDraggable={false}
           colorMode="system"
           fitView
-          fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
-          minZoom={0.2}
+          // A big app doesn't shrink to unreadable boxes: it opens at a zoom where paths can be
+          // read, and the minimap shows the rest.
+          fitViewOptions={{ padding: 0.1, minZoom: 0.8, maxZoom: 1.2 }}
+          minZoom={0.1}
           onNodeClick={(_, node) => {
             const route = (node as RouteNode).data.route
             window.location.hash = href({ name: 'page', routeId: route.id })
@@ -172,6 +180,16 @@ function RouteGraphView({ q }: { q: string }) {
         <span className="legend-item">
           <i className="line line-nav-code" /> push / redirect
         </span>
+        {hasSharedEdges && (
+          <label className="legend-item legend-toggle">
+            <input
+              type="checkbox"
+              checked={showShared}
+              onChange={(event) => setShowShared(event.target.checked)}
+            />{' '}
+            layout links &amp; middleware redirects
+          </label>
+        )}
       </div>
     </div>
   )
@@ -250,6 +268,11 @@ function subtreeMatches(node: RouteTreeNode, q: string): boolean {
   return matches(q, node.dir, ...Object.values(node.files)) || node.children.some((c) => subtreeMatches(c, q))
 }
 
+/** Folders with no route file anywhere below (`components`, `hooks`, ...) are not routes. */
+function hasRouteFiles(node: RouteTreeNode): boolean {
+  return Object.keys(node.files).length > 0 || node.children.some(hasRouteFiles)
+}
+
 function TreeNode({
   node,
   q,
@@ -261,7 +284,7 @@ function TreeNode({
   routeByFile: Map<string, Route>
   root?: boolean
 }) {
-  if (!subtreeMatches(node, q)) return null
+  if (!subtreeMatches(node, q) || (!root && !hasRouteFiles(node))) return null
   const { segment } = node
   const kind = SEGMENT_LABEL[segment.kind]
   const files = Object.entries(node.files)

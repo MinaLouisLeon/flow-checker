@@ -159,7 +159,7 @@ export class ComponentGraph {
     return this.#resolveSymbol(symbol, module)
   }
 
-  #resolveSymbol(symbol: TsSymbol, module: string | undefined, dynamic = false): Target {
+  #resolveSymbol(symbol: TsSymbol, module: string | undefined, dynamic = false, depth = 0): Target {
     const target = unalias(symbol)
     const node = target.getDeclarations()[0]
     if (!node) {
@@ -182,7 +182,17 @@ export class ComponentGraph {
     const decl = declarationOf(target)
     if (!decl) {
       const factory = packageFactoryOf(node)
-      return factory ? { resolution: 'external', module, factory } : { resolution: 'unresolved', module }
+      if (factory) return { resolution: 'external', module, factory }
+      // `({ as: Tag = 'h1' }) => <Tag />`: the parent picks the component.
+      if (isPropBinding(node)) return { resolution: 'prop' }
+      // `const Form = FormProvider`, `const Dialog = DialogPrimitive.Root`: an alias of a library component.
+      const aliased = aliasedExpression(node)
+      const aliasedSymbol = aliased?.getSymbol()
+      if (aliasedSymbol && aliasedSymbol !== symbol && depth < 5) {
+        const inner = this.#resolveSymbol(aliasedSymbol, module, dynamic, depth + 1)
+        if (inner.resolution !== 'unresolved') return { ...inner, module }
+      }
+      return { resolution: 'unresolved', module }
     }
     return { resolution: 'project', componentId: this.#visit(decl.body, decl), module, dynamic }
   }
@@ -290,7 +300,48 @@ function declarationOf(symbol: TsSymbol, depth = 0): Declaration | undefined {
   if (N.isExportAssignment(node)) {
     return fromExpression(node.getExpression(), name, node, depth)
   }
+  // Compound components: `Card.Header = CardHeader`, or `const Card = { Header: CardHeader }`.
+  const parent = node.getParent()
+  if (
+    N.isPropertyAccessExpression(node) &&
+    parent &&
+    N.isBinaryExpression(parent) &&
+    parent.getLeft() === node &&
+    parent.getOperatorToken().getKind() === ts.SyntaxKind.EqualsToken
+  ) {
+    return fromExpression(parent.getRight(), name, node, depth)
+  }
+  if (N.isPropertyAssignment(node)) {
+    const init = node.getInitializer()
+    return init ? fromExpression(init, name, node.getNameNode(), depth) : undefined
+  }
+  if (N.isShorthandPropertyAssignment(node)) {
+    const value = node.getValueSymbol()
+    return value ? declarationOf(unalias(value), depth + 1) : undefined
+  }
   return undefined
+}
+
+/** A name bound from a component's parameters: `({ as: Tag })`, `({ icon: Icon = Star })`. */
+function isPropBinding(node: Node): boolean {
+  if (N.isParameterDeclaration(node)) return true
+  if (!N.isBindingElement(node)) return false
+  const param = node.getFirstAncestor(
+    (a) => !N.isBindingElement(a) && !N.isObjectBindingPattern(a) && !N.isArrayBindingPattern(a),
+  )
+  return !!param && N.isParameterDeclaration(param)
+}
+
+/** The value a constant is set to when it is just another name: `const Form = FormProvider`. */
+function aliasedExpression(node: Node): Node | undefined {
+  if (!N.isVariableDeclaration(node)) return undefined
+  let init = node.getInitializer()
+  while (
+    init &&
+    (N.isAsExpression(init) || N.isParenthesizedExpression(init) || N.isSatisfiesExpression(init))
+  )
+    init = init.getExpression()
+  return init && (N.isIdentifier(init) || N.isPropertyAccessExpression(init)) ? init : undefined
 }
 
 function fromExpression(expr: Node, name: string, anchor: Node, depth: number): Declaration | undefined {

@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "graphql-relay",
   "model": {
-    "version": 8,
+    "version": 9,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -2346,7 +2346,8 @@
       "matched": 5,
       "ambiguous": 0,
       "unmatched": 0,
-      "manual": 0
+      "manual": 0,
+      "thirdParty": 0
     }
   },
   "flows": {
