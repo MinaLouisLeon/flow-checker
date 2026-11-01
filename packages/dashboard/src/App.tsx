@@ -15,6 +15,7 @@ import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
 import { RequestsScreen } from './screens/RequestsScreen'
+import { StartScreen } from './screens/StartScreen'
 import { TypesScreen } from './screens/TypesScreen'
 import { useScrollMemory } from './scroll'
 import { Empty } from './ui'
@@ -26,6 +27,7 @@ const NAV: {
   needsCapture?: boolean
   needsExport?: boolean
 }[] = [
+  { label: 'Start here', screen: { name: 'start' }, match: ['start'] },
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page'] },
   { label: 'Areas', screen: { name: 'areas', q: '' }, match: ['areas'] },
@@ -160,6 +162,8 @@ function shortFiles(files: string[]): string {
 
 function ScreenView({ screen }: { screen: Screen }) {
   switch (screen.name) {
+    case 'start':
+      return <StartScreen />
     case 'overview':
       return <Overview />
     case 'map':
@@ -192,7 +196,7 @@ function ScreenView({ screen }: { screen: Screen }) {
       return (
         <div className="screen">
           <Empty>
-            Nothing here. <a href="#/">Go to the overview</a>
+            Nothing here. <a href="#/">Go to Start here</a>
           </Empty>
         </div>
       )

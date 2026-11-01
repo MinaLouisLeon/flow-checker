@@ -37,7 +37,7 @@ function explore(root: string): Promise<{ url: string; output: () => string }> {
     const timer = setTimeout(() => fail(new Error(`explore didn't start:\n${output}`)), 90_000)
     const read = (chunk: Buffer) => {
       output += chunk.toString()
-      const url = /Next: open (http:\/\/127\.0\.0\.1:\d+) in your browser\./.exec(output)?.[1]
+      const url = /Next: open (http:\/\/127\.0\.0\.1:\d+) in your browser. Start here/.exec(output)?.[1]
       if (url) {
         clearTimeout(timer)
         done({ url, output: () => output })
@@ -63,7 +63,11 @@ test('explore opens the dashboard on a project with no setup', async ({ page }) 
   expect(dataDir).toBeTruthy()
   if (dataDir) cleanup.push(dataDir)
 
+  // Start here (M32) is the first screen, with the capture hint since capture is off.
   await page.goto(`${url}/#/`)
+  await expect(page.getByTestId('start-stack')).toContainText('Next.js')
+  await expect(page.getByTestId('capture-hint')).toBeVisible()
+  await page.locator('.nav').getByRole('link', { name: 'Overview' }).click()
   await expect(page.locator('.stats .stat').first()).toBeVisible()
   await page.locator('.nav').getByRole('link', { name: 'Map' }).click()
   await expect(page).toHaveURL(/#\/map/)

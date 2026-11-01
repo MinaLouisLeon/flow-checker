@@ -39,6 +39,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M29 | Endpoints             | Derived in `shared/src/endpoints.ts` (no model change); dashboard caches it per index in `endpointsOf()`.                |
 | M30 | Areas                 | Derived in `shared/src/areas.ts`; only the `areas` config is stored (`AppModel.areas`, optional, no version bump).       |
 | M31 | Guarded pages         | Model version 12, `Route.access`. Scanner records render exits; `scanner/src/access.ts` builds each page's label.        |
+| M32 | Start here            | `buildSummary()` in `shared/src/summary.ts`; items carry a `SummaryLink` each view renders. `#/` = Start here.           |
 
 ## Gotchas
 
@@ -357,3 +358,16 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   test caught it.
 - A Python patch script in a bash heredoc turns an escaped newline inside a TS string into a real line break; check
   with `grep` after patching, or use the Edit tool for those lines.
+
+## M32 — Start here (branch `feat/m32-start-here`)
+
+- One derivation, three renderers: `buildSummary()` returns sections of items with a `SummaryLink`; the dashboard
+  maps links with `summaryScreen()`, the exporter with `summaryTarget()`, the CLI prints `formatSummary()`. Add new
+  facts to the summary there, not in one view. The CLI golden (`flow-checker/test/__snapshots__/summary/`) equals
+  the shared text snapshot for the same fixture, which is how the three are kept in line.
+- `#/` is Start here and the overview is `#/overview`. Tests and e2e specs that want the overview's stat cards or
+  its GraphQL / tRPC sections must open `#/overview` (a bare `index.html` now opens Start here).
+- A Start here link to a filtered request list (`q` = a file, hook module or API client) only works because
+  `filterRequests` searches those fields; `dashboard/test/start.test.ts` fails when such a list comes up empty.
+- `flow-checker summary` must not write into the project (`writeModel: false`, `save: false` for the Postman and
+  GraphQL caches); it calls `collectSnapshot` only when `.flow-checker/` exists.

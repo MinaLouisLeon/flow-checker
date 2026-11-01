@@ -1,0 +1,35 @@
+Start here: react-query-v4 (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 4 pages, 0 route handlers)
+  Rendering  5 server, 9 client, 0 shared  (14 components)
+  Data       React Query  (11 requests)
+  Data       fetch  (12 requests)
+
+Areas (4 areas by URL)
+  home      /  (1 page, 2 flows, 3 endpoints)
+  settings  /settings  (1 page, 3 endpoints)
+  todos     /todos  (1 page, 1 endpoint)
+  users     /users  (1 page, 1 flow, 2 endpoints)
+
+Entry pages (2 pages nothing links to)
+  Start page  /  (1 page links here)
+  Not linked  /settings  (nothing in the app links here)
+  Not linked  /users  (nothing in the app links here)
+
+Main flows (3 flows)
+  AddTodoForm submit  / → /todos/[id]  (5 steps)
+  TodoList change     /  (4 steps)
+  UserList click      /users  (4 steps)
+
+Backends (7 endpoints)
+  External  {NEXT_PUBLIC_API_URL ?? http://localhost:4010}  (7 endpoints, 7 called from the browser)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Sends requests  src/services/api.ts  (12 requests)
+  Type            Todo  (src/types/todo.ts, used 7 times)
+  Type            User  (src/types/user.ts, used 4 times)
+
+To check
+  The scan resolved every page, component, type and request.

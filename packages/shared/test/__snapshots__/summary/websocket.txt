@@ -1,0 +1,27 @@
+Start here: websocket (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in app/, 2 pages, 0 route handlers)
+  Rendering  3 server, 3 client, 0 shared  (6 components)
+  Data       socket.io  (1 request)
+  Data       WebSocket  (2 requests)
+
+Areas (2 areas by URL)
+  home  /  (1 page, 1 flow, 2 endpoints)
+  chat  /chat  (1 page, 1 endpoint)
+
+Entry pages
+  Start page  /
+
+Main flows (1 flow)
+  Ping click  /  (2 steps)
+
+Backends (3 endpoints)
+  External  http://localhost:4011  (3 endpoints, 3 called from the browser)
+
+Where things live
+  Root layout  app/layout.tsx
+  Type         ChatMessage  (lib/types.ts, used 2 times)
+
+To check
+  The scan resolved every page, component, type and request.

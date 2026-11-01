@@ -1,0 +1,198 @@
+{
+  "nextVersion": "<next-version>",
+  "appDir": "app",
+  "sections": [
+    {
+      "id": "stack",
+      "title": "Stack",
+      "items": [
+        {
+          "label": "Next.js",
+          "value": "<next-version>",
+          "detail": "App Router in app/, 3 pages, 3 route handlers",
+          "link": {
+            "to": "map"
+          }
+        },
+        {
+          "label": "Rendering",
+          "value": "4 server, 3 client, 0 shared",
+          "detail": "7 components",
+          "link": {
+            "to": "components"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "Event streams (SSE)",
+          "detail": "3 requests",
+          "link": {
+            "to": "requests",
+            "transport": "sse"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "areas",
+      "title": "Areas",
+      "note": "3 areas by URL",
+      "items": [
+        {
+          "label": "home",
+          "value": "/",
+          "code": true,
+          "detail": "1 page, 1 endpoint",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1vn39fso9m3"
+          }
+        },
+        {
+          "label": "chat",
+          "value": "/chat",
+          "code": true,
+          "detail": "1 page, 1 flow, 1 endpoint",
+          "link": {
+            "to": "area",
+            "areaId": "ar_19t50bf2akw"
+          }
+        },
+        {
+          "label": "jobs",
+          "value": "/jobs",
+          "code": true,
+          "detail": "1 page, 1 flow, 1 endpoint",
+          "link": {
+            "to": "area",
+            "areaId": "ar_0dcdhr9zs9y"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "areas"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "entry",
+      "title": "Entry pages",
+      "items": [
+        {
+          "label": "Start page",
+          "value": "/",
+          "code": true,
+          "link": {
+            "to": "page",
+            "routeId": "rt_12v7saiyoj2"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "map"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "flows",
+      "title": "Main flows",
+      "note": "2 flows",
+      "items": [
+        {
+          "label": "Chat submit",
+          "value": "/chat",
+          "code": true,
+          "detail": "2 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_2ery8l2cvwj"
+          }
+        },
+        {
+          "label": "JobProgress click",
+          "value": "/jobs/[id]",
+          "code": true,
+          "detail": "2 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_1qphd907dik"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "flows"
+      },
+      "empty": "No flows found: no event handler leads to a request or another page."
+    },
+    {
+      "id": "backends",
+      "title": "Backends",
+      "note": "3 endpoints",
+      "items": [
+        {
+          "label": "This app",
+          "value": "This app's API",
+          "code": false,
+          "detail": "3 endpoints, 3 called from the browser",
+          "link": {
+            "to": "endpoints",
+            "host": "app"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "endpoints"
+      },
+      "empty": "The app sends no requests."
+    },
+    {
+      "id": "places",
+      "title": "Where things live",
+      "items": [
+        {
+          "label": "Root layout",
+          "value": "app/layout.tsx",
+          "code": true,
+          "link": {
+            "to": "component",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        },
+        {
+          "label": "Route handlers",
+          "value": "app/api/",
+          "code": true,
+          "detail": "3 handlers",
+          "link": {
+            "to": "map",
+            "view": "handlers"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "components"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "check",
+      "title": "To check",
+      "items": [],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "The scan resolved every page, component, type and request."
+    }
+  ]
+}

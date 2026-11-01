@@ -13,7 +13,7 @@ async function cardValue(page: Page, label: string): Promise<number> {
 
 /** Clicks the card's main link (the whole card, or its number and label). */
 async function openCard(page: Page, label: string) {
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   const card = page.locator('.stats .stat', { has: page.locator('.stat-label', { hasText: label }) })
   const main = card.locator('a.stat-main')
   await ((await main.count()) > 0 ? main : card).click()
@@ -37,14 +37,14 @@ test('every overview card opens a screen', async ({ page }) => {
 })
 
 test('the Components screen lists, filters and shows components', async ({ page }) => {
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   const total = await cardValue(page, 'Components')
   await openCard(page, 'Components')
   await expect(page.locator('.toolbar')).toContainText(`${total} of ${total}`)
   await expect(page.locator('.component-list > li')).toHaveCount(total)
 
   // The card's "client" part opens the list filtered to client components.
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   const client = page.locator('.stat-detail a', { hasText: /client$/ })
   const clientCount = Number((await client.textContent())?.split(' ')[0])
   await client.click()
@@ -61,13 +61,13 @@ test('the Components screen lists, filters and shows components', async ({ page 
 })
 
 test('the Requests screen lists, filters and shows requests', async ({ page }) => {
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   const total = await cardValue(page, 'Requests')
   await openCard(page, 'Requests')
   await expect(page.locator('.toolbar')).toContainText(`${total} of ${total}`)
 
   // "On events" from the card: the login and OTP forms.
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   await page.locator('.stat-detail a', { hasText: 'on events' }).click()
   await expect(page).toHaveURL(/#\/requests\?when=event$/)
   await expect(page.getByRole('button', { name: /On events/ })).toHaveAttribute('aria-pressed', 'true')
@@ -87,7 +87,7 @@ test('the Requests screen lists, filters and shows requests', async ({ page }) =
 })
 
 test('the Endpoints screen lists endpoints by host and shows who calls them', async ({ page }) => {
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   const total = await cardValue(page, 'Endpoints')
   await openCard(page, 'Endpoints')
   await expect(page.locator('.toolbar')).toContainText(`${total} of ${total}`)
@@ -112,7 +112,7 @@ test('the Endpoints screen lists endpoints by host and shows who calls them', as
 })
 
 test('the Areas screen shows one card per area and the Map frames them', async ({ page }) => {
-  await page.goto(`${dashboard}/#/`)
+  await page.goto(`${dashboard}/#/overview`)
   const total = await cardValue(page, 'Areas')
   await openCard(page, 'Areas')
   await expect(page.locator('.toolbar')).toContainText(`${total} of ${total}`)
@@ -144,4 +144,28 @@ test('the Areas screen shows one card per area and the Map frames them', async (
   await page.locator('.area-frame-name', { hasText: 'verify' }).click()
   await expect(page).toHaveURL(/#\/areas\/ar_/)
   await expect(page.locator('.split-side .panel-head h2')).toHaveText('verify')
+})
+
+test('Start here is the first screen and every item opens a screen', async ({ page }) => {
+  await page.goto(`${dashboard}/`)
+  await expect(page.locator('.nav a[aria-current=page]')).toHaveText('Start here')
+  for (const id of ['stack', 'areas', 'entry', 'flows', 'backends', 'places', 'check']) {
+    await expect(page.getByTestId(`start-${id}`)).toBeVisible()
+  }
+  await expect(page.getByTestId('start-stack')).toContainText('next-intl')
+
+  // Each link leads somewhere real, not to the "Nothing here" screen.
+  const links = await page.locator('.start-grid a').evaluateAll((as) => as.map((a) => a.getAttribute('href')))
+  expect(links.length).toBeGreaterThan(10)
+  for (const link of new Set(links)) {
+    await page.goto(`${dashboard}/${link}`)
+    await expect(page.locator('main'), String(link)).not.toContainText('Nothing here')
+    await expect(page.locator('main'), String(link)).not.toContainText('not in the current scan')
+  }
+
+  // The overview moved to #/overview; the brand link goes back to Start here.
+  await page.goto(`${dashboard}/#/overview`)
+  await expect(page.locator('.stats .stat').first()).toBeVisible()
+  await page.locator('.brand').click()
+  await expect(page.getByTestId('start-stack')).toBeVisible()
 })

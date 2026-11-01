@@ -1,0 +1,34 @@
+Start here: middleware (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in app/, 5 pages, 1 route handler)
+  Rendering  6 server, 0 client, 0 shared  (6 components)
+  Data       fetch  (4 requests)
+  Proxy      proxy.ts  (runs on 3 routes)
+
+Areas (4 areas by URL)
+  dashboard  /dashboard  (2 pages, 2 endpoints)
+  home       /  (1 page)
+  login      /login  (1 page)
+  products   /products  (1 page, 1 endpoint)
+
+Entry pages
+  Start page   /
+  Most linked  /login  (3 pages link here)
+  Most linked  /dashboard  (2 pages link here)
+
+Main flows
+  No flows found: no event handler leads to a request or another page.
+
+Backends (5 endpoints)
+  This app  This app's API  (1 endpoint)
+  External  {API_URL ?? http://localhost:4010}  (4 endpoints)
+
+Where things live
+  Root layout     app/layout.tsx
+  Sends requests  lib/api.ts  (3 requests)
+  Route handlers  app/api/  (1 handler)
+  Type            User  (types/user.ts, used 2 times)
+
+To check
+  The scan resolved every page, component, type and request.

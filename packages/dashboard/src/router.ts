@@ -6,6 +6,7 @@ import {
   type EndpointStatus,
   type EndpointTransport,
   type RequestSite,
+  type SummaryLink,
 } from '@flow-checker/shared'
 import { useEffect, useState } from 'react'
 import {
@@ -27,6 +28,8 @@ export const ACCESS_FILTERS = ['guarded', 'open', 'unknown'] as const
 export type AccessFilter = (typeof ACCESS_FILTERS)[number]
 
 export type Screen =
+  /** Start here (M32): the first screen. */
+  | { name: 'start' }
   | { name: 'overview' }
   /** `handlers`: the route handlers as a list (M23). */
   /** `areas`: the Map graph draws a frame around each area's pages (M30). */
@@ -88,6 +91,9 @@ export function parseHash(hash: string): Screen {
 
   switch (parts[0]) {
     case undefined:
+    case 'start':
+      return { name: 'start' }
+    case 'overview':
       return { name: 'overview' }
     case 'map':
       return {
@@ -170,8 +176,10 @@ export function href(screen: Screen): string {
     return `#${path}${s ? `?${s}` : ''}`
   }
   switch (screen.name) {
-    case 'overview':
+    case 'start':
       return '#/'
+    case 'overview':
+      return '#/overview'
     case 'map':
       return withQuery('/map', {
         view: screen.view === 'graph' ? undefined : screen.view,
@@ -234,6 +242,40 @@ export function href(screen: Screen): string {
       })
     case 'not-found':
       return '#/'
+  }
+}
+
+/** The screen a Start here item leads to (M32). */
+export function summaryScreen(link: SummaryLink): Screen {
+  switch (link.to) {
+    case 'overview':
+      return { name: 'overview' }
+    case 'map':
+      return { name: 'map', view: link.view ?? 'graph', q: '' }
+    case 'page':
+      return { name: 'page', routeId: link.routeId }
+    case 'middleware':
+      return link.routeId ? { name: 'page', routeId: link.routeId } : { name: 'map', view: 'graph', q: '' }
+    case 'areas':
+      return { name: 'areas', q: '' }
+    case 'area':
+      return { name: 'areas', areaId: link.areaId, q: '' }
+    case 'flows':
+      return { name: 'flows', q: '' }
+    case 'flow':
+      return { name: 'flows', flowId: link.flowId, q: '' }
+    case 'endpoints':
+      return { name: 'endpoints', q: '', host: link.host }
+    case 'components':
+      return { name: 'components', q: '', kind: link.kind }
+    case 'component':
+      return { name: 'component', componentId: link.componentId }
+    case 'requests':
+      return { name: 'requests', siteId: link.siteId, q: link.q ?? '', transport: link.transport }
+    case 'types':
+      return { name: 'types', q: '' }
+    case 'type':
+      return { name: 'types', typeId: link.typeId, q: '' }
   }
 }
 

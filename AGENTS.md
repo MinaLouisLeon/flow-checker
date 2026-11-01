@@ -102,3 +102,4 @@ re-run them on their own before assuming a regression.
 | M29 | Endpoints                                         | Done   |
 | M30 | Areas                                             | Done   |
 | M31 | Guarded pages                                     | Done   |
+| M32 | Start here                                        | Done   |

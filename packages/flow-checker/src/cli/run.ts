@@ -10,11 +10,13 @@ import { initCommand } from './init'
 import { postmanCommand } from './postman'
 import { isLiveTerminal, type ProgressDisplay, terminalDisplay } from './progress'
 import { scanCommand } from './scan'
+import { summaryCommand } from './summary'
 
 const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
   explore: 'Scan, watch and open the dashboard only: no app, no setup, project files untouched',
   scan: 'Scan only and write .flow-checker/model.json',
+  summary: 'Print a short tour of the app: stack, areas, entry pages, flows, backends (--json)',
   init: 'Add instrumentation hooks, config file and .gitignore entries',
   export: 'Export Markdown docs and a static HTML site (--md <dir>, --html <dir>)',
   doctor: 'Check Next.js version, hooks, ports and tsconfig',
@@ -47,6 +49,7 @@ Options:
   --types                 scan: also print the resolved types
   --requests              scan: also print the request sites
   --flows                 scan: also print navigation and inferred flows
+  --json                  summary: print JSON instead of text
   --md <dir>              export: write Markdown docs to this folder
   --html <dir>            export: write the static HTML site to this folder
                           (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
@@ -135,6 +138,13 @@ export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
         requests: values.requests,
         flows: values.flows,
       },
+      io,
+    )
+  }
+
+  if (command === 'summary') {
+    return summaryCommand(
+      { root: values.root, appDir: values['app-dir'], config: values.config, json: values.json },
       io,
     )
   }
@@ -235,6 +245,7 @@ function parse(argv: string[]) {
       types: { type: 'boolean' },
       requests: { type: 'boolean' },
       flows: { type: 'boolean' },
+      json: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },
       config: { type: 'string' },

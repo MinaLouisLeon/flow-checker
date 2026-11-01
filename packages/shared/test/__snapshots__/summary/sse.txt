@@ -1,0 +1,28 @@
+Start here: sse (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in app/, 3 pages, 3 route handlers)
+  Rendering  4 server, 3 client, 0 shared  (7 components)
+  Data       Event streams (SSE)  (3 requests)
+
+Areas (3 areas by URL)
+  home  /  (1 page, 1 endpoint)
+  chat  /chat  (1 page, 1 flow, 1 endpoint)
+  jobs  /jobs  (1 page, 1 flow, 1 endpoint)
+
+Entry pages
+  Start page  /
+
+Main flows (2 flows)
+  Chat submit        /chat  (2 steps)
+  JobProgress click  /jobs/[id]  (2 steps)
+
+Backends (3 endpoints)
+  This app  This app's API  (3 endpoints, 3 called from the browser)
+
+Where things live
+  Root layout     app/layout.tsx
+  Route handlers  app/api/  (3 handlers)
+
+To check
+  The scan resolved every page, component, type and request.
