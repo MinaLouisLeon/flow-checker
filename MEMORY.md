@@ -414,3 +414,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `enabled: false` there, but cached data is still returned.
 - The help line under the segment inputs also says "Open in app", so tests match the link (`Open in app ↗</a>` or
   `getByRole('link')`), not the text.
+- A fixture copy whose whole `node_modules` is one junction resolves no package on GitHub's Windows runners (pnpm
+  uses relative symlinks there; locally it makes absolute junctions, so it passes here). The scan then misses axios
+  calls and the flows built on them. Tests that check scan results on a copy must link each package by its real path
+  (`linkPackages()` in `e2e/explore.spec.ts` and `flow-checker/test/summary.test.ts`). Failed PR #45 on Windows only.

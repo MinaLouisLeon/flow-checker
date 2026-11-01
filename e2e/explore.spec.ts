@@ -2,7 +2,16 @@
 // .flow-checker/) opens a working dashboard whose Live screen explains how to turn capture on,
 // and the copy stays untouched.
 import { type ChildProcess, spawn } from 'node:child_process'
-import { cpSync, existsSync, mkdtempSync, readdirSync, rmSync, symlinkSync } from 'node:fs'
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, join, resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
@@ -10,6 +19,22 @@ import { expect, test } from '@playwright/test'
 const repo = resolve(import.meta.dirname, '..')
 const NOT_IN_CLONE =
   /^(\.flow-checker|\.next|node_modules|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
+
+/**
+ * Links each installed package by its real path, not the whole `node_modules` folder. pnpm links
+ * packages with relative symlinks on GitHub's Windows runners, and Windows resolves a relative link
+ * reached through a junction from the junction's side, so through one folder link no package
+ * (axios, next) resolved from the copy there. Same as `flow-checker/test/summary.test.ts`.
+ */
+function linkPackages(from: string, to: string) {
+  mkdirSync(to, { recursive: true })
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    if (entry.name === '.bin' || entry.name === '.pnpm' || entry.isFile()) continue
+    const source = join(from, entry.name)
+    if (entry.name.startsWith('@')) linkPackages(source, join(to, entry.name))
+    else symlinkSync(realpathSync(source), join(to, entry.name), 'junction')
+  }
+}
 
 let child: ChildProcess | undefined
 /** Removed after each test: the fixture copy and explore's data folder. */
@@ -55,7 +80,7 @@ test('explore opens the dashboard on a project with no setup', async ({ page }) 
   const from = join(repo, 'fixtures/basic')
   const root = join(tmp, 'basic')
   cpSync(from, root, { recursive: true, filter: (src) => !NOT_IN_CLONE.test(basename(src)) })
-  symlinkSync(join(from, 'node_modules'), join(root, 'node_modules'), 'junction')
+  linkPackages(join(from, 'node_modules'), join(root, 'node_modules'))
   const before = readdirSync(root).sort()
 
   const { url, output } = await explore(root)
