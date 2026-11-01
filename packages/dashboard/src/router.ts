@@ -74,6 +74,8 @@ export type Screen =
   | { name: 'live'; captureId?: string; q: string; filter?: MatchFilter }
   /** `flowId` is an inferred flow id, or a recorded flow id (`rec_...`, `var_...`). */
   | { name: 'flows'; flowId?: string; q: string }
+  /** Guided walk-through (M35); `flowId` is listed first. */
+  | { name: 'walk'; flowId?: string }
   | { name: 'export' }
   /** What each status, note and badge means (M34); `term` (`flag-dynamic-url`) is the one shown first. */
   | { name: 'glossary'; q: string; term?: string }
@@ -152,6 +154,8 @@ export function parseHash(hash: string): Screen {
       }
     case 'flows':
       return { name: 'flows', flowId: parts[1], q: params.get('q') ?? '' }
+    case 'walk':
+      return { name: 'walk', flowId: parts[1] }
     case 'export':
       return { name: 'export' }
     case 'glossary':
@@ -247,6 +251,8 @@ export function href(screen: Screen): string {
       return withQuery(screen.flowId ? `/flows/${encodeURIComponent(screen.flowId)}` : '/flows', {
         q: screen.q,
       })
+    case 'walk':
+      return screen.flowId ? `#/walk/${encodeURIComponent(screen.flowId)}` : '#/walk'
     case 'not-found':
       return '#/'
   }

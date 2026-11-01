@@ -19,6 +19,7 @@ import { PageView } from './screens/PageView'
 import { RequestsScreen } from './screens/RequestsScreen'
 import { StartScreen } from './screens/StartScreen'
 import { TypesScreen } from './screens/TypesScreen'
+import { WalkScreen } from './screens/WalkScreen'
 import { useScrollMemory } from './scroll'
 import { DetailsToggle, Empty } from './ui'
 
@@ -30,6 +31,7 @@ const NAV: {
   needsExport?: boolean
 }[] = [
   { label: 'Start here', screen: { name: 'start' }, match: ['start'] },
+  { label: 'Walk the app', screen: { name: 'walk' }, match: ['walk'] },
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page'] },
   { label: 'Areas', screen: { name: 'areas', q: '' }, match: ['areas'] },
@@ -206,6 +208,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <TypesScreen typeId={screen.typeId} q={screen.q} unused={screen.unused} />
     case 'flows':
       return <FlowsScreen flowId={screen.flowId} q={screen.q} />
+    case 'walk':
+      return <WalkScreen flowId={screen.flowId} />
     case 'live':
       return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
     case 'export':

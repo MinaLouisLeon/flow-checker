@@ -1,0 +1,9 @@
+params: [id]
+
+## Chat submit  /chat  1 request
+1. Submit the form in `Chat` on `/chat`
+2. It opens `event stream /api/chat`
+
+## JobProgress click  /jobs/[id]  1 request
+1. Click in `JobProgress` on `/jobs/[id]`
+2. It opens `event stream /api/jobs/:id/progress`

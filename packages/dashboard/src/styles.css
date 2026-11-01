@@ -1719,3 +1719,77 @@ kbd {
     grid-template-columns: 1fr;
   }
 }
+
+/* Walk the app (M35): flows as a checklist, and the coverage bars */
+.coverage {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.coverage-row {
+  display: grid;
+  grid-template-columns: 140px minmax(80px, 1fr) 44px auto;
+  align-items: center;
+  gap: 4px 10px;
+}
+.coverage-row .progress {
+  margin-bottom: 0;
+}
+.coverage-label {
+  font-size: 13px;
+}
+.coverage-percent {
+  font-weight: 600;
+  text-align: right;
+}
+.coverage-detail {
+  font-size: 12px;
+}
+.walk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.walk-card {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.walk-card.selected {
+  border-color: var(--accent);
+}
+.walk-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-bottom: 4px;
+}
+.walk-name {
+  font-weight: 600;
+}
+.walk-percent {
+  font-weight: 600;
+}
+.walk-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.walk-params label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+@media (max-width: 600px) {
+  .coverage-row {
+    grid-template-columns: 1fr 44px;
+  }
+  .coverage-row .progress,
+  .coverage-detail {
+    grid-column: 1 / -1;
+  }
+}

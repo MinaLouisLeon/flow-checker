@@ -1,0 +1,13 @@
+params: [id]
+
+## TodoPanel submit  /  entry  1 request
+1. Submit the form in `TodoPanel` on `/`
+2. It sends `POST /todos`
+
+## DeleteUserButton click  /users/[id]  4 requests
+1. Click in `DeleteUserButton` on `/users/[id]`
+2. It sends `DELETE /users/:id`
+3. It goes to `/`
+4. The server sends `GET /users` while it renders the page  (not seen)
+5. The page loads `GET /products`
+6. The page loads `GET todosUrl()`

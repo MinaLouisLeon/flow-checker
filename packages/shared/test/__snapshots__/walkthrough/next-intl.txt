@@ -1,0 +1,10 @@
+params: [locale] = en
+
+## LoginForm submit  /[locale]/login  3 requests
+1. Submit the form in `LoginForm` on `/[locale]/login`
+2. It sends `POST /auth/login`
+3. It goes to `/[locale]/verify`
+4. Submit the form in `VerifyOtpForm` on `/[locale]/verify`
+5. It sends `POST /auth/verify-otp`
+6. It goes to `/[locale]/dashboard`
+7. The page loads `GET /me`

@@ -339,6 +339,20 @@ function entrySection(index: ModelIndex): SummarySection {
   }
 }
 
+/**
+ * Pages a newcomer starts from (M35): the start page and the pages nothing in the app links or
+ * redirects to. Slots and intercepted views aren't entry pages.
+ */
+export function entryPageIds(index: ModelIndex): Set<string> {
+  const pages = index.model.routes.filter((r) => r.kind === 'page' && !r.slot && !r.intercepting)
+  const locales = new Set(index.model.middleware?.i18n?.locales ?? [])
+  const linked = new Set(index.navEdges.filter((e) => e.source !== e.target).map((e) => e.target))
+  const out = new Set(pages.filter((r) => !linked.has(r.id)).map((r) => r.id))
+  const root = rootPage(pages, locales)
+  if (root) out.add(root.id)
+  return out
+}
+
 function linkedFrom(n: number): string {
   return n === 1 ? '1 page links here' : `${n} pages link here`
 }

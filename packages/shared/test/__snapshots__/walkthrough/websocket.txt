@@ -1,0 +1,3 @@
+## Ping click  /  entry  1 request
+1. Click in `Ping` on `/`
+2. It opens `WebSocket /echo`
