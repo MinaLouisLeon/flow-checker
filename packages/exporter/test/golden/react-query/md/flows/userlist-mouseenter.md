@@ -46,7 +46,7 @@ sequenceDiagram
 { id: number; name: string; email: string; role: "admin" | "member" }
 ```
 
-**Captured** `GET http://localhost:4010/users/1` → 200 OK · 5 ms · 2026-10-30 01:38 UTC · page `/users`
+**Captured** `GET http://localhost:4010/users/1` → 200 OK · 5 ms · 2026-10-31 22:51 UTC · page `/users`
 
 Response body:
 

@@ -1,6 +1,7 @@
 import type { Component, ComponentRef } from '@flow-checker/shared'
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { useData } from './context'
+import { CAP, capped } from './lists'
 import { editorUrl } from './model-index'
 
 export function Badge({
@@ -131,8 +132,103 @@ export function SearchBox({
   )
 }
 
+export function Select<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: T
+  options: { value: T; label: string }[]
+  onChange: (value: T) => void
+}) {
+  return (
+    <select
+      className="select"
+      aria-label={label}
+      title={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value as T)}
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+const PAGE_SIZE = 200
+
+/**
+ * Long lists render 200 rows at a time, so typing in a search box stays quick on large apps.
+ * `resetKey` (the filters) starts again from the first page; `selected` is always shown.
+ */
+export function usePaged<T>(items: T[], resetKey: string, selected = -1) {
+  const [limit, setLimit] = useState(PAGE_SIZE)
+  useEffect(() => setLimit(PAGE_SIZE), [resetKey])
+  const shown = Math.max(limit, selected + 1)
+  return {
+    items: items.slice(0, shown),
+    more: Math.max(0, items.length - shown),
+    showMore: () => setLimit(shown + PAGE_SIZE),
+  }
+}
+
+export function ShowMore({ more, onClick }: { more: number; onClick: () => void }) {
+  if (more <= 0) return null
+  return (
+    <button type="button" className="button show-more" onClick={onClick}>
+      Show {Math.min(more, PAGE_SIZE)} more <span className="muted">({more} hidden)</span>
+    </button>
+  )
+}
+
 export function matches(query: string, ...fields: (string | undefined)[]): boolean {
   const q = query.trim().toLowerCase()
   if (!q) return true
   return fields.some((f) => f?.toLowerCase().includes(q))
+}
+
+/** A list that grows with the app: the first few entries, then "+N more" (M23). */
+export function useCapped<T>(items: readonly T[], limit = CAP) {
+  const [expanded, setExpanded] = useState(false)
+  return { ...capped(items, expanded, limit), expand: () => setExpanded(true) }
+}
+
+export function MoreButton({ hidden, onClick }: { hidden: number; onClick: () => void }) {
+  if (hidden <= 0) return null
+  return (
+    <button type="button" className="more-button" onClick={onClick}>
+      +{hidden} more
+    </button>
+  )
+}
+
+/** A capped `<ul>`: the first entries, then a "+N more" row. */
+export function CappedList<T>({
+  items,
+  className,
+  limit,
+  render,
+}: {
+  items: readonly T[]
+  className?: string
+  limit?: number
+  /** Renders one entry, keyed (a `<li>`). */
+  render: (item: T) => ReactNode
+}) {
+  const { shown, hidden, expand } = useCapped(items, limit)
+  return (
+    <ul className={className}>
+      {shown.map(render)}
+      {hidden > 0 && (
+        <li className="more-row">
+          <MoreButton hidden={hidden} onClick={expand} />
+        </li>
+      )}
+    </ul>
+  )
 }

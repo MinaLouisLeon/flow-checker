@@ -4,45 +4,65 @@
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch prefetchQuery(['users'])  server-render
   key: ['users']
   response: User[]
-  via: queryClient.prefetchQuery src/app/users/page.tsx:9 > http src/services/api.ts:30 > fetch src/services/api.ts:7
+  via: queryClient.prefetchQuery src/app/users/page.tsx:9 > http src/services/api.ts:31 > fetch src/services/api.ts:8
 
 ## AddTodoForm  src/components/AddTodoForm.tsx:9
 POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useMutation  event onSubmit
   body: NewTodo
   response: Todo
-  via: useMutation src/components/AddTodoForm.tsx:14 > http src/services/api.ts:26 > fetch src/services/api.ts:7
+  via: useMutation src/components/AddTodoForm.tsx:14 > http src/services/api.ts:27 > fetch src/services/api.ts:8
+
+## SettingsBadge  src/components/SettingsBadge.tsx:7
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  fetch useQuery([QueryKey.Settings])  page-load
+  key: ['settings']
+  response: Settings
+  via: useApiQuery src/components/SettingsBadge.tsx:8 > useQuery src/hooks/useApiQuery.ts:6 > http src/services/api.ts:34 > fetch src/services/api.ts:8
+
+## SettingsPanel  src/components/SettingsPanel.tsx:10
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  fetch useQuery([QueryKey.Settings])  page-load
+  key: ['settings']
+  response: Settings
+  via: useApiQuery src/components/SettingsPanel.tsx:12 > useQuery src/hooks/useApiQuery.ts:6 > http src/services/api.ts:34 > fetch src/services/api.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch useQuery([Scopes.users, STATS])  page-load
+  key: ['users', 'stats']
+  response: User[]
+  via: useQuery src/components/SettingsPanel.tsx:13 > http src/services/api.ts:31 > fetch src/services/api.ts:8
+GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useQuery([version, 'todos'])  page-load
+  key: [?version, 'todos']
+  response: Todo[]
+  via: useQuery src/components/SettingsPanel.tsx:14 > http src/services/api.ts:23 > fetch src/services/api.ts:8
 
 ## TodoDetail  src/components/TodoDetail.tsx:8
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useQuery(['todos', 'detail', id])  page-load
   key: ['todos', 'detail', :id]
   response: Todo
-  via: useQuery src/components/TodoDetail.tsx:9 > fetchTodo src/components/TodoDetail.tsx:9 > http src/services/api.ts:23 > fetch src/services/api.ts:7
+  via: useQuery src/components/TodoDetail.tsx:9 > fetchTodo src/components/TodoDetail.tsx:9 > http src/services/api.ts:24 > fetch src/services/api.ts:8
 
 ## TodoList  src/components/TodoList.tsx:9
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  fetch useQuery(todoKeys.lists())  page-load
   key: ['todos', 'list']
   response: Todo[]
-  via: useQuery src/components/TodoList.tsx:11 > http src/services/api.ts:22 > fetch src/services/api.ts:7
+  via: useQuery src/components/TodoList.tsx:11 > http src/services/api.ts:23 > fetch src/services/api.ts:8
 PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  fetch useMutation  event onChange
   body: TodoPatch
   response: Todo
-  via: useMutation src/components/TodoList.tsx:13 > updateTodo src/components/TodoList.tsx:13 > http src/services/api.ts:28 > fetch src/services/api.ts:7
+  via: useMutation src/components/TodoList.tsx:13 > updateTodo src/components/TodoList.tsx:13 > http src/services/api.ts:29 > fetch src/services/api.ts:8
 
 ## TodoStats  src/components/TodoStats.tsx:9
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  fetch useQueries(todoKeys.list(userId))  page-load
   key: ['todos', 'list', { userId: :userId }]
   response: Todo[]
-  via: useQueries src/components/TodoStats.tsx:11 > fetchUserTodos src/components/TodoStats.tsx:13 > http src/services/api.ts:24 > fetch src/services/api.ts:7
+  via: useQueries src/components/TodoStats.tsx:11 > fetchUserTodos src/components/TodoStats.tsx:13 > http src/services/api.ts:25 > fetch src/services/api.ts:8
 
 ## UserList  src/components/UserList.tsx:7
 GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  fetch useQuery(['users'])  page-load
   key: ['users']
   response: User[]
-  via: useQuery src/components/UserList.tsx:9 > http src/services/api.ts:30 > fetch src/services/api.ts:7
+  via: useQuery src/components/UserList.tsx:9 > http src/services/api.ts:31 > fetch src/services/api.ts:8
 DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  fetch useMutation(['deleteUser'])  event onClick
   key: ['deleteUser']
   response: User
-  via: useMutation src/components/UserList.tsx:11 > deleteUser src/components/UserList.tsx:11 > http src/services/api.ts:31 > fetch src/services/api.ts:7
+  via: useMutation src/components/UserList.tsx:11 > deleteUser src/components/UserList.tsx:11 > http src/services/api.ts:32 > fetch src/services/api.ts:8
 
 # Query cache links
 
@@ -56,6 +76,13 @@ invalidate ['todos']  invalidateQueries  AddTodoForm  event onSubmit  success  s
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos  (TodoList)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  (TodoStats)
 
+invalidate ['settings']  invalidateQueries  SettingsPanel  event onClick  src/components/SettingsPanel.tsx:21
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  (SettingsBadge)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings  (SettingsPanel)
+
+invalidate [?version]  invalidateQueries  SettingsPanel  event onClick  src/components/SettingsPanel.tsx:24
+  hits: (key not known)
+
 set-data ['todos', 'detail', :id]  setQueryData  TodoList  event onChange  exact success  src/components/TodoList.tsx:15
   after: PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id  (TodoDetail)
@@ -66,8 +93,9 @@ invalidate ['todos', 'list']  invalidateQueries  TodoList  event onChange  exact
 
 remove ['users', :id]  removeQueries  UserList  event onClick  exact success  src/components/UserList.tsx:13
   after: DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
-  hits: (no scanned query)
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (SettingsPanel)
 
 invalidate ['users']  invalidateQueries  UserList  event onClick  success  src/components/UserList.tsx:14
   after: DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+  hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (SettingsPanel)
   hits: GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  (UserList)

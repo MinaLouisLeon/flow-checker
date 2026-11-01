@@ -52,6 +52,9 @@ const LOAD_TRIGGERS = new Set(['server-render', 'page-load', 'effect'])
 export function inferFlows(input: FlowInput): Flow[] {
   const components = new Map(input.components.map((c) => [c.id, c]))
   const pageComponents = pageSubtrees(input.routes, components)
+  const routes = new Map(input.routes.map((r) => [r.id, r]))
+  const pathOf = (id: string) => routes.get(id)?.path ?? ''
+  const depthOf = (id: string) => pathOf(id).split('/').filter(Boolean).length
   const routesOf = new Map<string, string[]>()
   for (const route of input.routes) {
     for (const id of renderedOn(route, components)) push(routesOf, id, route.id)
@@ -127,7 +130,15 @@ export function inferFlows(input: FlowInput): Flow[] {
   const continuedBy = new Map<string, Set<string>>()
   for (const start of [...handlers.values()].sort((a, b) => compareLoc(a.loc, b.loc))) {
     if (start.requests.length === 0) continue
-    const routeId = routesOf.get(start.componentId)?.[0]
+    // In a page's own tree: that page. Only in a layout: every page under the layout can be the
+    // start, and the shallowest one (the layout's own segment) stands for them.
+    const onRoutes = routesOf.get(start.componentId) ?? []
+    const own = onRoutes.filter((id) => pageComponents.get(id)?.has(start.componentId))
+    const underLayout =
+      own.length === 0
+        ? [...onRoutes].sort((a, b) => depthOf(a) - depthOf(b) || compare(pathOf(a), pathOf(b)))
+        : []
+    const routeId = own[0] ?? underLayout[0]
     const steps: FlowStep[] = []
     const branches: FlowBranch[] = []
     const routeIds = routeId ? [routeId] : []
@@ -181,6 +192,7 @@ export function inferFlows(input: FlowInput): Flow[] {
         id: makeId('flw', start.key),
         name: `${component?.name ?? 'Component'} ${eventName(start.event)}`,
         ...(routeId ? { routeId } : {}),
+        ...(underLayout.length > 1 ? { startRouteIds: underLayout } : {}),
         componentId: start.componentId,
         steps,
         branches,

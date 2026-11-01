@@ -17,6 +17,7 @@ import {
   readPackageJson,
 } from './project'
 import type { CliIO } from './run'
+import { EDGE_BODY, editServerHook, SERVER_SNIPPET } from './server-hook'
 
 export interface InitCommandOptions {
   root?: string
@@ -27,8 +28,11 @@ export interface InitCommandOptions {
 
 interface Change {
   file: string
-  action: 'create' | 'append'
+  /** `replace` writes `content` as the whole new file. */
+  action: 'create' | 'append' | 'replace'
   content: string
+  /** What an edit does, shown in the list of changes. */
+  detail?: string
 }
 
 const CLIENT_SNIPPET = `// flow-checker: captures requests while you test the app. It does nothing unless the app
@@ -36,27 +40,6 @@ const CLIENT_SNIPPET = `// flow-checker: captures requests while you test the ap
 import { installClientRuntime } from '${PACKAGE_NAME}/runtime/client'
 
 installClientRuntime(process.env.NEXT_PUBLIC_FLOW_CHECKER)
-`
-
-const NODE_BODY = `  // flow-checker: captures server-side requests while you test. It does nothing unless FLOW_CHECKER=1.
-  if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'nodejs') {
-    const { registerServerRuntime } = await import('${PACKAGE_NAME}/runtime/server')
-    registerServerRuntime()
-  }`
-
-/** For middleware on the edge runtime (`middleware.ts` before Next.js 16): fetch only. */
-export const EDGE_BODY = `  // flow-checker: requests sent from middleware on the edge runtime (fetch only, best effort).
-  if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'edge') {
-    const { registerEdgeRuntime } = await import('${PACKAGE_NAME}/runtime/edge')
-    registerEdgeRuntime(process.env.FLOW_CHECKER_RUNTIME)
-  }`
-
-const REGISTER_BODY = `${NODE_BODY}
-${EDGE_BODY}`
-
-const SERVER_SNIPPET = `export async function register() {
-${REGISTER_BODY}
-}
 `
 
 const CONFIG_SNIPPET = `import { defineConfig } from '${PACKAGE_NAME}/config'
@@ -91,9 +74,6 @@ const NEXT_CONFIGS = [
   'next.config.mjs',
   'next.config.cjs',
 ]
-
-const REGISTER_EXPORT =
-  /export\s+(?:async\s+)?function\s+register\b|export\s+(?:const|let|var)\s+register\b|export\s*\{[^}]*\bregister\b/
 
 export async function initCommand(options: InitCommandOptions, io: CliIO): Promise<number> {
   const progress = createProgress(io, [
@@ -137,21 +117,18 @@ async function init(options: InitCommandOptions, io: CliIO, progress: Progress):
     changes.push({ file: client, action: 'append', content: `\n${CLIENT_SNIPPET}` })
   }
 
-  // Server hook. An existing register() can't be merged safely, so the user adds two lines.
+  // Server hook: the blocks go first in register(), outside any condition (M22). An existing
+  // register() is edited in place; shapes that can't be edited are left to the user.
   const server = findHook(dir, 'instrumentation')
   if (!server) {
     changes.push({ file: join(dir, `instrumentation${ext}`), action: 'create', content: SERVER_SNIPPET })
   } else {
-    const text = readFileSync(server, 'utf8')
-    if (!text.includes(`${PACKAGE_NAME}/runtime/server`)) {
-      if (REGISTER_EXPORT.test(text)) {
-        manual.push(
-          `${rel(server)} already exports register(). Add this at the start of it (register must be async):\n\n${REGISTER_BODY}\n`,
-        )
-      } else {
-        changes.push({ file: server, action: 'append', content: `\n${SERVER_SNIPPET}` })
-      }
-    } else if (!text.includes(`${PACKAGE_NAME}/runtime/edge`)) {
+    const edit = editServerHook(server, root)
+    if (edit.kind === 'append') changes.push({ file: server, action: 'append', content: edit.text })
+    else if (edit.kind === 'edit') {
+      changes.push({ file: server, action: 'replace', content: edit.text, detail: edit.what })
+    } else if (edit.kind === 'manual') manual.push(edit.note)
+    else if (!readFileSync(server, 'utf8').includes(`${PACKAGE_NAME}/runtime/edge`)) {
       // Hooks from v0.1 don't capture middleware on the edge runtime.
       const middleware = findMiddlewareFile(root, appDir)
       if (middleware && middlewareOnEdge(middleware, nextVersion(root))) {
@@ -194,7 +171,9 @@ It does nothing unless the app was started by flow-checker. Browser capture need
 
   io.out('flow-checker init will make these changes:\n')
   for (const change of changes) {
-    io.out(`  ${change.action === 'create' ? 'create' : 'update'}  ${rel(change.file)}`)
+    io.out(
+      `  ${change.action === 'create' ? 'create' : 'update'}  ${rel(change.file)}${change.detail ? ` (${change.detail})` : ''}`,
+    )
   }
   if (ignore.length > 0) io.out(`  update  .gitignore (${ignore.join(', ')})`)
   io.out('')
@@ -213,7 +192,7 @@ It does nothing unless the app was started by flow-checker. Browser capture need
   const steps = changes.length + (ignore.length > 0 ? 1 : 0)
   progress.start('apply', 'Applying changes…', steps)
   for (const [index, change] of changes.entries()) {
-    if (change.action === 'create') writeFileSync(change.file, change.content)
+    if (change.action === 'create' || change.action === 'replace') writeFileSync(change.file, change.content)
     else {
       const text = readFileSync(change.file, 'utf8')
       appendFileSync(change.file, `${text.endsWith('\n') ? '' : '\n'}${change.content}`)

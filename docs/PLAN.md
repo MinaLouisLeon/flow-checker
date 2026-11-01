@@ -618,6 +618,242 @@ capture: { maxMessages: 200, maxMessageBytes: 64_000 },
 - **Performance:** measured on the same machine against the published 0.1.0 (`FLOW_CHECKER_CLI` points `bench.mjs` at another build): cold scan 10.3 s → 12.9 s, re-scan 3.7 s → 4.9 s. Profiling showed `#eventStream` (M18) spending ~1 s on `functionOf()`: for a bodiless declaration it called ts-morph's `getImplementation()`, which searches every statement of the declaring file by name, i.e. all of `lib.dom.d.ts` for each `fetch` call. Declaration files are now skipped (no output change). After the fix: cold scan 11.9 s, re-scan 4.0 s, slowest API answer 182 ms, inside the CI budgets (25 s / 8 s / 1 s), which stay as they are. The rest of the scan time is the M1–M3 walk, as before.
 - **Not done here:** the `v0.2.0` tag and npm publish (the Release workflow runs on the tag after merging to `main`).
 
+### v0.2.2 milestones
+
+Decided on 2026-10-31. A patch release: fixes and missing screens, no new transports. Order: M21 → M22 → M23 → M24 → M25 → M26.
+
+**Generic fixes, not fixes for one app.** These problems were found by running the published **0.2.1** on a real test app (54 pages, a catch-all BFF proxy, react-hook-form forms, custom React Query hooks) and checking its dashboard and the app in Chrome. That app is only a test bed: flow-checker has to work on any Next.js App Router project. So:
+
+- Each fix targets the **code pattern**, written the way any project might write it. Never match names, paths or helpers from the test app (no lists of function names such as `handleSubmit` or `signedFetch`, no env variable names). The scanner follows the language (calls, arguments, JSX attributes, `new URL()`, enums, re-exports); library knowledge stays limited to public library APIs.
+- Each pattern gets its own small case **written from scratch** in a fixture or in `packages/scanner/test/wrappers.test.ts`, with variants: function declaration vs. arrow, inline vs. imported from another file, aliased or re-exported, `.ts` and `.js`.
+- "Done when" is measured on the fixtures, the perf app (`scripts/perf`) and the Next matrix. Real apps are a final smoke check in M26: the test app plus at least one other real project.
+
+| #   | Milestone                                                                                                                                                                                                                                     | Done when                                                                                                                                                                                                         | Status  |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| M21 | **Components and Requests screens:** searchable, filterable lists at `#/components` and `#/requests`, a request detail screen `#/requests/:siteId`, nav items, and the two overview cards (and their detail parts) link to them               | Every overview card opens a screen whose count matches the card; on the perf app (804 components, 1,000 requests) both lists render and filter without lag; both work in the static HTML export                   | ✅ Done |
+| M22 | **Server hook placement check:** `doctor` fails unless the flow-checker blocks are the **first statements of `register()`**, outside any condition; `init` inserts them there itself; `dev` warns when server capture never starts            | `doctor` fails, naming the line and the fix, for every misplaced shape in its tests and passes for every correct one; a matrix app with an existing `register()` is edited by `init` and captures server requests | ✅ Done |
+| M23 | **Dashboard fixes:** bounded lists (query-cache targets, callers, navigations), scroll reset between screens, route handler callers shown by URL and de-duplicated, generic instantiations folded in Types                                    | A page view of a synthetic model with 200 queries and invalidations that hit all of them stays under 5,000 DOM nodes; each fix has a unit or e2e test                                                             | ✅ Done |
+| M24 | **React Query keys:** enum, `as const` and `const` members read as static segments, an unreadable segment is never a wildcard, keys passed to custom query hooks are read per call, one capture verifies every site that shares its query     | The react-query fixtures (v4 and v5) have a case for each and link and match as described in the notes                                                                                                            | ✅ Done |
+| M25 | **Scanner fixes:** triggers through call arguments, shared mutation hooks, context and hook callbacks, URLs built with `new URL()`, catch-all proxy handlers, URLs from data, components chosen at runtime, library types, flows from layouts | Every pattern in the notes has test cases with variants; no fixture has duplicate sites; fixture `unknown` triggers are only the expected ones; the perf app's `model.json` doesn't grow                          | ✅ Done |
+| M26 | **Release v0.2.2:** CHANGELOG (also rename the stale `Unreleased` heading on `dev` to `0.2.1`), README sections for the new screens and the hook rule, Next matrix, perf budgets, before/after numbers on real apps                           | v0.2.2 on npm                                                                                                                                                                                                     | ✅ Done |
+
+### v0.2.2 notes
+
+**What was checked on the test app (2026-10-31).** Every dashboard screen on `:4400`, and the app on `:3000` with live capture on. Browser capture works: new captures showed up while browsing, matched to the right component, with no errors from the runtime. The issues in Next's dev overlay came from another browser extension and from Google One Tap, not from flow-checker. Its type-mismatch flags were real differences between the app's types and its API, so they are correct findings. The numbers in brackets below come from that app and only show how common each pattern is.
+
+**M21 — Components and Requests screens:**
+
+The Overview's Pages, Route handlers, Types and Flows cards are links, but Components and Requests are plain `<div>`s (`Stat` without `link` in `screens/Overview.tsx`). There is no screen to link to: `router.ts` has a single-component route (`#/component/:id`) but no list, and requests only appear inside the page view and the component panel.
+
+- **`#/components`** (`screens/ComponentsScreen.tsx`): one row per component with name, kind badge (`server` / `client` / `shared`), file, the pages it appears on, request count and flag count. Search by name or file (`?q=`). Filters for kind, "sends requests", "has flags" and resolution (`excluded`, `prop`, unresolved). Sort by name, requests or pages. A row opens `#/component/:id`.
+- **`#/requests`** (`screens/RequestsScreen.tsx`): one row per request site with method, URL pattern, transport, trigger (`page load`, `onSubmit`, `unknown`...), component, status (`verified`, `mismatch`, `needs-recheck`, not yet captured) and flags.
+  - Search by URL, component or file.
+  - Filters for status, trigger kind (on load / on events / server-side, the same split as the card), transport and "has flags".
+  - Sites with the same method and URL fold into one row "from N places", as on the page view.
+- **`#/requests/:siteId`**: the request on its own page, reusing `RequestView` (body and response types, server hops, type check, query-cache links, captures, the call path). Overview to-do items and Live's matched site link here instead of to the component that holds the request.
+- **Overview cards:** Components → `#/components`, Requests → `#/requests`. The detail parts link to pre-filtered lists (`server` → `?kind=server`, `on events` → `?trigger=event`). Route handlers → a route-handler list (M23) instead of the top of the tree, where handlers sit at the bottom.
+- **Nav:** Overview · Map · Components · Requests · Flows · Types · Live · Export.
+- **Size:** large apps have about 1,000 components. Render the list windowed (or in pages of 200) so typing in the search box stays under 50 ms.
+- **Static export:** both screens read the embedded data like the others do.
+- **Check:** router tests for the new routes and their query params; an e2e test that clicks each overview card and checks the screen and count; component tests for the filters.
+
+**Built in M21** (`packages/dashboard/src/lists.ts`, `screens/ComponentsScreen.tsx`, `screens/RequestsScreen.tsx`):
+
+- **Pure helpers in `lists.ts`:** component rows (pages, requests, notes per component), filters, sorting, `requestWhen()` (`load` / `event` / `server` / `unknown`, the overview card's split), request search, `siteOwner()` and `groupSame()` (moved out of `RequestView`). Search matches every word of the query in any field, in any order (`verifyotp post`).
+- **Both screens use the Types layout:** the list on the left, the selected item beside it. The selection is part of the URL with the filters: `#/components/:id?q=&kind=&has=&sort=` and `#/requests/:siteId?q=&status=&when=&transport=&flags=1`. Unknown filter values in a hand-edited URL are ignored. The component panel's links stay in the Components screen (`ComponentPanel`'s new `componentHref`). `#/component/:id` still exists for links from elsewhere.
+- **Components:** kind buttons with counts (the counts follow the other filters), "Show": any / sends requests / has things to check / not on any page, sort by name / most requests / most pages. Differs from the plan: there is no resolution filter, because `excluded` / `prop` / unresolved belong to component _references_, not to scanned components.
+- **Requests:** "when" buttons with counts (All, On load, On events, Server-side, Unknown trigger), status, transport (shown when the app uses more than one) and a "⚠ Flagged" toggle. The same request sent from several places is one row that opens into its places. The side panel says where the request is sent from (with a link), the pages it is on (up to 12), then the full request view.
+- **Request links:** `siteHref()` now opens the request page everywhere it was used (Live's matched site, flows, GraphQL / tRPC / SSE / WebSocket / Postman sections). The old target is `ownerHref()`. The overview's request notes link to the request.
+- **Overview:** Components and Requests cards link to the lists; each part of their detail line opens a filtered list. The Requests card also shows "N unknown trigger" when there are any (the three other parts didn't add up to the total before).
+- **Size:** lists render 200 rows at a time with "Show 200 more" (`usePaged()` in `ui.tsx`; the selected row is always shown). Measured on the perf app (804 components, 1,000 requests): 19–38 ms per keystroke in the search box (one 52 ms), about 1,360 DOM nodes. On the real test app (993 components) 4–33 ms.
+- **Not done here:** the Route handlers card still opens the route tree (M23).
+- **Check:** `packages/dashboard/test/lists.test.ts` (rows, filters, sorting, grouping, route round trips, unknown values); `e2e/screens.spec.ts` (each card opens its screen; counts match; filters, search and selection); `e2e/export.spec.ts` opens both screens in the static export.
+
+**M22 — Server hook placement check:**
+
+**Why.** When a project already has `register()` in `instrumentation.ts`, `init` can't create the hook, so it prints the blocks for the user to paste. Pasted inside an existing condition, they may never run. For example, `if (process.env.NODE_ENV === 'production') { … }` never runs under `next dev`, so server capture silently stays off (the test app captured no server request at all). `doctor` only looks for the import text, so it still prints `✓ Server hook`.
+
+**The rule `doctor` enforces.** The flow-checker blocks must be the **first statements of `register()`'s body**, at its top level, and not inside any condition. The rule is about shape, not about what a condition means: any wrapping condition fails, even one that happens to be true in dev, so the rule is simple to state and to follow.
+
+- **Finding `register`:** read `instrumentation.ts` / `.js` / `.mjs` (in `src/` or the root) with the TypeScript AST. `register` can be:
+  - `export async function register()`;
+  - `export const register = async () => { … }` or a function expression;
+  - `export { register }` or `export { setup as register }` of a local function;
+  - re-exported from another project file, which is followed.
+
+  If it can't be found or followed, `doctor` warns that it can't check the hook and says where `register` comes from.
+- **Placement:** the Node block (`if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'nodejs') { … registerServerRuntime() }`) comes first in the body. The edge block, when the project needs it, comes right after it. Only comments may come before them.
+  - **Fails:** any statement before them; the blocks inside an `if` / `else`, `switch`, loop, `try` / `catch` / `finally`, a ternary or `&&` / `||` expression, a nested function or callback, or after an early `return`.
+  - **The block's own condition** (`FLOW_CHECKER === '1'` and the runtime check) is expected. If it is changed or missing, `doctor` warns.
+- **Other failures:**
+  - `register` isn't `async`, so `await import(...)` can't work.
+  - `register` is an expression-bodied arrow (`export const register = () => init()`), which has no body to put the blocks in.
+  - Only one of the two blocks is placed correctly; each block is checked on its own.
+- **The message:** where the block is and why it doesn't run (for example, "inside `if (process.env.NODE_ENV === 'production' …)` at line 22: it never runs under `next dev`"), then the fix: move these lines to the start of `register()`, with the snippet. Exit code 1, like the other failed checks.
+- **`init`:**
+  - When `register()` exists in a shape it can edit (the first three shapes above), `init` inserts the blocks as its first statements itself, making `register` `async` if needed, and lists that change with the others before applying.
+  - Running `init` again on misplaced blocks moves them.
+  - The manual note stays only for shapes it can't edit. It says "as the first lines of `register()`, outside any `if`".
+- **`dev` safety net:** when browser captures reach a project route handler and no server capture has arrived 10 s after the first one, print one warning in the terminal and show a banner on Live ("Server capture isn't running: run `flow-checker doctor`").
+- **Check:**
+  - `doctor` tests, one per shape. Passing: first statements; comments before them; edge block second. Failing: a production `if`, a runtime `if`, an `else` branch, `try`, a `switch`, after an early `return`, after other statements, inside a nested callback, not `async`, an expression arrow. Also: a re-export from another file, `export { register }`, `.js` and `.mjs`, `src/` and root.
+  - `init` tests for each shape it edits.
+
+**Built in M22** (`packages/flow-checker/src/cli/server-hook.ts`, `packages/server/src/server-capture.ts`):
+
+- **One module for both commands.** `server-hook.ts` holds the snippets (moved out of `init.ts`), `findRegister()`, `checkPlacement()`, `checkHookFile()` (the doctor check) and `editServerHook()` (init). It parses with the TypeScript API from ts-morph, without a project or type checker.
+- **Finding `register`:** the four shapes in the plan, plus `export * from`, a name imported and then exported (`import { x } from './a'; export { x as register }`), and tsconfig path aliases (`@/lib/hooks`), followed up to 5 files deep. A package import (`from 'some-tracing-lib'`) or a value that isn't a function (`export const register = wrap(setup)`) is a warning that says where `register` comes from.
+- **What counts as the block:** each `import('…/runtime/server')` (or a call to a name statically imported from it) in `register()`; its block is the nearest `if` around it that tests `FLOW_CHECKER` or `NEXT_RUNTIME`, else its statement. Every construct between that block and `register()`'s body fails, and the message names the outermost one (the one to move out of). `NODE_ENV === 'production'` in the `then` branch (or `!== 'production'` in the `else`) says "it never runs under `next dev`"; other conditions say "it only runs when that condition holds". A block outside `register()` fails ("Next.js only runs register()"), and so does a file that loads the runtime without exporting `register`.
+- **Before the block:** only comments and other flow-checker blocks, so the edge block may come first or second. An unconditional `return` before it says "it never runs".
+- **Edge block:** checked by the Middleware check when the middleware runs on the edge runtime. Misplaced is a failure; missing stays a warning, as before.
+- **Hints:** misplaced blocks get "move these lines to the start of register(), outside any `if`", with the snippet, and "(or run `flow-checker init`, which moves them)" when init can edit that shape. Not `async` and expression arrows get their own fix.
+- **`init`:** inserts both blocks after the body's `{`, at the indentation of the body's first statement, and removes flow-checker's own blocks found elsewhere in the file (with their `// flow-checker:` comment lines). The wrapper they were in is left as it was (an empty `if` stays). It makes `register` `async`, turns a return type `T` into `Promise<T>`, and gives `() => init()` a body (`{ <blocks> return init() }`). Blocks written in another shape (no `if` of their own) are not moved: init leaves a note. A file with no `register` gets the snippet appended, as before. The change is listed as `update  instrumentation.ts (adds the flow-checker blocks at the start of register(), makes it async)`.
+- **`dev`:** prints the doctor message at start when the server hook fails the check. `ServerCaptureWatch` (server package) starts a 10 s timer at the first browser capture that goes to the page's own origin and hits a project route handler **that sends requests** (one with route-handler sites in the model; a handler that only answers makes no server capture, so it would warn wrongly). A server capture stops it. When it fires, the state becomes `missing`: the CLI prints one warning, `GET /api/server-capture` and the live feed's `server-capture` event carry it, and Live shows a banner. A later server capture turns it back to `running`. Captures timestamped before the watch started (re-matched after a re-scan) don't count.
+- **Matrix:** the matrix app now starts with its own `register(): void` with a production-only `if`; the script checks that init made it `async`, put the blocks first and kept the app's code, then `doctor` passes and `dev` captures the server fetches as before.
+- **Check:** `flow-checker/test/server-hook.test.ts` (every shape in the plan, passing and failing, the warnings, the CLI exit code and message, and init on each editable shape, including moving blocks and a second run changing nothing); `server/test/server-capture.test.ts`; a `dev` test in `init.test.ts` that ingests browser captures and gets one warning. The doctor tests' hook text is now a real `register()`.
+  - A matrix case: the app starts with a `register()` that has its own code and a production-only branch; `init` edits it, `doctor` passes and `dev` captures the server fetch.
+
+**M23 — Dashboard fixes:**
+
+- **Bounded lists.** Any list that grows with the app is capped: the first 5 entries plus "+N more", which expands. That covers query-cache targets, route handler callers, "Leaves this page", layout requests and type usages. An invalidation with no key reads "→ every query" instead of listing them all. (On the test app one page view listed about 120 queries per row: about 44,700 DOM nodes and 240,000 characters of text.)
+- **Scroll position leaks between screens.** Going from a scrolled list to another screen keeps the offset, so the new screen opens mid-list. Scroll to the top on a new screen; keep the position on back/forward and on `replaceScreen()` (search boxes, toggles).
+- **Route handler page.**
+  - Each caller shows the URL it sends; for a catch-all handler that is the concrete path, e.g. `POST /api/auth/login` for `/api/[...path]`.
+  - Callers at the same source line fold into one row, and callers are grouped by URL, with a search box.
+  - The handler's own outgoing requests come first.
+  - The Overview's Route handlers card opens a list of route handlers (a filter on the map screen) instead of the top of the route tree.
+- **Types list noise.** Each instantiation of a generic is its own row, many with "0 uses". Fold instantiations under their generic (`ApiResponse<T>` with N instantiations) and hide 0-use rows behind a toggle.
+- **Repeated navigations.** A navigation in a shared hook appears once for each component that uses the hook (12 identical rows on the test app). Fold to one row "from N components". That hook's `router.push` also showed the trigger `effect` although it only runs from event handlers; M25's trigger work covers it.
+- **Check:** unit tests for the capping and folding helpers; an e2e test for scroll reset; the DOM budget from the table, measured on a synthetic model.
+
+**Built in M23** (`packages/dashboard/src/lists.ts`, `ui.tsx`, `scroll.ts`, `RequestView.tsx`, `screens/PageView.tsx`, `screens/TypesScreen.tsx`, `screens/MapScreen.tsx`):
+
+- **Capping:** `capped()` (pure, in `lists.ts`) plus `useCapped()`, `MoreButton` and `CappedList` in `ui.tsx`. Five entries, then "+N more", which shows the rest. Capped: query-cache calls and each call's targets, "Leaves this page", route handler callers per URL, "From layouts", and a type's components, types and requests; also a component's "Rendered by" and "On pages". Request lists show 20 rows before "+N more" (5 for layouts and types).
+- **Every query:** a cache call with no key, procedure or operation (`hitsEveryQuery()`) reads "→ every query" instead of listing its targets.
+- **Closed requests render no body.** A request row's details (types, call path, cache links, captures) are rendered the first time it is opened (`LazyDetails`): closed, a request still cost dozens of nodes, and a page can list hundreds. The synthetic page (200 queries, nine cache calls that hit all of them) renders about 830 DOM nodes.
+- **Scroll:** `useScrollMemory()` gives each history entry an id in `history.state` and saves its scroll position. A new entry for another screen (`screenIdentity()`: the screen name, plus the route or component for the page and component views) scrolls to the top; choosing a row on a list screen or a component in the page view keeps the position. Back/forward restores the entry's position, and `replaceScreen()` now keeps `history.state`, so search boxes and toggles keep it too. `history.scrollRestoration` is `manual`.
+- **Route handler page:** "Requests it sends" first. Callers are grouped by method and URL (`callerGroups()`, sorted by URL), so a catch-all handler lists the concrete paths it is called with; callers in a group that send from the same line (the last frame of their call path) fold into one row "from N components". A search box (URL, component, file) shows when there are more than five callers.
+- **Route handler list:** the map has a third view, `#/map?view=handlers`, listing route handlers with their methods, callers and requests sent. The Overview's Route handlers card opens it.
+- **Types:** `typeRows()` folds types with the same declaration (`definedAt`) and base name into one `Name<…>` row with its instantiations and total uses, and hides types with no uses behind "Show unused (N)" (`#/types?all=1`). The selected type is always listed. Uses now also count requests whose body or response uses the type.
+- **Navigations:** `groupNavigations()` folds navigations with the same kind, href, trigger and line into one row "from N components".
+- **Check:** `dashboard/test/m23.test.ts` (capping, folding, type rows, scroll decisions, routes) on a synthetic model built over the next-intl snapshot by `dashboard/test/synthetic.ts`; `e2e/dashboard-limits.spec.ts` puts the same model into a static export and checks the DOM budget, the folded rows, the handler page, the types toggle and scroll reset / restore.
+
+**M24 — React Query keys:**
+
+- **Enum and constant members in keys.** `queryKey: [QueryKeys.feed]` with a string enum is read as a dynamic segment `[:feed]`. Read these as static segments, also when they are imported from another file, re-exported, or used inside template literals:
+  - string enum members;
+  - `as const` object properties;
+  - `const` string variables.
+- **An unreadable segment is never a wildcard.** Today a dynamic first segment links to every query in the app. A link whose first segment is unknown has no targets and says "key not known". With a known prefix, it links by the known prefix only.
+- **Keys through custom query hooks.** A project hook that forwards its arguments into React Query (`useInfiniteList({ queryKey, queryFn })` calling `useInfiniteQuery`) loses both the key and the site kind: the site shows as plain `fetch`, and invalidations of that key find "no scanned query". Follow the key and query-function arguments into any such project function, so each call gets its own site, kind and key. This works the same way as URLs through helpers in 0.2.1.
+- **One capture, several sites with the same query.** Components that mount the same query (same key, same query function) share one request. The capture is ambiguous today (three sites tied on the test app). Match it to all of them (a `shared` match) instead of asking the user.
+- **Check:** react-query fixture cases (v4 and v5) for each key spelling, a custom wrapper hook, an unreadable key and a shared query; a matcher test for the shared match.
+
+**Built in M24** (`packages/scanner/src/requests.ts`, `packages/shared/src/query-keys.ts`, `packages/server/src/matcher.ts`; model version 10):
+
+- **Enum members:** `#prop` reads a property of an enum (local, imported, through `export *` or an aliased re-export, `const enum`) as its member, and `#keyPart` / `#str` take the member's constant value (`getValue()`, so auto-numbered members are numbers). That covers keys, template literals (`` `${QueryKeys.profile}-${COMMENTS}` ``) and URLs. `as const` objects and `const` strings were already read; they now have test cases with variants (`.js` files, nested properties, element access).
+- **Unknown segments:** a key part the scanner can't evaluate is a `param` with `unknown: true` (shown `?name`) when it is rooted outside any function: a package import (`version` from `react`), a module value it can't follow, an enum member without a constant value, a module-level call. Values from inside a function (parameters, destructured names, locals, `useParams().id`, `searchParams.get('q')`) stay runtime params. `queryKeyHits()`: in a cache call's key, a spread or unknown segment ends the part that counts (the known prefix links), and a key with no known first segment (spread, unknown, or a runtime param) links nothing; in a query's key, an unknown segment is never hit, and a first segment that is a param isn't either. The dashboard and `scan` text say "key not known" for such a call (`isUnknownKey()`). A capture still fits an unknown segment with any value.
+- **Custom query hooks:** destructured parameters are bound now (`bindParams` keeps patterns; `#bindingValue` reads a destructured name from the argument, with pattern defaults, nested patterns, array patterns, and `const { queryKey } = options`). So `useList({ queryKey, queryFn })` → `useInfiniteQuery({ queryKey, queryFn })` gets a site per call with its own key and hook. An inline query function passed to such a hook is no longer also walked where it is written (`Walk.hookFns`), which left a plain `fetch` twin. The site's `hook.key` text follows the hook's parameters back to what the caller wrote (`useQuery([QueryKey.Settings])`).
+- **Shared queries:** `sameQuery()` in the matcher: both sites mount a query with a hook (`use*`, not a mutation; imperative `queryClient` calls run once, when called), with the same key, method and URL, and the same call path below the hook frame. A tie between such sites is a `matched` capture with `sharedWith`; a clear match lists them too (a refetch from one component's button still updates the other). `matchedSiteIds()` (shared) is used by the verifier (counts, staleness per site, the main site's type check), the per-site captures API, the export snapshot, Markdown export, flow walking, and Live shows "+N shared".
+- **Fixtures:** both react-query apps have a `/settings` page: an enum key through a project hook (v5: destructured function declaration; v4: positional arrow, keys imported through `services/index.ts` re-exports), an `as const` + `const` key, a key that starts with `version` from `react` (and an invalidation of it: "key not known"), and two components that mount the same query. Re-recorded: 19 + 17 captures, all matched; the two settings captures in each app match both components. The two `/users/:id` refetches shared by `prefetchQuery` and `ensureQueryData` stay ambiguous (imperative calls, see above).
+- **Differs from the plan:** a first segment that is a runtime param (`[scope]`) also links nothing, not only unreadable ones: it says nothing about which queries are meant.
+- **Performance:** perf app A/B on the same machine (only `requests.ts` swapped): cold scan 11.8 s → 12.0 s, re-scan 3.9 s → 3.9 s.
+- **Check:** `scanner/test/react-query-keys.test.ts` (each key spelling with variants, unknown segments and links, five hook shapes incl. `.js`), `shared/test/query-keys.test.ts`, `server/test/shared-query.test.ts`, fixture snapshots, the matching snapshot (which now prints shared sites) and the "every site verified" check through `matchedSiteIds()`.
+
+**M25 — Scanner fixes:**
+
+Code is in `packages/scanner/src/requests.ts` unless named. Bracketed counts are from the test app's 423 sites.
+
+- **Triggers through a call argument** (~25). A handler passed as an argument to a call whose result is the JSX attribute: `onSubmit={form.handleSubmit(onSubmit)}`, `onClick={debounce(save)}`, `onChange={withGuard(update)}`. `#triggerAt` / `#classify` only walk function-like ancestors, so they never reach the attribute.
+  - When a function reference is a call argument, walk up through the calls (and through a variable holding the result) to an `on*` JSX attribute, and return that event.
+  - No list of function names. Cases: react-hook-form, Formik and a project wrapper.
+- **Hooks that return several mutations** (~20). A project hook returns `{ add: a.mutate, update: u.mutate, remove: r.mutate }`; a caller that uses only `remove` gets all of them as its sites, the unused ones with trigger `unknown`.
+  - `#runHook` emits every mutation for every caller. A caller's sites should be only the mutations it uses: destructured, read as a property, or passed on.
+  - `#followUses` needs an "unused" result, and unused mutations aren't emitted for that caller.
+- **Local query and mutation functions walked twice** (9 duplicate sites). `const upload = async (p) => send(p); useMutation({ mutationFn: upload })` produces one site from walking `upload` in place (no hook frame) and one from `#runHook`. `#mergeTwins` keys on `hook.name`, so the two aren't merged. Skip local functions used as `queryFn` / `mutationFn` during the walk. The twin is also where some mutations got a `page-load` trigger: a mutation is never `page-load`.
+- **Other trigger paths** (~10):
+  - A context provider whose `value` holds a hook's functions: follow the value to `useContext` consumers and place the trigger there.
+  - A callback passed into another hook (`useSubmit({ onSubmit: verify })`).
+  - `on*` properties in object literals (menu configs, `{ onSelect: () => download() }`) are events, not `page-load`.
+- **URLs built with `new URL()`** (32). `const target = new URL(url); fetch(target.href)` ends as unknown, because `#str` resolves `target` to a `NewExpression` and gives up.
+  - Read `.href`, `.toString()`, `String(u)` and template use of a `new URL(...)` as that URL.
+  - Pass string methods with literal arguments through (`.replace()`, like `.trim()` today).
+  - Join `new URL(path, base)` when the base is an env value or a constant (`{API_URL}/path`), not only a string literal.
+- **Catch-all proxy handlers.** A route handler with a catch-all segment that forwards the incoming path to an upstream base produces `<base>/:path*`. Each client site that reaches it gets its upstream URL on its chain and in the dashboard (`POST /api/reviews` → `{API_URL}/reviews`).
+  - Cover the common ways to read the path: `params.path.join('/')`, `request.nextUrl.pathname`, `new URL(request.url).pathname`, with `.replace('/api/', '')` or `.slice()`.
+  - Cover `[...path]` and `[[...path]]`.
+- **Conditional side paths.** A request reached only under a condition inside a shared helper (a token refresh before the real request) appears on every page and every chain that uses the helper. Keep it, resolved, but mark it `conditional` and show it as a side hop, not on the main chain.
+- **URLs taken from data** (3). `fetch(file.url)` where the URL comes from an earlier response (often read with `.blob()`) becomes an info category (`runtime-url`, "URL from the data") instead of a "could not be resolved" warning.
+- **Components chosen at runtime** (5). In `components.ts`, `aliasedExpression` only accepts an identifier or a property access. Resolve every branch and every value of these:
+  - `const Comp = asChild ? Slot : 'button'`;
+  - `cond ? A : B`, including nested ternaries;
+  - `cond && A`;
+  - lookups in a const record (`ICONS[name]`).
+
+  Emit one conditional ref per project component; when every branch is external or intrinsic, the result is `external` with no warning.
+- **Library types expanded** (25 notes; 24 MB `model.json`, ~3.5 MB of it from two library types). Library generics such as react-hook-form's `Control<T>` or a carousel API type are expanded property by property, down to `Window`.
+  - Keep aliases declared in `node_modules` as `external` references below the top level.
+  - In `types.ts` `#structure`, check primitives and literals before the depth limit. About 14,800 plain `boolean` / `string` / `undefined` nodes are marked `unresolved: depth` today.
+  - In `model-index.ts`, don't raise "partly resolved" for unresolved nodes under a library type.
+- **Flows from layout components.** A flow that starts in a component rendered by a layout is attached only to the first route (`routesOf.get(start.componentId)?.[0]` in `scanner/src/flows.ts`). Attach it to the layout's segment, so it shows on every page under the layout.
+- **Check:**
+  - Test cases with variants for each pattern.
+  - Fixture snapshots updated where output changes. If `conditional`, `runtime-url` or conditional component refs change the format, bump `MODEL_VERSION` and keep older versions loading.
+  - The perf app's scan time and `model.json` size recorded and kept within budget.
+
+**Built in M25** (`packages/scanner/src/requests.ts`, `components.ts`, `types.ts`, `flows.ts`; model version 11):
+
+- **Handed-on functions.** `#valueTrigger()` places a function that is passed rather than called where it is written. From the value it climbs through object properties (an `on*` name is remembered), arrays and spreads, call arguments (an effect's first argument is `effect`; any other call's result is a new value), and `useMemo` / `useCallback` returns. It stops at a JSX attribute (an `on*` / `action` prop is the event; a context provider's `value` goes to `#providedTrigger()`) or a variable, whose uses `#holderTrigger()` follows (called, a member called or passed, destructured names one by one). An `on*` property is an event only in configs that aren't call options (`commit({ onCompleted })` runs when the call says, which the graphql-relay fixture showed). `#classify()` tries it for references and `#classifyFunction()` for inline functions. `#classifyReferences()` now skips dependency lists and shorthand properties are matched by value symbol.
+- **Walking references.** `#passedFunctions()` enters project functions passed by reference into a call the walk doesn't handle (`handleSubmit(save)`, `useEffect(load, [])`, `useFormik({ onSubmit: save })`) and `#configHandler()` those under an `on*` property anywhere, unless a hook already walks them (`Walk.hookFns`). `#reachesNetwork()` counts functions passed by reference too, so a hook that only does `return handleSubmit(login)` is entered.
+- **Contexts.** `#providedTrigger()` takes the context from `<X.Provider value>` or `<X value>` when `X` is a `createContext()` constant, finds its reads with ts-morph's `findReferencesAsNodes()` (`useContext(X)` / `use(X)`, and calls of a top-level hook that returns the read, cached per context) and places the provided member where each consumer uses it.
+- **Unused mutations.** `#followUses()` returns `'unused'` when a caller's result never takes the member a hook hands out (`resultUnused()`: a statement call, a destructuring without a rest element and without that name, or an identifier only read for other members). `#runHook` and the tRPC hooks then skip that mutation for that caller. A hook that returns another hook's result (`() => useItemMutations()`) now passes the caller's members on instead of React Query's (`#mutateUses`, `returnedAs` also skips `!`).
+- **Local hook functions.** `#onlyHookFn()` skips walking a local function in place when every use is a `queryFn` / `mutationFn` property or a hook's positional function argument (checked only in files whose text mentions a query hook).
+- **URLs.** `#str` reads `new URL(...).href` (`#urlMember`), `const { pathname } = new URL(...)`, `.replace()` / `.replaceAll()` with a string or regex (`replaceText()`: text parts only, `^` / `$` only at the ends), `.slice(n)` / `.substring(n)` (`sliceText()`), and joins `new URL(path, base)` when the base is a string, a constant or an env value that starts with an origin (or a relative path on a base ending in `/`).
+- **URLs from data.** `#fromData()` marks an unresolved URL `fromData` when it is read as a member (or destructured) from a local variable or an inline callback's parameter. `flagsOf()` then gives `runtime-url` instead of `dynamic-url`; `isInfoFlag()` (shared) keeps it out of the overview's to-do list, the ⚠ counts and the "Flagged" filter, and Postman's URL fill drops it like `dynamic-url`. Differs from the plan: a value from a component's or function's parameters (a prop) stays `dynamic-url`, since its callers decide it.
+- **Catch-all proxies.** While a route handler is walked (`#handlerRoute`), `<catch-all>.join('/')` (a `params` property, a destructured name or a parameter bound to it, `#isCatchAll`) is the hole `name*`, and `request.nextUrl.pathname` / `new URL(request.url).pathname` is the handler's own path with that hole (`#incomingPath`), so `.replace('/api/', '')` and `.slice(4)` work on it. The handler's site is `{API_URL}/:path*`; `upstreamUrl()` in `sites()` fills the part of a caller's path the catch-all matched into it as the caller's new `upstream`. `pathPatternRegex()` (shared) matches `:name*` as any number of segments.
+- **Side requests.** `#markSideRequests()` marks a site `conditional` when its first guarded call is inside a helper (not the origin's own code) and another site of the same origin shares the calls up to it and is unguarded from there. Two guarded alternatives (a ternary) aren't marked. The dashboard shows them under "Sometimes also on the server" and with a `sometimes` badge; `upstreamUrl()` ignores them.
+- **Components.** `#resolveTags()` reads a tag held in a variable whose value is a ternary (nested), `&&` / `||` / `??`, or an element access on a constant record (`as const`, `satisfies`, imported or re-exported, `.js`): one conditional ref per project component, keyed by tag and target; all library or HTML choices are one `external` ref. An unresolved or `prop` choice is added beside the project ones.
+- **Types.** `#external()` keeps a package type alias declared as its own object type (`isPackageStructure()`: a type literal, or an intersection with one) as `external` below the top level; aliases that map type arguments (`Pick`, `z.infer`) are still expanded. `#structure()` returns primitives, literals and unions of them before the depth check (`isPlain()`). `hasUnresolved()` no longer looks into `external` type arguments.
+- **Flows.** A flow whose starting component is in no page's own tree starts at the shallowest page under its layouts (`routeId`, ties by path) and lists them all in the new `startRouteIds`; `flowsByRoute` adds those pages, the page view says "starts here (in a layout)", and `formatFlows` prints `starts on:`.
+- **Model:** `RequestSite.upstream`, `RequestSite.conditional`, `RequestUrl.fromData`, flag `runtime-url`, `Flow.startRouteIds`; version 10 files still load. The request text, the dashboard request view and the Markdown export show "forwarded to" and "conditional".
+- **Fixtures:** their output didn't change (only the model version): none had these patterns, so they are covered by in-memory tests written from scratch. A new fixture check fails on twin sites (same origin and network call, one call path the tail of the other).
+- **Performance:** perf app A/B on the same machine (dev vs. this branch, three cold scans each): 12.5 s → 12.8 s median, `model.json` 4,111,782 bytes both. Bench: cold scan 12.8 s, re-scan median 4.0 s, slowest API answer 175 ms.
+- **Check:** `scanner/test/triggers.test.ts` (react-hook-form arrow / declaration / through a variable / inline / imported, Formik inline and imported, lodash `debounce`, a `.js` project wrapper, a project hook callback inline and imported, `useEffect(fn)`, `on*` configs inline / local / imported, contexts through `useMemo` + custom hook and inline + `useContext`, several mutations destructured / as members through a `.js` hook / passed on, local `mutationFn` / `queryFn`), `urls.test.ts` (`new URL` five ways incl. a `.js` helper and a re-exported constant, `.replace` with a regex and a string, `.slice`, data URLs and a prop, `[...path]` with destructured params and through a helper, `[[...rest]]` with `nextUrl` and `new URL(request.url)`, a refresh in a helper), `component-choice.test.ts`, `library-types.test.ts`, `layout-flows.test.ts`, the fixture twin check, and a dashboard list test for info flags.
+- **Not done here:** the Next matrix and the real-app smoke check (M26).
+
+**M26 — Release v0.2.2:** same steps as M20, plus a smoke check on real apps (the test app and at least one other project), with before/after numbers: "To check" count (132 on the test app now), unknown triggers (64), unresolved URLs (35), ambiguous captures, server captures (0 now, until its hook is moved), largest page view DOM size and `model.json` size.
+
+**Built in M26:**
+
+- **Docs:** `CHANGELOG.md` has the 0.2.2 section (the `Unreleased` notes from M21–M25 under a short summary with the real-app numbers below); `0.2.1` already had its own heading on `dev`. The package version is 0.2.2. The package README has a Dashboard section (every screen, with the Components and Requests filters), a "server hook goes first in `register()`" section (an example, and what `init`, `doctor` and `dev` do about it), and `init` no longer says it only prints the lines for an existing `register()`. No config or CLI options changed, so `docs/config.md` is unchanged.
+- **Next matrix:** 13.4.19, 14.2.35, 15.2.9, 15.5.28 and 16.4.3 all pass (init edits the existing `register()`, doctor, scan, and every capture check from M20).
+- **Real apps** (published 0.2.1 vs. this branch, same machine, `scan` + `export --html`, then every page view opened in Chromium; each app's `.flow-checker/` was backed up and restored):
+
+  | Test app (54 pages, 993 components) | 0.2.1        | 0.2.2                |
+  | ----------------------------------- | ------------ | -------------------- |
+  | "To check"                          | 129          | 15                   |
+  | Unknown triggers                    | 64           | 8                    |
+  | Unresolved URLs (`dynamic-url`)     | 35           | 2 (+1 `runtime-url`) |
+  | Request sites                       | 423          | 407                  |
+  | Largest page view (DOM nodes)       | 68,188       | 14,069               |
+  | Mean page view (DOM nodes)          | 19,835       | 3,215                |
+  | `model.json`                        | 24,476,402 B | 7,609,312 B          |
+
+  | Second app (29 pages, 511 components) | 0.2.1        | 0.2.2        |
+  | ------------------------------------- | ------------ | ------------ |
+  | "To check"                            | 150          | 47           |
+  | Unknown triggers                      | 6            | 6            |
+  | Request sites                         | 116          | 248          |
+  | Earlier captures matched              | 0 of 46      | 32           |
+  | Ambiguous / unmatched captures        | 8 / 38       | 2 / 12       |
+  | Largest page view (DOM nodes)         | 30,859       | 16,471       |
+  | `model.json`                          | 52,988,264 B | 13,609,371 B |
+
+  The "To check" count on the test app was 132 when the plan was written; the app changed a little since. The second app's sites doubled because requests 0.2.1 showed as one unresolved `/api/:param` per form are now resolved one by one, and each component mounting a shared query hook is its own query site (M24); the repeated keys left are distinct call paths (one per exported method of its catch-all proxy, one per upload component), not twins. Server captures could not be re-measured: the test app no longer has the hooks (`doctor` says so), and measuring them means running it against its backend.
+- **Found, not fixed here:** a request sent after an early-return guard in a shared helper (`if (res.status !== 401) return res` then a token refresh) is not marked `conditional`: `#markSideRequests()` only looks at enclosing `if` blocks, so each exported method of a catch-all proxy lists the refresh as part of its chain. Same pattern family as M25's side requests; a candidate for the next patch.
+- **Performance:** `bench.mjs 200` against the published 0.2.1 on the same machine, three runs each (alternating order): cold scan 12.8 / 11.5 / 11.7 s → 12.7 / 12.0 / 12.1 s, re-scan median 3.7 / 4.1 / 4.0 s → 4.9 / 4.3 / 4.2 s (the first 0.2.2 run was the noisy one), slowest API answer 149–163 ms → 181–199 ms. About 4–7% slower from the M21–M25 work, well inside the CI budgets (25 s / 8 s / 1 s), which stay as they are. The README's scan times now say about 12 s / 4 s.
+- **Not done here:** the `v0.2.2` tag and npm publish (the Release workflow runs on the tag after merging to `main`).
+
 ### M11 notes
 
 - **Docs:** user README in `packages/flow-checker/README.md` (shown on npm), `docs/config.md`, `CHANGELOG.md`, MIT `LICENSE`.
@@ -627,7 +863,7 @@ capture: { maxMessages: 200, maxMessageBytes: 64_000 },
 - **Published:** v0.1.0 is on npm as `@integr8-media/flow-checker` and was tested by hand after release (2026-10-30).
 - **Release:** `.github/workflows/release.yml` publishes on a `v*` tag that matches the package version, after every check, with `pnpm publish --provenance` (needs `NPM_TOKEN` or npm trusted publishing, and an `npm` environment). `verify:package` also checks `./next` from ESM, CommonJS and TypeScript.
 
-Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11. For v0.2.0: M12 → M13 → M14 → M15 → M16 → M17 → M18 → M19 → M20.
+Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11. For v0.2.0: M12 → M13 → M14 → M15 → M16 → M17 → M18 → M19 → M20. For v0.2.2: M21 → M22 → M23 → M24 → M25 → M26.
 
 ## 15. Risks and mitigations
 

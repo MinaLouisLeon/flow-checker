@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 11,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -18,6 +18,18 @@
       "page": "src/app/page.tsx"
     },
     "children": [
+      {
+        "segment": {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        },
+        "dir": "src/app/settings",
+        "files": {
+          "page": "src/app/settings/page.tsx"
+        },
+        "children": []
+      },
       {
         "segment": {
           "raw": "todos",
@@ -70,6 +82,27 @@
         }
       ],
       "componentId": "cmp_1bn0u7kkfdm"
+    },
+    {
+      "id": "rt_14nb5m1ywic",
+      "path": "/settings",
+      "kind": "page",
+      "file": "src/app/settings/page.tsx",
+      "segments": [
+        {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_12h7lqgksec"
     },
     {
       "id": "rt_0rsc27vk284",
@@ -252,6 +285,43 @@
       }
     },
     {
+      "id": "cmp_12h7lqgksec",
+      "name": "SettingsPage",
+      "file": "src/app/settings/page.tsx",
+      "loc": {
+        "file": "src/app/settings/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "SettingsBadge",
+          "resolution": "project",
+          "componentId": "cmp_1ln0r85hq1r",
+          "module": "@/components/SettingsBadge",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        },
+        {
+          "name": "SettingsPanel",
+          "resolution": "project",
+          "componentId": "cmp_0xxl3asjm3d",
+          "module": "@/components/SettingsPanel",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
       "id": "cmp_1an2304y5ca",
       "name": "TodoPage",
       "file": "src/app/todos/[id]/page.tsx",
@@ -391,6 +461,34 @@
       }
     },
     {
+      "id": "cmp_1ln0r85hq1r",
+      "name": "SettingsBadge",
+      "file": "src/components/SettingsBadge.tsx",
+      "loc": {
+        "file": "src/components/SettingsBadge.tsx",
+        "line": 7,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0xxl3asjm3d",
+      "name": "SettingsPanel",
+      "file": "src/components/SettingsPanel.tsx",
+      "loc": {
+        "file": "src/components/SettingsPanel.tsx",
+        "line": 10,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": []
+    },
+    {
       "id": "cmp_1gqfw2iamk9",
       "name": "TodoDetail",
       "file": "src/components/TodoDetail.tsx",
@@ -489,6 +587,60 @@
     }
   ],
   "types": [
+    {
+      "id": "typ_0ccr3ev5sff",
+      "name": "Settings",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types/settings.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "theme",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "light"
+                },
+                {
+                  "kind": "literal",
+                  "value": "dark"
+                }
+              ]
+            }
+          },
+          {
+            "name": "locale",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "digest",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                },
+                {
+                  "kind": "primitive",
+                  "name": "null"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     {
       "id": "typ_0fc96ucq8sd",
       "name": "Todo",
@@ -640,7 +792,7 @@
   ],
   "requests": [
     {
-      "id": "req_05rnuxi1tux",
+      "id": "req_0ui8fceun16",
       "origin": "component",
       "componentId": "cmp_0zsf7mc3ftx",
       "transport": "fetch",
@@ -686,13 +838,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 30,
+          "line": 31,
           "column": 33,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -702,7 +854,7 @@
       "hash": "0zi7ek9ho17"
     },
     {
-      "id": "req_03r8lbo98p3",
+      "id": "req_28shjpn0ddh",
       "origin": "component",
       "componentId": "cmp_0r1iugj2rde",
       "transport": "fetch",
@@ -752,13 +904,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 26,
+          "line": 27,
           "column": 3,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -768,7 +920,270 @@
       "hash": "1xbpqy3n23a"
     },
     {
-      "id": "req_26x0qqr5oo2",
+      "id": "req_25si4rwutp5",
+      "origin": "component",
+      "componentId": "cmp_1ln0r85hq1r",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[QueryKey.Settings]"
+      },
+      "queryKey": [
+        {
+          "kind": "static",
+          "value": "settings"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0ccr3ev5sff",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsBadge.tsx",
+          "line": 8,
+          "column": 20,
+          "callee": "useApiQuery"
+        },
+        {
+          "file": "src/hooks/useApiQuery.ts",
+          "line": 6,
+          "column": 3,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 34,
+          "column": 36,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "00pek2ni7s5"
+    },
+    {
+      "id": "req_0csf9iukmtt",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[QueryKey.Settings]"
+      },
+      "queryKey": [
+        {
+          "kind": "static",
+          "value": "settings"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0ccr3ev5sff",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 12,
+          "column": 30,
+          "callee": "useApiQuery"
+        },
+        {
+          "file": "src/hooks/useApiQuery.ts",
+          "line": 6,
+          "column": 3,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 34,
+          "column": 36,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "16qiegmunur"
+    },
+    {
+      "id": "req_2b9ev7p2mm7",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[Scopes.users, STATS]"
+      },
+      "queryKey": [
+        {
+          "kind": "static",
+          "value": "users"
+        },
+        {
+          "kind": "static",
+          "value": "stats"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_25sov0zzv45",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 13,
+          "column": 32,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 31,
+          "column": 33,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0emnhhdnnny"
+    },
+    {
+      "id": "req_1ahenbc3mal",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "transport": "fetch",
+      "hook": {
+        "name": "useQuery",
+        "module": "@tanstack/react-query",
+        "key": "[version, 'todos']"
+      },
+      "queryKey": [
+        {
+          "kind": "param",
+          "name": "version",
+          "unknown": true
+        },
+        {
+          "kind": "static",
+          "value": "todos"
+        }
+      ],
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "NEXT_PUBLIC_API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "page-load"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0fc96ucq8sd",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 14,
+          "column": 32,
+          "callee": "useQuery"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 23,
+          "column": 33,
+          "callee": "http"
+        },
+        {
+          "file": "src/services/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "19y4sju5f6g"
+    },
+    {
+      "id": "req_1weno1sappo",
       "origin": "component",
       "componentId": "cmp_1gqfw2iamk9",
       "transport": "fetch",
@@ -825,13 +1240,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 23,
+          "line": 24,
           "column": 42,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -841,7 +1256,7 @@
       "hash": "2bxjejosdtg"
     },
     {
-      "id": "req_0w5fn29f9ol",
+      "id": "req_0m87yeckbys",
       "origin": "component",
       "componentId": "cmp_0l3kw3n479w",
       "transport": "fetch",
@@ -891,13 +1306,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 22,
+          "line": 23,
           "column": 33,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -907,7 +1322,7 @@
       "hash": "0cr9b3kkqio"
     },
     {
-      "id": "req_0fkwrrjextd",
+      "id": "req_0dnsw9l7n7v",
       "origin": "component",
       "componentId": "cmp_0l3kw3n479w",
       "transport": "fetch",
@@ -963,13 +1378,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 28,
+          "line": 29,
           "column": 3,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -979,7 +1394,7 @@
       "hash": "258o74lk0da"
     },
     {
-      "id": "req_1q6jtlej76n",
+      "id": "req_1nziazfd4q1",
       "origin": "component",
       "componentId": "cmp_01uja5x3w41",
       "transport": "fetch",
@@ -1048,13 +1463,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 24,
+          "line": 25,
           "column": 51,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -1064,7 +1479,7 @@
       "hash": "195r3puckno"
     },
     {
-      "id": "req_1mf3kj1btd4",
+      "id": "req_10nfwo5qqhi",
       "origin": "component",
       "componentId": "cmp_20axc0bf4dg",
       "transport": "fetch",
@@ -1110,13 +1525,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 30,
+          "line": 31,
           "column": 33,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -1126,7 +1541,7 @@
       "hash": "0rrljchy4ux"
     },
     {
-      "id": "req_1y8ebytz6gz",
+      "id": "req_0jyi1zlxcdo",
       "origin": "component",
       "componentId": "cmp_20axc0bf4dg",
       "transport": "fetch",
@@ -1181,13 +1596,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 31,
+          "line": 32,
           "column": 43,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -1333,7 +1748,7 @@
         },
         {
           "kind": "request",
-          "siteId": "req_03r8lbo98p3"
+          "siteId": "req_28shjpn0ddh"
         },
         {
           "kind": "query-update",
@@ -1346,7 +1761,7 @@
         },
         {
           "kind": "request",
-          "siteId": "req_26x0qqr5oo2",
+          "siteId": "req_1weno1sappo",
           "onLoad": true
         }
       ],
@@ -1375,7 +1790,7 @@
         },
         {
           "kind": "request",
-          "siteId": "req_0fkwrrjextd"
+          "siteId": "req_0dnsw9l7n7v"
         },
         {
           "kind": "query-update",
@@ -1410,7 +1825,7 @@
         },
         {
           "kind": "request",
-          "siteId": "req_1y8ebytz6gz"
+          "siteId": "req_0jyi1zlxcdo"
         },
         {
           "kind": "query-update",
@@ -1429,7 +1844,7 @@
   ],
   "queryLinks": [
     {
-      "id": "qlk_0rs0w500iii",
+      "id": "qlk_23yb0a4nvfl",
       "kind": "hydrate",
       "method": "prefetchQuery",
       "origin": "component",
@@ -1442,10 +1857,10 @@
       ],
       "exact": true,
       "fromSiteIds": [
-        "req_05rnuxi1tux"
+        "req_0ui8fceun16"
       ],
       "targetSiteIds": [
-        "req_1mf3kj1btd4"
+        "req_10nfwo5qqhi"
       ],
       "trigger": {
         "kind": "server-render"
@@ -1464,13 +1879,13 @@
         },
         {
           "file": "src/services/api.ts",
-          "line": 30,
+          "line": 31,
           "column": 33,
           "callee": "http"
         },
         {
           "file": "src/services/api.ts",
-          "line": 7,
+          "line": 8,
           "column": 21,
           "callee": "fetch"
         }
@@ -1518,13 +1933,91 @@
         }
       ],
       "fromSiteIds": [
-        "req_03r8lbo98p3"
+        "req_28shjpn0ddh"
       ],
       "targetSiteIds": [
-        "req_26x0qqr5oo2",
-        "req_0w5fn29f9ol",
-        "req_1q6jtlej76n"
+        "req_1weno1sappo",
+        "req_0m87yeckbys",
+        "req_1nziazfd4q1"
       ]
+    },
+    {
+      "id": "qlk_0zg0nntlvv2",
+      "kind": "invalidate",
+      "method": "invalidateQueries",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "key": [
+        {
+          "kind": "static",
+          "value": "settings"
+        }
+      ],
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 21,
+          "column": 29
+        }
+      },
+      "loc": {
+        "file": "src/components/SettingsPanel.tsx",
+        "line": 21,
+        "column": 44
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 21,
+          "column": 44,
+          "callee": "queryClient.invalidateQueries"
+        }
+      ],
+      "fromSiteIds": [],
+      "targetSiteIds": [
+        "req_25si4rwutp5",
+        "req_0csf9iukmtt"
+      ]
+    },
+    {
+      "id": "qlk_1rvooe7b5wm",
+      "kind": "invalidate",
+      "method": "invalidateQueries",
+      "origin": "component",
+      "componentId": "cmp_0xxl3asjm3d",
+      "key": [
+        {
+          "kind": "param",
+          "name": "version",
+          "unknown": true
+        }
+      ],
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 24,
+          "column": 29
+        }
+      },
+      "loc": {
+        "file": "src/components/SettingsPanel.tsx",
+        "line": 24,
+        "column": 44
+      },
+      "callStack": [
+        {
+          "file": "src/components/SettingsPanel.tsx",
+          "line": 24,
+          "column": 44,
+          "callee": "queryClient.invalidateQueries"
+        }
+      ],
+      "fromSiteIds": [],
+      "targetSiteIds": []
     },
     {
       "id": "qlk_03t2ysc86iz",
@@ -1577,10 +2070,10 @@
         }
       ],
       "fromSiteIds": [
-        "req_0fkwrrjextd"
+        "req_0dnsw9l7n7v"
       ],
       "targetSiteIds": [
-        "req_26x0qqr5oo2"
+        "req_1weno1sappo"
       ]
     },
     {
@@ -1630,10 +2123,10 @@
         }
       ],
       "fromSiteIds": [
-        "req_0fkwrrjextd"
+        "req_0dnsw9l7n7v"
       ],
       "targetSiteIds": [
-        "req_0w5fn29f9ol"
+        "req_0m87yeckbys"
       ]
     },
     {
@@ -1683,9 +2176,11 @@
         }
       ],
       "fromSiteIds": [
-        "req_1y8ebytz6gz"
+        "req_0jyi1zlxcdo"
       ],
-      "targetSiteIds": []
+      "targetSiteIds": [
+        "req_2b9ev7p2mm7"
+      ]
     },
     {
       "id": "qlk_0durd7jx9w5",
@@ -1729,10 +2224,11 @@
         }
       ],
       "fromSiteIds": [
-        "req_1y8ebytz6gz"
+        "req_0jyi1zlxcdo"
       ],
       "targetSiteIds": [
-        "req_1mf3kj1btd4"
+        "req_2b9ev7p2mm7",
+        "req_10nfwo5qqhi"
       ]
     }
   ]

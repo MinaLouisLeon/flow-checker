@@ -21,10 +21,12 @@ import {
   formatQueryKey,
   type GraphqlInfo,
   type GraphqlOperation,
+  isInfoFlag,
   isVerified,
   type MatcherCondition,
   type MiddlewareMatcher,
   type ModelIndex,
+  matchedSiteIds,
   mismatchField,
   type Navigation,
   type PostmanContract,
@@ -87,11 +89,13 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   const captures = new Map<string, ExportCapture[]>()
   for (let i = data.captures.length - 1; i >= 0; i--) {
     const c = data.captures[i]
-    const siteId = c?.match?.status === 'matched' ? c.match.siteId : undefined
-    if (!c || !siteId) continue
-    const list = captures.get(siteId)
-    if (list) list.push(c)
-    else captures.set(siteId, [c])
+    if (!c) continue
+    // A shared query's request (M24) counts for every site that shares it.
+    for (const siteId of matchedSiteIds(c.match)) {
+      const list = captures.get(siteId)
+      if (list) list.push(c)
+      else captures.set(siteId, [c])
+    }
   }
   const callers = new Map<string, RequestSite>()
   for (const site of model.requests) {
@@ -1051,6 +1055,8 @@ function requestSection(
           : undefined,
       ],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
+      ['Forwarded to', site.upstream ? code(urlText(site.upstream)) : undefined],
+      ['Conditional', site.conditional ? 'a side request of the helper that sends it' : undefined],
       [
         'Stream',
         site.stream
@@ -1074,7 +1080,7 @@ function requestSection(
         site.callStack.length > 1 ? site.callStack.map((f) => code(f.callee)).join(' → ') : undefined,
       ],
     ]),
-    site.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
+    site.flags.map((f) => `> ${isInfoFlag(f) ? 'ℹ' : '⚠'} **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
     site.bodyType && `**Request body**${typeSource(site.bodyType)} ${typeBlock(ctx, site.bodyType, from)}`,
     site.responseType &&
       `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,

@@ -28,6 +28,12 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M18 | SSE                   | Model version 7. Streams sent on open, then only new messages (`stream.from`), merged by the verifier.                   |
 | M19 | WebSockets            | Model version 8. Reuses the M18 stream recorder both ways; socket.io decoded from its WS frames, not patched.            |
 | M20 | Release v0.2.0        | Matrix app has every v0.2.0 transport; it caught a React Query key race on Next 15. Publish = push the `v0.2.0` tag.     |
+| M21 | Components/Requests   | List logic is pure in `dashboard/src/lists.ts`; `siteHref()` opens the request page, `ownerHref()` the component.        |
+| M22 | Server hook placement | `cli/server-hook.ts` is shared by doctor, init and dev; the rule is shape-only (any wrapper around the blocks fails).    |
+| M23 | Dashboard fixes       | Lists that grow with the app use `CappedList` / `useCapped` (5, then "+N more"); request bodies render once opened.      |
+| M24 | React Query keys      | Model version 10. Unreadable key segments are `param` + `unknown`; shared queries are `matched` with `sharedWith`.       |
+| M25 | Scanner fixes         | Model version 11. Handed-on functions are placed by `#valueTrigger`; `runtime-url` is an info flag (`isInfoFlag`).       |
+| M26 | Release v0.2.2        | Real-app before/after = scan + `export --html` with each `cli.js`, then open every page view in Playwright.              |
 
 ## Gotchas
 
@@ -201,3 +207,85 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - `isThirdParty()`: cross-origin, no source-mapped project frame, and a cross-origin script on the stack.
 - To check the dashboard on a real app without touching its running instance: `flow-checker export --html <dir>`
   reads `.flow-checker/` but writes nothing there; serve the folder with any static server.
+
+## M21 — Components and Requests screens (branch `feat/m21-components-requests-screens`)
+
+- v0.2.2 rule: problems found on a real test app are fixed as general code patterns, each with its own test case
+  written from scratch. Never match names, paths or helpers from that app.
+- `lists.ts` holds the list logic (rows, filters, sorting, `requestWhen()`, `siteOwner()`, `groupSame()`), so it is
+  tested in node without rendering. `RequestView` re-exports `siteOwner` for the older imports.
+- Big lists render 200 rows at a time (`usePaged()` in `ui.tsx`); the selected row is always included. That kept
+  search at ~20–40 ms per keystroke on the perf app without a windowing library.
+- A CSS rule that comes after one with higher specificity on the same element trips biome's
+  `noDescendingSpecificity`; `.row-group:not([open]) > summary::before` matches `.request[open] > summary::before`.
+- Claude in Chrome can't open `file://` pages. To look at an exported site, serve the folder on 127.0.0.1
+  and add `?v=N` to the URL after re-exporting: the browser otherwise reuses the cached `data.js`.
+
+## M22 — Server hook placement (branch `feat/m22-server-hook-placement`)
+
+- `server-hook.ts` parses with `ts` from ts-morph (`createSourceFile`, no project): `findRegister()` follows
+  re-exports and tsconfig aliases; `editServerHook()` must use the lookup's own `SourceFile`, or nodes from two parses
+  never compare equal.
+- The dev safety net only waits on route handlers that have route-handler sites in the model: a handler that just
+  answers sends no server request, so a working hook would look broken.
+- Watch timers ignore captures timestamped before the watch started: a re-scan re-adds old captures to the store.
+- Doctor tests now need real `register()` text (`NODE_BODY` / `EDGE_BODY` from `server-hook.ts`): a bare top-level
+  `await import(...)` fails the placement check.
+- Patch scripts with backticks or `\n` must not go through bash heredocs (they get mangled); use the Edit tool.
+
+## M23 — Dashboard fixes (branch `feat/m23-dashboard-fixes`)
+
+- A closed `<details>` still renders its children in React: request rows render their body only once opened
+  (`LazyDetails` in `RequestView.tsx`). That, more than capping, keeps big pages small.
+- Scroll memory keys positions by an id stored in `history.state`. `replaceScreen()` must pass the current
+  `history.state` along, or the entry looks new and the screen jumps.
+- `dashboard/test/synthetic.ts` builds a big model over a fixture snapshot with type-only imports, so both vitest and
+  the Playwright spec (`e2e/dashboard-limits.spec.ts`, which rewrites an export's `data.js`) can use it.
+- Playwright scrolls an element into view before clicking it; to test that a toggle keeps the scroll position, click
+  it from script (`locator.evaluate((b) => b.click())`).
+
+## M24 — React Query keys (branch `feat/m24-react-query-keys`)
+
+- Enum members resolve in `#prop` (the member node), then `#keyPart` / `#str` read `EnumMember.getValue()`. `as const`
+  objects already worked through `skipWrappers`.
+- "Unknown" vs runtime key segments is decided by where the value's root is declared: inside a function = runtime
+  (`:id`), outside (package import, module value, module-level call) = unknown (`?name`). A runtime param as a cache
+  call's first segment also links nothing.
+- Destructured parameters are bound (`bindParams` keeps patterns; `#resolve` follows a `BindingElement` through
+  `#bindingValue`). Anything reading `env` by `ParameterDeclaration` still works: identifiers in a pattern resolve to
+  their `BindingElement`, never to the parameter.
+- A project call's arguments are walked in place after `#enter` (`#call` returns false): an inline `queryFn` passed to
+  a project hook was walked twice. `Walk.hookFns` skips functions already walked as a query/mutation function.
+- Use `matchedSiteIds(match)` (shared) wherever captures are counted or listed per site: a shared match verifies
+  several sites. `sameQuery()` only covers `use*` hooks; imperative `queryClient` calls stay separate.
+- Changing a fixture file can change a site `hash` (the formatter turned `<T,>` into `<T>` in a `.ts` file): update
+  the model snapshot after `biome check --write`.
+
+## M25 — Scanner fixes (branch `feat/m25-scanner-fixes`)
+
+- A function that is passed rather than called (`handleSubmit(save)`, `{ onSelect: save }`, a provider `value`) is
+  placed by `#valueTrigger()`: it climbs the value to a JSX prop, a variable (`#holderTrigger`) or a context
+  (`#providedTrigger`). An `on*` name only counts in configs that aren't call options: `commit({ onCompleted })` in
+  the graphql-relay fixture turned into `event onCompleted` until the call branch dropped it.
+- The walk only entered functions that are _called_; references passed into library calls were never walked
+  (`#passedFunctions` / `#configHandler`). Skip anything already in `Walk.hookFns` or the hook's site doubles.
+- Context consumers come from ts-morph `findReferencesAsNodes()` (language service), cached per context. Only reached
+  from provider values, so it costs nothing elsewhere.
+- `#followUses` can return `'unused'`; callers that build a frame from it must skip the mutation, not emit
+  `unknown`. When a hook returns another hook's result (`() => useX()`), the caller looks for the same members.
+- Fixture output didn't change for any M25 pattern: the fixtures don't have them. Each is covered in-memory
+  (`triggers`, `urls`, `component-choice`, `library-types`, `layout-flows` tests). The fixture twin check
+  (`has no duplicate sites`) guards the walked-twice bug.
+- A/B against `dev` without a worktree: `pnpm build`, copy `packages/flow-checker/dist` to a sibling folder (so
+  `node_modules` still resolves), `git stash`, build, copy, `git stash pop`, build; then scan one generated perf
+  app with both `cli.js` files.
+
+## M26 — Release v0.2.2 (branch `feat/m26-release-v0.2.2`)
+
+- Real-app smoke check without touching the apps: back up `.flow-checker/model.json` (scan overwrites it), run
+  `scan` then `export --html <dir>` with each build's `cli.js` (export writes nothing into `.flow-checker/`), restore.
+  The export's `data.js` holds the model and captures, so site diffs and the dashboard numbers come from it.
+- An app's own `node_modules/@integr8-media/flow-checker/dist/cli.js` is a ready "before" build for bench A/B too.
+- Run the Next matrix and the real-app scans before the perf bench, not alongside it: scan times taken
+  while the matrix runs are not comparable.
+- A site count that goes up on a real app isn't a regression by itself: check repeated keys' call paths for twins.

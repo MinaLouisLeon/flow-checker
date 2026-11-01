@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.2.2
+
+New Components and Requests screens, plus fixes found by running 0.2.1 on a large real app (54 pages, a catch-all proxy route, react-hook-form forms, custom React Query hooks). Models saved by 0.2 still load.
+
+On that app: things to check 129 → 15, unknown triggers 64 → 8, unresolved URLs 35 → 2, `model.json` 24.5 MB → 7.6 MB, and the largest page view 68,000 → 14,000 DOM nodes. On a second app, 32 of 46 earlier captures now match a request site (0 before), with 2 ambiguous (8 before).
+
+- **Components and Requests screens.** The dashboard has two new screens, also in the static HTML export. The Overview's Components and Requests cards now open them.
+  - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared) and by what it has (sends requests, things to check, not on any page), and sorted by name, requests or pages.
+  - **Requests:** every request, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status, transport and flags. The same request sent from several places is one row.
+  - The selected item opens beside the list, and the filters stay in the URL.
+  - Each part of the cards' detail line (`117 server`, `106 on events`...) opens the matching filtered list. The Requests card also counts requests with an unknown trigger.
+- Links to a request (the overview's to-do list, Live, flows, the GraphQL / tRPC / SSE / WebSocket / Postman sections) open the request on its own instead of the component that sends it.
+- **Server hook placement.** The flow-checker blocks must be the first statements of `register()` in `instrumentation.ts`, outside any `if`. Pasted inside an existing condition (`if (process.env.NODE_ENV === 'production')`), they never ran under `next dev` and server capture silently stayed off.
+  - `doctor` now reads `register()` (a function, an arrow or function expression, `export { setup as register }`, or a re-export from another project file) and fails when a block is inside an `if` / `else`, `switch`, loop, `try`, a ternary or `&&`, a nested callback, after other code or an early `return`, or when `register` isn't `async`. It names the line and prints the lines to move. Each block (Node.js and edge) is checked on its own.
+  - `init` edits an existing `register()` instead of asking you to: it puts the blocks first, makes `register` `async` when needed (`void` becomes `Promise<void>`), gives an `() => init()` arrow a body, and moves misplaced blocks when run again. Shapes it can't edit (a re-export from another file) still get a note.
+  - `dev` warns at start when the server hook is misplaced, and again, once, when your app answers route handlers that send requests but no server-side request is captured within 10 s. Live shows the same warning as a banner.
+- **Dashboard on large apps.**
+  - Lists that grow with the app show five entries, then "+N more": the queries a cache call hits, cache calls, where a page leads, route handler callers, layout requests and where a type is used. A cache call with no key reads "→ every query". Request details are only rendered when opened. A page that listed about 120 queries per cache call (about 44,700 DOM nodes) now stays small.
+  - A new screen opens at the top instead of at the previous screen's scroll position. Back and forward return to where you were; search boxes and toggles keep the position.
+  - Route handler pages list the requests the handler sends first, then its callers grouped by the URL they send (the concrete paths for a catch-all handler like `/api/[...path]`), with callers on the same line folded into one row and a search box. The Overview's Route handlers card opens a list of route handlers.
+  - Types: instantiations of a generic (`Page<User>`, `Page<Post>`) fold into one row, and unused types are behind a "Show unused" toggle.
+  - A navigation in a shared hook is one row "from N components" instead of one per component.
+- **React Query keys.**
+  - Enum members (`[QueryKeys.feed]`, also `const enum`, imported or re-exported), `as const` object properties and `const` strings are read as fixed key segments, also inside template literals. Before, an enum member was read as a runtime value (`[:feed]`).
+  - A key segment the scan can't read (a value from a package, a module value it can't follow) is shown as `?name` and is never treated as "any value": a cache call whose key starts with one (or with a runtime value) says "key not known" instead of hitting every query in the app, and one with a known start links by that start only.
+  - Keys and query functions passed to your own query hooks (`useList({ queryKey, queryFn })` calling `useInfiniteQuery`, with destructured, spread or positional arguments) are followed per call: each call is its own query site with its key, instead of a plain `fetch`, so invalidations of that key find it.
+  - Components that mount the same query (same key and query function) share one request. Its capture now verifies all of them (`+N shared` on Live) instead of being ambiguous.
+- **What starts a request.** Fewer `unknown` and wrong `page-load` triggers:
+  - A handler passed through a call is followed to the event prop it ends in: `onSubmit={form.handleSubmit(onSubmit)}`, `const submit = handleSubmit(save)`, `debounce(search)` kept in a variable, your own wrappers (`withGuard(remove)`), and options of a form hook (`useFormik({ onSubmit })`, whose `handleSubmit` goes to the form). Functions passed by reference (`handleSubmit(save)` with `save` imported, `useEffect(load, [])`) are now walked too.
+  - A callback handed to your own hook (`useSubmit({ onSubmit: verify })`) runs where the hook's result is used.
+  - `on*` entries of object configs (`{ label: 'Export', onSelect: exportAll }`) are events.
+  - A function shared through a context (`<Ctx.Provider value={{ remove: mutation.mutate }}>`, also through `useMemo` and React 19's `<Ctx value>`) is placed where the consumers (`useContext(Ctx)`, or a hook that returns it) use it.
+  - A hook that returns several mutations gives each caller only the ones it uses: `const { remove } = useItems()` no longer lists `add` and `update` with an unknown trigger. A result passed on whole keeps them all.
+  - A local function used as a `mutationFn` / `queryFn` is one site through its hook, not also a second site without it (sometimes with a `page-load` trigger).
+- **URLs.**
+  - `new URL()` is read through `.href`, `.toString()`, `String()` and templates, and its base can be an env value or a constant (`new URL('/v1/x', process.env.API_URL)` → `{API_URL}/v1/x`), not only a string.
+  - `.replace()` (strings and regexes), `.replaceAll()` and `.slice(n)` with known arguments are applied.
+  - A URL read from data at runtime (`fetch(file.url)` after `res.json()`, `files.map((f) => fetch(f.downloadUrl))`) is information ("URL from the data", `runtime-url`), not a "could not be resolved" warning. A URL from a prop is still a warning: the parent decides it.
+  - **Catch-all proxies.** A route handler like `/api/[...path]` that forwards the incoming path (`params.path.join('/')`, `request.nextUrl.pathname`, `new URL(request.url).pathname`, with `.replace()` or `.slice()`) sends to `{API_URL}/:path*`, and each request to it shows where it goes: `POST /api/reviews` is forwarded to `{API_URL}/reviews`. `[[...path]]` works too.
+  - A request a shared helper sends only sometimes before the real one (a token refresh) is marked `conditional` and shown apart ("Sometimes also on the server"), not as part of every chain.
+- **Components chosen at runtime.** `const Comp = asChild ? Slot : 'button'`, nested ternaries, `cond && A` and lookups in a constant record (`ICONS[name]`) list each project component they can be, as conditional children. When every choice is a library component or an HTML tag, it is one external child with no warning.
+- **Library types.** A package's own object types (react-hook-form's `Control<T>`, a carousel API) are kept by name instead of being expanded down to `Window`, plain values (`string`, `boolean`, literals) are shown at any depth, and a library type's arguments no longer make a type "partly resolved".
+- **Flows from layouts.** A flow that starts in a component a layout renders (a search bar in a header) shows on every page under that layout.
+- `.flow-checker/model.json` is now version 11. Version 1–10 files still load.
+
 ## 0.2.1
 
 Fixes found by running 0.2.0 on a large real app (a 54-page Next.js 16 app with its own `request()` wrapper). Models saved by 0.2 still load.

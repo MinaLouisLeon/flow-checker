@@ -97,7 +97,12 @@ export function applyPostman(model: AppModel, imported: PostmanImport, options: 
       }
       next.url = url
       if (!next.method) next.method = e.entry.method
-      flags = flags.filter((f) => f.kind !== 'dynamic-url' && (f.kind !== 'unknown-method' || !next.method))
+      flags = flags.filter(
+        (f) =>
+          f.kind !== 'dynamic-url' &&
+          f.kind !== 'runtime-url' &&
+          (f.kind !== 'unknown-method' || !next.method),
+      )
     }
 
     const mismatches: string[] = []

@@ -1258,3 +1258,135 @@ a.stat:hover {
   flex-wrap: wrap;
   row-gap: 4px;
 }
+
+/* Components and Requests screens (M21) */
+.select {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.button[aria-pressed="true"] {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+/* Request rows carry several badges and may wrap; component rows stay one line (the path truncates). */
+.request-list > li {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.entity-counts {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.row-link {
+  color: var(--text);
+  min-width: 0;
+}
+.row-link:hover .request-url {
+  color: var(--accent);
+}
+.row-group {
+  flex: 1;
+  min-width: 0;
+}
+.row-group > summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  cursor: pointer;
+  list-style: none;
+}
+.row-group > summary::-webkit-details-marker {
+  display: none;
+}
+/* Same specificity as `.request[open] > summary::before`, so the order of the rules doesn't matter. */
+.row-group:not([open]) > summary::before {
+  content: "▸";
+  color: var(--muted);
+  font-size: 11px;
+}
+.row-group[open] > summary::before {
+  content: "▾";
+  color: var(--muted);
+  font-size: 11px;
+}
+.sublist {
+  margin: 6px 0 0 18px;
+}
+.show-more {
+  align-self: flex-start;
+}
+.stat-main {
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+}
+.stat-main:hover {
+  text-decoration: none;
+}
+.stat-split:has(.stat-main:hover) {
+  border-color: var(--accent);
+}
+.stat-detail a {
+  color: inherit;
+}
+.stat-detail a:hover {
+  color: var(--accent);
+}
+
+/* Bounded lists and folded rows (M23) */
+.more-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+}
+.more-button:hover {
+  text-decoration: underline;
+}
+.more-row {
+  list-style: none;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.caller-groups > li.caller-group {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+.caller-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.callers {
+  margin-left: 18px;
+}
+.type-group > details {
+  width: 100%;
+}
+.type-group > details > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.type-group-name {
+  font-weight: 600;
+}
+.type-instances {
+  margin: 4px 0 0 18px;
+}

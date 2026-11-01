@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { type Check, runDoctor } from '../src/cli/doctor'
 import { type CliIO, runCli } from '../src/cli/run'
+import { EDGE_BODY, NODE_BODY } from '../src/cli/server-hook'
 
 const dirs: string[] = []
 const servers: Server[] = []
@@ -14,7 +15,7 @@ afterEach(async () => {
 })
 
 const CLIENT = "import { installClientRuntime } from '@integr8-media/flow-checker/runtime/client'\n"
-const SERVER = "await import('@integr8-media/flow-checker/runtime/server')\n"
+const SERVER = `export async function register() {\n${NODE_BODY}\n}\n`
 
 function project(files: Record<string, string>) {
   const dir = mkdtempSync(join(tmpdir(), 'flow-checker-doctor-'))
@@ -167,7 +168,7 @@ describe('flow-checker doctor: middleware (M14)', () => {
       ...installed(next),
       ...files,
     })
-  const EDGE = "await import('@integr8-media/flow-checker/runtime/edge')\n"
+  const EDGE = `export async function register() {\n${NODE_BODY}\n${EDGE_BODY}\n}\n`
 
   it('has no middleware check without a middleware file', async () => {
     const root = base('16.1.0', { 'src/instrumentation.ts': SERVER })
@@ -201,7 +202,7 @@ describe('flow-checker doctor: middleware (M14)', () => {
     expect(check?.status).toBe('warn')
     expect(check?.hint).toContain('registerEdgeRuntime(process.env.FLOW_CHECKER_RUNTIME)')
 
-    const wired = base('15.5.0', { ...files, 'src/instrumentation.ts': SERVER + EDGE })
+    const wired = base('15.5.0', { ...files, 'src/instrumentation.ts': EDGE })
     expect(byName(await runDoctor({ root: wired, ...(await freePorts()) })).Middleware?.status).toBe('ok')
 
     const node = base('15.5.0', {

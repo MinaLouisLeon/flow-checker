@@ -94,6 +94,18 @@ Every command shows its progress on stderr. In a terminal, a live line shows a s
 
 In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` lines are printed, as plain text.
 
+### Dashboard
+
+`flow-checker dev` serves the dashboard on port 4400. The same screens are in the static HTML export, read-only.
+
+- **Overview:** counts for pages, route handlers, components, requests, types and flows, each a link to its list, and the things to check (unresolved URLs, unknown triggers, type mismatches...), one note per request.
+- **Map:** the route map (graph or tree). A page shows its component tree, the requests it sends on load and on events (apart from those its layouts send on every page), where it leads and the flows that start on it.
+- **Components:** every component, searchable by name or file, filtered by kind (server / client / shared), by what it has (sends requests, things to check, not on any page) and sorted by name, requests or pages.
+- **Requests:** every request site, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status (verified, mismatch, needs re-check, not captured yet), transport and flags. The same request sent from several places is one row. A request opens on its own page with its body and response types, server hops, query-cache links, captures and the call path from the component.
+- **Flows**, **Types**, **Live** (captures as they arrive, with their match and type check) and **Export**.
+
+Filters and searches stay in the URL, so a filtered list can be bookmarked or shared. Lists that grow with the app (the queries a cache call hits, a route handler's callers...) show five entries, then "+N more".
+
 ### React Query
 
 `useQuery`, `useInfiniteQuery`, the suspense hooks, `useQueries` / `useSuspenseQueries` (one request per entry), `useMutation`, `usePrefetchQuery` and `queryClient.fetchQuery` / `prefetchQuery` / `ensureQueryData` (and their infinite forms) are request sites, in v4 and v5. Each query's key is read into segments (`['todos', 'detail', :id]`), also through key factories, `queryOptions()` and functions that return options.
@@ -140,11 +152,42 @@ While you test, every message in both directions is captured (redacted like bodi
 
 `flow-checker init` shows what it will change and asks first:
 
-- `instrumentation-client.ts` (browser hook) and `instrumentation.ts` (server hook), next to your `app` directory (in `src/` when you use `src/app`). If `instrumentation.ts` already exports `register()`, it prints the lines to add instead of editing it. The server hook also registers a small edge runtime, so requests sent from middleware on the edge runtime (`middleware.ts` before Next.js 16) are captured too; hooks written by 0.1 can get it from `init` or `doctor`.
+- `instrumentation-client.ts` (browser hook) and `instrumentation.ts` (server hook), next to your `app` directory (in `src/` when you use `src/app`). If `instrumentation.ts` already exports `register()`, `init` adds the flow-checker blocks as its first statements (see below). The server hook also registers a small edge runtime, so requests sent from middleware on the edge runtime (`middleware.ts` before Next.js 16) are captured too; hooks written by 0.1 can get it from `init` or `doctor`.
 - `flow-checker.config.ts`.
 - `.gitignore` entries for captured data.
 
 Both hooks are **no-ops unless the app was started by flow-checker** (`FLOW_CHECKER=1`), and the browser runtime is never active in production builds, so it is safe to commit them.
+
+### The server hook goes first in `register()`
+
+The two flow-checker blocks must be the **first statements of `register()`**, outside any `if`, and `register` must be `async`:
+
+```ts
+// instrumentation.ts
+export async function register() {
+  // flow-checker: captures server-side requests while you test. It does nothing unless FLOW_CHECKER=1.
+  if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'nodejs') {
+    const { registerServerRuntime } = await import('@integr8-media/flow-checker/runtime/server')
+    registerServerRuntime()
+  }
+  // flow-checker: requests sent from middleware on the edge runtime (fetch only, best effort).
+  if (process.env.FLOW_CHECKER === '1' && process.env.NEXT_RUNTIME === 'edge') {
+    const { registerEdgeRuntime } = await import('@integr8-media/flow-checker/runtime/edge')
+    registerEdgeRuntime(process.env.FLOW_CHECKER_RUNTIME)
+  }
+
+  // your own code
+  if (process.env.NODE_ENV === 'production') {
+    // ...
+  }
+}
+```
+
+Pasted inside an existing condition (such as a production-only `if`) or after an early `return`, they never run under `next dev`, and server-side requests are silently not captured.
+
+- `init` edits an existing `register()` for you: it puts the blocks first, makes `register` `async` when needed and moves misplaced blocks when run again. A `register` re-exported from another file gets a note with the lines to add instead.
+- `doctor` fails when a block is inside an `if`, `switch`, loop, `try`, ternary, `&&` or nested callback, comes after other code, or when `register` isn't `async`. It names the line and prints the lines to move.
+- `dev` warns at start when the hook is misplaced, and once more when your app answers route handlers that send requests but no server-side request is captured within 10 s. Live shows the same warning.
 
 `flow-checker dev` starts your dev command with `FLOW_CHECKER=1`, `PORT` and the capture settings in the environment. With `--no-app`, it prints that environment so you can start the app yourself (for example in a Docker container or a monorepo task runner).
 
@@ -212,7 +255,7 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 - Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.
 - tRPC: procedures called through `createCaller` or a server-side `createTRPCOptionsProxy({ router })` run without an HTTP request and are not request sites. Subscriptions are found in the code, but their streams are captured as plain requests. The router must be reachable from `fetchRequestHandler({ router })` or the client's `AppRouter` type.
 - Next.js before 15.3: browser capture needs webpack (no Turbopack) and `withFlowChecker()`.
-- Large repositories: the first scan of a ~1,800-file app takes about 10–12 s and a re-scan after an edit about 4 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
+- Large repositories: the first scan of a ~1,800-file app takes about 12 s and a re-scan after an edit about 4 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
 
 ## License
 

@@ -2,9 +2,18 @@ import { useData } from '../context'
 import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
-import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
+import { Badge, CappedList, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
 
-export function ComponentPanel({ componentId, routeId }: { componentId: string; routeId?: string }) {
+export function ComponentPanel({
+  componentId,
+  routeId,
+  componentHref,
+}: {
+  componentId: string
+  routeId?: string
+  /** Where links to other components go. Default: the page view, or the component's own screen. */
+  componentHref?: (id: string) => string
+}) {
   const { index } = useData()
   const component = index.components.get(componentId)
   if (!component) {
@@ -18,8 +27,12 @@ export function ComponentPanel({ componentId, routeId }: { componentId: string; 
   const parents = index.renderedBy.get(component.id) ?? []
   const routeIds = index.routesOf.get(component.id) ?? []
   const notes = index.notes.filter((n) => n.componentId === component.id)
-  const link = (id: string) =>
-    routeId ? href({ name: 'page', routeId, componentId: id }) : href({ name: 'component', componentId: id })
+  const link =
+    componentHref ??
+    ((id: string) =>
+      routeId
+        ? href({ name: 'page', routeId, componentId: id })
+        : href({ name: 'component', componentId: id }))
 
   return (
     <div className="panel">
@@ -95,16 +108,18 @@ export function ComponentPanel({ componentId, routeId }: { componentId: string; 
         {parents.length === 0 ? (
           <Empty>Not rendered by another project component.</Empty>
         ) : (
-          <ul className="list">
-            {parents.map((p) => (
+          <CappedList
+            className="list"
+            items={parents}
+            render={(p) => (
               <li key={`${p.parentId}:${p.ref.loc.line}`}>
                 <a href={link(p.parentId)}>{index.components.get(p.parentId)?.name ?? p.parentId}</a>
                 <RefBadges site={p.ref} />
                 <span className="spacer" />
                 <SourceLink file={p.ref.loc.file} line={p.ref.loc.line} column={p.ref.loc.column} />
               </li>
-            ))}
-          </ul>
+            )}
+          />
         )}
       </Section>
 
@@ -112,15 +127,17 @@ export function ComponentPanel({ componentId, routeId }: { componentId: string; 
         {routeIds.length === 0 ? (
           <Empty>Not reachable from any page.</Empty>
         ) : (
-          <ul className="chips">
-            {routeIds.map((id) => (
+          <CappedList
+            className="chips"
+            items={routeIds}
+            render={(id) => (
               <li key={id}>
                 <a className="chip" href={href({ name: 'page', routeId: id, componentId: component.id })}>
                   {index.routes.get(id)?.path ?? id}
                 </a>
               </li>
-            ))}
-          </ul>
+            )}
+          />
         )}
       </Section>
     </div>

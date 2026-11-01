@@ -67,6 +67,11 @@ export const CaptureMatchSchema = z.object({
   /** `manual` when you assigned it in the dashboard. */
   by: z.enum(['auto', 'manual']),
   siteId: z.string().optional(),
+  /**
+   * Matched: other sites that send this same request (M24). Components that mount the same React
+   * Query query (same key, same query function) share one request, so it verifies all of them.
+   */
+  sharedWith: z.array(z.string()).optional(),
   score: z.number(),
   /** Best candidates first (at most a few). */
   candidates: z.array(MatchCandidateSchema),
@@ -77,6 +82,12 @@ export const CaptureMatchSchema = z.object({
   thirdParty: z.boolean().optional(),
 })
 export type CaptureMatch = z.infer<typeof CaptureMatchSchema>
+
+/** The sites a match verifies: its site and the sites that share the request with it (M24). */
+export function matchedSiteIds(match: CaptureMatch | undefined): string[] {
+  if (match?.status !== 'matched' || !match.siteId) return []
+  return [match.siteId, ...(match.sharedWith ?? [])]
+}
 
 /** `.flow-checker/overrides.json`: your decisions, safe to commit. */
 export const OverridesSchema = z.object({
@@ -130,6 +141,17 @@ export interface VerificationSummary {
   counts: { matched: number; ambiguous: number; unmatched: number; manual: number; thirdParty?: number }
 }
 
+/**
+ * `GET /api/server-capture` and the live feed's `server-capture` event (M22). `missing`: browser
+ * requests reached a route handler that sends requests, but no server capture followed, so the
+ * server hook most likely never ran.
+ */
+export interface ServerCaptureStatus {
+  state: 'waiting' | 'running' | 'missing'
+  /** The browser request that started the wait, e.g. `POST /api/login`. */
+  request?: string
+}
+
 // --- URL and route patterns -----------------------------------------------------------------
 
 function escapeRegex(text: string): string {
@@ -138,9 +160,15 @@ function escapeRegex(text: string): string {
 
 /** Regex for a request site path pattern like `/users/:id` (a `:param` is one or more segments' text). */
 export function pathPatternRegex(pattern: string): RegExp {
-  const parts = pattern.split(/(:[A-Za-z_$][\w$]*)/)
+  // `:id` is one segment; `:path*` (a catch-all proxy's forwarded path, M25) is any number of them.
+  const parts = pattern.split(/(\/?:[A-Za-z_$][\w$]*\*?)/)
   const body = parts
-    .map((part) => (part.startsWith(':') && part.length > 1 ? '[^/?#]+' : escapeRegex(part)))
+    .map((part) => {
+      if (!/^\/?:./.test(part)) return escapeRegex(part)
+      const slash = part.startsWith('/')
+      if (part.endsWith('*')) return slash ? '(?:/[^?#]*)?' : '[^?#]*'
+      return `${slash ? '/' : ''}[^/?#]+`
+    })
     .join('')
   // A trailing slash on either side does not matter.
   return new RegExp(`^${body.replace(/\/$/, '')}/?$`)

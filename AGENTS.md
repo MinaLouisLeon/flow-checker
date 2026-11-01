@@ -90,4 +90,10 @@ re-run them on their own before assuming a regression.
 | M17 | GraphQL                                           | Done   |
 | M18 | SSE                                               | Done   |
 | M19 | WebSockets                                        | Done   |
-| M20 | Release v0.2.0                                    | Ready  |
+| M20 | Release v0.2.0                                    | Done   |
+| M21 | Components and Requests screens                   | Done   |
+| M22 | Server hook placement check                       | Done   |
+| M23 | Dashboard fixes (bounded lists, scroll, handlers) | Done   |
+| M24 | React Query keys                                  | Done   |
+| M25 | Scanner fixes (triggers, URLs, components, types) | Done   |
+| M26 | Release v0.2.2                                    | Done   |

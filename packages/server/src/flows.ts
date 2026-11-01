@@ -14,6 +14,7 @@ import {
   type FlowRun,
   type FlowStatus,
   type FlowsSummary,
+  matchedSiteIds,
   type RecordedFlow,
   type RecordedStep,
   type Route,
@@ -304,10 +305,7 @@ export class FlowTracker {
             continue
           }
           const hit = window.find(
-            (e) =>
-              e.kind === 'capture' &&
-              e.capture.match?.status === 'matched' &&
-              e.capture.match.siteId === expect.siteId,
+            (e) => e.kind === 'capture' && matchedSiteIds(e.capture.match).includes(expect.siteId),
           )
           if (!hit) break walk
           lastAt = Math.max(lastAt, hit.at)

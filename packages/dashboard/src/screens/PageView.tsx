@@ -8,11 +8,12 @@ import {
 } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
+import { CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
 import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
-import { QueryLinkList, RequestList, triggerLabel } from '../RequestView'
+import { ownerHref, QueryLinkList, RequestList, RequestSummary, triggerLabel } from '../RequestView'
 import { href } from '../router'
-import { Badge, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
+import { Badge, CappedList, Empty, KindBadge, RefBadges, SearchBox, Section, SourceLink } from '../ui'
 import { ComponentPanel } from './ComponentPanel'
 
 export function PageView({ routeId, componentId }: { routeId: string; componentId?: string }) {
@@ -109,7 +110,10 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         <MiddlewareSection index={index} routeId={routeId} />
 
         {navigations.length > 0 && (
-          <Section title="Leaves this page" aside={<span className="count">{navigations.length}</span>}>
+          <Section
+            title="Leaves this page"
+            aside={<span className="count">{groupNavigations(navigations).length}</span>}
+          >
             <NavigationList navigations={navigations} />
           </Section>
         )}
@@ -133,7 +137,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
               <summary className="muted">
                 Sent by the layouts around this page, on every page under them. Show them.
               </summary>
-              <RequestList sites={fromLayouts} empty="" open={false} owners />
+              <RequestList sites={fromLayouts} empty="" open={false} owners limit={CAP} />
               {layoutLinks.length > 0 && <QueryLinkList links={layoutLinks} />}
             </details>
           </Section>
@@ -155,7 +159,13 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
                 <li key={flow.id}>
                   <a href={href({ name: 'flows', flowId: flow.id, q: '' })}>{flow.name}</a>
                   <span className="spacer" />
-                  <span className="muted">{flow.routeId === routeId ? 'starts here' : 'passes through'}</span>
+                  <span className="muted">
+                    {flow.routeId === routeId
+                      ? 'starts here'
+                      : flow.startRouteIds?.includes(routeId)
+                        ? 'starts here (in a layout)'
+                        : 'passes through'}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -206,22 +216,30 @@ const NAV_LABEL: Record<Navigation['kind'], string> = {
   'permanent-redirect': 'permanent redirect',
 }
 
-/** Where the page sends the user: redirects while it renders, links and router calls. */
+/**
+ * Where the page sends the user: redirects while it renders, links and router calls. The same
+ * navigation found in several components (a shared hook) is one row.
+ */
 function NavigationList({ navigations }: { navigations: Navigation[] }) {
   const { index } = useData()
   // Redirects first: a page that only redirects is mostly that.
-  const sorted = [...navigations].sort(
-    (a, b) => Number(b.kind.includes('redirect')) - Number(a.kind.includes('redirect')),
-  )
+  const groups = groupNavigations(navigations).sort((a, b) => Number(isRedirect(b)) - Number(isRedirect(a)))
   return (
-    <ul className="list nav-list">
-      {sorted.map((nav) => {
+    <CappedList
+      className="list nav-list"
+      items={groups}
+      render={(group) => {
+        const nav = group[0] as Navigation
         const target = nav.targetRouteId ? index.routes.get(nav.targetRouteId) : undefined
         const options = target ? [] : candidatePages(index, nav.href)
-        const owner = nav.componentId ? index.components.get(nav.componentId)?.name : undefined
+        const owners = [
+          ...new Set(
+            group.flatMap((n) => (n.componentId ? [index.components.get(n.componentId)?.name ?? '?'] : [])),
+          ),
+        ]
         return (
           <li key={nav.id}>
-            <Badge tone={nav.kind.includes('redirect') ? 'warn' : 'muted'}>{NAV_LABEL[nav.kind]}</Badge>
+            <Badge tone={isRedirect(group) ? 'warn' : 'muted'}>{NAV_LABEL[nav.kind]}</Badge>
             {target ? (
               <a href={href({ name: 'page', routeId: target.id })}>
                 <code>{target.path}</code>
@@ -246,17 +264,20 @@ function NavigationList({ navigations }: { navigations: Navigation[] }) {
               </span>
             )}
             <span className="spacer" />
-            <span className="muted">
+            <span className="muted" title={owners.length > 1 ? owners.join(', ') : undefined}>
               {triggerLabel(nav.trigger)}
-              {owner ? ` · ${owner}` : ''}
+              {owners.length === 1 ? ` · ${owners[0]}` : ''}
+              {owners.length > 1 ? ` · from ${owners.length} components` : ''}
             </span>
             <SourceLink file={nav.loc.file} line={nav.loc.line} column={nav.loc.column} />
           </li>
         )
-      })}
-    </ul>
+      }}
+    />
   )
 }
+
+const isRedirect = (group: Navigation[]) => (group[0] as Navigation).kind.includes('redirect')
 
 /** Pages an href with placeholders could go to: `/:locale/jobs/:param` -> `/[locale]/jobs/applied`, ... */
 function candidatePages(index: ModelIndex, url: Navigation['href']): Route[] {
@@ -284,9 +305,15 @@ function pageLinks(index: ModelIndex, routeId: string): QueryLink[] {
   )
 }
 
+/**
+ * A route handler: what it sends on, then who calls it, grouped by the URL each caller sends (for a
+ * catch-all handler, the concrete paths), with callers at the same line folded into one row.
+ */
 function RouteHandlerView({ route, index }: { route: Route; index: ModelIndex }) {
+  const [q, setQ] = useState('')
   const sends = index.handlerRequests.get(route.id) ?? []
   const callers = index.handlerCallers.get(route.id) ?? []
+  const groups = callerGroups(callers, index, q)
   return (
     <div className="screen">
       <header className="page-head">
@@ -306,39 +333,84 @@ function RouteHandlerView({ route, index }: { route: Route; index: ModelIndex })
 
       <MiddlewareSection index={index} routeId={route.id} />
 
+      <Section title="Requests it sends" aside={<span className="count">{sends.length}</span>}>
+        <RequestList sites={sends} empty="This handler sends no requests to other services." />
+      </Section>
+
       <Section title="Called from" aside={<span className="count">{callers.length}</span>}>
         {callers.length === 0 ? (
           <Empty>No component in the scan calls this route.</Empty>
         ) : (
-          <ul className="list">
-            {callers.map((site) => {
-              const c = site.componentId ? index.components.get(site.componentId) : undefined
-              return (
-                <li key={site.id}>
-                  <span className={`method method-${(site.method ?? 'unknown').toLowerCase()}`}>
-                    {site.method ?? '?'}
-                  </span>
-                  {c ? <a href={href({ name: 'component', componentId: c.id })}>{c.name}</a> : <span>?</span>}
-                  <span className="spacer" />
-                  {site.callStack[0] && (
-                    <SourceLink
-                      file={site.callStack[0].file}
-                      line={site.callStack[0].line}
-                      column={site.callStack[0].column}
+          <>
+            {callers.length > CAP && (
+              <div className="toolbar">
+                <SearchBox value={q} onChange={setQ} placeholder="Search callers by URL, component or file" />
+                <span className="muted">
+                  {groups.reduce((n, g) => n + g.count, 0)} of {callers.length}
+                </span>
+              </div>
+            )}
+            {groups.length === 0 ? (
+              <Empty>No caller matches.</Empty>
+            ) : (
+              <ul className="list caller-groups">
+                {groups.map((group) => (
+                  <li key={group.label} className="caller-group">
+                    <div className="caller-url">
+                      <RequestSummary site={(group.rows[0] as RequestSite[])[0] as RequestSite} />
+                      <span className="spacer" />
+                      <span className="count">{group.count}</span>
+                    </div>
+                    <CappedList
+                      className="list callers"
+                      items={group.rows}
+                      render={(row) => <CallerRow key={(row[0] as RequestSite).id} row={row} />}
                     />
-                  )}
-                </li>
-              )
-            })}
-          </ul>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
-      </Section>
-
-      <Section title="Requests it sends" aside={<span className="count">{sends.length}</span>}>
-        <RequestList sites={sends} empty="This handler sends no requests to other services." />
       </Section>
     </div>
   )
+}
+
+/** Callers that send the request from the same line: their components, and that line. */
+function CallerRow({ row }: { row: RequestSite[] }) {
+  const { index } = useData()
+  const first = row[0] as RequestSite
+  const owners = [...new Map(row.map((s) => [s.componentId ?? s.id, s])).values()]
+  const at = sendLine(first)
+  return (
+    <li>
+      {owners.length === 1 ? (
+        <OwnerLink site={first} />
+      ) : (
+        <span title={owners.map((s) => siteOwner(s, index)).join(', ')}>
+          from {owners.length} {first.componentId ? 'components' : 'places'}:{' '}
+          {owners.slice(0, CAP).map((s, i) => (
+            <span key={s.id}>
+              {i > 0 && ', '}
+              <OwnerLink site={s} />
+            </span>
+          ))}
+          {owners.length > CAP && <span className="muted"> and {owners.length - CAP} more</span>}
+        </span>
+      )}
+      {first.trigger.kind !== 'unknown' && <span className="muted"> · {triggerLabel(first.trigger)}</span>}
+      <span className="spacer" />
+      {at && <SourceLink file={at.file} line={at.line} column={at.column} />}
+    </li>
+  )
+}
+
+function OwnerLink({ site }: { site: RequestSite }) {
+  const { index } = useData()
+  const to = ownerHref(site)
+  const name = siteOwner(site, index)
+  return to ? <a href={to}>{name}</a> : <span>{name}</span>
 }
 
 function TreeItem({

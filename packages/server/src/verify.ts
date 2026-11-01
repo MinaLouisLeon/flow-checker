@@ -11,6 +11,7 @@ import {
   type CaptureMatch,
   type CaptureSummary,
   checkCapture,
+  matchedSiteIds,
   pairRenamedSites,
   type RequestSite,
   type SiteVerification,
@@ -101,11 +102,11 @@ export class Verifier {
     }
   }
 
-  /** Taken before the code of the site it matched last changed. */
-  isStale(capture: Capture): boolean {
+  /** Taken before the code of the site it matched (or `siteId`, one it shares) last changed. */
+  isStale(capture: Capture, siteId?: string): boolean {
     const match = capture.match
     if (match?.status !== 'matched' || !match.siteId) return false
-    const since = this.history.since(this.sites.get(match.siteId)?.hash)
+    const since = this.history.since(this.sites.get(siteId ?? match.siteId)?.hash)
     return since !== undefined && since !== BEGINNING && Date.parse(capture.timestamp) < Date.parse(since)
   }
 
@@ -211,20 +212,23 @@ export class Verifier {
     const checks = new Map<string, { captureId: string; check: TypeCheck; stale: boolean }[]>()
     for (const capture of this.store.all()) {
       const match = capture.match
-      if (match?.status !== 'matched' || !match.siteId) continue
-      const entry = sites[match.siteId] ?? { captures: 0 }
-      sites[match.siteId] = entry
-      entry.captures++
-      const stale = this.isStale(capture)
-      if (stale) entry.stale = (entry.stale ?? 0) + 1
-      if (!entry.lastAt || capture.timestamp >= entry.lastAt) {
-        entry.lastAt = capture.timestamp
-        entry.lastCaptureId = capture.id
-      }
-      if (capture.typeCheck?.siteId === match.siteId) {
-        const list = checks.get(match.siteId) ?? []
-        checks.set(match.siteId, list)
-        list.push({ captureId: capture.id, check: capture.typeCheck, stale })
+      // A shared query's request (M24) verifies every site that shares it.
+      for (const siteId of matchedSiteIds(match)) {
+        const entry = sites[siteId] ?? { captures: 0 }
+        sites[siteId] = entry
+        entry.captures++
+        const stale = this.isStale(capture, siteId)
+        if (stale) entry.stale = (entry.stale ?? 0) + 1
+        if (!entry.lastAt || capture.timestamp >= entry.lastAt) {
+          entry.lastAt = capture.timestamp
+          entry.lastCaptureId = capture.id
+        }
+        // Shared sites send the same request with the same code, so the main site's check holds.
+        if (capture.typeCheck && capture.typeCheck.siteId === match?.siteId) {
+          const list = checks.get(siteId) ?? []
+          checks.set(siteId, list)
+          list.push({ captureId: capture.id, check: capture.typeCheck, stale })
+        }
       }
     }
     for (const [siteId, entry] of Object.entries(sites)) {
@@ -268,6 +272,9 @@ export class Verifier {
       return {
         ...previous,
         siteId: movedTo,
+        ...(previous.sharedWith
+          ? { sharedWith: previous.sharedWith.map((id) => this.renamed[id] ?? id) }
+          : {}),
         candidates: previous.candidates.map((c) => ({ ...c, siteId: this.renamed[c.siteId] ?? c.siteId })),
       }
     }

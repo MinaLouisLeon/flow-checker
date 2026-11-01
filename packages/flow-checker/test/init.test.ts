@@ -63,7 +63,7 @@ describe('flow-checker init', () => {
     expect(again.out.join('\n')).toContain('already set up')
   })
 
-  it('appends to existing hooks and leaves an existing register() to the user', async () => {
+  it('appends to existing hooks and puts the blocks into an existing register()', async () => {
     const root = project({
       'app/page.tsx': '',
       'instrumentation-client.js': "console.log('mine')",
@@ -75,8 +75,9 @@ describe('flow-checker init', () => {
     const client = read(root, 'instrumentation-client.js')
     expect(client.startsWith("console.log('mine')\n")).toBe(true)
     expect(client).toContain('installClientRuntime(process.env.NEXT_PUBLIC_FLOW_CHECKER)')
-    expect(read(root, 'instrumentation.js')).toBe('export function register() {}\n')
-    expect(out.join('\n')).toContain('already exports register()')
+    const server = read(root, 'instrumentation.js')
+    expect(server.startsWith('export async function register() {\n  // flow-checker:')).toBe(true)
+    expect(out.join('\n')).toContain('update  instrumentation.js (adds the flow-checker blocks')
     expect(existsSync(join(root, 'flow-checker.config.ts'))).toBe(false)
   })
 
@@ -168,5 +169,56 @@ describe('flow-checker dev capture', () => {
     }
     // A full dev start (scan + server) takes about a second alone, but several times that while
     // the whole suite compiles TypeScript in parallel.
+  }, 20_000)
+
+  it('warns once when route handlers are hit but no server capture arrives (M22)', async () => {
+    const root = project({
+      'app/page.tsx': 'export default function Home() { return <main /> }',
+      'app/api/login/route.ts':
+        "export async function POST() {\n  const res = await fetch('https://upstream.example/login')\n  return Response.json(await res.json())\n}\n",
+    })
+    const { cli, err } = io()
+    const session = await startDev({ root, port: 0, open: false, watch: false, serverCaptureWaitMs: 50 }, cli)
+    if (typeof session === 'number') throw new Error(`startDev failed with ${session}`)
+    try {
+      const runtime = JSON.parse(session.appEnv.NEXT_PUBLIC_FLOW_CHECKER ?? '{}')
+      const browser = {
+        id: 'cap_1',
+        sessionId: 'ses_1',
+        origin: 'browser',
+        transport: 'fetch',
+        timestamp: new Date().toISOString(),
+        durationMs: 5,
+        pageUrl: 'http://localhost:3000/',
+        request: {
+          method: 'POST',
+          url: 'http://localhost:3000/api/login',
+          headers: {},
+          body: { kind: 'none' },
+        },
+        response: { status: 200, headers: {}, body: { kind: 'none' } },
+        stack: [],
+        redacted: true,
+        redactedPaths: [],
+      }
+      const send = (captures: unknown[]) =>
+        fetch(session.ingestUrl, {
+          method: 'POST',
+          body: JSON.stringify({ token: runtime.token, captures, events: [] }),
+        })
+      expect((await send([browser])).status).toBe(204)
+      expect((await send([{ ...browser, id: 'cap_2' }])).status).toBe(204)
+      await new Promise((r) => setTimeout(r, 300))
+      const warnings = err.filter((line) => line.includes("server capture isn't running"))
+      expect(warnings).toHaveLength(1)
+      expect(warnings[0]).toContain('POST /api/login')
+      expect(warnings[0]).toContain('flow-checker doctor')
+      expect(await (await fetch(`${session.url}/api/server-capture`)).json()).toEqual({
+        state: 'missing',
+        request: 'POST /api/login',
+      })
+    } finally {
+      await session.close()
+    }
   }, 20_000)
 })

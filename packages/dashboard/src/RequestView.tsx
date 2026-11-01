@@ -3,15 +3,19 @@
 import {
   formatQueryKey,
   hasCaptures,
+  isInfoFlag,
+  isUnknownKey,
   type QueryLink,
   queryLinkTarget,
   type RequestSite,
   type Trigger,
   urlText,
 } from '@flow-checker/shared'
+import { Children, type ReactNode, useState } from 'react'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import { GraphqlFact } from './GraphqlView'
+import { groupSame, hitsEveryQuery, siteOwner, warnings } from './lists'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
@@ -20,7 +24,7 @@ import { StreamEvents } from './SseView'
 import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
-import { Badge, Empty, SourceLink } from './ui'
+import { Badge, Empty, MoreButton, SourceLink, useCapped } from './ui'
 
 const TRIGGER_LABEL: Record<Trigger['kind'], string> = {
   'server-render': 'server render',
@@ -55,19 +59,15 @@ export function siteLabel(site: RequestSite, index: ModelIndex): string {
   return `${siteOwner(site, index)} · ${site.method ?? '?'} ${target}`
 }
 
-/** The component, route handler or server action a site runs in. */
-export function siteOwner(site: RequestSite, index: ModelIndex): string {
-  if (site.componentId) return index.components.get(site.componentId)?.name ?? 'component'
-  if (site.origin === 'route-handler' && site.routeId) {
-    return `${site.handlerMethod ?? ''} ${index.routes.get(site.routeId)?.path ?? 'route handler'}`.trim()
-  }
-  if (site.origin === 'server-action') return `action ${site.serverAction?.name ?? '?'}`
-  if (site.origin === 'middleware') return `middleware ${index.model.middleware?.file ?? ''}`.trim()
-  return site.origin
+export { siteOwner }
+
+/** Screen that shows the site: the request on its own, in the request list (M21). */
+export function siteHref(site: RequestSite): string {
+  return href({ name: 'requests', siteId: site.id, q: '' })
 }
 
-/** Screen that shows the site: its component, or the route handler's page. */
-export function siteHref(site: RequestSite): string | undefined {
+/** Screen that shows where a site runs: its component, or the route handler's page. */
+export function ownerHref(site: RequestSite): string | undefined {
   if (site.componentId) return href({ name: 'component', componentId: site.componentId })
   if (site.routeId) return href({ name: 'page', routeId: site.routeId })
   return undefined
@@ -77,14 +77,20 @@ export function triggerLabel(trigger: Trigger): string {
   return trigger.kind === 'event' && trigger.event ? trigger.event : TRIGGER_LABEL[trigger.kind]
 }
 
+/** Rows a request list shows before "+N more". */
+const REQUEST_LIMIT = 20
+
 export function RequestList({
   sites,
   empty,
   open,
   owners,
+  limit = REQUEST_LIMIT,
 }: {
   sites: RequestSite[]
   empty: string
+  /** Rows shown before "+N more": lists of requests grow with the app. */
+  limit?: number
   /** Expand the details. Default: when there are three or fewer. */
   open?: boolean
   /**
@@ -94,11 +100,12 @@ export function RequestList({
   owners?: boolean
 }) {
   const { index } = useData()
-  if (sites.length === 0) return <Empty>{empty}</Empty>
   const groups = owners ? groupSame(sites) : sites.map((s) => [s])
+  const { shown, hidden, expand } = useCapped(groups, limit)
+  if (sites.length === 0) return <Empty>{empty}</Empty>
   return (
     <ul className="requests">
-      {groups.map((group) => {
+      {shown.map((group) => {
         const first = group[0] as RequestSite
         if (group.length === 1)
           return (
@@ -109,7 +116,7 @@ export function RequestList({
         const names = [...new Set(group.map((s) => siteOwner(s, index)))]
         return (
           <li key={first.id}>
-            <details className="request request-group">
+            <LazyDetails className="request request-group">
               <summary>
                 <RequestSummary site={first} />
                 <span className="muted request-owner" title={names.join(', ')}>
@@ -130,26 +137,41 @@ export function RequestList({
                   </li>
                 ))}
               </ul>
-            </details>
+            </LazyDetails>
           </li>
         )
       })}
+      {hidden > 0 && (
+        <li className="more-row">
+          <MoreButton hidden={hidden} onClick={expand} />
+        </li>
+      )}
     </ul>
   )
 }
 
-/** Sites that send the same request (method, URL, trigger), in first-seen order. */
-function groupSame(sites: RequestSite[]): RequestSite[][] {
-  const groups = new Map<string, RequestSite[]>()
-  for (const site of sites) {
-    const target =
-      site.transport === 'server-action' ? site.serverAction?.name : site.url && urlText(site.url)
-    const key = `${site.method ?? '?'} ${target ?? '?'} ${site.transport} ${triggerLabel(site.trigger)}`
-    const group = groups.get(key)
-    if (group) group.push(site)
-    else groups.set(key, [site])
-  }
-  return [...groups.values()]
+/**
+ * `<details>` whose content is only rendered once opened: a closed request still costs dozens of
+ * DOM nodes (types, call path, cache links), and a page can list hundreds.
+ */
+function LazyDetails({
+  className,
+  open = false,
+  children,
+}: {
+  className: string
+  open?: boolean
+  /** The `<summary>` first, then the body. */
+  children: ReactNode
+}) {
+  const [opened, setOpened] = useState(open)
+  const [summary, ...body] = Children.toArray(children)
+  return (
+    <details className={className} open={open} onToggle={(e) => e.currentTarget.open && setOpened(true)}>
+      {summary}
+      {opened && body}
+    </details>
+  )
 }
 
 export function RequestSummary({ site }: { site: RequestSite }) {
@@ -169,44 +191,65 @@ export function RequestSummary({ site }: { site: RequestSite }) {
   )
 }
 
-function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; owner?: boolean }) {
+/** How it is sent, what starts it, its flags and its verification status. */
+export function SiteBadges({ site }: { site: RequestSite }) {
+  return (
+    <>
+      <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
+        {site.transport === 'server-action'
+          ? 'server action'
+          : site.client
+            ? `${site.client.module} · ${site.client.name}`
+            : site.transport}
+        {site.hook ? ` · ${site.hook.name}` : ''}
+      </Badge>
+      <Badge
+        tone={site.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
+        title={TRIGGER_TITLE[site.trigger.kind]}
+      >
+        {triggerLabel(site.trigger)}
+      </Badge>
+      {site.conditional && (
+        <Badge tone="muted" title="Sent only under a condition in a shared helper, next to the main request">
+          sometimes
+        </Badge>
+      )}
+      {warnings(site).length > 0 && (
+        <Badge
+          tone="warn"
+          title={warnings(site)
+            .map((f) => f.message)
+            .join('\n')}
+        >
+          ⚠ {warnings(site).length}
+        </Badge>
+      )}
+      <SiteStatusBadge site={site} />
+    </>
+  )
+}
+
+export function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; owner?: boolean }) {
   const { index } = useData()
   const target = site.targetRouteId ? index.routes.get(site.targetRouteId) : undefined
   const chain = (site.chain ?? []).map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
 
   return (
-    <details className="request" open={open}>
+    <LazyDetails className="request" open={open}>
       <summary>
         <RequestSummary site={site} />
         {owner && <span className="muted request-owner">from {siteOwner(site, index)}</span>}
         <span className="spacer" />
-        <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
-          {site.transport === 'server-action'
-            ? 'server action'
-            : site.client
-              ? `${site.client.module} · ${site.client.name}`
-              : site.transport}
-          {site.hook ? ` · ${site.hook.name}` : ''}
-        </Badge>
-        <Badge
-          tone={site.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
-          title={TRIGGER_TITLE[site.trigger.kind]}
-        >
-          {triggerLabel(site.trigger)}
-        </Badge>
-        {site.flags.length > 0 && (
-          <Badge tone="warn" title={site.flags.map((f) => f.message).join('\n')}>
-            ⚠ {site.flags.length}
-          </Badge>
-        )}
-        <SiteStatusBadge site={site} />
+        <SiteBadges site={site} />
       </summary>
 
       <div className="request-body">
         {site.flags.length > 0 && (
           <ul className="notes">
             {site.flags.map((f) => (
-              <li key={f.kind}>⚠ {f.message}</li>
+              <li key={f.kind} className={isInfoFlag(f) ? 'muted' : undefined}>
+                {isInfoFlag(f) ? 'ℹ' : '⚠'} {f.message}
+              </li>
             ))}
           </ul>
         )}
@@ -290,6 +333,15 @@ function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; 
               </dd>
             </>
           )}
+          {site.upstream && (
+            <>
+              <dt>Forwarded to</dt>
+              <dd>
+                <code>{urlText(site.upstream)}</code>{' '}
+                <span className="muted">by the catch-all route handler</span>
+              </dd>
+            </>
+          )}
         </dl>
 
         <TypeBlock
@@ -312,16 +364,32 @@ function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; 
           />
         )}
 
-        {chain.length > 0 && (
+        {chain.some((hop) => !hop.conditional) && (
           <div className="request-chain">
             <h4>Then on the server</h4>
             <ul>
-              {chain.map((hop) => (
-                <li key={hop.id}>
-                  <RequestSummary site={hop} />
-                  {hop.responseType && <span className="muted"> → {hop.responseType.text}</span>}
-                </li>
-              ))}
+              {chain
+                .filter((hop) => !hop.conditional)
+                .map((hop) => (
+                  <li key={hop.id}>
+                    <RequestSummary site={hop} />
+                    {hop.responseType && <span className="muted"> → {hop.responseType.text}</span>}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+        {chain.some((hop) => hop.conditional) && (
+          <div className="request-chain">
+            <h4>Sometimes also on the server</h4>
+            <ul>
+              {chain
+                .filter((hop) => hop.conditional)
+                .map((hop) => (
+                  <li key={hop.id}>
+                    <RequestSummary site={hop} />
+                  </li>
+                ))}
             </ul>
           </div>
         )}
@@ -355,7 +423,7 @@ function RequestItem({ site, open, owner }: { site: RequestSite; open: boolean; 
           </ol>
         </div>
       </div>
-    </details>
+    </LazyDetails>
   )
 }
 
@@ -371,13 +439,11 @@ const LINK_LABEL: Record<QueryLink['kind'], string> = {
 /** React Query cache calls: what they do, the key they target, and the queries they hit (M13). */
 export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[]; showTargets?: boolean }) {
   const { index } = useData()
+  const { shown, hidden, expand } = useCapped(links)
   return (
     <ul className="list query-links">
-      {links.map((link) => {
+      {shown.map((link) => {
         const owner = link.componentId ? index.components.get(link.componentId) : undefined
-        const targets = link.targetSiteIds
-          .map((id) => index.requests.get(id))
-          .filter((s): s is RequestSite => !!s)
         return (
           <li key={link.id}>
             <span>
@@ -393,26 +459,52 @@ export function QueryLinkList({ links, showTargets = true }: { links: QueryLink[
                   in <a href={href({ name: 'component', componentId: owner.id })}>{owner.name}</a>
                 </span>
               )}
-              {showTargets && (
-                <span className="muted">
-                  {' → '}
-                  {targets.length === 0
-                    ? 'no scanned query'
-                    : targets.map((t, i) => (
-                        <span key={t.id}>
-                          {i > 0 && ', '}
-                          <code>{siteLabel(t, index)}</code>
-                        </span>
-                      ))}
-                </span>
-              )}
+              {showTargets && <QueryTargets link={link} />}
             </span>
             <span className="spacer" />
             <SourceLink file={link.loc.file} line={link.loc.line} column={link.loc.column} />
           </li>
         )
       })}
+      {hidden > 0 && (
+        <li className="more-row">
+          <MoreButton hidden={hidden} onClick={expand} />
+        </li>
+      )}
     </ul>
+  )
+}
+
+/**
+ * The queries a cache call hits: a few, then "+N more". A call with no key hits every query; one
+ * whose key starts with a value the scanner can't read hits none it can name (M24).
+ */
+function QueryTargets({ link }: { link: QueryLink }) {
+  const { index } = useData()
+  const targets = link.targetSiteIds.map((id) => index.requests.get(id)).filter((s): s is RequestSite => !!s)
+  const { shown, hidden, expand } = useCapped(targets)
+  return (
+    <span className="muted">
+      {' → '}
+      {hitsEveryQuery(link)
+        ? 'every query'
+        : targets.length === 0
+          ? isUnknownKey(link.key)
+            ? 'key not known'
+            : 'no scanned query'
+          : shown.map((t, i) => (
+              <span key={t.id}>
+                {i > 0 && ', '}
+                <code>{siteLabel(t, index)}</code>
+              </span>
+            ))}
+      {!hitsEveryQuery(link) && hidden > 0 && (
+        <>
+          {' '}
+          <MoreButton hidden={hidden} onClick={expand} />
+        </>
+      )}
+    </span>
   )
 }
 

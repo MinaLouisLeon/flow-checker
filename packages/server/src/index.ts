@@ -13,6 +13,7 @@ export { type RunningServer, type StartOptions, startServer } from './listen'
 export { fingerprint, MATCH_MARGIN, MATCH_THRESHOLD, Matcher } from './matcher'
 export { OverridesFile } from './overrides'
 export { ScanFeed, type ScanListener, type ScanUpdate } from './scan-feed'
+export { SERVER_CAPTURE_WAIT_MS, ServerCaptureWatch } from './server-capture'
 export {
   buildSnapshot,
   collectSnapshot,

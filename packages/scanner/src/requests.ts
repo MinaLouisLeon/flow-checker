@@ -48,7 +48,10 @@ import {
 } from '@flow-checker/shared'
 import {
   type ArrowFunction,
+  type BindingElement,
   type CallExpression,
+  type EnumDeclaration,
+  type EnumMember,
   type FunctionDeclaration,
   type FunctionExpression,
   type JsxAttribute,
@@ -195,6 +198,9 @@ HOOKS.set('swr/mutation#default', SWR('useSWRMutation', 'mutation', 'swr/mutatio
 /** Hooks that bind a server action to a form: `useActionState(action, initial)`. */
 const ACTION_STATE_HOOKS = new Set(['react#useActionState', 'react-dom#useFormState'])
 
+/** A file that may pass local functions to a query hook (checked before looking for them). */
+const HOOK_TEXT = /queryFn|mutationFn|useSWR|useQuery|useMutation|useInfiniteQuery/
+
 /** Mutation result members that run the mutation. */
 const MUTATE_MEMBERS = new Set(['mutate', 'mutateAsync', 'trigger'])
 
@@ -330,6 +336,11 @@ interface Walk {
   frames: Frame[]
   /** Functions on the current path, so recursion terminates. */
   active: Set<Node>
+  /**
+   * Functions walked as a query or mutation function. An inline one passed to a project hook
+   * (`useList({ queryFn: () => getFeed() })`) is not walked again where it is written.
+   */
+  hookFns?: Set<Node>
 }
 
 interface Found {
@@ -416,6 +427,12 @@ export class RequestScanner {
   readonly #streams: SseEndpoint[] = []
   /** Functions that write SSE text from their parameters, by function. */
   readonly #sseHelpers = new Map<Node, SseHelper[]>()
+  /** The route handler being walked: its incoming path can be forwarded (catch-all proxies). */
+  #handlerRoute: Route | undefined
+  /** Local functions used only as a query or mutation function (see `#onlyHookFn`). */
+  readonly #hookFnCache = new Map<Node, boolean>()
+  /** A context's consumers: the `useContext()` reads (also through custom hooks), by context. */
+  readonly #consumers = new Map<Node, CallExpression[]>()
 
   constructor(root: string, types: TypeResolver, options: RequestScannerOptions = {}) {
     this.#root = root
@@ -449,7 +466,12 @@ export class RequestScanner {
         routeId: route.id,
         handlerMethod: method,
       }
-      this.#walk(fn, fn, EMPTY_ENV, { origin, frames: [], active: new Set([fn]) })
+      this.#handlerRoute = route
+      try {
+        this.#walk(fn, fn, EMPTY_ENV, { origin, frames: [], active: new Set([fn]) })
+      } finally {
+        this.#handlerRoute = undefined
+      }
       this.#eventStream(route, method, fn, file)
     }
   }
@@ -808,6 +830,7 @@ export class RequestScanner {
   /** Every site, sorted by where it starts, with route handler and server action chains linked. */
   sites(routes: Route[]): RequestSite[] {
     this.#mergeTwins()
+    this.#markSideRequests()
     const sites = [...this.#sites.values()]
     const handlers = routes
       .filter((r) => r.kind === 'route-handler')
@@ -837,8 +860,42 @@ export class RequestScanner {
           (!site.procedure || s.procedure?.path === site.procedure.path),
       )
       if (chain.length > 0) site.chain = chain.map((s) => s.id)
+      const upstream = upstreamUrl(target.route.path, path, chain)
+      if (upstream) site.upstream = upstream
     }
     return sites.sort(bySite)
+  }
+
+  /**
+   * A request a shared helper sends only under a condition (`if (expired) await refresh()`) while
+   * the same call also sends its main request unconditionally: a side request, marked
+   * `conditional`. Branches that are alternatives (both guarded) aren't marked.
+   */
+  #markSideRequests() {
+    const byOrigin = new Map<string, RequestSite[]>()
+    for (const site of this.#sites.values()) {
+      const meta = this.#siteMeta.get(site.id)
+      if (!meta) continue
+      const list = byOrigin.get(meta.originKey) ?? []
+      list.push(site)
+      byOrigin.set(meta.originKey, list)
+    }
+    const loc = (f: CallFrame | undefined) => (f ? `${f.file}:${f.line}:${f.column}` : '')
+    for (const list of byOrigin.values()) {
+      for (const site of list) {
+        const guarded = this.#siteMeta.get(site.id)?.guarded ?? []
+        // The first guarded call inside a helper (not in the origin's own code).
+        const at = guarded.findIndex((g, i) => g && i >= 1)
+        if (at < 1) continue
+        const main = list.some((other) => {
+          if (other === site || other.callStack.length <= at) return false
+          for (let i = 0; i < at; i++) if (loc(other.callStack[i]) !== loc(site.callStack[i])) return false
+          const otherGuarded = this.#siteMeta.get(other.id)?.guarded ?? []
+          return !otherGuarded.slice(at).some(Boolean)
+        })
+        if (main) site.conditional = true
+      }
+    }
   }
 
   /**
@@ -955,6 +1012,10 @@ export class RequestScanner {
   /** Visits every call in `node`, which is inside the function `scope`. */
   #walk(node: Node, scope: Node, env: Env, w: Walk) {
     node.forEachDescendant((d, traversal) => {
+      if (w.hookFns?.has(d)) {
+        traversal.skip()
+        return
+      }
       if (N.isJsxOpeningElement(d) || N.isJsxSelfClosingElement(d)) this.#link(d, scope, env, w)
       if (N.isJsxAttribute(d)) {
         this.#jsxAttribute(d, scope, env, w)
@@ -965,10 +1026,83 @@ export class RequestScanner {
         traversal.skip()
         return
       }
-      if (N.isCallExpression(d) && this.#call(d, scope, env, w)) traversal.skip()
+      // A local function used only as a query or mutation function is walked through its hook.
+      if (isFunctionLike(d) && this.#onlyHookFn(d)) {
+        traversal.skip()
+        return
+      }
+      if (N.isCallExpression(d)) {
+        if (this.#call(d, scope, env, w)) traversal.skip()
+        else this.#passedFunctions(d, scope, env, w)
+      }
+      if (N.isPropertyAssignment(d) || N.isShorthandPropertyAssignment(d))
+        this.#configHandler(d, scope, env, w)
       if (N.isNewExpression(d) && (this.#eventSource(d, scope, env, w) || this.#webSocket(d, scope, env, w)))
         traversal.skip()
     })
+  }
+
+  /**
+   * Project functions passed by reference into a call (`handleSubmit(save)`, `debounce(search)`,
+   * `useEffect(load, [])`) run when that call decides: they are walked from the reference, and the
+   * trigger is found from where the call's result goes.
+   */
+  #passedFunctions(call: CallExpression, scope: Node, env: Env, w: Walk) {
+    for (const arg of call.getArguments()) {
+      const inner = skipWrappers(arg)
+      if (N.isIdentifier(inner) || N.isPropertyAccessExpression(inner)) this.#enterPassed(arg, scope, env, w)
+      else if (N.isObjectLiteralExpression(inner)) {
+        // `useFormik({ onSubmit: save })`: options handed to a library or a project hook.
+        for (const p of inner.getProperties()) {
+          if (N.isPropertyAssignment(p)) {
+            const value = p.getInitializer()
+            const v = value ? skipWrappers(value) : undefined
+            if (value && v && (N.isIdentifier(v) || N.isPropertyAccessExpression(v)))
+              this.#enterPassed(value, scope, env, w)
+          } else if (N.isShorthandPropertyAssignment(p)) this.#enterPassed(p.getNameNode(), scope, env, w)
+        }
+      }
+    }
+  }
+
+  /** `{ label: 'Export', onSelect: exportAll }`: a handler in an object config. */
+  #configHandler(prop: Node, scope: Node, env: Env, w: Walk) {
+    if (!N.isPropertyAssignment(prop) && !N.isShorthandPropertyAssignment(prop)) return
+    if (!/^on[A-Z]/.test(prop.getName())) return
+    const value = N.isPropertyAssignment(prop) ? prop.getInitializer() : prop.getNameNode()
+    const v = value ? skipWrappers(value) : undefined
+    if (value && v && (N.isIdentifier(v) || N.isPropertyAccessExpression(v)))
+      this.#enterPassed(value, scope, env, w)
+  }
+
+  #enterPassed(ref: Node, scope: Node, env: Env, w: Walk) {
+    const fn = this.#functionValue(ref, env)
+    if (!fn || !isProject(fn) || w.active.has(fn) || w.hookFns?.has(fn) || !this.#isScanned(fn)) return
+    if (isInside(fn, scope) || w.frames.length >= MAX_DEPTH || this.#isServerAction(fn)) return
+    if (!this.#reachesNetwork(fn)) return
+    this.#enter(fn, EMPTY_ENV, { node: ref, callee: oneLine(ref.getText()), scope }, w)
+  }
+
+  /**
+   * A local function every use of which is a query or mutation function (`mutationFn: upload`,
+   * `useSWR(key, load)`): the hook walks it, so walking it where it is written makes a twin
+   * without the hook (and with the wrong trigger).
+   */
+  #onlyHookFn(fn: Node): boolean {
+    const known = this.#hookFnCache.get(fn)
+    if (known !== undefined) return known
+    let result = false
+    const holder = holderName(fn)
+    const owner = fn.getFirstAncestor(isFunctionLike)
+    if (holder && owner && HOOK_TEXT.test(fn.getSourceFile().getFullText())) {
+      const symbol = holder.getSymbol()
+      const refs = owner
+        .getDescendantsOfKind(ts.SyntaxKind.Identifier)
+        .filter((ref) => ref !== holder && refersTo(ref, symbol) && !isDependencyList(ref))
+      result = refs.length > 0 && refs.every((ref) => isHookFnPosition(ref))
+    }
+    this.#hookFnCache.set(fn, result)
+    return result
   }
 
   /** `new EventSource(url)` (M18), with the events its listeners read and their types. */
@@ -1009,7 +1143,7 @@ export class RequestScanner {
       {
         transport: 'sse',
         method: 'GET',
-        url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+        url: this.#requestUrl(input, env),
         stream: {
           api: 'event-source',
           events,
@@ -1052,7 +1186,7 @@ export class RequestScanner {
       {
         transport: 'websocket',
         method: 'GET',
-        url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+        url: this.#requestUrl(input, env),
         socket: {
           api: 'websocket',
           messages: this.#socketMessages(expr, scope, 'websocket', env),
@@ -1660,11 +1794,9 @@ export class RequestScanner {
     if (proxy === 'react') {
       const type = REACT_METHODS[method] as TrpcProcedureType
       const def: HookDef = { name: method, module: '@trpc/react-query', kind: queryKind(type) }
-      const frame: Frame = {
-        ...this.#frame(call, scope),
-        hook: { def },
-        ...(type === 'mutation' ? { trigger: this.#mutationTrigger(call, scope, w.frames) } : {}),
-      }
+      const trigger = type === 'mutation' ? this.#mutationTrigger(call, scope, w.frames) : undefined
+      if (trigger === 'unused') return
+      const frame: Frame = { ...this.#frame(call, scope), hook: { def }, ...(trigger ? { trigger } : {}) }
       this.#emitTrpc(w, frame, path, type)
       const options = call.getArguments()[type === 'mutation' ? 0 : 1]
       if (type === 'mutation' && options) this.#mutationCallbacks({ node: options, env }, frame, call, w)
@@ -1697,12 +1829,14 @@ export class RequestScanner {
       found = true
       const anchor = def.multi && entry.node ? entry.node : call
       const type = OPTIONS_METHODS[options.trpc.method] as TrpcProcedureType
+      const trigger = def.kind === 'mutation' ? this.#mutationTrigger(call, scope, w.frames) : undefined
+      if (trigger === 'unused') continue
       const frame: Frame = {
         node: anchor,
         callee: anchor === call ? oneLine(call.getExpression().getText()) : def.name,
         scope,
         hook: { def },
-        ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope, w.frames) } : {}),
+        ...(trigger ? { trigger } : {}),
       }
       this.#emitTrpc(w, frame, options.trpc.path, type)
       if (type !== 'mutation') continue
@@ -1821,6 +1955,10 @@ export class RequestScanner {
   #runHook(call: CallExpression, anchor: Node, def: HookDef, args: HookArgs, scope: Node, w: Walk) {
     const fn = args.fn ? this.#functionValue(args.fn.node, args.fn.env) : undefined
     if (!fn || w.active.has(fn) || w.frames.length >= MAX_DEPTH) return
+    w.hookFns ??= new Set()
+    w.hookFns.add(fn)
+    const trigger = def.kind === 'mutation' ? this.#mutationTrigger(call, scope, w.frames) : undefined
+    if (trigger === 'unused') return
 
     const keyNode = args.key?.node
     const parts = def.rq && args.key ? this.#queryKey(args.key.node, args.key.env) : undefined
@@ -1831,11 +1969,11 @@ export class RequestScanner {
       scope,
       hook: {
         def,
-        ...(keyNode ? { key: oneLine(keyNode.getText()) } : {}),
+        ...(keyNode ? { key: oneLine(this.#writtenKey(keyNode, args.key?.env ?? EMPTY_ENV).getText()) } : {}),
         ...(typeArg && !def.multi ? { typeArg } : {}),
         ...(parts ? { parts } : {}),
       },
-      ...(def.kind === 'mutation' ? { trigger: this.#mutationTrigger(call, scope, w.frames) } : {}),
+      ...(trigger ? { trigger } : {}),
     }
     // SWR passes the key to the fetcher. An inline function written in a factory
     // (`(id) => queryOptions({ queryFn: () => getItem(id) })`) sees the factory's arguments.
@@ -1848,6 +1986,25 @@ export class RequestScanner {
     // What runs after the mutation: navigation, cache updates (and requests) in its callbacks.
     const options = args.options
     if (def.kind === 'mutation' && options) this.#mutationCallbacks(options, frame, anchor, w)
+  }
+
+  /**
+   * The key as the caller wrote it: through a project hook's parameters (`useList({ queryKey })`
+   * shows the caller's `[QueryKeys.feed]`), but not through constants or factories.
+   */
+  #writtenKey(node: Node, env: Env): Node {
+    let current = node
+    let scope = env
+    for (let i = 0; i < 10; i++) {
+      if (!N.isIdentifier(current)) break
+      const decl = declarationOf(current)
+      if (!decl || !(N.isParameterDeclaration(decl) || N.isBindingElement(decl))) break
+      const r = this.#resolve(current, scope)
+      if (!r.node || r.node === current) break
+      current = r.node
+      scope = r.env
+    }
+    return current
   }
 
   /**
@@ -1952,13 +2109,26 @@ export class RequestScanner {
     if (N.isTrueLiteral(node) || N.isFalseLiteral(node))
       return { kind: 'static', value: N.isTrueLiteral(node) }
     if (N.isNullLiteral(node)) return { kind: 'static', value: null }
+    if (N.isEnumMember(node)) {
+      const value = enumValue(node)
+      if (value !== undefined) return { kind: 'static', value }
+      return { kind: 'param', name: node.getName(), unknown: true }
+    }
     if (N.isTemplateExpression(node)) {
       const str = this.#str(node, r.env)
       if (str?.parts.every((p) => 'text' in p)) {
         return { kind: 'static', value: str.parts.map((p) => ('text' in p ? p.text : '')).join('') }
       }
       const name = str?.parts.map((p) => ('text' in p ? p.text : `:${p.hole}`)).join('')
-      return { kind: 'param', name: name?.replace(/^:/, '') || holeName(expr) }
+      // `page-${n}` keeps its text; a lone hole (`${id}`) is just the name.
+      const plain = name && /^:[\w$]+$/.test(name) ? name.slice(1) : name
+      // A hole the scanner can't read (a library value) makes the whole segment unknown.
+      const unreadable = node
+        .getTemplateSpans()
+        .some(
+          (span) => !this.#str(span.getExpression(), r.env) && this.#unreadable(span.getExpression(), r.env),
+        )
+      return { kind: 'param', name: plain || holeName(expr), ...(unreadable ? { unknown: true } : {}) }
     }
     if (N.isObjectLiteralExpression(node) && depth < 8) {
       const entries: { key: string; value: QueryKeyPart }[] = []
@@ -1973,11 +2143,50 @@ export class RequestScanner {
       }
       return { kind: 'object', entries }
     }
-    // Only known at runtime: named after the value as written where it is passed in.
-    return {
-      kind: 'param',
-      name: holeName(N.isIdentifier(node) || N.isPropertyAccessExpression(node) ? node : expr),
+    // Only known at runtime: named after the value as written where it is passed in. A value the
+    // scanner can't read at all (a library constant, a module value it can't follow) is `unknown`:
+    // it is never treated as "any value" when linking cache calls.
+    const name = holeName(N.isIdentifier(node) || N.isPropertyAccessExpression(node) ? node : expr)
+    return this.#unreadable(node, r.env) ? { kind: 'param', name, unknown: true } : { kind: 'param', name }
+  }
+
+  /**
+   * Whether a value the scanner couldn't evaluate is unreadable rather than a runtime value.
+   * Runtime values come from inside a function: parameters, destructured names, local
+   * variables (`todo.id`, `params.slug`, `searchParams.get('q')`). Anything rooted outside one
+   * (an import from a package, a module constant it can't follow, an enum member without a
+   * constant value) or the result of calling a function is unreadable.
+   */
+  #unreadable(expr: Node, env: Env): boolean {
+    let node = skipWrappers(this.#resolve(expr, env).node ?? expr)
+    for (let i = 0; i < 20; i++) {
+      if (N.isPropertyAccessExpression(node) || N.isElementAccessExpression(node)) {
+        node = skipWrappers(node.getExpression())
+        continue
+      }
+      if (N.isCallExpression(node)) {
+        const callee = skipWrappers(node.getExpression())
+        // `String(id)`, `encodeURIComponent(slug)`: the value of their argument.
+        const arg = node.getArguments()[0]
+        if (N.isIdentifier(callee) && /^(String|Number|encodeURIComponent|encodeURI)$/.test(callee.getText()))
+          return arg ? this.#unreadable(arg, env) : true
+        // `searchParams.get('q')`, `user.name.trim()`: a method of a runtime value.
+        if (N.isPropertyAccessExpression(callee)) {
+          node = skipWrappers(callee.getExpression())
+          continue
+        }
+        // `useParams()`, `getId()` called while the code runs; at module level it is a constant.
+        return !node.getFirstAncestor((a) => isFunctionLike(a))
+      }
+      break
     }
+    if (node.getKind() === ts.SyntaxKind.ThisKeyword) return false
+    if (!N.isIdentifier(node)) return !node.getFirstAncestor((a) => isFunctionLike(a))
+    const decl = declarationOf(node)
+    if (!decl || !isProject(decl)) return true
+    if (N.isParameterDeclaration(decl) || N.isBindingElement(decl)) return false
+    if (N.isVariableDeclaration(decl)) return !decl.getFirstAncestor((a) => isFunctionLike(a))
+    return true
   }
 
   /**
@@ -2210,7 +2419,7 @@ export class RequestScanner {
       return {
         transport: 'sse',
         ...(method ? { method } : {}),
-        url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+        url: this.#requestUrl(input, env),
         ...(body ? { bodyType: body } : {}),
         stream: { api: 'fetch', events: [] },
         ...(methodDefault ? { methodDefault } : {}),
@@ -2219,7 +2428,7 @@ export class RequestScanner {
     return {
       transport: 'fetch',
       ...(method ? { method } : {}),
-      url: toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''),
+      url: this.#requestUrl(input, env),
       ...(body ? { bodyType: body } : {}),
       ...(methodDefault ? { methodDefault } : {}),
     }
@@ -2282,7 +2491,11 @@ export class RequestScanner {
     return {
       transport: 'axios',
       ...(method ? { method } : {}),
-      url: toUrl(base && path ? joinUrl(base, path) : path, urlArg ? oneLine(urlArg.getText()) : ''),
+      url: this.#fromData(
+        toUrl(base && path ? joinUrl(base, path) : path, urlArg ? oneLine(urlArg.getText()) : ''),
+        urlArg,
+        env,
+      ),
       ...(body ? { bodyType: body } : {}),
     }
   }
@@ -2359,7 +2572,11 @@ export class RequestScanner {
       transport: 'api-client',
       client: { module: ref.client.module, name },
       ...(method ? { method } : {}),
-      url: toUrl(base && path ? joinUrl(base, path) : path, urlArg ? oneLine(urlArg.getText()) : ''),
+      url: this.#fromData(
+        toUrl(base && path ? joinUrl(base, path) : path, urlArg ? oneLine(urlArg.getText()) : ''),
+        urlArg,
+        env,
+      ),
       ...(body ? { bodyType: body } : {}),
       ...(responseType ? { responseType } : {}),
     }
@@ -2503,6 +2720,18 @@ export class RequestScanner {
       if (callee && isProject(callee) && callee !== fn && this.#isScanned(callee)) {
         found = this.#isServerAction(callee) || this.#reachesNetwork(callee)
       }
+      // `return handleSubmit(login)`: a project function passed on by reference runs too.
+      for (const arg of found ? [] : d.getArguments()) {
+        const inner = skipWrappers(arg)
+        if (!N.isIdentifier(inner) && !N.isPropertyAccessExpression(inner)) continue
+        const symbol = inner.getSymbol()
+        const passed = symbol ? functionOf(unalias(symbol).getDeclarations()[0]) : undefined
+        if (!passed || passed === fn || !isProject(passed) || !this.#isScanned(passed)) continue
+        if (this.#reachesNetwork(passed)) {
+          found = true
+          break
+        }
+      }
     })
     this.#reaches.set(fn, found)
     return found
@@ -2632,6 +2861,12 @@ export class RequestScanner {
 
   /** Looks for an enclosing event handler or effect between `node` and `scope`. */
   #classify(node: Node, scope: Node, depth: number): Trigger | undefined {
+    // A function handed on by reference: `handleSubmit(save)`, `{ onSelect: save }`.
+    const inner = skipWrappers(node)
+    if (N.isIdentifier(inner) || N.isPropertyAccessExpression(inner)) {
+      const found = this.#valueTrigger(node, scope, depth)
+      if (found) return found
+    }
     let current: Node = node
     while (current !== scope) {
       const parent = current.getParent()
@@ -2657,8 +2892,11 @@ export class RequestScanner {
     }
     if (parent && N.isJsxExpression(parent)) {
       const attr = parent.getParentIfKind(ts.SyntaxKind.JsxAttribute)
-      if (attr) return attributeTrigger(attr, this.#loc(attr))
+      if (attr) return attributeTrigger(attr, this.#loc(attr)) ?? this.#valueTrigger(fn, scope, depth)
     }
+    // Inline, but handed on: `handleSubmit(async (d) => ...)`, `{ onSelect: () => ... }`.
+    const handed = this.#valueTrigger(fn, scope, depth)
+    if (handed) return handed
     if (N.isFunctionDeclaration(fn)) {
       const name = fn.getNameNode()
       return name ? this.#classifyReferences(name, scope, depth) : undefined
@@ -2674,14 +2912,199 @@ export class RequestScanner {
     const symbol = name.getSymbol()
     if (!symbol) return undefined
     for (const ref of scope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
-      if (ref === name || ref.getSymbol() !== symbol) continue
+      if (ref === name || !refersTo(ref, symbol) || isDependencyList(ref)) continue
       const parent = ref.getParent()
       const attr =
         parent && N.isJsxExpression(parent) ? parent.getParentIfKind(ts.SyntaxKind.JsxAttribute) : undefined
-      const found = attr ? attributeTrigger(attr, this.#loc(attr)) : this.#classify(ref, scope, depth + 1)
+      const found =
+        (attr ? attributeTrigger(attr, this.#loc(attr)) : undefined) ?? this.#classify(ref, scope, depth + 1)
       if (found) return found
     }
     return undefined
+  }
+
+  /**
+   * What starts a function that is handed on rather than called where it is written: passed to a
+   * call whose result ends in an event prop (`handleSubmit(onSubmit)`, `debounce(fn)` kept in a
+   * variable, `useFormik({ onSubmit })`), given to an effect, put in an object config under an
+   * `on*` name (`{ onSelect: download }`), or provided through a context (placed where the
+   * consumers use it). `member` is the property the value is read under so far.
+   */
+  #valueTrigger(start: Node, scope: Node, depth: number, member?: string): Trigger | undefined {
+    if (depth > 4) return undefined
+    const first = outerParens(start)
+    let cur = first
+    let onName: string | undefined
+    for (let i = 0; i < 16 && cur !== scope; i++) {
+      const parent = cur.getParent()
+      if (!parent) break
+      if (
+        (N.isPropertyAssignment(parent) && parent.getInitializer() === cur) ||
+        (N.isShorthandPropertyAssignment(parent) && parent.getNameNode() === cur)
+      ) {
+        const name = propertyName(parent.getNameNode())
+        member ??= name
+        if (/^on[A-Z]/.test(name)) onName ??= name
+        const object = parent.getParent()
+        if (!object) break
+        cur = outerParens(object)
+        continue
+      }
+      if (N.isArrayLiteralExpression(parent) || N.isSpreadElement(parent) || N.isSpreadAssignment(parent)) {
+        cur = outerParens(N.isArrayLiteralExpression(parent) ? parent : (parent.getParent() ?? parent))
+        continue
+      }
+      if (N.isCallExpression(parent) && parent.getExpression() !== cur) {
+        const name = calleeName(parent) ?? ''
+        if (EFFECT_HOOKS.has(name) && parent.getArguments()[0] === cur)
+          return { kind: 'effect', loc: this.#loc(parent) }
+        // The call's result is a new value (`handleSubmit(fn)` returns the handler), except for
+        // `useCallback(fn)` / `useMemo(() => value)`. An `on*` option of a call
+        // (`commit({ onCompleted })`) runs when the call says, not on an event of that name.
+        if (!CALLBACK_HOOKS.has(name)) {
+          member = undefined
+          onName = undefined
+        }
+        cur = outerParens(parent)
+        continue
+      }
+      // `useMemo(() => ({ remove: m.mutate }), [])`: the value the memo returns.
+      const returnedFrom =
+        N.isArrowFunction(parent) && parent.getBody() === cur
+          ? parent
+          : N.isReturnStatement(parent)
+            ? parent.getFirstAncestor(isFunctionLike)
+            : undefined
+      if (returnedFrom) {
+        const outer = outerParens(returnedFrom)
+        const call = outer.getParent()
+        if (
+          call &&
+          N.isCallExpression(call) &&
+          call.getArguments()[0] === outer &&
+          CALLBACK_HOOKS.has(calleeName(call) ?? '')
+        ) {
+          cur = outerParens(call)
+          continue
+        }
+        break
+      }
+      if (N.isJsxExpression(parent)) {
+        const attr = parent.getParentIfKind(ts.SyntaxKind.JsxAttribute)
+        if (!attr) break
+        const event = attributeTrigger(attr, this.#loc(attr))
+        if (event) return event
+        if (attr.getNameNode().getText() === 'value') {
+          const found = this.#providedTrigger(attr, member, depth)
+          if (found) return found
+        }
+        break
+      }
+      if (N.isVariableDeclaration(parent) && parent.getInitializer() === cur && cur !== first) {
+        const found = this.#holderTrigger(parent.getNameNode(), scope, depth + 1, member)
+        if (found) return found
+        break
+      }
+      break
+    }
+    return onName ? { kind: 'event', event: onName, loc: this.#loc(start) } : undefined
+  }
+
+  /**
+   * Where a value kept in a variable is used: called (`submit()`), a member called or passed
+   * (`formik.handleSubmit`), or handed on again. Destructured names are followed one by one.
+   */
+  #holderTrigger(name: Node, scope: Node, depth: number, member?: string): Trigger | undefined {
+    if (depth > 4) return undefined
+    if (N.isObjectBindingPattern(name)) {
+      for (const element of name.getElements()) {
+        const found = this.#holderTrigger(element.getNameNode(), scope, depth)
+        if (found) return found
+      }
+      return undefined
+    }
+    if (!N.isIdentifier(name)) return undefined
+    const symbol = name.getSymbol()
+    if (!symbol) return undefined
+    for (const ref of scope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
+      if (ref === name || !refersTo(ref, symbol) || isDependencyList(ref)) continue
+      let use: Node = ref
+      const parent = ref.getParent()
+      if (parent && N.isPropertyAccessExpression(parent) && parent.getExpression() === ref) use = parent
+      const outer = use.getParent()
+      const found =
+        outer && N.isCallExpression(outer) && outer.getExpression() === use
+          ? this.#classify(outer, scope, depth + 1)
+          : this.#valueTrigger(use, scope, depth + 1, use === ref ? member : undefined)
+      if (found) return found
+    }
+    return undefined
+  }
+
+  /**
+   * A value given to a context provider (`<Ctx.Provider value={...}>`, or `<Ctx value>`): what
+   * starts it is where the context's consumers use the member it is provided under.
+   */
+  #providedTrigger(attr: JsxAttribute, member: string | undefined, depth: number): Trigger | undefined {
+    const element = attr.getFirstAncestor((a) => N.isJsxOpeningElement(a) || N.isJsxSelfClosingElement(a))
+    if (!element || !(N.isJsxOpeningElement(element) || N.isJsxSelfClosingElement(element))) return undefined
+    const tag = element.getTagNameNode()
+    const contextName =
+      N.isPropertyAccessExpression(tag) && tag.getName() === 'Provider' ? tag.getExpression() : tag
+    if (!N.isIdentifier(contextName)) return undefined
+    const decl = declarationOf(contextName)
+    const init = decl && N.isVariableDeclaration(decl) ? decl.getInitializer() : undefined
+    const created = init ? skipWrappers(init) : undefined
+    if (!decl || !created || !N.isCallExpression(created) || calleeName(created) !== 'createContext')
+      return undefined
+    const members = new Set([member ?? SELF])
+    for (const read of this.#contextReads(decl)) {
+      const readScope = read.getFirstAncestor(isFunctionLike)
+      if (!readScope) continue
+      const uses = this.#mutateUses(read, members, readScope)
+      for (const use of uses.calls) {
+        const found = this.#triggerAt(use, readScope, depth + 1)
+        if (found) return found
+      }
+    }
+    return undefined
+  }
+
+  /** `useContext(Ctx)` / `use(Ctx)` calls, also through hooks that return one (`useItems()`). */
+  #contextReads(decl: Node): CallExpression[] {
+    const known = this.#consumers.get(decl)
+    if (known) return known
+    const out: CallExpression[] = []
+    this.#consumers.set(decl, out)
+    const name = N.isVariableDeclaration(decl) ? decl.getNameNode() : undefined
+    if (!name || !N.isIdentifier(name)) return out
+    const reads: CallExpression[] = []
+    for (const ref of name.findReferencesAsNodes()) {
+      const call = ref.getParent()
+      if (!call || !N.isCallExpression(call) || call.getArguments()[0] !== ref) continue
+      if (/^(useContext|use)$/.test(calleeName(call) ?? '')) reads.push(call)
+    }
+    // A hook that returns the read (`const useItems = () => useContext(Ctx)!`) is read where it is called.
+    for (let i = 0; i < reads.length && i < 50; i++) {
+      const read = reads[i] as CallExpression
+      const fn = read.getFirstAncestor(isFunctionLike)
+      const holder =
+        fn && returnedAs(read) === SELF
+          ? fn.getFirstAncestor(isFunctionLike)
+            ? undefined
+            : holderName(fn)
+          : undefined
+      if (!holder || !N.isIdentifier(holder)) {
+        out.push(read)
+        continue
+      }
+      for (const ref of holder.findReferencesAsNodes()) {
+        const call = ref.getParent()
+        if (call && N.isCallExpression(call) && call.getExpression() === ref && !reads.includes(call))
+          reads.push(call)
+      }
+    }
+    return out
   }
 
   /**
@@ -2690,7 +3113,7 @@ export class RequestScanner {
    * of the hook are searched, up the walk's frames. A mutation never runs on page load: a call
    * that can't be placed is `unknown`, unless it is made right in the component's body.
    */
-  #mutationTrigger(hook: CallExpression, scope: Node, frames: Frame[] = []): Trigger {
+  #mutationTrigger(hook: CallExpression, scope: Node, frames: Frame[] = []): Trigger | 'unused' {
     return this.#followUses(this.#mutateUses(hook, MUTATE_MEMBERS, scope), scope, frames, MUTATE_MEMBERS)
   }
 
@@ -2703,12 +3126,13 @@ export class RequestScanner {
     for (let i = frames.length - 1; i >= 0; i--) {
       const frame = frames[i] as Frame
       if (!localHolder(frame.node, frame.scope)) continue
-      return this.#followUses(
+      const found = this.#followUses(
         { calls: [frame.node], escapes: new Set() },
         frame.scope,
         frames.slice(0, i),
         new Set(),
       )
+      return found === 'unused' ? { kind: 'unknown' } : found
     }
     return undefined
   }
@@ -2724,7 +3148,7 @@ export class RequestScanner {
     scope: Node,
     frames: Frame[],
     selfMembers: Set<string>,
-  ): Trigger {
+  ): Trigger | 'unused' {
     let uses = start
     let useScope = scope
     for (let level = frames.length - 1; ; level--) {
@@ -2765,6 +3189,13 @@ export class RequestScanner {
       const members = uses.escapes.has(SELF) ? new Set([...uses.escapes, ...selfMembers]) : uses.escapes
       uses = this.#mutateUses(caller.node, members, caller.scope)
       useScope = caller.scope
+      // `const { remove } = useItems()` doesn't take `add`: it never runs from this caller.
+      if (
+        uses.calls.length === 0 &&
+        uses.escapes.size === 0 &&
+        resultUnused(caller.node, members, caller.scope)
+      )
+        return 'unused'
     }
     return { kind: 'unknown' }
   }
@@ -2795,9 +3226,11 @@ export class RequestScanner {
     const variable = call.getParentIfKind(ts.SyntaxKind.VariableDeclaration)
     const name = variable?.getNameNode()
     if (!name) {
-      // `return useMutation(...)` / `return useSave()`: the caller gets the result itself.
+      // `return useMutation(...)` / `return useSave()`: the caller gets the result itself, so it
+      // looks for the same members.
       const returned = returnedAs(call)
-      if (returned) escapes.add(returned === SELF ? SELF : returned)
+      if (returned === SELF) for (const m of members) escapes.add(m)
+      else if (returned) escapes.add(returned)
       return { calls, escapes }
     }
     if (N.isIdentifier(name)) {
@@ -2830,13 +3263,14 @@ export class RequestScanner {
   }
 
   /** The trigger of a call, or of a function passed straight to an event prop (`onClick={save}`). */
-  #triggerAt(node: Node, scope: Node): Trigger | undefined {
+  #triggerAt(node: Node, scope: Node, depth = 0): Trigger | undefined {
     const parent = node.getParent()
     if (parent && N.isJsxExpression(parent)) {
       const attr = parent.getParentIfKind(ts.SyntaxKind.JsxAttribute)
-      if (attr) return attributeTrigger(attr, this.#loc(attr))
+      const event = attr ? attributeTrigger(attr, this.#loc(attr)) : undefined
+      if (event) return event
     }
-    return this.#classify(node, scope, 0)
+    return this.#classify(node, scope, depth)
   }
 
   /** `const [state, formAction] = useActionState(...)`: where `formAction` is used. */
@@ -3032,9 +3466,64 @@ export class RequestScanner {
         node = initializer
         continue
       }
+      // `function useList({ queryKey, queryFn })`, `const { queryKey } = options`.
+      if (decl && N.isBindingElement(decl)) {
+        const value = this.#bindingValue(decl, scope)
+        if (!value) break
+        if (!value.node) return value
+        node = value.node
+        scope = value.env
+        continue
+      }
       break
     }
     return { node, env: scope }
+  }
+
+  /**
+   * The value a destructured name takes: the property (or element) of what the pattern
+   * destructures, a parameter's argument or a `const`'s initializer, or the default written in
+   * the pattern when the property is absent.
+   */
+  #bindingValue(element: BindingElement, env: Env, depth = 0): Resolved | undefined {
+    if (depth > MAX_DEPTH || element.getDotDotDotToken()) return undefined
+    const pattern = element.getParent()
+    const holder = pattern.getParent()
+    let source: Resolved | undefined
+    if (N.isParameterDeclaration(holder)) {
+      const binding = env.get(holder)
+      if (!binding) return undefined
+      const init = holder.getInitializer()
+      source = binding.expr
+        ? { node: binding.expr, env: binding.env }
+        : init
+          ? { node: init, env }
+          : undefined
+    } else if (N.isVariableDeclaration(holder)) {
+      const init = holder.getInitializer()
+      if (!init || !isConst(holder)) return undefined
+      source = { node: init, env }
+    } else if (N.isBindingElement(holder)) {
+      source = this.#bindingValue(holder, env, depth + 1)
+    }
+    const fallback = element.getInitializer()
+    const orDefault = (): Resolved | undefined => (fallback ? { node: fallback, env } : undefined)
+    if (!source?.node) return source && !fallback ? { node: undefined, env } : orDefault()
+    if (N.isObjectBindingPattern(pattern)) {
+      const nameNode = element.getPropertyNameNode() ?? element.getNameNode()
+      const prop = this.#prop(source.node, source.env, propertyName(nameNode))
+      if (prop === 'unknown') return undefined
+      if (prop === 'absent' || !prop.node) return orDefault() ?? { node: undefined, env }
+      return prop
+    }
+    const list = this.#evaluate(source.node, source.env)
+    const array = list.node ? skipWrappers(list.node) : undefined
+    if (!array || !N.isArrayLiteralExpression(array)) return undefined
+    const elements = array.getElements()
+    const index = pattern.getElements().indexOf(element)
+    if (elements.slice(0, index + 1).some((e) => N.isSpreadElement(e))) return undefined
+    const item = elements[index]
+    return item ? { node: item, env: list.env } : (orDefault() ?? { node: undefined, env })
   }
 
   /** A property of an object value, through spreads (`{ ...init, method }`) and parameters. */
@@ -3057,6 +3546,12 @@ export class RequestScanner {
       const a = this.#str(yes.node, yes.env)
       const b = this.#str(no.node, no.env)
       return a && b && strText(a) === strText(b) ? yes : 'unknown'
+    }
+    // `QueryKeys.feed` on an enum: the member, read by `#keyPart` and `#str`.
+    const enumDecl = enumOf(value)
+    if (enumDecl) {
+      const member = enumDecl.getMember(name)
+      return member ? { node: member, env: EMPTY_ENV } : 'absent'
     }
     if (!N.isObjectLiteralExpression(r.node)) return 'unknown'
     const properties = r.node.getProperties()
@@ -3108,6 +3603,10 @@ export class RequestScanner {
       return { parts: [{ text: node.getLiteralValue() }] }
     }
     if (N.isNumericLiteral(node)) return { parts: [{ text: String(node.getLiteralValue()) }] }
+    if (N.isEnumMember(node)) {
+      const value = enumValue(node)
+      return value === undefined ? undefined : { parts: [{ text: String(value) }] }
+    }
     if (N.isTemplateExpression(node)) {
       let out: Str = { parts: [{ text: node.getHead().getLiteralText() }] }
       for (const span of node.getTemplateSpans()) {
@@ -3145,22 +3644,50 @@ export class RequestScanner {
     if (envName) return { parts: [{ hole: envName }], env: envName }
     if (N.isIdentifier(node)) {
       const r = this.#resolve(node, env)
-      if (!r.node || r.node === node) return undefined
+      if (!r.node || r.node === node) {
+        // `const { pathname } = new URL(request.url)`: a member of a URL object.
+        const decl = r.node ? declarationOf(r.node) : undefined
+        const holder = decl && N.isBindingElement(decl) ? decl.getParent().getParent() : undefined
+        if (
+          decl &&
+          N.isBindingElement(decl) &&
+          holder &&
+          N.isVariableDeclaration(holder) &&
+          isConst(holder)
+        ) {
+          const init = holder.getInitializer()
+          const name = propertyName(decl.getPropertyNameNode() ?? decl.getNameNode())
+          if (init && !decl.getDotDotDotToken()) return this.#urlMember(init, env, name, depth)
+        }
+        return undefined
+      }
       return next(r.node, r.env)
     }
     if (N.isPropertyAccessExpression(node)) {
+      const member = this.#urlMember(node.getExpression(), env, node.getName(), depth)
+      if (member) return member
       const prop = this.#prop(node.getExpression(), env, node.getName())
       return prop === 'absent' || prop === 'unknown' ? undefined : next(prop.node, prop.env)
     }
     if (N.isNewExpression(node) && node.getExpression().getText() === 'URL') {
-      // `new URL('/x', base)`: a path on a string base, or on the current request's origin.
+      // `new URL('/x', base)`: a path on a base the code gives (a string, a constant, an env
+      // value), or on the current request's origin.
       const [path, base] = node.getArguments()
       const value = path ? next(path) : undefined
       if (!value || !base) return value
       const first = value.parts[0]
-      if (!(first && 'text' in first && first.text.startsWith('/'))) return value
-      const baseValue = N.isStringLiteral(skipWrappers(base)) ? next(base) : undefined
-      return baseValue ? joinUrl(baseValue, value) : value
+      if (first && 'text' in first && /^[a-z][a-z0-9+.-]*:\/\//i.test(first.text)) return value
+      const baseValue = next(base)
+      const baseFirst = baseValue?.parts[0]
+      const isOrigin =
+        !!baseValue?.env ||
+        (!!baseFirst && 'text' in baseFirst && /^[a-z][a-z0-9+.-]*:\/\//i.test(baseFirst.text))
+      if (!baseValue || !isOrigin) return value
+      const baseLast = baseValue.parts.at(-1)
+      // A relative path (`'teams'`) goes after the base's last `/`; only a base ending in `/` is safe.
+      const absolute = !!first && 'text' in first && first.text.startsWith('/')
+      if (!absolute && !(baseLast && 'text' in baseLast && baseLast.text.endsWith('/'))) return value
+      return joinUrl(baseValue, value)
     }
     if (N.isCallExpression(node)) {
       const callee = node.getExpression()
@@ -3172,6 +3699,26 @@ export class RequestScanner {
       if (N.isPropertyAccessExpression(callee)) {
         const name = callee.getName()
         if (name === 'toString' || name === 'trim') return next(callee.getExpression())
+        if (name === 'replace' || name === 'replaceAll') {
+          const [search, by] = node.getArguments()
+          const value = next(callee.getExpression())
+          const replacement = by ? literalOf(next(by)) : undefined
+          const pattern = search ? searchPattern(search, (n) => literalOf(next(n))) : undefined
+          if (!value || replacement === undefined || pattern === undefined) return undefined
+          return replaceText(value, pattern, replacement, name === 'replaceAll')
+        }
+        if (name === 'slice' || name === 'substring') {
+          const [start, end] = node.getArguments()
+          const value = next(callee.getExpression())
+          const from = start ? skipWrappers(start) : undefined
+          if (!value || end || !from || !N.isNumericLiteral(from)) return undefined
+          return sliceText(value, from.getLiteralValue())
+        }
+        // `path.join('/')` on a catch-all route's segments: the forwarded path.
+        if (name === 'join' && this.#isCatchAll(callee.getExpression(), env)) {
+          const sep = node.getArguments()[0]
+          if (sep && literalOf(next(sep)) === '/') return { parts: [{ hole: `${this.#catchAllName()}*` }] }
+        }
         if (name === 'toUpperCase' || name === 'toLowerCase') {
           const value = next(callee.getExpression())
           if (!value) return undefined
@@ -3201,6 +3748,113 @@ export class RequestScanner {
       if (r.node && r.node !== node) return next(r.node, r.env)
     }
     return undefined
+  }
+
+  #requestUrl(input: Node | undefined, env: Env): RequestUrl {
+    return this.#fromData(toUrl(this.#str(input, env), input ? oneLine(input.getText()) : ''), input, env)
+  }
+
+  /**
+   * An unresolved URL read from data (`fetch(file.url)` after `const file = await res.json()`,
+   * `const { downloadUrl } = file`, `files.map((f) => fetch(f.url))`) is marked as such: the code
+   * can't say it, and that isn't a gap in the scan. A value from a component's or a function's
+   * parameters (a prop) comes from its callers, so it stays unresolved.
+   */
+  #fromData(url: RequestUrl, input: Node | undefined, env: Env): RequestUrl {
+    if (url.confidence !== 'unknown' || !input) return url
+    const r = this.#resolve(input, env)
+    let root = r.node ? skipWrappers(r.node) : undefined
+    if (!root || envVarOf(root)) return url
+    // Read as a member: `file.url`, `rows[0].href`, or a destructured name.
+    let member = false
+    while (N.isPropertyAccessExpression(root) || N.isElementAccessExpression(root)) {
+      root = skipWrappers(root.getExpression())
+      member = true
+    }
+    let data: boolean
+    if (N.isCallExpression(root)) data = member
+    else if (!N.isIdentifier(root)) data = false
+    else {
+      let decl = declarationOf(root)
+      while (decl && N.isBindingElement(decl)) {
+        decl = decl.getParent().getParent()
+        member = true
+      }
+      if (decl && N.isVariableDeclaration(decl)) data = member
+      else if (decl && N.isParameterDeclaration(decl)) {
+        // `.map((f) => fetch(f.url))`, `.then((data) => ...)`: an inline callback's parameter.
+        const fn = outerParens(decl.getParent())
+        const call = fn.getParent()
+        data =
+          (N.isArrowFunction(decl.getParent()) || N.isFunctionExpression(decl.getParent())) &&
+          !!call &&
+          N.isCallExpression(call) &&
+          call.getExpression() !== fn
+      } else data = false
+    }
+    return data ? { ...url, fromData: true } : url
+  }
+
+  /**
+   * A member of a URL object as text: `new URL(...).href` is the URL itself, and in a route
+   * handler `request.nextUrl.pathname` / `new URL(request.url).pathname` is the incoming path.
+   */
+  #urlMember(object: Node, env: Env, name: string, depth: number): Str | undefined {
+    if (name !== 'href' && name !== 'pathname') return undefined
+    const target = this.#evaluate(object, env)
+    const node = target.node ? skipWrappers(target.node) : undefined
+    if (!node) return undefined
+    const isNew = N.isNewExpression(node) && node.getExpression().getText() === 'URL'
+    if (name === 'href') return isNew ? this.#str(node, target.env, depth + 1) : undefined
+    if (!this.#handlerRoute) return undefined
+    const incoming =
+      (N.isPropertyAccessExpression(node) && node.getName() === 'nextUrl') ||
+      (isNew &&
+        ((arg) => {
+          const inner = arg ? skipWrappers(arg) : undefined
+          return !!inner && N.isPropertyAccessExpression(inner) && /^(url|nextUrl)$/.test(inner.getName())
+        })(node.getArguments()[0]))
+    return incoming ? this.#incomingPath() : undefined
+  }
+
+  /** The handler's own path, with its catch-all segment as the hole `name*` (`/api/` + `:path*`). */
+  #incomingPath(): Str | undefined {
+    const route = this.#handlerRoute
+    if (!route) return undefined
+    let out: Str = { parts: [] }
+    for (const segment of route.path.split('/').filter(Boolean)) {
+      const rest = /^\[\[?\.\.\.(.+?)\]\]?$/.exec(segment)
+      const param = /^\[(.+)\]$/.exec(segment)
+      const part: Part = rest
+        ? { hole: `${rest[1]}*` }
+        : param
+          ? { hole: param[1] as string }
+          : { text: segment }
+      out = concat(concat(out, { parts: [{ text: '/' }] }), { parts: [part] })
+    }
+    return out.parts.length > 0 ? out : { parts: [{ text: '/' }] }
+  }
+
+  #catchAllName(): string | undefined {
+    const segment = this.#handlerRoute?.path.split('/').find((s) => /^\[\[?\.\.\./.test(s))
+    return segment?.replace(/^\[\[?\.\.\.|\]\]?$/g, '')
+  }
+
+  /** The catch-all route's segments: `params.path`, `const { path } = await params`, a parameter bound to them. */
+  #isCatchAll(expr: Node, env: Env): boolean {
+    const name = this.#catchAllName()
+    if (!name) return false
+    const r = this.#resolve(expr, env)
+    const node = r.node ? skipWrappers(r.node) : undefined
+    if (!node) return false
+    if (N.isPropertyAccessExpression(node)) return node.getName() === name
+    if (!N.isIdentifier(node)) return false
+    const decl = declarationOf(node)
+    return (
+      !!decl &&
+      N.isBindingElement(decl) &&
+      propertyName(decl.getPropertyNameNode() ?? decl.getNameNode()) === name
+    )
   }
 
   /** The value of a condition when it can be told from the code, e.g. `LIST.includes('/x')`. */
@@ -3309,6 +3963,51 @@ function joinUrl(base: Str, path: Str): Str {
   return concat(base, path)
 }
 
+/** The first argument of `.replace()`: a string, or a regex literal. */
+function searchPattern(search: Node, text: (n: Node) => string | undefined): string | RegExp | undefined {
+  const inner = skipWrappers(search)
+  if (N.isRegularExpressionLiteral(inner)) {
+    try {
+      return inner.getLiteralValue()
+    } catch {
+      return undefined
+    }
+  }
+  return text(inner)
+}
+
+/**
+ * `.replace()` on known text. Runtime holes are left alone; a pattern is matched within the text
+ * parts (a `^` only at the very start, a `$` only at the very end).
+ */
+function replaceText(value: Str, pattern: string | RegExp, by: string, all: boolean): Str {
+  const global = all || (pattern instanceof RegExp && pattern.global)
+  let done = false
+  const parts = value.parts.map((part, i): Part => {
+    if (!('text' in part) || (done && !global)) return part
+    if (pattern instanceof RegExp) {
+      if (pattern.source.startsWith('^') && i !== 0) return part
+      if (pattern.source.endsWith('$') && i !== value.parts.length - 1) return part
+      const re = new RegExp(pattern.source, pattern.flags)
+      if (!re.test(part.text)) return part
+      done = true
+      return { text: part.text.replace(new RegExp(pattern.source, pattern.flags), by) }
+    }
+    if (!part.text.includes(pattern)) return part
+    done = true
+    return { text: global ? part.text.split(pattern).join(by) : part.text.replace(pattern, by) }
+  })
+  return { ...value, parts: concat({ parts: [] }, { parts }).parts }
+}
+
+/** `.slice(n)`: only when the first `n` characters are known text. */
+function sliceText(value: Str, start: number): Str | undefined {
+  const first = value.parts[0]
+  if (start < 0 || !first || !('text' in first) || first.text.length < start) return undefined
+  const { env: _, ...rest } = value
+  return { ...rest, parts: [{ text: first.text.slice(start) }, ...value.parts.slice(1)] }
+}
+
 const HOLE = '\u0000'
 
 /** Splits an evaluated URL into base, path pattern and query. */
@@ -3376,6 +4075,33 @@ function holeName(node: Node): string {
     }
   }
   return 'param'
+}
+
+/**
+ * The URL a catch-all proxy forwards a request to: the handler's own request whose path holds
+ * the catch-all (`{API_URL}/:path*`), with the part of the caller's path the catch-all matched.
+ */
+function upstreamUrl(routePath: string, path: string, chain: RequestSite[]): RequestUrl | undefined {
+  const name = routePath
+    .split('/')
+    .find((s) => /^\[\[?\.\.\./.test(s))
+    ?.replace(/^\[\[?\.\.\.|\]\]?$/g, '')
+  if (!name) return undefined
+  const forwarded = chain.find((s) => s.url?.path?.includes(`:${name}*`) && !s.conditional)?.url
+  if (!forwarded?.path) return undefined
+  let source = ''
+  for (const segment of routePath.split('/').filter(Boolean)) {
+    if (/^\[\[\.\.\..+\]\]$/.test(segment)) source += '(?:/(.*))?'
+    else if (/^\[\.\.\..+\]$/.test(segment)) source += '/(.+)'
+    else if (/^\[.+\]$/.test(segment)) source += '/[^/]+'
+    else source += `/${segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
+  }
+  const match = new RegExp(`^${source}/?$`).exec(path)
+  if (!match) return undefined
+  const rest = (match[1] ?? '').replace(/\/$/, '')
+  const upstream = forwarded.path.replace(`:${name}*`, rest).replace(/\/{2,}/g, '/')
+  const pattern = /:[A-Za-z_$]/.test(upstream)
+  return { ...forwarded, path: upstream || '/', confidence: pattern ? 'pattern' : 'exact' }
 }
 
 /** Regex for a route path in bracket form: `/api/products/[id]`. */
@@ -3564,10 +4290,14 @@ interface SseHelper {
 function flagsOf(site: RequestSite): Flag[] {
   const flags: Flag[] = []
   if (site.url && site.url.confidence === 'unknown') {
-    flags.push({
-      kind: 'dynamic-url',
-      message: `The URL could not be resolved: ${site.url.text || '(no argument)'}`,
-    })
+    flags.push(
+      site.url.fromData
+        ? { kind: 'runtime-url', message: `The URL comes from data at runtime: ${site.url.text}` }
+        : {
+            kind: 'dynamic-url',
+            message: `The URL could not be resolved: ${site.url.text || '(no argument)'}`,
+          },
+    )
   }
   if (!site.method) flags.push({ kind: 'unknown-method', message: 'The HTTP method could not be resolved.' })
   if (site.socket) {
@@ -3689,6 +4419,47 @@ function refersTo(ref: Node, symbol: TsSymbol | undefined): boolean {
   return !!parent && N.isShorthandPropertyAssignment(parent) && parent.getValueSymbol() === symbol
 }
 
+/**
+ * The caller never takes `members` from a hook's result: it calls the hook as a statement,
+ * destructures other names (no rest element), or only reads other members. A result passed on
+ * whole (`<List actions={all} />`) may still run them.
+ */
+function resultUnused(call: Node, members: Set<string>, scope: Node): boolean {
+  const variable = call.getParentIfKind(ts.SyntaxKind.VariableDeclaration)
+  const name = variable?.getNameNode()
+  if (!name) return !!call.getParentIfKind(ts.SyntaxKind.ExpressionStatement)
+  if (N.isObjectBindingPattern(name)) return !name.getElements().some((e) => e.getDotDotDotToken())
+  if (!N.isIdentifier(name) || members.has(SELF)) return false
+  const symbol = name.getSymbol()
+  for (const ref of scope.getDescendantsOfKind(ts.SyntaxKind.Identifier)) {
+    if (ref === name || !refersTo(ref, symbol) || isDependencyList(ref)) continue
+    const parent = ref.getParent()
+    if (parent && N.isPropertyAccessExpression(parent) && parent.getExpression() === ref) {
+      if (members.has(parent.getName())) return false
+      continue
+    }
+    return false
+  }
+  return true
+}
+
+/** A function reference given to a query hook as its function: `queryFn: load`, `useSWR(key, load)`. */
+function isHookFnPosition(ref: Node): boolean {
+  const parent = ref.getParent()
+  if (!parent) return false
+  if (N.isShorthandPropertyAssignment(parent)) return /^(queryFn|mutationFn)$/.test(parent.getName())
+  if (N.isPropertyAssignment(parent) && parent.getInitializer() === ref)
+    return /^(queryFn|mutationFn)$/.test(propertyName(parent.getNameNode()))
+  if (N.isCallExpression(parent) && parent.getExpression() !== ref) {
+    const def = hookOf(parent)
+    if (!def) return false
+    const index = parent.getArguments().indexOf(ref)
+    // SWR's fetcher, or React Query v4's positional `useQuery(key, fn)` / `useMutation(fn)`.
+    return def.fnArg !== undefined ? index === def.fnArg : index === (def.kind === 'mutation' ? 0 : 1)
+  }
+  return false
+}
+
 /** In a hook's dependency list: `useCallback(fn, [mutate])`. */
 function isDependencyList(ref: Node): boolean {
   const list = ref.getParent()
@@ -3710,7 +4481,12 @@ function returnedAs(value: Node): string | undefined {
   let node = value
   let name: string | undefined
   for (let parent = node.getParent(); parent; node = parent, parent = parent.getParent()) {
-    if (N.isParenthesizedExpression(parent) || N.isAsExpression(parent) || N.isSatisfiesExpression(parent))
+    if (
+      N.isParenthesizedExpression(parent) ||
+      N.isAsExpression(parent) ||
+      N.isSatisfiesExpression(parent) ||
+      N.isNonNullExpression(parent)
+    )
       continue
     if (name === undefined && N.isPropertyAssignment(parent) && parent.getInitializer() === node) {
       name = propertyName(parent.getNameNode())
@@ -3823,8 +4599,9 @@ function bind(fn: Node, args: Node[], env: Env): Env {
 
 function bindParams(fn: FunctionLike, values: Binding[]): Env {
   const out = new Map<Node, Binding>()
+  // Destructured parameters are bound too: `#bindingValue` reads their names from the argument.
   fn.getParameters().forEach((param, i) => {
-    if (param.isRestParameter() || !N.isIdentifier(param.getNameNode())) return
+    if (param.isRestParameter()) return
     out.set(param, values[i] ?? { expr: undefined, env: EMPTY_ENV })
   })
   return out
@@ -3842,6 +4619,23 @@ function declarationOf(identifier: Node): Node | undefined {
   }
   const resolved = unalias(symbol)
   return resolved.getValueDeclaration() ?? resolved.getDeclarations()[0]
+}
+
+/** The enum an identifier names (`QueryKeys` in `QueryKeys.feed`), also through imports and re-exports. */
+function enumOf(node: Node): EnumDeclaration | undefined {
+  if (!N.isIdentifier(node)) return undefined
+  const decl = declarationOf(node)
+  return decl && N.isEnumDeclaration(decl) ? decl : undefined
+}
+
+/** An enum member's constant value: `feed = 'feed'`, or the number of an auto-numbered member. */
+function enumValue(member: EnumMember): string | number | undefined {
+  try {
+    const value = member.getValue()
+    return typeof value === 'string' || typeof value === 'number' ? value : undefined
+  } catch {
+    return undefined
+  }
 }
 
 function isConst(decl: Node): boolean {

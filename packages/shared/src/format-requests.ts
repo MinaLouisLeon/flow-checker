@@ -1,6 +1,6 @@
 // Plain-text rendering of request sites: used by `flow-checker scan --requests` and snapshot tests.
-import type { AppModel, QueryLink, RequestSite, RequestUrl, Trigger } from './model'
-import { formatQueryKey, queryLinkTarget } from './query-keys'
+import type { AppModel, Flag, QueryLink, RequestSite, RequestUrl, Trigger } from './model'
+import { formatQueryKey, isUnknownKey, queryLinkTarget } from './query-keys'
 
 export function formatRequests(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -45,12 +45,15 @@ export function formatRequests(model: AppModel): string {
       }
       if (site.targetRouteId)
         out.push(`  handled by: ${routes.get(site.targetRouteId)?.file ?? site.targetRouteId}`)
+      if (site.upstream) out.push(`  forwarded to: ${urlText(site.upstream)}`)
+      if (site.conditional) out.push('  conditional: a side request of the helper that sends it')
       for (const id of site.chain ?? []) {
         const next = sites.get(id)
         out.push(`  then: ${next ? requestText(next) : id}`)
       }
       out.push(`  via: ${site.callStack.map((f) => `${f.callee} ${f.file}:${f.line}`).join(' > ')}`)
-      for (const flag of site.flags) out.push(`  ⚠ ${flag.kind}: ${flag.message}`)
+      for (const flag of site.flags)
+        out.push(`  ${isInfoFlag(flag) ? 'ℹ' : '⚠'} ${flag.kind}: ${flag.message}`)
     }
   }
 
@@ -140,7 +143,8 @@ export function formatRequests(model: AppModel): string {
         const owner = target?.componentId ? components.get(target.componentId)?.name : undefined
         out.push(`  hits: ${target ? requestText(target) : id}${owner ? `  (${owner})` : ''}`)
       }
-      if (link.targetSiteIds.length === 0) out.push('  hits: (no scanned query)')
+      if (link.targetSiteIds.length === 0)
+        out.push(isUnknownKey(link.key) ? '  hits: (key not known)' : '  hits: (no scanned query)')
     }
   }
   return `${out.join('\n')}\n`
@@ -187,6 +191,11 @@ function requestText(site: RequestSite): string {
 }
 
 /** `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id?x=:y`, or `? <expression>` when unknown. */
+/** Flags that inform rather than ask for a check: `runtime-url` (the URL comes from data). */
+export function isInfoFlag(flag: Flag): boolean {
+  return flag.kind === 'runtime-url'
+}
+
 export function urlText(url: RequestUrl): string {
   if (url.confidence === 'unknown' && !url.path) return `? ${url.text}`
   const base = url.baseEnv

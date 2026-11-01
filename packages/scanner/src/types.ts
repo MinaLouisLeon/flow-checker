@@ -202,9 +202,11 @@ export class TypeResolver {
 
   /** The type's own structure, without hoisting it as a named type. */
   #structure(type: Type, location: Node, depth: number): TypeShape {
-    if (depth > this.#maxDepth) return { kind: 'unresolved', text: typeText(type, location), reason: 'depth' }
-
     const flags = type.getFlags()
+    // Plain values cost nothing to show, so the depth limit doesn't cut them off.
+    if (depth > this.#maxDepth && !isPlain(type))
+      return { kind: 'unresolved', text: typeText(type, location), reason: 'depth' }
+
     if (type.isLiteral() || type.isBooleanLiteral()) return literalShape(type)
     // Enums are unions of literals; a single-member enum is just the literal.
     if (type.isEnum() && !type.isUnion()) return literalShape(type)
@@ -248,7 +250,15 @@ export class TypeResolver {
 
     const alias = type.getAliasSymbol()
     const aliasDecl = alias?.getDeclarations()[0]
-    if (alias && aliasDecl && !this.#isProject(aliasDecl) && !isExpandable(type)) {
+    // A package's own object type (`type Control<T> = { ... }`) is its plumbing, not data the
+    // app defines: kept by name below the top level instead of expanded down to `Window`.
+    // Aliases that transform the app's types (`Pick`, `z.infer`) are still expanded.
+    if (
+      alias &&
+      aliasDecl &&
+      !this.#isProject(aliasDecl) &&
+      (!isExpandable(type) || (depth > 0 && isPackageStructure(aliasDecl)))
+    ) {
       return this.#externalShape(alias.getName(), aliasDecl, type.getAliasTypeArguments(), location, depth)
     }
 
@@ -467,6 +477,27 @@ function isExpandable(type: Type): boolean {
   const symbol = type.getSymbol()
   // Anonymous or mapped object types have no interface/class symbol.
   return !symbol || !isNamedSymbol(symbol)
+}
+
+/**
+ * An alias a package declares as an object type of its own (`type Api = { ... }`, also joined
+ * with `&`), as opposed to one that maps or picks from its type arguments. TypeScript's lib
+ * (`Pick`, `Partial`) isn't a package.
+ */
+function isPackageStructure(decl: Node): boolean {
+  if (!N.isTypeAliasDeclaration(decl) || !packageOf(decl.getSourceFile().getFilePath())) return false
+  const node = decl.getTypeNode()
+  if (!node) return false
+  if (N.isTypeLiteral(node)) return true
+  return N.isIntersectionTypeNode(node) && node.getTypeNodes().some((t) => N.isTypeLiteral(t))
+}
+
+/** A primitive, a literal, or a union of those: cheap to show at any depth. */
+function isPlain(type: Type): boolean {
+  if (type.isUnion()) return type.getUnionTypes().every((t) => isPlain(t))
+  if (type.isLiteral() || type.isBooleanLiteral()) return true
+  const flags = type.getFlags()
+  return PRIMITIVE_FLAGS.some(([flag]) => (flags & flag) !== 0)
 }
 
 function literalShape(type: Type): TypeShape {

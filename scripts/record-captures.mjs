@@ -53,6 +53,11 @@ const scripts = {
     await settle(page)
     await page.click('button:has-text("Refresh")')
     await settle(page)
+    // M24: two components share one settings query; invalidating it refetches it once.
+    await page.goto(`${app}/settings`)
+    await settle(page)
+    await page.click('button:has-text("Reload settings")')
+    await settle(page)
   },
   'react-query-v4': async (page) => {
     await page.goto(`${app}/`)
@@ -66,6 +71,10 @@ const scripts = {
     await page.goto(`${app}/users`)
     await settle(page)
     await page.click('button:has-text("Delete") >> nth=1')
+    await settle(page)
+    await page.goto(`${app}/settings`)
+    await settle(page)
+    await page.click('button:has-text("Reload settings")')
     await settle(page)
   },
   'server-actions': async (page) => {

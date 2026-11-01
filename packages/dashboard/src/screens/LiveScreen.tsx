@@ -15,6 +15,7 @@ import {
   useClearCaptures,
   useFlows,
   useRecording,
+  useServerCapture,
 } from '../api'
 import { useData } from '../context'
 import { GraphqlCaptureFact } from '../GraphqlView'
@@ -77,6 +78,7 @@ export function LiveScreen({
   const enabled = Boolean(meta.capture)
   const exported = meta.exported
   const captures = useCaptures(enabled)
+  const serverCapture = useServerCapture(enabled && !exported)
   const status = live ?? 'connecting'
   const clear = useClearCaptures()
 
@@ -163,6 +165,13 @@ export function LiveScreen({
           )}
         </div>
         {captures.error && <div className="banner banner-error">{captures.error.message}</div>}
+        {serverCapture.data?.state === 'missing' && (
+          <div className="banner banner-warn" role="alert" data-testid="server-capture-banner">
+            Server capture isn't running: run <code>flow-checker doctor</code>. Your app answered{' '}
+            <code>{serverCapture.data.request ?? 'a route handler'}</code>, but no server-side request was
+            captured.
+          </div>
+        )}
         {all.length === 0 ? (
           <Empty>
             No requests captured yet. Use your app
@@ -464,7 +473,11 @@ function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?
     // A shared route handler (e.g. a catch-all proxy) says little: name the feature that called it.
     const parentSite = parent?.match?.siteId ? index.requests.get(parent.match.siteId) : undefined
     const via = site?.origin === 'route-handler' && parentSite ? parentSite : undefined
-    const title = site ? siteLabel(site, index) : match.siteId
+    const label = site ? siteLabel(site, index) : match.siteId
+    // One request for a query several components mount (M24): it verifies each of them.
+    const shared = (match.sharedWith ?? []).map((id) => index.requests.get(id)).filter((s) => !!s)
+    const owners = shared.map((s) => siteOwner(s, index))
+    const title = shared.length > 0 ? `${label}, shared with ${owners.join(', ')}` : label
     return (
       <Badge tone="ok" title={via ? `${title}, for ${siteLabel(via, index)}` : title}>
         ✓{' '}
@@ -473,6 +486,7 @@ function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?
           : site
             ? siteOwner(site, index)
             : 'matched'}
+        {shared.length > 0 ? ` +${shared.length} shared` : ''}
         {match.by === 'manual' ? ' (you)' : ''}
       </Badge>
     )

@@ -2,6 +2,9 @@
 // installs that Next.js version with the packed @integr8-media/flow-checker, sets it up the way the
 // docs say (`flow-checker init`, plus withFlowChecker() before 15.3), and checks:
 //
+//   init    → the app's existing register() (non-async, with a production-only `if`) gets the
+//             flow-checker blocks as its first statements and becomes async (M22)
+//
 //   doctor  → no failed check
 //   scan    → the page, route handler and its three requests are found, plus the middleware
 //             (`middleware.ts` before 16, `proxy.ts` from 16): its matcher, redirect and fetch;
@@ -21,7 +24,7 @@
 //   node scripts/next-matrix.mjs --keep          # keep the temporary apps for debugging
 import { execFileSync, spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { createServer as createNetServer } from 'node:net'
 import { tmpdir } from 'node:os'
@@ -140,6 +143,15 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   const init = fc('init', '--yes')
   if (legacy !== init.includes('withFlowChecker')) {
     throw new Error(`init ${legacy ? 'did not ask' : 'asked'} for withFlowChecker():\n${init}`)
+  }
+  // M22: the existing register() is edited in place, keeping the app's own code.
+  const hook = readFileSync(join(app, 'instrumentation.ts'), 'utf8')
+  if (
+    !init.includes('update  instrumentation.ts (adds the flow-checker blocks at the start of register()') ||
+    !/^export async function register\(\): Promise<void> \{\n {2}\/\/ flow-checker:/.test(hook) ||
+    !hook.includes("console.log('tracing on')")
+  ) {
+    throw new Error(`init did not edit the existing register():\n${init}\n${hook}`)
   }
   if (legacy) {
     writeFileSync(
@@ -368,6 +380,14 @@ function writeApp(dir, proxy) {
       null,
       2,
     ),
+    // The app's own register() from before flow-checker (M22): init must put its blocks first,
+    // outside this condition, and make register async.
+    'instrumentation.ts': `export function register(): void {
+  if (process.env.NODE_ENV === 'production') {
+    console.log('tracing on')
+  }
+}
+`,
     'app/layout.tsx': `export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
