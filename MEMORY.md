@@ -36,6 +36,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M26 | Release v0.2.2        | Real-app before/after = scan + `export --html` with each `cli.js`, then open every page view in Playwright.              |
 | M27 | Early-return guards   | `SiteMeta.afterExit` beside `guarded`; side requests and twin choice use both, `isGuarded` itself is unchanged.          |
 | M28 | `explore`             | `startDev({ explore })`; no setup = capture off + `model.json` in `<tmp>/flow-checker/<name>-<hash>` (`dataDir`).        |
+| M29 | Endpoints             | Derived in `shared/src/endpoints.ts` (no model change); dashboard caches it per index in `endpointsOf()`.                |
 
 ## Gotchas
 
@@ -308,3 +309,16 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Tests that copy a fixture link its `node_modules` with a `junction` symlink (no admin rights needed on Windows)
   instead of copying it. Remove the copy only after the CLI process has exited: on Windows its working directory or
   open handles make `rmSync` fail with `EBUSY`, so spawn with `--root` rather than `cwd`.
+
+## M29 — Endpoints (branch `feat/m29-endpoints`)
+
+- Never name a `Screen` field `key`: `App.tsx` spreads the screen into the screen component's props
+  (`<X {...screen} />`), and React keeps `key` for itself, so the component never gets it. The endpoints screen
+  uses `endpointId`. Only the e2e test caught it; the router round-trip unit test passed.
+- Endpoint keys normalize param names (`/users/:id` = `/users/:userId`) and drop the query string; the
+  fixture test recomputes the "distinct (base, method, URL pattern)" count on its own, so a change to the key
+  rules has to change both on purpose.
+- Uncalled route handler methods are listed under this app, except on tRPC, GraphQL and catch-all handlers,
+  whose callers send whatever path or method they like.
+- The perf app's 1,000 sites give 1,000 endpoints (each generated URL is distinct), so it is the worst case for
+  the list size, not a folding test; the react-query fixture is the one where sites fold (13 → 7).

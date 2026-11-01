@@ -7,14 +7,22 @@
 //   issues.md            open flags, type mismatches, unmatched captures
 //   middleware.md        middleware / proxy: matcher, routes it runs on, redirects, rewrites, requests
 //   postman.md           the imported Postman collection: its requests, callers, unused endpoints, gaps
+//   endpoints.md         backend endpoints by host: callers, pages, types, a captured example (M29)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
+  buildEndpoints,
   buildIndex,
   type CapturedBody,
   type Component,
+  type Endpoint,
+  type EndpointHost,
+  type EndpointList,
+  type EndpointStatus,
+  type EndpointTransport,
   type ExportCapture,
   type ExportData,
+  endpointLabel,
   type Flow,
   type FlowStatus,
   type FlowStep,
@@ -52,6 +60,7 @@ import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table
 import {
   type DocNames,
   docNames,
+  ENDPOINTS,
   GRAPHQL,
   ISSUES,
   MIDDLEWARE,
@@ -81,6 +90,7 @@ interface Ctx {
   captures: Map<string, ExportCapture[]>
   /** Site id → the site whose `chain` leads to it. */
   callers: Map<string, RequestSite>
+  endpoints: EndpointList
 }
 
 export function renderMarkdown(data: ExportData): ExportFiles {
@@ -101,7 +111,15 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   for (const site of model.requests) {
     for (const id of site.chain ?? []) if (!callers.has(id)) callers.set(id, site)
   }
-  const ctx: Ctx = { data, model, index, names: docNames(model), captures, callers }
+  const ctx: Ctx = {
+    data,
+    model,
+    index,
+    names: docNames(model),
+    captures,
+    callers,
+    endpoints: buildEndpoints(index),
+  }
 
   const files: ExportFiles = {}
   files[README] = readme(ctx)
@@ -123,6 +141,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
+  files[ENDPOINTS] = endpointsDoc(ctx)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -154,6 +173,7 @@ function readme(ctx: Ctx): string {
       ['Route handlers', String(handlers.length)],
       ['Components', String(model.components.length)],
       ['Requests', String(model.requests.length)],
+      ['Endpoints', link(String(ctx.endpoints.endpoints.length), from, ENDPOINTS)],
       ['Flows', String(model.flows.length)],
       ['Types', String(model.types.length)],
     ],
@@ -198,6 +218,20 @@ function readme(ctx: Ctx): string {
           code(route.file),
           String(index.handlerRequests.get(route.id)?.length ?? 0),
         ]),
+      ),
+    )
+  }
+  if (ctx.endpoints.hosts.length > 0) {
+    sections.push(
+      '## Backends',
+      table(
+        ['Host', 'Endpoints', 'Called from the browser'],
+        ctx.endpoints.hosts.map((h) => [
+          link(hostTitle(h), from, ENDPOINTS, anchorId(hostAnchor(h))),
+          String(h.endpoints.length),
+          String(h.endpoints.filter((e) => e.browser).length),
+        ]),
+        ['left', 'right', 'right'],
       ),
     )
   }
@@ -1722,6 +1756,136 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     if (route) target = routeLink(ctx, route, from)
   }
   return `${target ? `${target}: ` : ''}${text(message)} (${where})`
+}
+
+// --- Endpoints (M29) ------------------------------------------------------------------------
+
+const ENDPOINT_TRANSPORT: Record<EndpointTransport, string> = {
+  http: 'HTTP',
+  trpc: 'tRPC',
+  graphql: 'GraphQL',
+  sse: 'event stream',
+  websocket: 'WebSocket',
+  'server-action': 'server action',
+}
+
+function hostTitle(h: EndpointHost): string {
+  return h.kind === 'app' ? text(h.label) : code(h.label)
+}
+
+function hostAnchor(h: EndpointHost): string {
+  return `host-${h.key}`
+}
+
+function endpointStatusText(e: Endpoint): string {
+  const of = e.siteIds.length > 1 ? ` (${e.verifiedSites} of ${e.siteIds.length} call sites)` : ''
+  const labels: Record<EndpointStatus, string> = {
+    verified: `✓ verified${of}`,
+    mismatch: '✗ type mismatch',
+    'needs-recheck': '↻ needs re-check',
+    'not-captured': 'not captured',
+  }
+  return labels[e.status]
+}
+
+function endpointSide(e: Endpoint): string {
+  if (e.browser) return e.server ? 'browser + server' : 'browser'
+  return e.siteIds.length + e.forwardedSiteIds.length > 0 ? 'server' : '—'
+}
+
+function endpointsDoc(ctx: Ctx): string {
+  const from = ENDPOINTS
+  const { hosts, endpoints } = ctx.endpoints
+  const browser = endpoints.filter((e) => e.browser).length
+  return doc([
+    '# Endpoints',
+    link('← Overview', from, README),
+    endpoints.length === 0
+      ? 'No requests found, so no endpoints.'
+      : `${plural(endpoints.length, 'endpoint')} on ${plural(hosts.length, 'host')}, ${browser} called from the browser. One endpoint is a method and URL pattern; tRPC procedures, GraphQL operations and server actions count one each. Requests to this app's own route handlers are listed under "This app's API", and what those handlers send on under the host it goes to.`,
+    ...hosts.flatMap((h) => [
+      `## ${anchor(hostAnchor(h))}${hostTitle(h)}`,
+      h.baseEnv
+        ? `Base URL from ${code(`process.env.${h.baseEnv}`)}${h.base ? `, falls back to ${code(h.base)}` : ''}.`
+        : h.kind === 'unknown'
+          ? 'The scan could not read where these go: the URL is built at runtime. Use the app with capture on to see it.'
+          : undefined,
+      table(
+        ['Endpoint', 'Transport', 'Called from', 'Call sites', 'Pages', 'Status'],
+        h.endpoints.map((e) => [
+          `[${code(endpointLabel(e))}](#${anchorId(e.key)})`,
+          ENDPOINT_TRANSPORT[e.transport],
+          endpointSide(e),
+          String(e.siteIds.length + e.forwardedSiteIds.length),
+          String(e.routeIds.length),
+          endpointStatusText(e),
+        ]),
+        ['left', 'left', 'left', 'right', 'right', 'left'],
+      ),
+      ...h.endpoints.map((e) => endpointSection(ctx, e, from)),
+    ]),
+  ])
+}
+
+function endpointSection(ctx: Ctx, e: Endpoint, from: string): string {
+  const sites = e.siteIds.map((id) => ctx.index.requests.get(id)).filter((s): s is RequestSite => !!s)
+  const forwarded = e.forwardedSiteIds
+    .map((id) => ctx.index.requests.get(id))
+    .filter((s): s is RequestSite => !!s)
+  const handler = e.routeId ? ctx.index.routes.get(e.routeId) : undefined
+  const pages = e.routeIds
+    .map((id) => ctx.index.routes.get(id))
+    .filter((r): r is Route => !!r)
+    .map((r) => routeLink(ctx, r, from))
+  const callerList = (list: RequestSite[]) =>
+    list.map((s) => `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}`).join('<br>')
+  const rpc = [
+    e.procedure
+      ? ` · ${link(code(e.procedure.path), from, TRPC, anchorId(trpcAnchor(e.procedure.path)))} (${e.procedure.type})`
+      : '',
+    e.operation
+      ? ` · ${link(code(e.operation.name || '(anonymous)'), from, GRAPHQL, anchorId(graphqlAnchor(e.operation)))}`
+      : '',
+  ].join('')
+  return doc([
+    `### ${anchor(e.key)}${code(endpointLabel(e))}`,
+    facts([
+      ['Status', endpointStatusText(e)],
+      ['Transport', `${ENDPOINT_TRANSPORT[e.transport]}${rpc}`],
+      ['Called from', endpointSide(e)],
+      ['Served by', handler ? routeLink(ctx, handler, from) : undefined],
+      ['Query', e.queries.length > 0 ? e.queries.map((q) => code(`?${q}`)).join(', ') : undefined],
+      [
+        'Postman',
+        e.contracts.length > 0
+          ? e.contracts.map((c) => link(text(c.name), from, POSTMAN, anchorId(c.requestId))).join(', ')
+          : undefined,
+      ],
+      ['Pages', pages.length > 0 ? pages.join(', ') : undefined],
+      ['Call sites', sites.length > 0 ? callerList(sites) : 'nothing in the code calls it'],
+      ['Forwarded here', forwarded.length > 0 ? callerList(forwarded) : undefined],
+    ]),
+    e.bodyType && `**Request body**${typeSource(e.bodyType)} ${typeBlock(ctx, e.bodyType, from)}`,
+    e.responseType && `**Response**${typeSource(e.responseType)} ${typeBlock(ctx, e.responseType, from)}`,
+    endpointExample(ctx, e),
+  ]).trimEnd()
+}
+
+/** The newest successful capture of any of its call sites (else the newest one). */
+function endpointExample(ctx: Ctx, e: Endpoint): string | undefined {
+  const seen = new Set<string>()
+  const list: ExportCapture[] = []
+  for (const id of e.siteIds) {
+    for (const c of ctx.captures.get(id) ?? []) {
+      if (seen.has(c.id)) continue
+      seen.add(c.id)
+      list.push(c)
+    }
+  }
+  if (list.length === 0) return undefined
+  list.sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0))
+  const ok = list.find((c) => !c.error && (c.response?.status ?? 0) < 400) ?? list[0]
+  return ok ? example(ok, list.length) : undefined
 }
 
 // --- Links and labels --------------------------------------------------------------------------

@@ -11,6 +11,7 @@ export type {
 export { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, defineConfig } from './config'
 export { CLI_NAME, DEFAULT_PORTS, MODEL_VERSION, PACKAGE_NAME } from './constants'
 export * from './diff'
+export * from './endpoints'
 export * from './export'
 export * from './flow-runs'
 export { formatModel } from './format'

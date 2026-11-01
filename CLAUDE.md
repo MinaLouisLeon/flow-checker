@@ -25,7 +25,7 @@ M19 WebSockets · M20 release v0.2.0 (published; 0.2.1 followed with scan-accura
 M21 Components and Requests screens · M22 server hook placement check · M23 dashboard fixes ·
 M24 React Query keys · M25 scanner fixes · M26 release v0.2.2 (branch `feat/m26-release-v0.2.2`; publish = push the
 `v0.2.2` tag after merging to `main`) · M27 early-return guards (v0.3.0, branch `feat/m27-early-return-guards`) ·
-M28 `flow-checker explore` (branch `feat/m28-explore`).
+M28 `flow-checker explore` (branch `feat/m28-explore`) · M29 Endpoints (branch `feat/m29-endpoints`).
 
-Next: M29 Endpoints (v0.3.0 onboarding, M27–M37; v0.4.0 coding-agent context, M38–M40; see `docs/PLAN.md`).
+Next: M30 Areas (v0.3.0 onboarding, M27–M37; v0.4.0 coding-agent context, M38–M40; see `docs/PLAN.md`).
 Fixes must target code patterns, not the app they were found on.
