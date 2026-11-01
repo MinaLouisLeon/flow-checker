@@ -9,6 +9,7 @@ import {
 import { useState } from 'react'
 import {
   type LiveStatus,
+  type Meta,
   useAssignMatch,
   useCapture,
   useCaptures,
@@ -85,7 +86,11 @@ export function LiveScreen({
   if (!enabled) {
     return (
       <div className="screen">
-        <Empty>Live capture is off. Start the dashboard with "flow-checker" to capture requests.</Empty>
+        {meta.explore ? (
+          <CaptureHint explore={meta.explore} />
+        ) : (
+          <Empty>Live capture is off. Start the dashboard with "flow-checker" to capture requests.</Empty>
+        )}
       </div>
     )
   }
@@ -164,6 +169,7 @@ export function LiveScreen({
             </>
           )}
         </div>
+        {meta.explore && <CaptureHint explore={meta.explore} />}
         {captures.error && <div className="banner banner-error">{captures.error.message}</div>}
         {serverCapture.data?.state === 'missing' && (
           <div className="banner banner-warn" role="alert" data-testid="server-capture-banner">
@@ -764,4 +770,33 @@ function formatBytes(n: number | undefined): string {
   if (n < 1024) return `${n} B`
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
   return `${(n / 1024 / 1024).toFixed(1)} MB`
+}
+
+/**
+ * `flow-checker explore` (M28) doesn't run the app: says whether capture is off or just has no app
+ * sending to it, and lists the commands that turn it on.
+ */
+export function CaptureHint({ explore }: { explore: NonNullable<Meta['explore']> }) {
+  const commands = explore.enableCapture
+  return (
+    <div className="banner banner-info capture-hint" data-testid="capture-hint">
+      <p>
+        {explore.setup
+          ? 'This dashboard was started with explore, so your app is not running from here: the captures below are from earlier runs.'
+          : 'Capture is off. This dashboard was started with explore, which reads the code only and leaves the project untouched.'}{' '}
+        To check the map against real requests while you use the app, run{' '}
+        {commands.length === 1 ? 'this command' : 'these commands'} in the project:
+      </p>
+      <ol className="capture-commands">
+        {commands.map((command) => (
+          <li key={command}>
+            <code>{command}</code>
+          </li>
+        ))}
+      </ol>
+      {explore.dataDir && (
+        <p className="muted">The scan is kept outside the project, in {explore.dataDir}.</p>
+      )}
+    </div>
+  )
 }

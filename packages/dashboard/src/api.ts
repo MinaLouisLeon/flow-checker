@@ -40,6 +40,15 @@ export interface Meta {
   watching?: boolean
   /** Present when the dashboard can export (M10): the folder each format is written to. */
   export?: Record<ExportFormat, string>
+  /** Started by `flow-checker explore` (M28): the app isn't run from here. */
+  explore?: {
+    /** The project has a flow-checker setup, so its captures are shown. */
+    setup: boolean
+    /** Without a setup: the folder outside the project that holds the scan and exports. */
+    dataDir?: string
+    /** Commands that turn capture on, in order. */
+    enableCapture: string[]
+  }
   /** A static HTML export (M10): data is embedded, nothing can be changed. */
   exported?: {
     projectName: string

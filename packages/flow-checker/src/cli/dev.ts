@@ -7,6 +7,7 @@ import { ENV, type RuntimeConfig, resolveCaptureOptions } from '@flow-checker/ru
 import { ScanError } from '@flow-checker/scanner'
 import {
   CaptureStore,
+  type ExploreInfo,
   type ProjectWatcher,
   ScanFeed,
   startServer,
@@ -17,6 +18,7 @@ import { type AppModel, DEFAULT_PORTS, type FlowCheckerConfig } from '@flow-chec
 import { version } from '../../package.json'
 import { type AppProcess, startApp } from './app-process'
 import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
+import { enableCaptureCommands, exploreDataDir, hasSetup, projectSetup } from './explore'
 import { configExportDirs, writeFormat } from './export'
 import { graphqlForScan } from './graphql'
 import { appOrigins, contractSummary, postmanForScan } from './postman'
@@ -51,6 +53,11 @@ export interface DevCommandOptions {
   devCommand?: string
   /** Re-scan when source files change. Default: true. */
   watch?: boolean
+  /**
+   * `flow-checker explore` (M28): never start the app or edit project files. Without a setup,
+   * capture is off and data goes to a folder outside the project.
+   */
+  explore?: boolean
   /** Called after each re-scan triggered by a file change (tests). */
   onRescan?: (model: AppModel, files: string[]) => void
   /** How long to wait for a server capture before warning (tests). Default: 10 s. */
@@ -62,8 +69,10 @@ export interface DevSession {
   port: number
   /** Ingest endpoint the runtime posts to. */
   ingestUrl: string
-  /** Env the app runs with (also handy to start it yourself). */
+  /** Env the app runs with (also handy to start it yourself). Empty when capture is off. */
   appEnv: Record<string, string>
+  /** Explore without a setup: where the scan and exports go instead of `.flow-checker/`. */
+  dataDir?: string
   close: () => Promise<void>
 }
 
@@ -77,10 +86,11 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     { id: 'config', weight: 1 },
     ...scanSteps(69),
     { id: 'dashboard', weight: 3 },
-    { id: 'app', weight: 27 },
+    ...(options.explore ? [] : [{ id: 'app', weight: 27 }]),
   ])
 
   let config: FlowCheckerConfig
+  let configFile: string | undefined
   progress.start('config', 'Loading config…')
   try {
     const loaded = await loadConfig(root, options.config)
@@ -89,6 +99,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     if (loaded.file) io.out(`Config: ${loaded.file}`)
     if (loaded.root !== root) io.out(`Project root: ${loaded.root}`)
     root = loaded.root
+    configFile = loaded.file
     for (const line of configDetails(root, loaded.file, config)) progress.detail(line)
   } catch (error) {
     progress.finish()
@@ -100,6 +111,19 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 
   const appDir = options.appDir ?? config.appDir
+  // Explore leaves a project without a setup untouched: its data lives outside it.
+  let explore: ExploreInfo | undefined
+  if (options.explore) {
+    const setup = projectSetup(root, configFile)
+    const outside = hasSetup(setup) ? undefined : exploreDataDir(root)
+    explore = {
+      setup: !outside,
+      ...(outside ? { dataDir: outside } : {}),
+      enableCapture: enableCaptureCommands(root, setup),
+    }
+  }
+  const dataDir = explore?.dataDir
+  if (dataDir) io.out(`No flow-checker setup found: the scan is kept in ${dataDir}, outside the project.`)
   const appPort = options.appPort ?? config.ports?.app ?? DEFAULT_PORTS.app
   // A cloud collection is fetched again on each start (local files on every scan).
   const postman = await postmanForScan(root, config, io, progress, { refresh: true })
@@ -114,6 +138,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     graphql,
     postman,
     appOrigins: appOrigins(config, appPort),
+    dataDir,
   })
   progress.detail(`scan runs ${scanner.inWorker ? 'in a worker thread' : 'in this thread'}`)
   // One scan at a time: a change that arrives during a scan waits for it.
@@ -163,22 +188,29 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   }
 
   const captureOptions = resolveCaptureOptions(config.capture)
-  if (captureOptions.storeRaw) {
+  // Capture is off when explore found no setup: there is no hook to send anything.
+  const captureOn = !dataDir
+  if (captureOn && captureOptions.storeRaw) {
     io.err(
       'Warning: capture.storeRaw is on. Captured requests are saved WITHOUT masking passwords and tokens.',
     )
   }
-  const added = ensureGitignore(root)
-  if (added.length > 0) io.out(`Added ${added.join(', ')} to .gitignore`)
+  if (!options.explore) {
+    const added = ensureGitignore(root)
+    if (added.length > 0) io.out(`Added ${added.join(', ')} to .gitignore`)
+  }
 
-  const store = new CaptureStore({ root }).load()
-  const token = ingestToken(root)
+  const store = captureOn ? new CaptureStore({ root }).load() : undefined
+  // Explore doesn't start the app, so the token needn't survive restarts for Next's compile cache.
+  const token = captureOn ? ingestToken(root, { save: !options.explore }) : ''
 
   const dashboardDir = findDashboardDir()
   if (!dashboardDir) io.err('Dashboard build not found. The API still works, but there is no UI to show.')
 
   progress.start('dashboard', 'Starting the dashboard…')
-  const exportDirs = configExportDirs(root, config)
+  const exportDirs = dataDir
+    ? { md: join(dataDir, 'docs'), html: join(dataDir, 'site') }
+    : configExportDirs(root, config)
   const watching = options.watch !== false
   const scans = watching ? new ScanFeed() : undefined
   const server = await startServer({
@@ -190,7 +222,8 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     appPort,
     version,
     port: options.port ?? config.ports?.dashboard ?? DEFAULT_PORTS.dashboard,
-    capture: {
+    explore,
+    capture: store && {
       store,
       token,
       options: captureOptions,
@@ -212,7 +245,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     },
   })
   progress.done()
-  io.out(`Dashboard: ${server.url}`)
+  if (!options.explore) io.out(`Dashboard: ${server.url}`)
 
   let watcher: ProjectWatcher | undefined
   let warmTimer: ReturnType<typeof setTimeout> | undefined
@@ -253,12 +286,9 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
   const ingestUrl = `${server.url}/ingest`
   const runtimeConfig: RuntimeConfig = { ingest: ingestUrl, token, capture: captureOptions }
   const json = JSON.stringify(runtimeConfig)
-  const appEnv: Record<string, string> = {
-    [ENV.enabled]: '1',
-    [ENV.server]: json,
-    [ENV.client]: json,
-    PORT: String(appPort),
-  }
+  const appEnv: Record<string, string> = captureOn
+    ? { [ENV.enabled]: '1', [ENV.server]: json, [ENV.client]: json, PORT: String(appPort) }
+    : {}
 
   let app: AppProcess | undefined
   let stopped = false
@@ -301,6 +331,15 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     } else {
       progress.finish()
     }
+  } else if (explore) {
+    progress.finish()
+    io.out(
+      explore.setup
+        ? `Your app isn't started here. To capture requests, run: ${explore.enableCapture.join(', then ')}`
+        : `Capture is off. To turn it on, run: ${explore.enableCapture.join(', then ')}`,
+    )
+    io.out(`Dashboard: ${server.url}`)
+    io.out(`Next: open ${server.url} in your browser.`)
   } else {
     progress.finish()
     // Without --app the user starts it (Docker, a task runner...) and needs this env.
@@ -315,13 +354,14 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
     port: server.port,
     ingestUrl,
     appEnv,
+    ...(dataDir ? { dataDir } : {}),
     close: async () => {
       stopped = true
       progress.finish()
       clearTimeout(warmTimer)
       await watcher?.close()
       await app?.stop()
-      store.writeSessions()
+      store?.writeSessions()
       await server.close()
       await scanner.close()
     },
@@ -366,6 +406,11 @@ function describeFiles(files: string[]): string {
 export async function devCommand(options: DevCommandOptions, io: CliIO): Promise<number> {
   const result = await startDev({ app: true, ...options }, io)
   if (typeof result === 'number') return result
+  return runUntilStopped(result, io)
+}
+
+/** Keeps a started session running until Ctrl+C (dev, explore). */
+export function runUntilStopped(result: DevSession, io: CliIO): number {
   let closing = false
   const stop = () => {
     if (closing) return
@@ -382,13 +427,14 @@ export async function devCommand(options: DevCommandOptions, io: CliIO): Promise
  * Secret the runtime sends with each batch, so other local pages can't write captures.
  * Kept per project (gitignored), so Next's compile cache stays valid across runs.
  */
-function ingestToken(root: string): string {
+function ingestToken(root: string, { save = true }: { save?: boolean } = {}): string {
   const file = join(root, '.flow-checker', 'cache', 'ingest-token')
   try {
     const existing = readFileSync(file, 'utf8').trim()
     if (/^[a-f0-9]{32}$/.test(existing)) return existing
   } catch {}
   const token = randomBytes(16).toString('hex')
+  if (!save) return token
   mkdirSync(join(root, '.flow-checker', 'cache'), { recursive: true })
   writeFileSync(file, token)
   return token
