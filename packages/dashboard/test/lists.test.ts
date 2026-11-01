@@ -86,6 +86,20 @@ describe('request filters', () => {
     expect(filterRequests(basic, { q: '', status: 'verified' })).toEqual([])
   })
 
+  it('leaves out sites whose only flag is information (a URL from data)', () => {
+    const basic = index('basic')
+    const [first, ...rest] = basic.model.requests
+    const info = {
+      ...first,
+      url: { text: 'file.url', confidence: 'unknown', fromData: true },
+      flags: [{ kind: 'runtime-url', message: 'The URL comes from data at runtime: file.url' }],
+    } as RequestSite
+    const withInfo = buildIndex({ ...basic.model, requests: [info, ...rest] })
+    expect(filterRequests(withInfo, { q: '', flagged: true })).toEqual([])
+    // Nor is it something to check on the overview.
+    expect(withInfo.notes.filter((n) => n.requestId === info.id)).toEqual([])
+  })
+
   it('searches method and URL, the component and the file', () => {
     const intl = index('next-intl')
     expect(filterRequests(intl, { q: 'post login' }).map(label)).toEqual(['POST /auth/login'])

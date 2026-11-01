@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "middleware",
   "model": {
-    "version": 10,
+    "version": 11,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",

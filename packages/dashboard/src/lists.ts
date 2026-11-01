@@ -2,6 +2,7 @@
 // model index, so they are unit-tested without rendering.
 import {
   type Component,
+  isInfoFlag,
   type NamedType,
   type Navigation,
   type QueryLink,
@@ -51,7 +52,7 @@ export interface RequestFilter {
   status?: RequestSite['status']
   when?: RequestWhen
   transport?: RequestSite['transport']
-  /** Only sites with flags. */
+  /** Only sites with flags (not information like `runtime-url`). */
   flagged?: boolean
 }
 
@@ -113,7 +114,7 @@ export function filterRequests(index: ModelIndex, filter: RequestFilter): Reques
       (!filter.status || site.status === filter.status) &&
       (!filter.when || requestWhen(site) === filter.when) &&
       (!filter.transport || site.transport === filter.transport) &&
-      (!filter.flagged || site.flags.length > 0) &&
+      (!filter.flagged || warnings(site).length > 0) &&
       matchesAll(
         filter.q,
         `${site.method ?? '?'} ${siteTarget(site)}`,
@@ -312,4 +313,9 @@ function matchesAll(query: string, ...fields: (string | undefined)[]): boolean {
     .join('\n')
     .toLowerCase()
   return words.every((w) => text.includes(w))
+}
+
+/** A site's flags that ask for a check (`runtime-url` only informs). */
+export function warnings(site: RequestSite) {
+  return site.flags.filter((f) => !isInfoFlag(f))
 }

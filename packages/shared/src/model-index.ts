@@ -1,5 +1,5 @@
 // Lookup tables and derived facts the dashboard screens and the exporter need, built once per model.
-import { urlText } from './format-requests'
+import { isInfoFlag, urlText } from './format-requests'
 import type {
   AppModel,
   Component,
@@ -164,7 +164,10 @@ export function buildIndex(model: AppModel): ModelIndex {
   }
 
   const flowsByRoute = new Map<string, Flow[]>()
-  for (const flow of model.flows) for (const id of new Set(flow.routeIds)) push(flowsByRoute, id, flow)
+  // A flow from a layout component shows on every page under the layout.
+  for (const flow of model.flows) {
+    for (const id of new Set([...(flow.startRouteIds ?? []), ...flow.routeIds])) push(flowsByRoute, id, flow)
+  }
 
   // Navigation edges. A navigation in a page's own component tree starts from that page. One
   // only found in a layout starts from the shallowest page that uses the layout (not from every
@@ -325,8 +328,8 @@ function hasUnresolved(shape: TypeShape): boolean {
       return shape.types.some(hasUnresolved)
     case 'function':
       return shape.params.some((p) => hasUnresolved(p.type)) || hasUnresolved(shape.returns)
-    case 'external':
-      return (shape.typeArguments ?? []).some(hasUnresolved)
+    // `external` too: what a library type is given to (`Control<FormValues>`) is the library's
+    // business, so a cut-off argument there isn't a gap in the app's own types.
     default:
       return false
   }
@@ -391,7 +394,7 @@ function scanNotes(model: AppModel): ScanNote[] {
       })
     }
     for (const flag of site.flags) {
-      if (SCAN_GAPS.has(flag.kind)) continue
+      if (SCAN_GAPS.has(flag.kind) || isInfoFlag(flag)) continue
       notes.push({
         kind:
           flag.kind === 'stale'

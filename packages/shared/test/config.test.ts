@@ -8,7 +8,7 @@ describe('shared', () => {
   })
 
   it('exposes stable defaults', () => {
-    expect(MODEL_VERSION).toBe(10)
+    expect(MODEL_VERSION).toBe(11)
     expect(DEFAULT_PORTS).toEqual({ dashboard: 4400, app: 3000 })
   })
 })

@@ -23,7 +23,23 @@
   - A key segment the scan can't read (a value from a package, a module value it can't follow) is shown as `?name` and is never treated as "any value": a cache call whose key starts with one (or with a runtime value) says "key not known" instead of hitting every query in the app, and one with a known start links by that start only.
   - Keys and query functions passed to your own query hooks (`useList({ queryKey, queryFn })` calling `useInfiniteQuery`, with destructured, spread or positional arguments) are followed per call: each call is its own query site with its key, instead of a plain `fetch`, so invalidations of that key find it.
   - Components that mount the same query (same key and query function) share one request. Its capture now verifies all of them (`+N shared` on Live) instead of being ambiguous.
-- `.flow-checker/model.json` is now version 10. Version 1–9 files still load.
+- **What starts a request.** Fewer `unknown` and wrong `page-load` triggers:
+  - A handler passed through a call is followed to the event prop it ends in: `onSubmit={form.handleSubmit(onSubmit)}`, `const submit = handleSubmit(save)`, `debounce(search)` kept in a variable, your own wrappers (`withGuard(remove)`), and options of a form hook (`useFormik({ onSubmit })`, whose `handleSubmit` goes to the form). Functions passed by reference (`handleSubmit(save)` with `save` imported, `useEffect(load, [])`) are now walked too.
+  - A callback handed to your own hook (`useSubmit({ onSubmit: verify })`) runs where the hook's result is used.
+  - `on*` entries of object configs (`{ label: 'Export', onSelect: exportAll }`) are events.
+  - A function shared through a context (`<Ctx.Provider value={{ remove: mutation.mutate }}>`, also through `useMemo` and React 19's `<Ctx value>`) is placed where the consumers (`useContext(Ctx)`, or a hook that returns it) use it.
+  - A hook that returns several mutations gives each caller only the ones it uses: `const { remove } = useItems()` no longer lists `add` and `update` with an unknown trigger. A result passed on whole keeps them all.
+  - A local function used as a `mutationFn` / `queryFn` is one site through its hook, not also a second site without it (sometimes with a `page-load` trigger).
+- **URLs.**
+  - `new URL()` is read through `.href`, `.toString()`, `String()` and templates, and its base can be an env value or a constant (`new URL('/v1/x', process.env.API_URL)` → `{API_URL}/v1/x`), not only a string.
+  - `.replace()` (strings and regexes), `.replaceAll()` and `.slice(n)` with known arguments are applied.
+  - A URL read from data at runtime (`fetch(file.url)` after `res.json()`, `files.map((f) => fetch(f.downloadUrl))`) is information ("URL from the data", `runtime-url`), not a "could not be resolved" warning. A URL from a prop is still a warning: the parent decides it.
+  - **Catch-all proxies.** A route handler like `/api/[...path]` that forwards the incoming path (`params.path.join('/')`, `request.nextUrl.pathname`, `new URL(request.url).pathname`, with `.replace()` or `.slice()`) sends to `{API_URL}/:path*`, and each request to it shows where it goes: `POST /api/reviews` is forwarded to `{API_URL}/reviews`. `[[...path]]` works too.
+  - A request a shared helper sends only sometimes before the real one (a token refresh) is marked `conditional` and shown apart ("Sometimes also on the server"), not as part of every chain.
+- **Components chosen at runtime.** `const Comp = asChild ? Slot : 'button'`, nested ternaries, `cond && A` and lookups in a constant record (`ICONS[name]`) list each project component they can be, as conditional children. When every choice is a library component or an HTML tag, it is one external child with no warning.
+- **Library types.** A package's own object types (react-hook-form's `Control<T>`, a carousel API) are kept by name instead of being expanded down to `Window`, plain values (`string`, `boolean`, literals) are shown at any depth, and a library type's arguments no longer make a type "partly resolved".
+- **Flows from layouts.** A flow that starts in a component a layout renders (a search bar in a header) shows on every page under that layout.
+- `.flow-checker/model.json` is now version 11. Version 1–10 files still load.
 
 ## 0.2.1
 

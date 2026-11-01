@@ -344,6 +344,11 @@ export const RequestUrlSchema = z.object({
   path: z.string().optional(),
   /** Query string pattern without `?`, e.g. `userId=:userId`. */
   query: z.string().optional(),
+  /**
+   * With `unknown`: the URL is read from data at runtime (a field of an earlier response, a
+   * destructured value or prop), so the code can't say it (M25). Flagged `runtime-url`, not `dynamic-url`.
+   */
+  fromData: z.boolean().optional(),
 })
 export type RequestUrl = z.infer<typeof RequestUrlSchema>
 
@@ -380,9 +385,12 @@ export const FlagSchema = z.object({
    * From a Postman collection (M15): `not-in-collection` (a site the collection has no request
    * for), `contract-mismatch` (the code's type doesn't fit the saved examples) and, on collection
    * requests, `unused-endpoint` (no site calls it).
+   * `runtime-url` (M25) is information, not a gap: the URL comes from data at runtime (a field of
+   * an earlier response, a prop), so the code can't say it.
    */
   kind: z.enum([
     'dynamic-url',
+    'runtime-url',
     'unknown-method',
     'unknown-response',
     'unknown-trigger',
@@ -612,6 +620,16 @@ export const RequestSiteSchema = z.object({
   /** Requests this one leads to on the server: route handler (BFF) hops or fetches in the server action. */
   chain: z.array(z.string()).optional(),
   /**
+   * For a request to a catch-all route handler that forwards the incoming path (a proxy,
+   * `/api/[...path]`): the URL the handler sends this request on to (M25).
+   */
+  upstream: RequestUrlSchema.optional(),
+  /**
+   * Sent only under a condition inside a shared helper (a token refresh before the real request),
+   * so it is a side request of the calls that use the helper, not part of their main path (M25).
+   */
+  conditional: z.boolean().optional(),
+  /**
    * Hash of the code that sends the request: the functions on its call path, its URL, method and
    * trigger. Whitespace, comments and line numbers don't count, so moving code doesn't change it.
    * When it changes, captures taken before are stale and the site needs a re-check (M9).
@@ -762,8 +780,13 @@ export const FlowSchema = z.object({
   id: z.string(),
   /** From the starting component and event, e.g. `LoginForm submit`. Rename in the dashboard. */
   name: z.string(),
-  /** Where it starts. */
+  /** Where it starts. For a flow that starts in a layout, the shallowest page under that layout. */
   routeId: z.string().optional(),
+  /**
+   * Set when it starts in a component a layout renders (a header form, a menu): every page under
+   * that layout, since it can start on any of them (M25).
+   */
+  startRouteIds: z.array(z.string()).optional(),
   componentId: z.string(),
   /** The success path, in order. */
   steps: z.array(FlowStepSchema),
@@ -1049,7 +1072,8 @@ export const AppModelSchema = z.object({
    * version 2 (before M14) no middleware, version 3 (before M15) no Postman contract, version 4
    * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams,
    * version 7 (before M19) no WebSockets, version 8 no `prop` component references, version 9
-   * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`).
+   * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`),
+   * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags.
    */
   version: z
     .union([
@@ -1062,6 +1086,7 @@ export const AppModelSchema = z.object({
       z.literal(7),
       z.literal(8),
       z.literal(9),
+      z.literal(10),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

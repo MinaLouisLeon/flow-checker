@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "server-actions",
   "model": {
-    "version": 10,
+    "version": 11,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
