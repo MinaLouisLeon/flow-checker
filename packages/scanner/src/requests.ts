@@ -365,6 +365,8 @@ interface SiteMeta {
   methodDefault: boolean
   /** Per call frame: reached only on some paths of its function (`if`, ternary, `&&`). */
   guarded: boolean[]
+  /** Per call frame: after an earlier statement of its function that can return or throw (M27). */
+  afterExit: boolean[]
 }
 
 export interface RequestScannerOptions {
@@ -867,9 +869,10 @@ export class RequestScanner {
   }
 
   /**
-   * A request a shared helper sends only under a condition (`if (expired) await refresh()`) while
-   * the same call also sends its main request unconditionally: a side request, marked
-   * `conditional`. Branches that are alternatives (both guarded) aren't marked.
+   * A request a shared helper sends only under a condition (`if (expired) await refresh()`, or
+   * after an early exit: `if (res.status !== 401) return res; await refresh()`) while the same call
+   * also sends its main request unconditionally: a side request, marked `conditional`. Branches
+   * that are alternatives (both guarded) aren't marked.
    */
   #markSideRequests() {
     const byOrigin = new Map<string, RequestSite[]>()
@@ -883,15 +886,19 @@ export class RequestScanner {
     const loc = (f: CallFrame | undefined) => (f ? `${f.file}:${f.line}:${f.column}` : '')
     for (const list of byOrigin.values()) {
       for (const site of list) {
-        const guarded = this.#siteMeta.get(site.id)?.guarded ?? []
+        const meta = this.#siteMeta.get(site.id)
+        if (!meta) continue
+        const sometimes = meta.guarded.map((g, i) => g || !!meta.afterExit[i])
         // The first guarded call inside a helper (not in the origin's own code).
-        const at = guarded.findIndex((g, i) => g && i >= 1)
+        const at = sometimes.findIndex((g, i) => g && i >= 1)
         if (at < 1) continue
         const main = list.some((other) => {
           if (other === site || other.callStack.length <= at) return false
           for (let i = 0; i < at; i++) if (loc(other.callStack[i]) !== loc(site.callStack[i])) return false
-          const otherGuarded = this.#siteMeta.get(other.id)?.guarded ?? []
-          return !otherGuarded.slice(at).some(Boolean)
+          const om = this.#siteMeta.get(other.id)
+          if (!om) return false
+          for (let i = at; i < om.guarded.length; i++) if (om.guarded[i] || om.afterExit[i]) return false
+          return true
         })
         if (main) site.conditional = true
       }
@@ -969,7 +976,13 @@ export class RequestScanner {
     if (!metaA || !metaB) return undefined
     const guardedA = metaA.guarded.slice(shared).some(Boolean)
     const guardedB = metaB.guarded.slice(shared).some(Boolean)
-    if (a.method === b.method) return guardedA && !guardedB ? a : b
+    if (a.method === b.method) {
+      if (guardedA !== guardedB) return guardedA ? a : b
+      // A retry after an early exit gives way to the request sent before it.
+      const exitA = metaA.afterExit.slice(shared).some(Boolean)
+      const exitB = metaB.afterExit.slice(shared).some(Boolean)
+      return exitA && !exitB ? a : b
+    }
     // Different methods: only a guarded branch's default method gives way.
     if (guardedA && !guardedB && metaA.methodDefault) return a
     if (guardedB && !guardedA && metaB.methodDefault) return b
@@ -2809,6 +2822,7 @@ export class RequestScanner {
       originKey: w.origin.key,
       methodDefault: !!found.methodDefault,
       guarded: frames.map((f) => isGuarded(f.node)),
+      afterExit: frames.map((f) => isAfterExit(f.node)),
     })
     if (hookFrame?.hook?.def.rq) {
       this.#siteKinds.set(id, { kind: hookFrame.hook.def.kind, client: !!hookFrame.hook.def.client })
@@ -4531,6 +4545,45 @@ function isGuarded(node: Node): boolean {
     child = parent
   }
   return false
+}
+
+/**
+ * Whether a call comes after a statement of its own function that can leave it early
+ * (`if (ok) return res`, `if (!token) throw ...`, a loop or `try` with a `return` inside), so it
+ * only runs on some paths. Only statements before the call's own, in each enclosing block, count.
+ */
+function isAfterExit(node: Node): boolean {
+  let child: Node = node
+  for (let parent = node.getParent(); parent && !isFunctionLike(parent); parent = parent.getParent()) {
+    if (N.isArrowFunction(parent) || N.isFunctionExpression(parent)) break
+    if (N.isBlock(parent) || N.isCaseClause(parent) || N.isDefaultClause(parent)) {
+      for (const stmt of parent.getStatements()) {
+        if (stmt === child) break
+        if (canExit(stmt)) return true
+      }
+    }
+    child = parent
+  }
+  return false
+}
+
+const exitCache = new WeakMap<Node, boolean>()
+
+/** A statement that returns or throws on some of its paths (not one that always does). */
+function canExit(stmt: Node): boolean {
+  if (N.isReturnStatement(stmt) || N.isThrowStatement(stmt)) return false
+  const cached = exitCache.get(stmt)
+  if (cached !== undefined) return cached
+  let found = false
+  stmt.forEachDescendant((n, traversal) => {
+    if (isFunctionLike(n) || N.isClassDeclaration(n) || N.isClassExpression(n)) traversal.skip()
+    else if (N.isReturnStatement(n) || N.isThrowStatement(n)) {
+      found = true
+      traversal.stop()
+    }
+  })
+  exitCache.set(stmt, found)
+  return found
 }
 
 function isFunctionLike(node: Node | undefined): node is FunctionLike {

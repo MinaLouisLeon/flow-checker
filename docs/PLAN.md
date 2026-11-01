@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M20 done (v0.2.0 not yet published). **v0.1.0 is published on npm** (scanner, types, dashboard, runtime capture, matching + verification, flows, type comparison, watch + incremental re-scan, export, public release). M12 (CLI progress output) and M13 (React Query APIs, keys and cache links) are on `dev` for v0.2.0; M14 (middleware / proxy) is on `dev`; M15 (Postman collection import) is on `dev`; M16 (tRPC) is on `dev`; M17 (GraphQL) is on `dev`; M18 (SSE) and M19 (WebSockets) are on `dev`. M20 (release v0.2.0: docs, extended Next matrix, performance recheck) is on `feat/release-v0.2.0`; publishing waits for the `v0.2.0` tag. Updated: 2026-10-31.
+> Status: M0–M27 done. **v0.2.2 is the latest release** (published versions: 0.1.0, 0.2.0, 0.2.1, 0.2.2). Next: **v0.3.0** (onboarding, M27–M37), then **v0.4.0** (coding-agent context, M38–M40). Updated: 2026-11-01.
 
 ## 1. Goal
 
@@ -854,6 +854,123 @@ Code is in `packages/scanner/src/requests.ts` unless named. Bracketed counts are
 - **Performance:** `bench.mjs 200` against the published 0.2.1 on the same machine, three runs each (alternating order): cold scan 12.8 / 11.5 / 11.7 s → 12.7 / 12.0 / 12.1 s, re-scan median 3.7 / 4.1 / 4.0 s → 4.9 / 4.3 / 4.2 s (the first 0.2.2 run was the noisy one), slowest API answer 149–163 ms → 181–199 ms. About 4–7% slower from the M21–M25 work, well inside the CI budgets (25 s / 8 s / 1 s), which stay as they are. The README's scan times now say about 12 s / 4 s.
 - **Not done here:** the `v0.2.2` tag and npm publish (the Release workflow runs on the tag after merging to `main`).
 
+### v0.3.0 milestones
+
+Decided on 2026-11-01. Theme: **onboarding**. A developer who has just cloned an unfamiliar Next.js project should understand how it is built and how it behaves as fast and simply as possible, with no setup to start. Almost everything needed is already in the model; these milestones show it the way a newcomer asks about it: what does this app do, which feature is this, which backends does it call, which pages need a login, what breaks if I change this file. New features, so a minor release. Order: M27 → M28 → M29 → M30 → M31 → M32 → M33 → M34 → M35 → M36 → M37. Coding-agent context (`export --llm`, an MCP server) is planned for v0.4.0.
+
+Same rules as v0.2.2: fixes and views target **code patterns**, never names or paths from one app; each pattern gets cases written from scratch with variants. Every new screen also works in the static HTML export unless it needs a running server (and then it says so). The perf app budgets (25 s / 8 s / 1 s) still hold.
+
+| #   | Milestone                                                                                                                                                                                                                              | Done when                                                                                                                                                                                    | Status  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| M27 | **Early-return guards:** a request sent after an early `return` / `throw` in a helper (`if (res.status !== 401) return res`, then a token refresh) is marked `conditional`, like M25's side requests                                   | Test cases with variants mark the request `conditional`; a catch-all proxy's methods list the refresh as "sometimes"; fixture snapshots don't change                                         | ✅ Done |
+| M28 | **`flow-checker explore`:** scan + dashboard with no app, no hooks and no config, leaving the project untouched; the Live screen explains how to add capture later                                                                     | On a fresh copy of each fixture and the perf app (no config, no hooks, no `.flow-checker/`), `npx flow-checker explore` opens a working dashboard and `git status` stays clean               | Planned |
+| M29 | **Endpoints:** `#/endpoints`, one row per backend endpoint (method + URL pattern), grouped by host / base URL, with the pages and components that call it and its verification; `endpoints.md` in the Markdown export                  | Each fixture's endpoint count equals its distinct (base, method, URL pattern) sites; the perf app's list filters in under 50 ms; works in the static export; golden files updated            | Planned |
+| M30 | **Areas:** pages, components, requests and flows grouped by feature (route segment, else feature folder), an Areas screen with one card per area, and an `areas` config option to rename or merge them                                 | Every page is in exactly one area; fixture areas are snapshot-tested; the perf app's areas match its generated features; works in the static export                                          | Planned |
+| M31 | **Guarded pages:** each page labeled `guarded` (with the condition and where it redirects), `open` or `unknown`, from middleware redirects and conditional `redirect()` / `notFound()` in its layouts and page; a Map filter and badge | The middleware fixture and new guard cases (layout, page, middleware, helper; inline and imported) label every page as expected; no page is `guarded` without a condition shown              | Planned |
+| M32 | **Start here:** the first dashboard screen, a `flow-checker summary` command and `ONBOARDING.md` in the export: stack, areas, entry pages, main flows, backends, where things live                                                     | Each fixture's summary is golden-tested (screen data, CLI text, Markdown); `summary` on the perf app prints under 60 lines; every item links to its screen                                   | Planned |
+| M33 | **Global search:** Ctrl+K / Cmd+K box over pages, components, requests, endpoints, types, flows and areas, keyboard only                                                                                                               | On the perf app each keystroke answers in under 50 ms; an e2e test finds and opens one item of each kind with the keyboard; works in the static export                                       | Planned |
+| M34 | **Plain wording:** a short explanation for every status, flag, badge and trigger, shown where it appears (tooltip + a Glossary screen); fewer badges by default with a "show details" toggle                                           | A test fails when a status, flag kind, trigger kind or transport has no explanation; the page view of a fixture shows fewer badges by default than in 0.2.2                                  | Planned |
+| M35 | **Guided walk-through:** a checklist of flows not yet confirmed, each step with "open in app", live ticks as captures arrive, and a coverage % (flows, requests) on the overview                                                       | An e2e test follows the checklist on the auth fixture (login → OTP → dashboard): the flow becomes confirmed and its coverage reaches 100%                                                    | Planned |
+| M36 | **Impact check:** `flow-checker impact <file>`, `scan --diff <git ref>`, `scan --fail-on <flag kinds>`, `--json` for both, and an "Affected by changes" panel in the dashboard                                                         | Editing a type, a hook, an API client and a constants file in fixture tests lists the expected pages, flows and requests; `--diff` works against a commit; `--fail-on` exit codes are tested | Planned |
+| M37 | **Release v0.3.0:** README (onboarding quick start with `explore` first), config docs for `areas`, CHANGELOG, Next matrix, perf budgets, and a newcomer check on two real apps                                                         | v0.3.0 on npm                                                                                                                                                                                | Planned |
+
+### v0.3.0 notes
+
+**Model changes (`packages/shared`):** `Route.access` (`guarded | open | unknown`, with the guards found: kind, condition text, target route, location) and the `areas` config option. Endpoints, areas and the summary are **derived** in `packages/shared` (`endpoints.ts`, `areas.ts`, `summary.ts`) from the model, so the dashboard, the exporter and the CLI share one implementation and `model.json` doesn't grow. Bump `MODEL_VERSION` for `access`; version 11 files still load (`access` absent = `unknown`).
+
+**M27 — Early-return guards:**
+
+- `#markSideRequests()` only looks at enclosing `if` blocks. A call is also guarded when an earlier statement of the same function body can leave it: `if (cond) return …`, `if (cond) throw …`, `if (cond) { …; return }`, and the `else`-less form of the same.
+- Only statements before the call in the same block count; a `return` inside a nested function doesn't.
+- **Check:** cases in `scanner/test/` for each shape, as a function declaration and an arrow, inline and imported, `.ts` and `.js`, plus a catch-all proxy whose shared fetch helper refreshes a token after a 401 check (each method's chain shows the refresh as "sometimes").
+
+**Built in M27** (`packages/scanner/src/requests.ts`, branch `feat/m27-early-return-guards`):
+
+- `SiteMeta.afterExit` (per call frame, beside `guarded`): `isAfterExit()` climbs from the call to its function and, in each enclosing block or `case`, checks the statements before the call's own. `canExit()` is true for a statement that returns or throws on some paths (an `if`, a loop, a `try`, a nested block), not inside a nested function or class, and not a bare `return` / `throw`. Cached per statement.
+- `#markSideRequests()` treats a frame as "sometimes" when it is `guarded` or `afterExit`, and the main request must be neither from that frame on. So the refresh and the retry after `if (res.status !== 401) return res` are side requests and the first call is the main one; two alternatives (`if (upload) return fetch(a); return fetch(b)`) still aren't marked.
+- `#twinToDrop()`: for twins with the same method and the same `if` guarding, the one after an early exit gives way (the retry merges into the first call instead of the other way round). The multipart-branch rule from 0.2.1 is unchanged.
+- No model change: `conditional` already existed (M25).
+- **Check:** `scanner/test/early-exit.test.ts` (a declaration with `return` + refresh + retry, a `.js` arrow with a block that throws, a block that returns through a re-export, a catch-all proxy whose `GET` and `POST` go through the helper; not marked: a `return` in a callback, two alternatives, a guard in the component itself). It fails 5 of 6 on the old scanner. Fixture snapshots and goldens don't change.
+- **Performance:** perf app, same machine, the check switched off vs. on (two runs each): cold scan 17.4 / 17.3 s → 17.1 / 17.6 s, re-scan median 5.6 / 5.1 s → 6.1 / 5.7 s, within noise and the CI budgets. The machine was slower than during M26 (about 17 s cold for both builds).
+
+**M28 — `explore`:**
+
+- `flow-checker explore` = scan + watch + dashboard, never starts the app and never edits files. `loadConfig()` already returns an empty config when there is no file.
+- When the project has no flow-checker setup (no config, no hooks, no `.flow-checker/`), data goes to a cache folder outside the project (in the OS temp folder, keyed by the project path), so a fresh clone stays clean. With a setup it uses `.flow-checker/` like `dev`, and existing captures are shown.
+- The Live screen and the walk-through (M35) say capture is off and show the one command that turns it on (`init`, then `flow-checker`).
+- The startup output ends with the dashboard URL and "next: open Start here".
+- **Check:** CLI test on a fixture copy with no setup asserts nothing is written inside it; an e2e test opens the dashboard from `explore`.
+
+**M29 — Endpoints:**
+
+- One endpoint = base (origin, env base or same-origin) + method + URL pattern; GraphQL by operation, tRPC by procedure, WebSocket / SSE by URL. Route handlers of the app itself are listed as **"this app's API"**, and their upstream calls under the external host they forward to.
+- Columns: method, URL pattern, base, transport, number of call sites, pages, status (verified / mismatch / not captured), Postman contract when present. Filters: host, transport, status, "called from the browser" / "server only".
+- A row opens `#/endpoints/:key`: every call site (links to `#/requests/:siteId`), the body and response types and the newest captured examples.
+- Export: `endpoints.md` (grouped by host) and the screen in the static site.
+- Out of scope here: OpenAPI and Postman **export** (later, from the same list).
+
+**M30 — Areas:**
+
+- Default grouping: the first static route segment after route groups and locale segments (`/[locale]/billing/invoices` → `billing`); pages at the root form the `home` area. If that gives a single area, fall back to the top feature folder of the page files (`src/features/<x>`, `src/modules/<x>`: any folder that holds most of a page's components, not a fixed list of names).
+- A component belongs to every area whose pages use it; one used by more than half of the areas is listed as **shared**. Requests and flows follow their component and start page.
+- Config: `areas: { rename?: Record<string, string>, merge?: Record<string, string[]> }`.
+- Area card: pages, flows, endpoints called, shared components used, open flags. Areas also show up as group frames on the Map graph (toggle).
+
+**M31 — Guarded pages:**
+
+- Guards come from what the scan already reads: middleware redirects (`Navigation` with origin `middleware`, its conditions and the pages it can redirect away from, M14) and `redirect()` / `notFound()` navigations in the page, its layouts or a function they call, under a condition, before the content renders.
+- The label is about **behavior, not auth**: "redirects to `/login` when `!session`". `unknown` when the condition can't be read or a guard depends on runtime data the scan can't follow; never `open` just because nothing was found inside an unresolved helper.
+- Captures confirm it: a real redirect from that page marks the guard as seen.
+- Shown as a badge in the page view, the Map and the Requests / Components lists; a Map filter for guarded / open.
+
+**M32 — Start here:**
+
+- Sections, all derived from the model and `package.json`:
+  - **Stack:** Next version, router, rendering split (server / client components), data libraries found (React Query, SWR, tRPC, GraphQL client, axios, configured API clients), next-intl, middleware / proxy, Postman contract.
+  - **Areas** (M30) with page counts.
+  - **Entry pages:** the root page, pages nothing links to, and the most-linked pages.
+  - **Main flows:** the longest confirmed or inferred flows, one line each.
+  - **Backends** (M29): each host with its endpoint count.
+  - **Where things live:** the root layout, the files that send the most requests (the API client), the most-used types, middleware.
+  - **To check:** the top open flags, linking to the overview's to-do list.
+- `flow-checker summary` prints the same text (`--json` for scripts), and `ONBOARDING.md` is written by the Markdown export.
+- `#/` opens Start here; the current overview moves to `#/overview` (old links keep working).
+
+**M33 — Global search:**
+
+- One in-memory index built once per model (rebuilt after a re-scan), ranked by exact > prefix > word match, kind shown on each result. Matches names, files, URL patterns and route paths.
+- Ctrl+K / Cmd+K and `/` open it from any screen; arrows + Enter open a result.
+
+**M34 — Plain wording:**
+
+- One table of explanations in `packages/shared` (`glossary.ts`) used by the dashboard tooltips, the Glossary screen, the Markdown export and the CLI help.
+- Each entry says what it means and what to do about it (for `dynamic-url`: "the URL is built at runtime; use the page once with capture on, or add the client to `apiClients`").
+- Page view and lists show the main badge only (status); trigger, transport and flag details move behind "show details" (remembered per viewer).
+
+**M35 — Guided walk-through:**
+
+- A "Walk the app" screen: flows not yet confirmed, most important first (start pages, then flows with requests). Each step: what to do ("submit the form in `LoginForm`"), an "open in app" link on `:3000` with the page path filled in (dynamic segments asked for once and remembered), and a tick when the capture or navigation arrives.
+- Coverage on Start here and the overview: confirmed flows / all flows, captured requests / all requests.
+- Without capture (`explore`) the screen shows the steps as a reading guide and how to turn capture on.
+
+**M36 — Impact check:**
+
+- The reverse index: file → components, request sites (any frame of the call path), types (definition and use), navigations and flows; then up to the pages through component trees and layouts. Files that are only imported (constants, utils) use the import graph the incremental re-scan keeps (6.7).
+- `impact <file>[:line]` prints the affected pages, flows and requests, grouped by area. `scan --diff <ref>` runs it for the files changed since `ref` (`git diff --name-only`). `scan --fail-on <kinds>` (planned since M11) exits 1 when any listed flag kind is open. `--json` for CI.
+- The dashboard panel lists what the latest re-scan changed and what it affects.
+
+**M37 — Release v0.3.0:** same steps as M26. The README starts with the newcomer path (`npx @integr8-media/flow-checker explore` → Start here → walk the app). Real-app check: time from clone to the first useful screen, and whether each Start here section is right, on the test app and one other project.
+
+### v0.4.0 milestones
+
+Decided on 2026-11-01. Theme: **coding-agent context**. Newcomers often ask Claude, Cursor or Copilot about a codebase; the model already answers most of those questions, so give it to them directly. New features, so a minor release. Order: M38 → M39 → M40.
+
+| #   | Milestone                                                                                                                                                                                                                                                                                                       | Done when                                                                                                                                       | Status  |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| M38 | **`export --llm`:** a compact `CONTEXT.md` (also served as `llms.txt`) with the stack, areas, routes, endpoints, flows, guarded pages and key types, plus detail files it links to; redacted, no raw captures                                                                                                   | Golden files per fixture; the perf app's `CONTEXT.md` stays under 40 KB with every page and endpoint reachable through its links                | Planned |
+| M39 | **`flow-checker mcp`:** a read-only MCP server (stdio) with tools for the summary, search, a route, an endpoint and its callers, a component, a flow, a type and its uses, guarded pages and impact; reads `.flow-checker/` (or scans) and re-scans on change; README setup for Claude Code, Cursor and VS Code | An MCP client test calls every tool on the fixtures and checks the answers; answers are size-capped and redacted; no tool writes to the project | Planned |
+| M40 | **Release v0.4.0:** README section for agents, CHANGELOG, Next matrix, perf budgets                                                                                                                                                                                                                             | v0.4.0 on npm                                                                                                                                   | Planned |
+
 ### M11 notes
 
 - **Docs:** user README in `packages/flow-checker/README.md` (shown on npm), `docs/config.md`, `CHANGELOG.md`, MIT `LICENSE`.
@@ -863,7 +980,7 @@ Code is in `packages/scanner/src/requests.ts` unless named. Bracketed counts are
 - **Published:** v0.1.0 is on npm as `@integr8-media/flow-checker` and was tested by hand after release (2026-10-30).
 - **Release:** `.github/workflows/release.yml` publishes on a `v*` tag that matches the package version, after every check, with `pnpm publish --provenance` (needs `NPM_TOKEN` or npm trusted publishing, and an `npm` environment). `verify:package` also checks `./next` from ESM, CommonJS and TypeScript.
 
-Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11. For v0.2.0: M12 → M13 → M14 → M15 → M16 → M17 → M18 → M19 → M20. For v0.2.2: M21 → M22 → M23 → M24 → M25 → M26.
+Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map) → M3 → M5 → M6 → M7 → M8 → M9 → M10 → M11. For v0.2.0: M12 → M13 → M14 → M15 → M16 → M17 → M18 → M19 → M20. For v0.2.2: M21 → M22 → M23 → M24 → M25 → M26. For v0.3.0: M27 → M28 → M29 → M30 → M31 → M32 → M33 → M34 → M35 → M36 → M37. For v0.4.0: M38 → M39 → M40.
 
 ## 15. Risks and mitigations
 
@@ -885,5 +1002,5 @@ Suggested order for early value: M0 → M1 → M2 → M4 (usable as a static map
 
 - Pages Router (`pages/`).
 - ~~GraphQL operation-level analysis, WebSockets and SSE streams~~ → planned for v0.2.0 (M17–M19).
-- OpenAPI and Postman **export**. These are easy to add later from the same model. (Postman collection **import** is planned for v0.2.0, M15.)
+- OpenAPI and Postman **export**. These are easy to add later from the same model, now from the endpoint list (M29). (Postman collection **import** was done in v0.2.0, M15.)
 - Live iframe preview with element highlighting.
