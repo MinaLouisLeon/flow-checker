@@ -40,6 +40,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M30 | Areas                 | Derived in `shared/src/areas.ts`; only the `areas` config is stored (`AppModel.areas`, optional, no version bump).       |
 | M31 | Guarded pages         | Model version 12, `Route.access`. Scanner records render exits; `scanner/src/access.ts` builds each page's label.        |
 | M32 | Start here            | `buildSummary()` in `shared/src/summary.ts`; items carry a `SummaryLink` each view renders. `#/` = Start here.           |
+| M33 | Global search         | `buildSearchIndex()` / `search()` in `shared/src/search.ts`; `searchOf()` caches, `searchScreen()` links.                |
 
 ## Gotchas
 
@@ -371,3 +372,16 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `filterRequests` searches those fields; `dashboard/test/start.test.ts` fails when such a list comes up empty.
 - `flow-checker summary` must not write into the project (`writeModel: false`, `save: false` for the Postman and
   GraphQL caches); it calls `collectSnapshot` only when `.flow-checker/` exists.
+
+## M33 — Global search (branch `feat/m33-global-search`)
+
+- The ranking is pure (`shared/src/search.ts`) so a v0.4.0 agent tool can reuse it; the dashboard only adds the box
+  and `searchScreen()`. Add a new kind there, in `SEARCH_KINDS`, `searchScreen()` and the link test.
+- Word matching keeps each field on its own line in `allWords`: without that, `src/user` matched a component named
+  `User` in `src/b.tsx` (pieces from two fields).
+- `localeCompare` in the sort was most of the cost of a one-letter query on the perf app (28 ms → 15 ms with plain
+  `<` / `>`).
+- e2e: `getByRole('combobox')` also finds `<select>`s (the Components screen has two); scope it to the dialog.
+  Playwright's `fill()` sends no key events, so it can't test that `/` in a field doesn't open the box: use
+  `keyboard.type()`.
+- Ids are `rt_`, `cmp_`, `req_`, `typ_`, `flw_`, `ep_`, `ar_` (not `ty_` / `fl_`).

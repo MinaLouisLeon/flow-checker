@@ -1,7 +1,8 @@
 import { CLI_NAME } from '@flow-checker/shared'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useFlows, useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
+import { GlobalSearch, shortcutLabel, useSearchShortcut } from './GlobalSearch'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { AreasScreen } from './screens/AreasScreen'
@@ -58,6 +59,10 @@ export function App() {
     return guards ? new Map(Object.entries(guards).map(([id, list]) => [id, new Set(list)])) : undefined
   }, [flows.data])
 
+  const [searching, setSearching] = useState(false)
+  useSearchShortcut(setSearching)
+  const closeSearch = useCallback(() => setSearching(false), [])
+
   const error = model.error ?? meta.error
   return (
     <div className="app">
@@ -83,6 +88,15 @@ export function App() {
           ))}
         </nav>
         <span className="spacer" />
+        <button
+          type="button"
+          className="button search-open"
+          disabled={!index}
+          aria-keyshortcuts="Control+K Meta+K /"
+          onClick={() => setSearching(true)}
+        >
+          Search <kbd>{shortcutLabel()}</kbd>
+        </button>
         {exported && (
           <span className="muted topbar-meta" title={exported.generatedAt}>
             {exported.projectName} · exported {new Date(exported.generatedAt).toLocaleString()}
@@ -143,6 +157,7 @@ export function App() {
             value={{ index, meta: meta.data, live: captureOn ? live : undefined, seenGuards }}
           >
             <ScreenView screen={screen} />
+            {searching && <GlobalSearch onClose={closeSearch} />}
           </DataContext.Provider>
         ) : (
           <div className="screen">

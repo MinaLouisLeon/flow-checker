@@ -6,6 +6,7 @@ import {
   type EndpointStatus,
   type EndpointTransport,
   type RequestSite,
+  type SearchItem,
   type SummaryLink,
 } from '@flow-checker/shared'
 import { useEffect, useState } from 'react'
@@ -276,6 +277,27 @@ export function summaryScreen(link: SummaryLink): Screen {
       return { name: 'types', q: '' }
     case 'type':
       return { name: 'types', typeId: link.typeId, q: '' }
+  }
+}
+
+/** The screen a global search result opens (M33). */
+export function searchScreen(item: SearchItem): Screen {
+  switch (item.kind) {
+    case 'page':
+    case 'handler':
+      return { name: 'page', routeId: item.id }
+    case 'component':
+      return { name: 'component', componentId: item.id }
+    case 'request':
+      return { name: 'requests', siteId: item.id, q: '' }
+    case 'endpoint':
+      return { name: 'endpoints', endpointId: item.id, q: '' }
+    case 'type':
+      return { name: 'types', typeId: item.id, q: '' }
+    case 'flow':
+      return { name: 'flows', flowId: item.id, q: '' }
+    case 'area':
+      return { name: 'areas', areaId: item.id, q: '' }
   }
 }
 
