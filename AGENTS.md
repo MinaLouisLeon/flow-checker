@@ -101,3 +101,4 @@ re-run them on their own before assuming a regression.
 | M28 | `flow-checker explore`                            | Done   |
 | M29 | Endpoints                                         | Done   |
 | M30 | Areas                                             | Done   |
+| M31 | Guarded pages                                     | Done   |

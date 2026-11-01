@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -57,7 +57,11 @@
           "componentId": "cmp_2dznycb4aq7"
         }
       ],
-      "componentId": "cmp_0ku4o3jpe9o"
+      "componentId": "cmp_0ku4o3jpe9o",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     },
     {
       "id": "rt_2656kti2wza",
@@ -83,7 +87,11 @@
           "componentId": "cmp_2dznycb4aq7"
         }
       ],
-      "componentId": "cmp_0vmo84pmvzo"
+      "componentId": "cmp_0vmo84pmvzo",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     }
   ],
   "components": [

@@ -1,3 +1,4 @@
+export * from './access'
 export * from './areas'
 export * from './capture'
 export type {

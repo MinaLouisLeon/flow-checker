@@ -83,4 +83,6 @@ export interface FlowsSummary {
   recorded: RecordedFlow[]
   /** The named recording in progress, if any. */
   recording?: { id: string; name: string; startedAt: string }
+  /** Page guards a captured session hit, by route id (M31). */
+  guards?: Record<string, string[]>
 }

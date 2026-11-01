@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "sse",
   "model": {
-    "version": 11,
+    "version": 12,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -143,7 +143,11 @@
             "componentId": "cmp_2dznycb4aq7"
           }
         ],
-        "componentId": "cmp_0ku4o3jpe9o"
+        "componentId": "cmp_0ku4o3jpe9o",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       },
       {
         "id": "rt_1fha06qip71",
@@ -240,7 +244,11 @@
             "componentId": "cmp_2dznycb4aq7"
           }
         ],
-        "componentId": "cmp_071fu3pg2y0"
+        "componentId": "cmp_071fu3pg2y0",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       },
       {
         "id": "rt_1kar2b8hpep",
@@ -266,7 +274,11 @@
             "componentId": "cmp_2dznycb4aq7"
           }
         ],
-        "componentId": "cmp_015g2q10jn5"
+        "componentId": "cmp_015g2q10jn5",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       }
     ],
     "components": [

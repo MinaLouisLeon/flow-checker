@@ -22,11 +22,16 @@ import {
   TRANSPORTS,
 } from './lists'
 
+/** Map filter on page access (M31). */
+export const ACCESS_FILTERS = ['guarded', 'open', 'unknown'] as const
+export type AccessFilter = (typeof ACCESS_FILTERS)[number]
+
 export type Screen =
   | { name: 'overview' }
   /** `handlers`: the route handlers as a list (M23). */
   /** `areas`: the Map graph draws a frame around each area's pages (M30). */
-  | { name: 'map'; view: MapView; q: string; areas?: boolean }
+  /** `access`: only pages with that access label stand out (M31). */
+  | { name: 'map'; view: MapView; q: string; areas?: boolean; access?: AccessFilter }
   /** Pages grouped by feature (M30); `areaId` is the one shown beside the cards. */
   | { name: 'areas'; areaId?: string; q: string }
   | { name: 'page'; routeId: string; componentId?: string }
@@ -90,6 +95,7 @@ export function parseHash(hash: string): Screen {
         view: oneOf(MAP_VIEWS, params.get('view')) ?? 'graph',
         q: params.get('q') ?? '',
         areas: params.get('areas') === '1' || undefined,
+        access: oneOf(ACCESS_FILTERS, params.get('access')),
       }
     case 'areas':
       return { name: 'areas', areaId: parts[1], q: params.get('q') ?? '' }
@@ -171,6 +177,7 @@ export function href(screen: Screen): string {
         view: screen.view === 'graph' ? undefined : screen.view,
         q: screen.q,
         areas: screen.areas ? '1' : undefined,
+        access: screen.access,
       })
     case 'areas':
       return withQuery(screen.areaId ? `/areas/${encodeURIComponent(screen.areaId)}` : '/areas', {

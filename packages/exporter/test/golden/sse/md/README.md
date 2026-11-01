@@ -53,11 +53,11 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/`](pages/index.md) | `app/page.tsx` | 1 | ✓ 1 verified |
-| [`/chat`](pages/chat.md) | `app/chat/page.tsx` | 1 | ✓ 1 verified |
-| [`/jobs/[id]`](pages/jobs.%5Bid%5D.md) | `app/jobs/[id]/page.tsx` | 1 | ✗ 1 mismatch |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `app/page.tsx` | open | 1 | ✓ 1 verified |
+| [`/chat`](pages/chat.md) | `app/chat/page.tsx` | open | 1 | ✓ 1 verified |
+| [`/jobs/[id]`](pages/jobs.%5Bid%5D.md) | `app/jobs/[id]/page.tsx` | open | 1 | ✗ 1 mismatch |
 
 ## Areas
 

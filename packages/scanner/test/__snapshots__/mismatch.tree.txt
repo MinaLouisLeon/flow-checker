@@ -17,3 +17,4 @@ layouts: app/layout.tsx
 HomePage  server  app/page.tsx:8
 ├─ SettingsPanel  client (use client)  components/SettingsPanel.tsx:8
 └─ TodoPanel  client (use client)  components/TodoPanel.tsx:9
+access: open

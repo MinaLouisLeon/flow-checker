@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -87,7 +87,24 @@
           "componentId": "cmp_0jf6im1pjt6"
         }
       ],
-      "componentId": "cmp_0nwenv6i3tq"
+      "componentId": "cmp_0nwenv6i3tq",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_2baze4pwm5w",
+            "kind": "not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "condition": "!hasLocale(routing.locales, locale)",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      }
     },
     {
       "id": "rt_0nr7aw4u4g0",
@@ -113,7 +130,24 @@
           "componentId": "cmp_0jf6im1pjt6"
         }
       ],
-      "componentId": "cmp_1uzxf8sin17"
+      "componentId": "cmp_1uzxf8sin17",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_2baze4pwm5w",
+            "kind": "not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "condition": "!hasLocale(routing.locales, locale)",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      }
     },
     {
       "id": "rt_1cprhxt7jgk",
@@ -139,7 +173,24 @@
           "componentId": "cmp_0jf6im1pjt6"
         }
       ],
-      "componentId": "cmp_01kdhdsgw4y"
+      "componentId": "cmp_01kdhdsgw4y",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_2baze4pwm5w",
+            "kind": "not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "condition": "!hasLocale(routing.locales, locale)",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      }
     },
     {
       "id": "rt_0s0435jzyyw",
@@ -165,7 +216,24 @@
           "componentId": "cmp_0jf6im1pjt6"
         }
       ],
-      "componentId": "cmp_2awb26rqgh7"
+      "componentId": "cmp_2awb26rqgh7",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_2baze4pwm5w",
+            "kind": "not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "condition": "!hasLocale(routing.locales, locale)",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      }
     }
   ],
   "components": [

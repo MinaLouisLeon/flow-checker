@@ -51,13 +51,13 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/`](pages/index.md) | `app/page.tsx` | 0 | — |
-| [`/dashboard`](pages/dashboard.md) | `app/dashboard/page.tsx` | 1 | ✓ 1 verified |
-| [`/dashboard/settings`](pages/dashboard.settings.md) | `app/dashboard/settings/page.tsx` | 1 | ✓ 1 verified |
-| [`/login`](pages/login.md) | `app/login/page.tsx` | 0 | — |
-| [`/products`](pages/products.md) | `app/products/page.tsx` | 1 | ✓ 1 verified |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `app/page.tsx` | open | 0 | — |
+| [`/dashboard`](pages/dashboard.md) | `app/dashboard/page.tsx` | guarded | 1 | ✓ 1 verified |
+| [`/dashboard/settings`](pages/dashboard.settings.md) | `app/dashboard/settings/page.tsx` | guarded | 1 | ✓ 1 verified |
+| [`/login`](pages/login.md) | `app/login/page.tsx` | guarded | 0 | — |
+| [`/products`](pages/products.md) | `app/products/page.tsx` | open | 1 | ✓ 1 verified |
 
 ## Areas
 

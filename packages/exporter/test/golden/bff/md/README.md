@@ -45,10 +45,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/`](pages/index.md) | `src/app/page.tsx` | 2 | ✓ 2 verified |
-| [`/products/[id]`](pages/products.%5Bid%5D.md) | `src/app/products/[id]/page.tsx` | 1 | ✓ 1 verified |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `src/app/page.tsx` | open | 2 | ✓ 2 verified |
+| [`/products/[id]`](pages/products.%5Bid%5D.md) | `src/app/products/[id]/page.tsx` | open | 1 | ✓ 1 verified |
 
 ## Areas
 

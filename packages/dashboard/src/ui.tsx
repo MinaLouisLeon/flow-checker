@@ -1,8 +1,49 @@
-import type { Component, ComponentRef } from '@flow-checker/shared'
+import { accessOf, type Component, type ComponentRef, guardText, type Route } from '@flow-checker/shared'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useData } from './context'
 import { CAP, capped } from './lists'
 import { editorUrl } from './model-index'
+
+/**
+ * A page's access label (M31): `guarded`, `access unknown`, or `open` (left out when `compact`, so
+ * busy lists only mark the pages that can stop). The title lists the guards.
+ */
+export function AccessBadge({ route, compact }: { route: Route; compact?: boolean }) {
+  if (route.kind !== 'page') return null
+  const access = accessOf(route)
+  const lines = [...access.guards.map(guardText), ...(access.reasons ?? []).map((r) => `? ${r.text}`)].map(
+    (line) => line.replaceAll('`', ''),
+  )
+  const title = lines.length > 0 ? lines.join('\n') : 'Nothing redirects or stops this page'
+  if (access.status === 'guarded')
+    return (
+      <Badge tone="shared" title={title}>
+        guarded
+      </Badge>
+    )
+  if (access.status === 'unknown')
+    return (
+      <Badge tone="muted" title={title}>
+        access ?
+      </Badge>
+    )
+  return compact ? null : (
+    <Badge tone="ok" title={title}>
+      open
+    </Badge>
+  )
+}
+
+/** Text with `code` spans, as the shared wording writes it (M31). */
+export function CodeText({ text }: { text: string }) {
+  const parts = text.split('`')
+  return <>{parts.map((part, i) => (i % 2 === 1 ? <code key={i}>{part}</code> : part))}</>
+}
+
+/** The compact access badge for a page chip in a list, when the page can stop. */
+export function PageAccess({ route }: { route: Route | undefined }) {
+  return route ? <AccessBadge route={route} compact /> : null
+}
 
 export function Badge({
   tone = 'neutral',

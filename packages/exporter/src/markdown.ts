@@ -14,6 +14,7 @@ import {
   type AppModel,
   type Area,
   type AreaList,
+  accessOf,
   buildAreas,
   buildEndpoints,
   buildIndex,
@@ -33,6 +34,7 @@ import {
   formatQueryKey,
   type GraphqlInfo,
   type GraphqlOperation,
+  guardText,
   isInfoFlag,
   isVerified,
   type MatcherCondition,
@@ -209,10 +211,16 @@ function readme(ctx: Ctx): string {
     sections.push(
       '## Pages',
       table(
-        ['Page', 'File', 'Requests', 'Status'],
+        ['Page', 'File', 'Access', 'Requests', 'Status'],
         pages.map((route) => {
           const sites = routeSites(ctx, route)
-          return [routeLink(ctx, route, from), code(route.file), String(sites.length), statusCounts(sites)]
+          return [
+            routeLink(ctx, route, from),
+            code(route.file),
+            accessOf(route).status,
+            String(sites.length),
+            statusCounts(sites),
+          ]
         }),
       ),
     )
@@ -479,8 +487,10 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
           : undefined,
       ],
       ['Layouts', layouts.join(' → ') || undefined],
+      ['Access', accessOf(route).status],
       ['Status', sites.length > 0 ? statusCounts(sites) : undefined],
     ]),
+    ...accessSection(ctx, route),
     '## Component tree',
     route.componentId
       ? componentTree(ctx, route.componentId, from)
@@ -502,6 +512,21 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     sites.length === 0 ? 'This page sends no requests the scan found.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
   ])
+}
+
+/** What can stop the page (M31), with the guards a captured session hit marked "seen". */
+function accessSection(ctx: Ctx, route: Route): string[] {
+  const access = accessOf(route)
+  if (access.guards.length === 0 && !access.reasons?.length) return []
+  const seen = new Set(ctx.data.flows?.guards?.[route.id] ?? [])
+  const lines = [
+    ...access.guards.map((g) => {
+      const where = code(`${g.loc.file}:${g.loc.line}`)
+      return `- ${guardText(g)}, ${where}${seen.has(g.id) ? ' (seen)' : ''}`
+    }),
+    ...(access.reasons ?? []).map((r) => `- Not sure: ${r.text}`),
+  ]
+  return ['## Access', lines.join('\n')]
 }
 
 function handlerDoc(ctx: Ctx, route: Route, from: string): string {

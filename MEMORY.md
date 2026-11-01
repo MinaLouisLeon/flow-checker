@@ -38,6 +38,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M28 | `explore`             | `startDev({ explore })`; no setup = capture off + `model.json` in `<tmp>/flow-checker/<name>-<hash>` (`dataDir`).        |
 | M29 | Endpoints             | Derived in `shared/src/endpoints.ts` (no model change); dashboard caches it per index in `endpointsOf()`.                |
 | M30 | Areas                 | Derived in `shared/src/areas.ts`; only the `areas` config is stored (`AppModel.areas`, optional, no version bump).       |
+| M31 | Guarded pages         | Model version 12, `Route.access`. Scanner records render exits; `scanner/src/access.ts` builds each page's label.        |
 
 ## Gotchas
 
@@ -336,3 +337,23 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   a frame, so tests click its name label.
 - Nested `doc()` sections in the Markdown exporter end with a newline; `.trimEnd()` them (like `endpointSection`) or
   the file gets double blank lines.
+
+## M31 — Guarded pages (branch `feat/m31-guarded-pages`)
+
+- Guards are found on the request walk: `#emitExit` records `redirect()` / `notFound()`-like calls (and `router.push` /
+  `.replace` from an effect) when their trigger is render-time; event handlers and server actions don't count.
+  `renderExitCall` is also in `#reachesNetwork`, or helpers that only call `notFound()` are never entered.
+- The label is `open` only when nothing was found and nothing was skipped: calls into excluded files or imports that
+  don't resolve (`#unfollow`), a guard in a loop or a callback (`unclear`), an unread matcher and package middleware
+  (other than next-intl) all make it `unknown`.
+- `#pathChecks` now splits `a && b` into terms, so a middleware condition no longer repeats the path check it is
+  narrowed by, and drops an earlier `if (onApp && !sid) return` that can't apply on the redirect's own path. M14
+  navigations' `condition` text changed with it (the fixtures didn't have the pattern).
+- Seen guards ride on the flows summary (`FlowsSummary.guards`), so the live dashboard and the static export get
+  them with no new endpoint. The runtime reports `redirect` session events from Next's RSC navigation fetch
+  (`response.redirected`, or a 401 / 403 / 404 status) and from the first page's navigation timing status. A full
+  page load that was redirected can't be seen: the browser doesn't expose the URL it asked for.
+- `App.tsx` passes the Map's props one by one (not spread): a new Map option must be added there too. Only the e2e
+  test caught it.
+- A Python patch script in a bash heredoc turns an escaped newline inside a TS string into a real line break; check
+  with `grep` after patching, or use the Edit tool for those lines.

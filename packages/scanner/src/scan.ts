@@ -17,6 +17,7 @@ import {
   type Trpc,
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
+import { addRouteAccess } from './access'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
@@ -408,6 +409,15 @@ function analyze(
     ? buildMiddleware(middlewareRead, routes, navigations, requests)
     : undefined
   const flows = inferFlows({ routes, components, requests: sites, navigations, queryLinks })
+  addRouteAccess({
+    routes,
+    components,
+    navigations,
+    ...(middleware ? { middleware } : {}),
+    exits: requests.renderExits(),
+    unfollowed: requests.unfollowed(),
+    responses: requests.middlewareResponses(),
+  })
   const modelTypes = types.types()
   report({
     phase: 'flows',

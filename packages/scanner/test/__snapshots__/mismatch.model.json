@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -33,7 +33,11 @@
           "componentId": "cmp_2dznycb4aq7"
         }
       ],
-      "componentId": "cmp_0ku4o3jpe9o"
+      "componentId": "cmp_0ku4o3jpe9o",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     }
   ],
   "components": [

@@ -7,6 +7,8 @@ export interface DashboardData {
   meta: Meta
   /** Live feed connection, when capture is on. */
   live?: LiveStatus
+  /** Page guards a captured session hit: route id -> guard ids (M31). */
+  seenGuards?: Map<string, Set<string>>
 }
 
 export const DataContext = createContext<DashboardData | null>(null)
