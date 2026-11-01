@@ -1,0 +1,32 @@
+by route
+
+home from /
+  pages: /[locale]
+  components: HomePage
+  shared components: LocaleLayout
+  requests: 0, endpoints: 0, notes: 0
+  flows: -
+
+dashboard from /[locale]/dashboard
+  pages: /[locale]/dashboard
+  components: DashboardPage, DashboardProfile
+  shared components: LocaleLayout
+  requests: 1, endpoints: 1, notes: 0
+  flows: -
+
+login from /[locale]/login
+  pages: /[locale]/login
+  components: LoginPage, LoginForm
+  shared components: LocaleLayout
+  requests: 1, endpoints: 1, notes: 0
+  flows: LoginForm submit
+
+verify from /[locale]/verify
+  pages: /[locale]/verify
+  components: VerifyPage, VerifyOtpForm
+  shared components: LocaleLayout
+  requests: 1, endpoints: 1, notes: 0
+  flows: -
+
+shared components: LocaleLayout
+shared requests: 0

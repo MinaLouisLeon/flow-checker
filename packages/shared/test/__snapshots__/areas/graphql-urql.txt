@@ -1,0 +1,25 @@
+by route
+
+home from /
+  pages: /
+  components: HomePage, AddTodoForm, TodoList
+  shared components: RootLayout, Providers
+  requests: 2, endpoints: 2, notes: 0
+  flows: AddTodoForm submit
+
+todos from /todos
+  pages: /todos/[id]
+  components: TodoPage, TodoDetail
+  shared components: RootLayout, Providers
+  requests: 2, endpoints: 2, notes: 0
+  flows: TodoDetail click
+
+users from /users
+  pages: /users
+  components: UsersPage, UserList
+  shared components: RootLayout, Providers
+  requests: 1, endpoints: 1, notes: 0
+  flows: UserList click
+
+shared components: RootLayout, Providers
+shared requests: 0

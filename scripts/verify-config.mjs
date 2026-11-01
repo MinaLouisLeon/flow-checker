@@ -86,6 +86,7 @@ try {
       `  export: { md: 'out/docs', html: 'out/site' },`,
       `  postman: { collection: 'contract/api.postman_collection.json' },`,
       `  graphql: { schema: 'api/schema.graphql', endpoint: '/api/gql' },`,
+      `  areas: { rename: { notes: 'Notes and lists' } },`,
       `})`,
     ),
     // The API contract (postman): one request the code sends, one nothing calls.
@@ -237,6 +238,12 @@ try {
   check(
     'export.html: the site is written to web/out/site',
     existsSync(join(top, 'web', 'out', 'site', 'index.html')),
+  )
+  // areas (M30): kept in the model, so the export names the area as configured.
+  const areasDoc = join(top, 'web', 'out', 'docs', 'areas.md')
+  check(
+    'areas.rename: the export names the area as configured',
+    existsSync(areasDoc) && readFileSync(areasDoc, 'utf8').includes('Notes and lists'),
   )
 
   // --- dev: ports, capture options passed to the runtime, server-side redaction --------------

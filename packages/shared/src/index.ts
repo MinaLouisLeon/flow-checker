@@ -1,6 +1,8 @@
+export * from './areas'
 export * from './capture'
 export type {
   ApiClientConfig,
+  AreasConfig,
   CaptureConfig,
   FlowCheckerConfig,
   GraphqlConfig,

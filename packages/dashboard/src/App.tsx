@@ -4,6 +4,7 @@ import { useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
+import { AreasScreen } from './screens/AreasScreen'
 import { ComponentPanel } from './screens/ComponentPanel'
 import { ComponentsScreen } from './screens/ComponentsScreen'
 import { EndpointsScreen } from './screens/EndpointsScreen'
@@ -27,6 +28,7 @@ const NAV: {
 }[] = [
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page'] },
+  { label: 'Areas', screen: { name: 'areas', q: '' }, match: ['areas'] },
   { label: 'Components', screen: { name: 'components', q: '' }, match: ['components', 'component'] },
   { label: 'Requests', screen: { name: 'requests', q: '' }, match: ['requests'] },
   { label: 'Endpoints', screen: { name: 'endpoints', q: '' }, match: ['endpoints'] },
@@ -153,7 +155,9 @@ function ScreenView({ screen }: { screen: Screen }) {
     case 'overview':
       return <Overview />
     case 'map':
-      return <MapScreen view={screen.view} q={screen.q} />
+      return <MapScreen view={screen.view} q={screen.q} areas={screen.areas} />
+    case 'areas':
+      return <AreasScreen areaId={screen.areaId} q={screen.q} />
     case 'page':
       return <PageView routeId={screen.routeId} componentId={screen.componentId} />
     case 'component':

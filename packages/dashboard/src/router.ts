@@ -25,7 +25,10 @@ import {
 export type Screen =
   | { name: 'overview' }
   /** `handlers`: the route handlers as a list (M23). */
-  | { name: 'map'; view: MapView; q: string }
+  /** `areas`: the Map graph draws a frame around each area's pages (M30). */
+  | { name: 'map'; view: MapView; q: string; areas?: boolean }
+  /** Pages grouped by feature (M30); `areaId` is the one shown beside the cards. */
+  | { name: 'areas'; areaId?: string; q: string }
   | { name: 'page'; routeId: string; componentId?: string }
   | { name: 'component'; componentId: string }
   /** Component list (M21); `componentId` is the one shown beside it. */
@@ -82,7 +85,14 @@ export function parseHash(hash: string): Screen {
     case undefined:
       return { name: 'overview' }
     case 'map':
-      return { name: 'map', view: oneOf(MAP_VIEWS, params.get('view')) ?? 'graph', q: params.get('q') ?? '' }
+      return {
+        name: 'map',
+        view: oneOf(MAP_VIEWS, params.get('view')) ?? 'graph',
+        q: params.get('q') ?? '',
+        areas: params.get('areas') === '1' || undefined,
+      }
+    case 'areas':
+      return { name: 'areas', areaId: parts[1], q: params.get('q') ?? '' }
     case 'page':
       if (!parts[1]) break
       return { name: 'page', routeId: parts[1], componentId: params.get('c') ?? undefined }
@@ -157,7 +167,15 @@ export function href(screen: Screen): string {
     case 'overview':
       return '#/'
     case 'map':
-      return withQuery('/map', { view: screen.view === 'graph' ? undefined : screen.view, q: screen.q })
+      return withQuery('/map', {
+        view: screen.view === 'graph' ? undefined : screen.view,
+        q: screen.q,
+        areas: screen.areas ? '1' : undefined,
+      })
+    case 'areas':
+      return withQuery(screen.areaId ? `/areas/${encodeURIComponent(screen.areaId)}` : '/areas', {
+        q: screen.q,
+      })
     case 'page':
       return withQuery(`/page/${encodeURIComponent(screen.routeId)}`, { c: screen.componentId })
     case 'component':

@@ -37,6 +37,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M27 | Early-return guards   | `SiteMeta.afterExit` beside `guarded`; side requests and twin choice use both, `isGuarded` itself is unchanged.          |
 | M28 | `explore`             | `startDev({ explore })`; no setup = capture off + `model.json` in `<tmp>/flow-checker/<name>-<hash>` (`dataDir`).        |
 | M29 | Endpoints             | Derived in `shared/src/endpoints.ts` (no model change); dashboard caches it per index in `endpointsOf()`.                |
+| M30 | Areas                 | Derived in `shared/src/areas.ts`; only the `areas` config is stored (`AppModel.areas`, optional, no version bump).       |
 
 ## Gotchas
 
@@ -322,3 +323,16 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   whose callers send whatever path or method they like.
 - The perf app's 1,000 sites give 1,000 endpoints (each generated URL is distinct), so it is the worst case for
   the list size, not a folding test; the react-query fixture is the one where sites fold (13 → 7).
+
+## M30 — Areas (branch `feat/m30-areas`)
+
+- The `areas` config reaches every view through the model: the scanner copies it to `AppModel.areas` (like
+  `apiClients` reaches the scan), so the dashboard, the static export and the Markdown never need the config file.
+  An optional field doesn't need a `MODEL_VERSION` bump (older files load, older readers drop it).
+- No fixture has feature folders or a single URL area with folders, so the folder fallback is only covered by
+  hand-written models in `shared/test/areas.test.ts` (three base folder names, `.tsx` / `.jsx`). Components most pages
+  use (a `Button`) are left out when picking a page's folder, or a shared `src/components` would win.
+- Area frames on the Map are extra React Flow nodes behind the pages (`zIndex: -1`); the page nodes cover the middle of
+  a frame, so tests click its name label.
+- Nested `doc()` sections in the Markdown exporter end with a newline; `.trimEnd()` them (like `endpointSection`) or
+  the file gets double blank lines.

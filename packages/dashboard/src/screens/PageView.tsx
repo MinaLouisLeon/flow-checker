@@ -8,7 +8,7 @@ import {
 } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
-import { CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
+import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
 import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
 import { ownerHref, QueryLinkList, RequestList, RequestSummary, triggerLabel } from '../RequestView'
@@ -43,6 +43,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
   const links = allLinks.filter((l) => own.has(l.componentId as string))
   const layoutLinks = allLinks.filter((l) => !own.has(l.componentId as string))
   const navigations = index.model.navigations.filter((n) => n.componentId && own.has(n.componentId))
+  const area = areasOf(index).byRoute.get(route.id)
 
   return (
     <div className="screen screen-split">
@@ -67,6 +68,12 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         </header>
         <div className="page-file">
           <SourceLink file={route.file} />
+          {area && (
+            <span className="muted">
+              {' '}
+              · area <a href={href({ name: 'areas', areaId: area.id, q: '' })}>{area.name}</a>
+            </span>
+          )}
         </div>
 
         {route.segments.some((s) => s.kind !== 'static') && (

@@ -8,9 +8,13 @@
 //   middleware.md        middleware / proxy: matcher, routes it runs on, redirects, rewrites, requests
 //   postman.md           the imported Postman collection: its requests, callers, unused endpoints, gaps
 //   endpoints.md         backend endpoints by host: callers, pages, types, a captured example (M29)
+//   areas.md             pages grouped by feature: their components, flows, endpoints and open notes (M30)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
+  type Area,
+  type AreaList,
+  buildAreas,
   buildEndpoints,
   buildIndex,
   type CapturedBody,
@@ -58,6 +62,7 @@ import {
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
 import {
+  AREAS,
   type DocNames,
   docNames,
   ENDPOINTS,
@@ -91,6 +96,7 @@ interface Ctx {
   /** Site id → the site whose `chain` leads to it. */
   callers: Map<string, RequestSite>
   endpoints: EndpointList
+  areas: AreaList
 }
 
 export function renderMarkdown(data: ExportData): ExportFiles {
@@ -111,6 +117,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   for (const site of model.requests) {
     for (const id of site.chain ?? []) if (!callers.has(id)) callers.set(id, site)
   }
+  const endpoints = buildEndpoints(index)
   const ctx: Ctx = {
     data,
     model,
@@ -118,7 +125,8 @@ export function renderMarkdown(data: ExportData): ExportFiles {
     names: docNames(model),
     captures,
     callers,
-    endpoints: buildEndpoints(index),
+    endpoints,
+    areas: buildAreas(index, endpoints),
   }
 
   const files: ExportFiles = {}
@@ -142,6 +150,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
   files[ENDPOINTS] = endpointsDoc(ctx)
+  files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
@@ -170,6 +179,7 @@ function readme(ctx: Ctx): string {
     ['', 'Count'],
     [
       ['Pages', String(pages.length)],
+      ['Areas', link(String(ctx.areas.areas.length), from, AREAS)],
       ['Route handlers', String(handlers.length)],
       ['Components', String(model.components.length)],
       ['Requests', String(model.requests.length)],
@@ -204,6 +214,21 @@ function readme(ctx: Ctx): string {
           const sites = routeSites(ctx, route)
           return [routeLink(ctx, route, from), code(route.file), String(sites.length), statusCounts(sites)]
         }),
+      ),
+    )
+  }
+  if (ctx.areas.areas.length > 1) {
+    sections.push(
+      '## Areas',
+      table(
+        ['Area', 'Pages', 'Flows', 'Endpoints'],
+        ctx.areas.areas.map((a) => [
+          link(text(a.name), from, AREAS, anchorId(a.id)),
+          String(a.routeIds.length),
+          String(a.flowIds.length),
+          String(a.endpointKeys.length),
+        ]),
+        ['left', 'right', 'right', 'right'],
       ),
     )
   }
@@ -1966,4 +1991,84 @@ function statusCounts(sites: RequestSite[]): string {
     n('inferred') > 0 && `${n('inferred')} inferred`,
   ]
   return parts.filter(Boolean).join(', ')
+}
+
+// --- Areas (M30) ----------------------------------------------------------------------------
+
+const AREAS_BY: Record<AreaList['by'], string> = {
+  route:
+    'Pages are grouped by the first static part of their URL (after route groups, dynamic segments and locales).',
+  folder:
+    'The URLs give a single area, so pages are grouped by the feature folder that holds most of their components.',
+}
+
+function areasDoc(ctx: Ctx): string {
+  const from = AREAS
+  const { areas, sharedComponentIds, sharedRequestIds, unknownConfig } = ctx.areas
+  return doc([
+    '# Areas',
+    link('← Overview', from, README),
+    areas.length === 0
+      ? 'No pages found, so no areas.'
+      : `${plural(areas.length, 'area')}. ${AREAS_BY[ctx.areas.by]} Rename or merge them with the ${code('areas')} option in ${code('flow-checker.config.ts')}.`,
+    unknownConfig.length > 0 &&
+      `> ⚠ The ${code('areas')} config names areas the scan didn't find: ${unknownConfig.map(code).join(', ')}.`,
+    areas.length > 0 &&
+      table(
+        ['Area', 'From', 'Pages', 'Components', 'Flows', 'Endpoints', 'Shared components', 'To check'],
+        areas.map((a) => [
+          `[${text(a.name)}](#${anchorId(a.id)})`,
+          a.from.map(code).join(', '),
+          String(a.routeIds.length),
+          String(a.componentIds.length),
+          String(a.flowIds.length),
+          String(a.endpointKeys.length),
+          String(a.sharedComponentIds.length),
+          String(a.notes.length),
+        ]),
+        ['left', 'left', 'right', 'right', 'right', 'right', 'right', 'right'],
+      ),
+    ...areas.map((a) => areaSection(ctx, a, from)),
+    sharedComponentIds.length > 0 &&
+      doc([
+        '## Shared',
+        'Components used by more than half of the areas, and the requests only they send.',
+        facts([
+          ['Components', sharedComponentIds.map((id) => componentLink(ctx, id, from)).join(', ')],
+          [
+            'Requests',
+            sharedRequestIds.length > 0
+              ? sharedRequestIds
+                  .map((id) => ctx.index.requests.get(id))
+                  .filter((s): s is RequestSite => !!s)
+                  .map((s) => siteLink(ctx, s, from))
+                  .join(', ')
+              : undefined,
+          ],
+        ]),
+      ]).trimEnd(),
+  ])
+}
+
+function areaSection(ctx: Ctx, a: Area, from: string): string {
+  const routes = a.routeIds.map((id) => ctx.index.routes.get(id)).filter((r): r is Route => !!r)
+  const flows = a.flowIds.map((id) => ctx.index.flows.get(id)).filter((f): f is Flow => !!f)
+  const endpoints = a.endpointKeys.map((k) => ctx.endpoints.byKey.get(k)).filter((e): e is Endpoint => !!e)
+  const list = (items: string[]) => (items.length > 0 ? items.join(', ') : undefined)
+  return doc([
+    `## ${anchor(a.id)}${text(a.name)}`,
+    facts([
+      ['Key', a.name === a.key ? undefined : code(a.key)],
+      ['From', a.from.map(code).join(', ')],
+      ['Pages', list(routes.map((r) => routeLink(ctx, r, from)))],
+      ['Components', list(a.componentIds.map((id) => componentLink(ctx, id, from)))],
+      ['Shared components', list(a.sharedComponentIds.map((id) => componentLink(ctx, id, from)))],
+      ['Flows', list(flows.map((f) => flowLink(ctx, f, from)))],
+      [
+        'Endpoints',
+        list(endpoints.map((e) => link(code(endpointLabel(e)), from, ENDPOINTS, anchorId(e.key)))),
+      ],
+      ['To check', a.notes.length > 0 ? link(plural(a.notes.length, 'open note'), from, ISSUES) : undefined],
+    ]),
+  ]).trimEnd()
 }
