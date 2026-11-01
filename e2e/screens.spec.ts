@@ -26,6 +26,7 @@ test('every overview card opens a screen', async ({ page }) => {
     ['Components', /#\/components$/],
     ['Types', /#\/types$/],
     ['Requests', /#\/requests$/],
+    ['Endpoints', /#\/endpoints$/],
     ['Flows', /#\/flows$/],
   ]
   for (const [label, url] of expected) {
@@ -82,4 +83,29 @@ test('the Requests screen lists, filters and shows requests', async ({ page }) =
   await page.getByRole('searchbox', { name: 'Search URL, component or file' }).fill('verifyotp post')
   await expect(page.locator('.request-list > li')).toHaveCount(1)
   await expect(page.locator('.request-list')).toContainText('/auth/verify-otp')
+})
+
+test('the Endpoints screen lists endpoints by host and shows who calls them', async ({ page }) => {
+  await page.goto(`${dashboard}/#/`)
+  const total = await cardValue(page, 'Endpoints')
+  await openCard(page, 'Endpoints')
+  await expect(page.locator('.toolbar')).toContainText(`${total} of ${total}`)
+  const rows = page.locator('.endpoint-list > li:not(.endpoint-host)')
+  await expect(rows).toHaveCount(total)
+  await expect(page.locator('.endpoint-list > li.endpoint-host')).toContainText('NEXT_PUBLIC_API_URL')
+
+  // Callers are searchable: the endpoint behind the OTP form.
+  await page.getByRole('searchbox', { name: 'Search URL, host, page or component' }).fill('verifyotp')
+  await expect(rows).toHaveCount(1)
+  await rows.locator('a.row-link').click()
+  await expect(page).toHaveURL(/#\/endpoints\/ep_[^?]+\?q=verifyotp$/)
+  const panel = page.locator('.split-side')
+  await expect(panel.locator('.panel-head h2')).toContainText('/auth/verify-otp')
+  await expect(panel).toContainText('Call sites')
+
+  // A call site opens the request; the request links back to its endpoint.
+  await panel.locator('.request-chain').getByRole('link', { name: 'VerifyOtpForm', exact: true }).click()
+  await expect(page).toHaveURL(/#\/requests\/req_/)
+  await page.locator('.split-side .request-facts a', { hasText: 'POST /auth/verify-otp' }).click()
+  await expect(page).toHaveURL(/#\/endpoints\/ep_/)
 })

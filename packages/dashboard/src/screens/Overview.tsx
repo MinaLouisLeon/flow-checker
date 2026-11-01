@@ -2,7 +2,7 @@ import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import { GraphqlSection } from '../GraphqlView'
-import { COMPONENT_KINDS, countWhen, REQUEST_WHEN, type RequestWhen } from '../lists'
+import { COMPONENT_KINDS, countWhen, endpointsOf, REQUEST_WHEN, type RequestWhen } from '../lists'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
@@ -36,6 +36,8 @@ export function Overview() {
   const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
   // Postman flags get their own section below, not the generic "could not resolve" group.
   const notes = index.notes.filter((n) => !isPostmanNote(n, index))
+  const endpoints = endpointsOf(index)
+  const backends = endpoints.hosts.filter((h) => h.kind === 'external').length
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
@@ -65,6 +67,12 @@ export function Overview() {
             text: `${when[w]} ${WHEN_TEXT[w]}`,
             link: href({ name: 'requests', q: '', when: w }),
           }))}
+        />
+        <Stat
+          label="Endpoints"
+          value={endpoints.endpoints.length}
+          link={href({ name: 'endpoints', q: '' })}
+          detail={`${backends} backend${backends === 1 ? '' : 's'}`}
         />
         <Stat
           label="Flows"

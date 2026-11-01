@@ -99,3 +99,4 @@ re-run them on their own before assuming a regression.
 | M26 | Release v0.2.2                                    | Done   |
 | M27 | Early-return guards (v0.3.0)                      | Done   |
 | M28 | `flow-checker explore`                            | Done   |
+| M29 | Endpoints                                         | Done   |

@@ -1,5 +1,12 @@
 // Hash routing: works from the tool server and from a static export folder alike.
-import type { Component, RequestSite } from '@flow-checker/shared'
+import {
+  type Component,
+  ENDPOINT_STATUSES,
+  ENDPOINT_TRANSPORTS,
+  type EndpointStatus,
+  type EndpointTransport,
+  type RequestSite,
+} from '@flow-checker/shared'
 import { useEffect, useState } from 'react'
 import {
   COMPONENT_HAS,
@@ -7,6 +14,8 @@ import {
   COMPONENT_SORTS,
   type ComponentHas,
   type ComponentSort,
+  ENDPOINT_SIDES,
+  type EndpointSide,
   REQUEST_STATUSES,
   REQUEST_WHEN,
   type RequestWhen,
@@ -37,6 +46,16 @@ export type Screen =
       when?: RequestWhen
       transport?: RequestSite['transport']
       flagged?: boolean
+    }
+  /** Backend endpoints by host (M29); `endpointId` (an endpoint key) is the one shown beside the list. */
+  | {
+      name: 'endpoints'
+      endpointId?: string
+      q: string
+      host?: string
+      transport?: EndpointTransport
+      status?: EndpointStatus
+      side?: EndpointSide
     }
   /** `unused`: also list types with no uses (M23). */
   | { name: 'types'; typeId?: string; q: string; unused?: boolean }
@@ -88,6 +107,16 @@ export function parseHash(hash: string): Screen {
         when: oneOf(REQUEST_WHEN, params.get('when')),
         transport: oneOf(TRANSPORTS, params.get('transport')),
         flagged: params.get('flags') === '1' || undefined,
+      }
+    case 'endpoints':
+      return {
+        name: 'endpoints',
+        endpointId: parts[1],
+        q: params.get('q') ?? '',
+        host: params.get('host') || undefined,
+        transport: oneOf(ENDPOINT_TRANSPORTS, params.get('transport')),
+        status: oneOf(ENDPOINT_STATUSES, params.get('status')),
+        side: oneOf(ENDPOINT_SIDES, params.get('side')),
       }
     case 'types':
       return {
@@ -151,6 +180,17 @@ export function href(screen: Screen): string {
         transport: screen.transport,
         flags: screen.flagged ? '1' : undefined,
       })
+    case 'endpoints':
+      return withQuery(
+        screen.endpointId ? `/endpoints/${encodeURIComponent(screen.endpointId)}` : '/endpoints',
+        {
+          q: screen.q,
+          host: screen.host,
+          transport: screen.transport,
+          status: screen.status,
+          side: screen.side,
+        },
+      )
     case 'types':
       return withQuery(screen.typeId ? `/types/${encodeURIComponent(screen.typeId)}` : '/types', {
         q: screen.q,

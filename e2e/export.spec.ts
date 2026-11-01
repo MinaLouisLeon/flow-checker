@@ -66,6 +66,13 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await page.locator('.nav a', { hasText: 'Components' }).click()
   await expect(page.locator('.component-list')).toContainText('VerifyOtpForm')
 
+  // Endpoints (M29) are worked out from the embedded model, captures included.
+  await page.locator('.nav a', { hasText: 'Endpoints' }).click()
+  await page.locator('.endpoint-list a.row-link', { hasText: '/auth/login' }).click()
+  const endpoint = page.locator('.split-side')
+  await expect(endpoint).toContainText('LoginForm')
+  await expect(endpoint.locator('.request-captures')).toContainText('/auth/login')
+
   expect(errors).toEqual([])
 })
 

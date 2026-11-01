@@ -558,7 +558,7 @@ function SiteCaptures({ site }: { site: RequestSite }) {
   )
 }
 
-function TypeBlock({
+export function TypeBlock({
   title,
   text,
   shape,
