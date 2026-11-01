@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -103,7 +103,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_2flvqsq9ypc"
+      "componentId": "cmp_2flvqsq9ypc",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     },
     {
       "id": "rt_044xcwxfqfa",
@@ -157,7 +161,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_1an2304y5ca"
+      "componentId": "cmp_1an2304y5ca",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     },
     {
       "id": "rt_1xs1qhs4r3f",
@@ -178,7 +186,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_0zsf7mc3ftx"
+      "componentId": "cmp_0zsf7mc3ftx",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     }
   ],
   "components": [

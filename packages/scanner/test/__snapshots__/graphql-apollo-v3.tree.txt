@@ -29,13 +29,16 @@ HomePage  server  src/app/page.tsx:5
 ├─ TodoList  client (use client)  src/components/TodoList.tsx:8
 │  └─ Link  external next/link  [conditional]
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:9
+access: open
 
 ## /search  src/app/search/page.tsx
 layouts: src/app/layout.tsx
 SearchPage  server  src/app/search/page.tsx:3
 └─ Search  client (use client)  src/components/Search.tsx:8
+access: open
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
 TodoPage  server  src/app/todos/[id]/page.tsx:3
 └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:8
+access: open

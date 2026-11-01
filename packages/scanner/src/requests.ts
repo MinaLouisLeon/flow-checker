@@ -69,7 +69,7 @@ import {
   ts,
 } from 'ts-morph'
 import { siteHash } from './code-hash'
-import { directives, importModuleOf, isConditional, unalias } from './components'
+import { directives, importModuleOf, isConditional, isPackage, unalias } from './components'
 import {
   type DocRef,
   documentHashes,
@@ -81,7 +81,15 @@ import {
 } from './graphql'
 import { type GraphQLSchema, operationShapes, usedFragments } from './graphql-schema'
 import { unmask } from './graphql-types'
-import { linkApi, type NavApi, type NavKind, navigationCall, outcomeOf } from './navigation'
+import {
+  type ExitKind,
+  linkApi,
+  type NavApi,
+  type NavKind,
+  navigationCall,
+  outcomeOf,
+  renderExitCall,
+} from './navigation'
 import { compare, relativeTo } from './paths'
 import {
   eventSourceListeners,
@@ -331,6 +339,39 @@ interface NavFound {
   from?: PathCheck
 }
 
+/** A redirect or `notFound()`-like call reached while a component renders (M31). */
+export interface RenderExit {
+  id: string
+  kind: 'redirect' | 'client-redirect' | ExitKind
+  componentId: string
+  /** The conditions it is under, as written. Absent: on every render (or `unclear`). */
+  condition?: string
+  /** Why the condition can't be read (inside a loop or a callback). */
+  unclear?: string
+  navigationId?: string
+  loc: SourceLoc
+}
+
+/** A call made while a component renders that the walk couldn't enter (M31). */
+export interface Unfollowed {
+  componentId: string
+  callee: string
+  /** `excluded`: the function is in a file the config leaves out. `missing`: the import doesn't resolve. */
+  why: 'excluded' | 'missing'
+  loc: SourceLoc
+}
+
+/** Middleware answering itself with a response (M31). */
+export interface MiddlewareResponse {
+  id: string
+  /** The status written, when it is a number literal. */
+  status?: number
+  condition?: string
+  from?: PathCheck
+  exclude: PathCheck[]
+  loc: SourceLoc
+}
+
 interface Walk {
   origin: Origin
   frames: Frame[]
@@ -407,6 +448,10 @@ export class RequestScanner {
   /** Middleware rewrites (M14), and the path checks around middleware redirects by navigation id. */
   readonly #rewrites = new Map<string, MiddlewareRewrite>()
   readonly #navExclude = new Map<string, PathCheck[]>()
+  /** What can stop a page while it renders, and what the walk couldn't follow there (M31). */
+  readonly #exits = new Map<string, RenderExit>()
+  readonly #unfollowed = new Map<string, Unfollowed>()
+  readonly #mwResponses = new Map<string, MiddlewareResponse>()
   /** Hook call (or `useQueries` entry) -> ids of the sites it runs. */
   readonly #hookSites = new Map<Node, string[]>()
   /** Site id -> what its hook does, for React Query sites. */
@@ -829,6 +874,21 @@ export class RequestScanner {
     return this.#navExclude.get(id) ?? []
   }
 
+  /** Redirects and `notFound()`-like calls reached while a component renders (M31). */
+  renderExits(): RenderExit[] {
+    return [...this.#exits.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** Calls made while a component renders that the walk couldn't follow (excluded or missing files). */
+  unfollowed(): Unfollowed[] {
+    return [...this.#unfollowed.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** Middleware answers that aren't redirects or rewrites (`NextResponse.json(..., { status: 401 })`). */
+  middlewareResponses(): MiddlewareResponse[] {
+    return [...this.#mwResponses.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
   /** Every site, sorted by where it starts, with route handler and server action chains linked. */
   sites(routes: Route[]): RequestSite[] {
     this.#mergeTwins()
@@ -1051,6 +1111,8 @@ export class RequestScanner {
       if (N.isPropertyAssignment(d) || N.isShorthandPropertyAssignment(d))
         this.#configHandler(d, scope, env, w)
       if (N.isNewExpression(d) && (this.#eventSource(d, scope, env, w) || this.#webSocket(d, scope, env, w)))
+        traversal.skip()
+      else if (N.isNewExpression(d) && w.origin.kind === 'middleware' && this.#middlewareAnswer(d, scope, w))
         traversal.skip()
     })
   }
@@ -1309,6 +1371,12 @@ export class RequestScanner {
       this.#emitNav(w, this.#frame(call, scope), { ...nav, href }, call)
       return true
     }
+    const exit = renderExitCall(call)
+    if (exit) {
+      this.#emitExit(w, this.#frame(call, scope), exit, call)
+      return true
+    }
+    if (w.origin.kind === 'middleware' && this.#middlewareAnswer(call, scope, w)) return true
     const trpc = procedureCall(call)
     if (trpc && trpc.proxy !== 'server') {
       this.#trpcCall(call, trpc, scope, env, w)
@@ -1366,7 +1434,13 @@ export class RequestScanner {
     }
 
     const fn = calleeFunction(call)
-    if (!fn || !isProject(fn) || w.active.has(fn) || !this.#isScanned(fn)) return false
+    if (!fn) {
+      if (w.origin.kind === 'component' && isUnresolvedImport(call)) this.#unfollow(w, call, scope, 'missing')
+      return false
+    }
+    if (isProject(fn) && !this.#isScanned(fn) && w.origin.kind === 'component')
+      this.#unfollow(w, call, scope, 'excluded')
+    if (!isProject(fn) || w.active.has(fn) || !this.#isScanned(fn)) return false
     if (this.#isServerAction(fn) && w.origin.client) {
       this.#emit(w, this.#frame(call, scope), this.#actionSite(fn, false))
       return false
@@ -1522,10 +1596,12 @@ export class RequestScanner {
    * condition, and a path check inside them (`pathname.startsWith('/admin') && !isAdmin`) can
    * still give `from`.
    */
-  #pathChecks(guards: Guard[]): { from?: PathCheck; exclude: PathCheck[]; rest: Guard[] } {
+  #pathChecks(written: Guard[]): { from?: PathCheck; exclude: PathCheck[]; rest: Guard[] } {
     let from: PathCheck | undefined
     const exclude: PathCheck[] = []
     const rest: Guard[] = []
+    // `a && b` holds when each term does, so a path check among them is split out (M31).
+    const guards = written.flatMap((g) => conjunctionTerms(g.node, g.negated))
     for (let i = guards.length - 1; i >= 0; i--) {
       const guard = guards[i] as Guard
       const test = this.#pathTest(guard.node)
@@ -1538,7 +1614,15 @@ export class RequestScanner {
       rest.unshift(guard)
       from ??= this.#pathIn(guard.node, guard.negated)
     }
-    return { ...(from ? { from } : {}), exclude, rest }
+    // `!(onApp && !sid)` always holds on `/login`: a path check that can't match there settles it.
+    const settled = (g: Guard) => {
+      if (!from || !g.negated) return false
+      return conjunctionTerms(g.node, false).some((term) => {
+        const test = this.#pathTest(term.node)
+        return !!test && test.positive && !pathsOverlap(test, from as PathCheck)
+      })
+    }
+    return { ...(from ? { from } : {}), exclude, rest: rest.filter((g) => !settled(g)) }
   }
 
   /** A path check that holds inside `a && b` (or `!(a || b)`). */
@@ -2721,6 +2805,7 @@ export class RequestScanner {
         queryClientMethod(d) ||
         isActionStateHook(d) ||
         navigationCall(d) ||
+        renderExitCall(d) ||
         middlewareResponse(d) ||
         (procedureCall(d)?.proxy ?? 'server') !== 'server' ||
         isGraphqlRequest(d) ||
@@ -2853,7 +2938,71 @@ export class RequestScanner {
       loc: this.#loc(node),
       callStack,
     })
+    if (w.origin.kind === 'component' && found.kind !== 'link') {
+      const kind = found.kind === 'push' || found.kind === 'replace' ? 'client-redirect' : 'redirect'
+      this.#emitExit(w, last, kind, node, id)
+    }
     return id
+  }
+
+  /**
+   * A redirect or `notFound()`-like call reached while a component renders, or (in the browser)
+   * from an effect: it can stop the page. Event handlers don't count (M31).
+   */
+  #emitExit(w: Walk, last: Frame, kind: RenderExit['kind'] | ExitKind, node: Node, navigationId?: string) {
+    if (w.origin.kind !== 'component' || !w.origin.componentId) return
+    const frames = [...w.frames, last]
+    const trigger = this.#trigger(frames, w.origin).kind
+    const render = trigger === 'server-render' || trigger === 'page-load'
+    if (!render && !(trigger === 'effect' && kind === 'client-redirect')) return
+    const callStack = frames.map((f) => this.#loc(f.node))
+    const id = makeId('gd', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#exits.has(id)) return
+    const when = exitCondition(frames)
+    this.#exits.set(id, {
+      id,
+      kind,
+      componentId: w.origin.componentId,
+      ...when,
+      ...(navigationId ? { navigationId } : {}),
+      loc: this.#loc(node),
+    })
+  }
+
+  /** A call the walk can't enter while a component renders: it might redirect (M31). */
+  #unfollow(w: Walk, call: CallExpression, scope: Node, why: Unfollowed['why']) {
+    if (!w.origin.componentId) return
+    const frame = this.#frame(call, scope)
+    const trigger = this.#trigger([...w.frames, frame], w.origin).kind
+    if (trigger !== 'server-render' && trigger !== 'page-load') return
+    const loc = this.#loc(call)
+    const key = `${w.origin.key}|${loc.file}:${loc.line}:${loc.column}`
+    if (this.#unfollowed.has(key)) return
+    this.#unfollowed.set(key, { componentId: w.origin.componentId, callee: frame.callee, why, loc })
+  }
+
+  /**
+   * Middleware that answers itself: `NextResponse.json(body, { status })`, `Response.json()`,
+   * `new NextResponse(...)`, `new Response(...)`. The page doesn't render (M31).
+   */
+  #middlewareAnswer(node: CallExpression | NewExpression, scope: Node, w: Walk): boolean {
+    const status = middlewareAnswerStatus(node)
+    if (status === undefined) return false
+    const frames = [...w.frames, this.#frame(node, scope)]
+    const { from, exclude, rest } = this.#pathChecks(frames.flatMap((f) => guardsOf(f.node, f.scope)))
+    const condition = conditionText(rest)
+    const loc = this.#loc(node)
+    const id = makeId('gd', w.origin.key, `${loc.file}:${loc.line}:${loc.column}`)
+    if (this.#mwResponses.has(id)) return true
+    this.#mwResponses.set(id, {
+      id,
+      ...(typeof status === 'number' ? { status } : {}),
+      ...(condition ? { condition } : {}),
+      ...(from ? { from } : {}),
+      exclude,
+      loc,
+    })
+    return true
   }
 
   // --- Triggers ------------------------------------------------------------------------------
@@ -4235,6 +4384,188 @@ function conditionText(guards: Guard[]): string | undefined {
   return guards
     .map((g) => (g.negated ? negate(g.node) : oneLine(skipWrappers(g.node).getText())))
     .join(' && ')
+}
+
+// --- Guards (M31) ----------------------------------------------------------------------------
+
+/** Whether some request path can pass both checks. */
+function pathsOverlap(a: PathCheck, b: PathCheck): boolean {
+  const trim = (p: string) => (p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p)
+  const under = (path: string, base: string) => base === '/' || path === base || path.startsWith(`${base}/`)
+  const [x, y] = [trim(a.path), trim(b.path)]
+  if (a.kind === 'exact' && b.kind === 'exact') return x === y
+  if (a.kind === 'exact') return under(x, y)
+  if (b.kind === 'exact') return under(y, x)
+  return under(x, y) || under(y, x)
+}
+
+/** The terms that must all hold: `a && b` -> a, b; `!(a || b)` -> !a, !b. Anything else is one term. */
+function conjunctionTerms(node: Node, negated: boolean): Guard[] {
+  const inner = skipWrappers(node)
+  if (N.isPrefixUnaryExpression(inner) && inner.getOperatorToken() === ts.SyntaxKind.ExclamationToken) {
+    const operand = skipWrappers(inner.getOperand())
+    if (N.isBinaryExpression(operand)) return conjunctionTerms(operand, !negated)
+  }
+  if (N.isBinaryExpression(inner)) {
+    const op = inner.getOperatorToken().getKind()
+    const all =
+      (op === ts.SyntaxKind.AmpersandAmpersandToken && !negated) ||
+      (op === ts.SyntaxKind.BarBarToken && negated)
+    if (all)
+      return [...conjunctionTerms(inner.getLeft(), negated), ...conjunctionTerms(inner.getRight(), negated)]
+  }
+  return [{ node, negated }]
+}
+
+const LOOPS = new Set([
+  ts.SyntaxKind.ForStatement,
+  ts.SyntaxKind.ForInStatement,
+  ts.SyntaxKind.ForOfStatement,
+  ts.SyntaxKind.WhileStatement,
+  ts.SyntaxKind.DoStatement,
+])
+
+/**
+ * When the call at the end of `frames` runs, from the code around each frame: `if` / `?:`
+ * branches, `&&` / `||` / `??`, `switch` cases, `catch`, and earlier `if (x) return` (or
+ * `if (x) redirect()`) guards. `unclear` when it sits in a loop or in a callback other than an
+ * effect or a `.then()`, whose condition the text can't say.
+ */
+function exitCondition(frames: Frame[]): { condition?: string; unclear?: string } {
+  const parts: string[] = []
+  for (const frame of frames) {
+    const found = conditionsIn(frame.node, frame.scope)
+    if (found.unclear) return { unclear: found.unclear }
+    parts.push(...found.parts)
+  }
+  return parts.length > 0 ? { condition: [...new Set(parts)].join(' && ') } : {}
+}
+
+function conditionsIn(node: Node, scope: Node): { parts: string[]; unclear?: string } {
+  const levels: string[][] = []
+  let child: Node = node
+  for (let current = node.getParent(); current && child !== scope; current = current.getParent()) {
+    if (current === scope) break
+    if (isFunctionLike(current)) {
+      const parent = current.getParent()
+      const call = parent && N.isCallExpression(parent) ? parent : undefined
+      const name = call ? calleeName(call) : undefined
+      if (call && name && EFFECT_HOOKS.has(name)) {
+        // The effect runs after render; its own body decides.
+      } else if (call && (name === 'then' || name === 'catch')) {
+        const failed = name === 'catch' || call.getArguments()[1] === current
+        if (failed) levels.push(['the request fails'])
+      } else {
+        return { parts: [], unclear: 'it runs inside a callback' }
+      }
+    } else if (LOOPS.has(current.getKind()) && child !== loopHead(current)) {
+      return { parts: [], unclear: 'it runs inside a loop' }
+    } else if (N.isIfStatement(current) && child !== current.getExpression()) {
+      const cond = current.getExpression()
+      levels.push([child === current.getThenStatement() ? plain(cond) : negate(cond)])
+    } else if (N.isConditionalExpression(current) && child !== current.getCondition()) {
+      const cond = current.getCondition()
+      levels.push([child === current.getWhenTrue() ? plain(cond) : negate(cond)])
+    } else if (N.isBinaryExpression(current) && child === current.getRight()) {
+      const op = current.getOperatorToken().getKind()
+      const left = current.getLeft()
+      if (op === ts.SyntaxKind.AmpersandAmpersandToken) levels.push([plain(left)])
+      else if (op === ts.SyntaxKind.BarBarToken) levels.push([negate(left)])
+      else if (op === ts.SyntaxKind.QuestionQuestionToken) levels.push([`${plain(left)} == null`])
+    } else if (N.isCaseClause(current)) {
+      const block = current.getParent()
+      const sw = block?.getParent()
+      if (sw && N.isSwitchStatement(sw)) {
+        levels.push([`${plain(sw.getExpression())} === ${plain(current.getExpression())}`])
+      }
+    } else if (N.isDefaultClause(current)) {
+      return { parts: [], unclear: 'it is the default of a switch' }
+    } else if (N.isCatchClause(current)) {
+      levels.push(['the try block throws'])
+    } else if (N.isBlock(current) || N.isSourceFile(current)) {
+      const before: string[] = []
+      for (const statement of current.getStatements()) {
+        if (statement === child) break
+        if (
+          N.isIfStatement(statement) &&
+          !statement.getElseStatement() &&
+          stops(statement.getThenStatement())
+        )
+          before.push(negate(statement.getExpression()))
+      }
+      levels.push(before)
+    }
+    child = current
+  }
+  return { parts: levels.reverse().flat() }
+}
+
+/** The part of a loop that runs once (`for (init; test; ...)` head), so code there isn't "in" the loop. */
+function loopHead(loop: Node): Node | undefined {
+  if (N.isForOfStatement(loop) || N.isForInStatement(loop)) return loop.getExpression()
+  if (N.isWhileStatement(loop)) return loop.getExpression()
+  if (N.isForStatement(loop)) return loop.getInitializer()
+  return undefined
+}
+
+/** Leaves the function: `return`, `throw`, `redirect()` / `notFound()` (they throw), or a block ending in one. */
+function stops(statement: Node): boolean {
+  if (exits(statement)) return true
+  if (N.isExpressionStatement(statement)) {
+    const expr = skipWrappers(statement.getExpression())
+    const call = N.isAwaitExpression(expr) ? skipWrappers(expr.getExpression()) : expr
+    if (!N.isCallExpression(call)) return false
+    const nav = navigationCall(call)
+    return !!renderExitCall(call) || nav?.kind === 'redirect' || nav?.kind === 'permanent-redirect'
+  }
+  if (N.isBlock(statement)) {
+    const last = statement.getStatements().at(-1)
+    return !!last && stops(last)
+  }
+  return false
+}
+
+function plain(expr: Node): string {
+  return oneLine(skipWrappers(expr).getText())
+}
+
+/**
+ * The status of a middleware response that answers the request itself (`NextResponse.json()`,
+ * `Response.json()`, `new NextResponse()`, `new Response()`): the number written, `null` when it
+ * isn't a number literal, `undefined` when the node isn't such a response.
+ */
+function middlewareAnswerStatus(node: CallExpression | NewExpression): number | null | undefined {
+  const callee = node.getExpression()
+  let target: Node = callee
+  if (N.isCallExpression(node)) {
+    if (!N.isPropertyAccessExpression(callee) || callee.getName() !== 'json') return undefined
+    target = callee.getExpression()
+  }
+  if (!N.isIdentifier(target)) return undefined
+  const module = importModuleOf(target)
+  const isNext = module === 'next/server' && unaliasedText(target) === 'NextResponse'
+  if (!isNext && !(module === undefined && target.getText() === 'Response')) return undefined
+  const options = node.getArguments()[1]
+  if (!options) return 200
+  const value = skipWrappers(options)
+  if (!N.isObjectLiteralExpression(value)) return null
+  const prop = value.getProperty('status')
+  if (!prop) return 200
+  const init = N.isPropertyAssignment(prop) ? prop.getInitializer() : undefined
+  return init && N.isNumericLiteral(init) ? init.getLiteralValue() : null
+}
+
+/** A call to an import from a project path (`./auth`, `@/lib/auth`) that doesn't resolve to a file. */
+function isUnresolvedImport(call: CallExpression): boolean {
+  const expr = call.getExpression()
+  const root = N.isPropertyAccessExpression(expr) ? expr.getExpression() : expr
+  if (!N.isIdentifier(root)) return false
+  const module = importModuleOf(root)
+  if (!module || isPackage(module)) return false
+  const symbol = root.getSymbol()
+  if (!symbol) return true
+  const target = symbol.isAlias() ? symbol.getAliasedSymbol() : symbol
+  return !target || target.getDeclarations().length === 0
 }
 
 function negate(expr: Node): string {

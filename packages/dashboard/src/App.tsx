@@ -1,6 +1,6 @@
 import { CLI_NAME } from '@flow-checker/shared'
 import { useMemo } from 'react'
-import { useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
+import { useFlows, useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
@@ -49,6 +49,12 @@ export function App() {
   const live = useLiveFeed(captureOn || Boolean(meta.data?.watching))
   const lastScan = useLastScan()
   const index = useMemo(() => (model.data ? buildIndex(model.data) : undefined), [model.data])
+  // Page guards a captured session hit (M31), from the flows summary.
+  const flows = useFlows(captureOn || Boolean(exported))
+  const seenGuards = useMemo(() => {
+    const guards = flows.data?.guards
+    return guards ? new Map(Object.entries(guards).map(([id, list]) => [id, new Set(list)])) : undefined
+  }, [flows.data])
 
   const error = model.error ?? meta.error
   return (
@@ -131,7 +137,9 @@ export function App() {
             <div className="banner banner-error">Could not load the scan: {error.message}</div>
           </div>
         ) : index && meta.data ? (
-          <DataContext.Provider value={{ index, meta: meta.data, live: captureOn ? live : undefined }}>
+          <DataContext.Provider
+            value={{ index, meta: meta.data, live: captureOn ? live : undefined, seenGuards }}
+          >
             <ScreenView screen={screen} />
           </DataContext.Provider>
         ) : (
@@ -155,7 +163,7 @@ function ScreenView({ screen }: { screen: Screen }) {
     case 'overview':
       return <Overview />
     case 'map':
-      return <MapScreen view={screen.view} q={screen.q} areas={screen.areas} />
+      return <MapScreen view={screen.view} q={screen.q} areas={screen.areas} access={screen.access} />
     case 'areas':
       return <AreasScreen areaId={screen.areaId} q={screen.q} />
     case 'page':

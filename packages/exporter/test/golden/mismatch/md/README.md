@@ -39,9 +39,9 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/`](pages/index.md) | `app/page.tsx` | 4 | ✓ 1 verified, ✗ 3 mismatch |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `app/page.tsx` | open | 4 | ✓ 1 verified, ✗ 3 mismatch |
 
 ## Backends
 

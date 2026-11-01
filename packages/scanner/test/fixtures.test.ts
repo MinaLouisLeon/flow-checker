@@ -67,6 +67,19 @@ describe.each(FIXTURES)('fixture %s', (fixture) => {
     await expect(formatFlows(scan(fixture))).toMatchFileSnapshot(`__snapshots__/${fixture}.flows.txt`)
   })
 
+  it('labels every page, and shows a condition for every guarded one (M31)', () => {
+    for (const route of scan(fixture).routes) {
+      if (route.kind !== 'page') {
+        expect(route.access).toBeUndefined()
+        continue
+      }
+      expect(route.access, route.path).toBeDefined()
+      if (route.access?.status !== 'guarded') continue
+      const shown = route.access.guards.filter((g) => !g.unclear && (g.condition || g.always))
+      expect(shown.length, route.path).toBeGreaterThan(0)
+    }
+  })
+
   it('has no duplicate sites', () => {
     // A twin is the same network call from the same origin, reached once through a path and
     // once through the tail of it (a local function walked in place and through its hook).

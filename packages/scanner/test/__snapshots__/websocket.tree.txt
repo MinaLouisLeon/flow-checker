@@ -20,8 +20,10 @@ HomePage  server  app/page.tsx:5
 ├─ Ticker  client (use client)  components/Ticker.tsx:10
 ├─ Ping  client (use client)  components/Ping.tsx:7
 └─ Link  external next/link
+access: open
 
 ## /chat  app/chat/page.tsx
 layouts: app/layout.tsx
 ChatPage  server  app/chat/page.tsx:3
 └─ Chat  client (use client)  components/Chat.tsx:9
+access: open

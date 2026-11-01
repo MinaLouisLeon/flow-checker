@@ -1,5 +1,8 @@
 import {
+  accessOf,
   type ComponentRef,
+  guardAction,
+  guardWhen,
   type Navigation,
   type QueryLink,
   type RequestSite,
@@ -13,7 +16,18 @@ import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
 import { ownerHref, QueryLinkList, RequestList, RequestSummary, triggerLabel } from '../RequestView'
 import { href } from '../router'
-import { Badge, CappedList, Empty, KindBadge, RefBadges, SearchBox, Section, SourceLink } from '../ui'
+import {
+  AccessBadge,
+  Badge,
+  CappedList,
+  CodeText,
+  Empty,
+  KindBadge,
+  RefBadges,
+  SearchBox,
+  Section,
+  SourceLink,
+} from '../ui'
 import { ComponentPanel } from './ComponentPanel'
 
 export function PageView({ routeId, componentId }: { routeId: string; componentId?: string }) {
@@ -53,6 +67,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
             <code>{route.path}</code>
           </h1>
           <Badge>{route.kind === 'page' ? 'page' : 'route handler'}</Badge>
+          <AccessBadge route={route} />
           {route.slot && <Badge tone="muted">slot @{route.slot}</Badge>}
           {route.intercepting && (
             <Badge tone="muted" title={`From ${route.intercepting.from}`}>
@@ -89,6 +104,8 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
             </ul>
           </Section>
         )}
+
+        <AccessSection route={route} index={index} routeId={routeId} />
 
         <Section title="Layout chain">
           {route.layoutChain.length === 0 ? (
@@ -497,5 +514,80 @@ function TreeItem({
         </ul>
       )}
     </li>
+  )
+}
+
+const GUARD_PLACE: Record<string, string> = {
+  middleware: 'middleware',
+  layout: 'layout',
+  page: 'page',
+  component: 'component',
+}
+
+/** What can stop the page from rendering (M31): middleware, layouts, the page and its components. */
+function AccessSection({ route, index, routeId }: { route: Route; index: ModelIndex; routeId: string }) {
+  const { seenGuards } = useData()
+  const access = accessOf(route)
+  const seen = seenGuards?.get(routeId)
+  const summary =
+    access.status === 'guarded'
+      ? 'This page redirects or stops under the conditions below.'
+      : access.status === 'open'
+        ? 'Nothing in the middleware, the layouts or the page redirects or stops it.'
+        : "Something may redirect or stop this page, but the scan can't say when."
+  return (
+    <Section title="Access" aside={<AccessBadge route={route} />}>
+      <p className="muted">{summary}</p>
+      {access.guards.length > 0 && (
+        <ul className="list guard-list">
+          {access.guards.map((guard) => {
+            const target = guard.targetRouteId ? index.routes.get(guard.targetRouteId) : undefined
+            const component = guard.componentId ? index.components.get(guard.componentId) : undefined
+            return (
+              <li key={guard.id} data-guard={guard.kind}>
+                <Badge tone="muted">{GUARD_PLACE[guard.in]}</Badge>
+                <span>
+                  {target ? (
+                    <>
+                      <CodeText text={guardAction({ ...guard, target: undefined })} /> to{' '}
+                      <a href={href({ name: 'page', routeId: target.id })}>
+                        <code>{guard.target ?? target.path}</code>
+                      </a>
+                    </>
+                  ) : (
+                    <CodeText text={guardAction(guard)} />
+                  )}{' '}
+                  <CodeText text={guardWhen(guard)} />
+                  {component && guard.in !== 'middleware' && (
+                    <span className="muted"> · {component.name}</span>
+                  )}
+                </span>
+                {seen?.has(guard.id) && (
+                  <Badge tone="ok" title="A captured page visit was redirected or stopped like this">
+                    seen
+                  </Badge>
+                )}
+                <span className="spacer" />
+                <SourceLink file={guard.loc.file} line={guard.loc.line} column={guard.loc.column} />
+              </li>
+            )
+          })}
+        </ul>
+      )}
+      {(access.reasons ?? []).length > 0 && (
+        <ul className="list">
+          {(access.reasons ?? []).map((reason) => (
+            <li key={reason.text}>
+              <Badge tone="muted">?</Badge>
+              <span>
+                <CodeText text={reason.text} />
+              </span>
+              <span className="spacer" />
+              {reason.loc && <SourceLink file={reason.loc.file} line={reason.loc.line} />}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
   )
 }

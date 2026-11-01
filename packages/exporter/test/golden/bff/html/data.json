@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "bff",
   "model": {
-    "version": 11,
+    "version": 12,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -98,7 +98,11 @@
             "componentId": "cmp_17dqv782ua7"
           }
         ],
-        "componentId": "cmp_2flvqsq9ypc"
+        "componentId": "cmp_2flvqsq9ypc",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       },
       {
         "id": "rt_1kkymdue03z",
@@ -174,7 +178,11 @@
             "componentId": "cmp_17dqv782ua7"
           }
         ],
-        "componentId": "cmp_0w4ykuez903"
+        "componentId": "cmp_0w4ykuez903",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       }
     ],
     "components": [

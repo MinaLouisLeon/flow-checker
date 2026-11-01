@@ -43,10 +43,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/`](pages/index.md) | `app/page.tsx` | 2 | ✓ 1 verified, ✗ 1 mismatch |
-| [`/chat`](pages/chat.md) | `app/chat/page.tsx` | 1 | ✓ 1 verified |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `app/page.tsx` | open | 2 | ✓ 1 verified, ✗ 1 mismatch |
+| [`/chat`](pages/chat.md) | `app/chat/page.tsx` | open | 1 | ✓ 1 verified |
 
 ## Areas
 

@@ -21,19 +21,25 @@ RootLayout  server  src/app/layout.tsx:5
 ## /  src/app/page.tsx
 layouts: src/app/layout.tsx
 Home  server  src/app/page.tsx:3
+access: guarded
+  redirects to `/products` always (page)  src/app/page.tsx:4
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
 ProductsPage  server  src/app/products/page.tsx:7
 ├─ Link  external next/link
 └─ DeleteProductButton  client (use client)  src/components/DeleteProductButton.tsx:7
+access: open
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
 ProductPage  server  src/app/products/[id]/page.tsx:7
 └─ Link  external next/link
+access: guarded
+  shows the not-found page (404) when `!product` (page)  src/app/products/[id]/page.tsx:10
 
 ## /products/new  src/app/products/new/page.tsx
 layouts: src/app/layout.tsx
 NewProductPage  server  src/app/products/new/page.tsx:3
 └─ CreateProductForm  client (use client)  src/components/CreateProductForm.tsx:10
+access: open

@@ -48,12 +48,12 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/[locale]`](pages/%5Blocale%5D.md) | `src/app/[locale]/page.tsx` | 0 | — |
-| [`/[locale]/dashboard`](pages/%5Blocale%5D.dashboard.md) | `src/app/[locale]/dashboard/page.tsx` | 1 | ✓ 1 verified |
-| [`/[locale]/login`](pages/%5Blocale%5D.login.md) | `src/app/[locale]/login/page.tsx` | 1 | ✓ 1 verified |
-| [`/[locale]/verify`](pages/%5Blocale%5D.verify.md) | `src/app/[locale]/verify/page.tsx` | 1 | ✓ 1 verified |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/[locale]`](pages/%5Blocale%5D.md) | `src/app/[locale]/page.tsx` | guarded | 0 | — |
+| [`/[locale]/dashboard`](pages/%5Blocale%5D.dashboard.md) | `src/app/[locale]/dashboard/page.tsx` | guarded | 1 | ✓ 1 verified |
+| [`/[locale]/login`](pages/%5Blocale%5D.login.md) | `src/app/[locale]/login/page.tsx` | guarded | 1 | ✓ 1 verified |
+| [`/[locale]/verify`](pages/%5Blocale%5D.verify.md) | `src/app/[locale]/verify/page.tsx` | guarded | 1 | ✓ 1 verified |
 
 ## Areas
 

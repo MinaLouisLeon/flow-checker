@@ -16,7 +16,7 @@ import {
 } from '../lists'
 import { ownerHref, RequestItem, RequestSummary, SiteBadges } from '../RequestView'
 import { href, replaceScreen, type Screen } from '../router'
-import { Badge, Empty, SearchBox, Select, ShowMore, SourceLink, usePaged } from '../ui'
+import { Badge, Empty, PageAccess, SearchBox, Select, ShowMore, SourceLink, usePaged } from '../ui'
 
 type RequestsScreen = Extract<Screen, { name: 'requests' }>
 
@@ -261,6 +261,7 @@ function RequestPanel({ site }: { site: RequestSite }) {
                     >
                       {index.routes.get(id)?.path ?? id}
                     </a>
+                    <PageAccess route={index.routes.get(id)} />
                   </li>
                 ))}
                 {routeIds.length > MAX_PAGES && (

@@ -43,12 +43,12 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Requests | Status |
-| --- | --- | --- | --- |
-| [`/`](pages/index.md) | `src/app/page.tsx` | 3 | ✓ 3 verified |
-| [`/settings`](pages/settings.md) | `src/app/settings/page.tsx` | 4 | ✓ 4 verified |
-| [`/todos/[id]`](pages/todos.%5Bid%5D.md) | `src/app/todos/[id]/page.tsx` | 1 | ✓ 1 verified |
-| [`/users`](pages/users.md) | `src/app/users/page.tsx` | 5 | ✓ 5 verified |
+| Page | File | Access | Requests | Status |
+| --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `src/app/page.tsx` | open | 3 | ✓ 3 verified |
+| [`/settings`](pages/settings.md) | `src/app/settings/page.tsx` | open | 4 | ✓ 4 verified |
+| [`/todos/[id]`](pages/todos.%5Bid%5D.md) | `src/app/todos/[id]/page.tsx` | open | 1 | ✓ 1 verified |
+| [`/users`](pages/users.md) | `src/app/users/page.tsx` | open | 5 | ✓ 5 verified |
 
 ## Areas
 

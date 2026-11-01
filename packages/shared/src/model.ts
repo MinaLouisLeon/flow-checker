@@ -79,6 +79,54 @@ export const LayoutRefSchema = z.object({
 })
 export type LayoutRef = z.infer<typeof LayoutRefSchema>
 
+// Guarded pages (M31): what can stop a page from rendering, read from middleware and from the
+// page, its layouts and the components they render. About behavior, not auth: "redirects to
+// `/login` when `!session`".
+
+export const PageGuardSchema = z.object({
+  /** Stable across pages: a layout's guard has the same id on every page under it. */
+  id: z.string(),
+  /**
+   * `redirect`: `redirect()` / `permanentRedirect()`, or a middleware redirect. `not-found`,
+   * `forbidden`, `unauthorized`: Next's functions of those names. `client-redirect`:
+   * `router.push()` / `.replace()` in the browser while the page renders or in an effect.
+   * `respond`: middleware answers itself, with an error status.
+   */
+  kind: z.enum(['redirect', 'not-found', 'forbidden', 'unauthorized', 'client-redirect', 'respond']),
+  /** Where it is: the middleware, a layout around the page, the page, or a component they render. */
+  in: z.enum(['middleware', 'layout', 'page', 'component']),
+  componentId: z.string().optional(),
+  /** The condition, as written (`!session`). Absent with `always`, or when it can't be read (`unclear`). */
+  condition: z.string().optional(),
+  /** Happens on every request to the page. */
+  always: z.literal(true).optional(),
+  /** Why the scan can't say when it happens (a condition or matcher it can't read). */
+  unclear: z.string().optional(),
+  /** Redirects: the target as resolved (`/login`), or as written when it doesn't resolve. */
+  target: z.string().optional(),
+  targetRouteId: z.string().optional(),
+  /** Middleware: the status it answers or redirects with, when written. */
+  status: z.number().int().optional(),
+  /** Redirects: the navigation in `AppModel.navigations`. */
+  navigationId: z.string().optional(),
+  /** The call that redirects or stops. */
+  loc: SourceLocSchema,
+})
+export type PageGuard = z.infer<typeof PageGuardSchema>
+
+export const RouteAccessSchema = z.object({
+  /**
+   * `guarded`: a guard with a condition the scan read (or one that always applies).
+   * `unknown`: something may stop the page but the scan can't say when (`reasons`).
+   * `open`: nothing found, and nothing the scan couldn't follow.
+   */
+  status: z.enum(['guarded', 'open', 'unknown']),
+  guards: z.array(PageGuardSchema),
+  /** What the scan couldn't follow: a middleware factory, a helper in an excluded file. */
+  reasons: z.array(z.object({ text: z.string(), loc: SourceLocSchema.optional() })).optional(),
+})
+export type RouteAccess = z.infer<typeof RouteAccessSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -98,6 +146,8 @@ export const RouteSchema = z.object({
   slot: z.string().optional(),
   /** Set when the page is an intercepting route. `path` is the URL it intercepts. */
   intercepting: z.object({ marker: z.string(), from: z.string() }).optional(),
+  /** Pages: what can stop the page from rendering (M31). Absent in older models: read it as `unknown`. */
+  access: RouteAccessSchema.optional(),
 })
 export type Route = z.infer<typeof RouteSchema>
 
@@ -1079,7 +1129,8 @@ export const AppModelSchema = z.object({
    * (before M16) no tRPC, version 5 (before M17) no GraphQL, version 6 (before M18) no event streams,
    * version 7 (before M19) no WebSockets, version 8 no `prop` component references, version 9
    * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`),
-   * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags.
+   * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags,
+   * version 11 (before M31) no page `access` (read as `unknown`).
    */
   version: z
     .union([
@@ -1093,6 +1144,7 @@ export const AppModelSchema = z.object({
       z.literal(8),
       z.literal(9),
       z.literal(10),
+      z.literal(11),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

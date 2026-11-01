@@ -6,6 +6,7 @@
 | --- | --- |
 | File | `app/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
+| Access | open |
 | Status | ✓ 1 verified, ✗ 3 mismatch |
 
 ## Component tree

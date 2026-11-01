@@ -2,7 +2,7 @@ import { useData } from '../context'
 import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
-import { Badge, CappedList, Empty, KindBadge, RefBadges, Section, SourceLink } from '../ui'
+import { Badge, CappedList, Empty, KindBadge, PageAccess, RefBadges, Section, SourceLink } from '../ui'
 
 export function ComponentPanel({
   componentId,
@@ -135,6 +135,7 @@ export function ComponentPanel({
                 <a className="chip" href={href({ name: 'page', routeId: id, componentId: component.id })}>
                   {index.routes.get(id)?.path ?? id}
                 </a>
+                <PageAccess route={index.routes.get(id)} />
               </li>
             )}
           />

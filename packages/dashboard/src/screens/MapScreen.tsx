@@ -12,14 +12,14 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { isVerified as isSiteVerified } from '@flow-checker/shared'
+import { accessOf, isVerified as isSiteVerified } from '@flow-checker/shared'
 import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
 import { areasOf } from '../lists'
 import type { ModelIndex } from '../model-index'
-import { href, type MapView, replaceScreen } from '../router'
-import { Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
+import { ACCESS_FILTERS, type AccessFilter, href, type MapView, replaceScreen } from '../router'
+import { AccessBadge, Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
 
 interface RouteNodeData extends Record<string, unknown> {
   route: Route
@@ -42,10 +42,29 @@ const nodeTypes = { route: RouteNodeView, area: AreaFrameView }
 const FRAME_PAD = 12
 const FRAME_TOP = 26
 
-export function MapScreen({ view, q, areas }: { view: MapView; q: string; areas?: boolean }) {
-  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas })
-  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas })
-  const setAreas = (next: boolean) => replaceScreen({ name: 'map', view, q, areas: next || undefined })
+export function MapScreen({
+  view,
+  q,
+  areas,
+  access,
+}: {
+  view: MapView
+  q: string
+  areas?: boolean
+  access?: AccessFilter
+}) {
+  const { index } = useData()
+  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas, access })
+  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas, access })
+  const setAreas = (next: boolean) =>
+    replaceScreen({ name: 'map', view, q, areas: next || undefined, access })
+  const setAccess = (next: AccessFilter | undefined) =>
+    replaceScreen({ name: 'map', view, q, areas, access: next })
+  const accessCounts = useMemo(() => {
+    const counts: Record<AccessFilter, number> = { guarded: 0, open: 0, unknown: 0 }
+    for (const route of index.model.routes) if (route.kind === 'page') counts[accessOf(route).status]++
+    return counts
+  }, [index])
 
   return (
     <div className="screen screen-full">
@@ -68,9 +87,27 @@ export function MapScreen({ view, q, areas }: { view: MapView; q: string; areas?
             Areas
           </label>
         )}
+        {view === 'graph' && (
+          <fieldset className="segmented" aria-label="Page access">
+            <button type="button" aria-pressed={!access} onClick={() => setAccess(undefined)}>
+              All pages
+            </button>
+            {ACCESS_FILTERS.map((a) => (
+              <button
+                key={a}
+                type="button"
+                aria-pressed={access === a}
+                onClick={() => setAccess(access === a ? undefined : a)}
+                title={ACCESS_HINTS[a]}
+              >
+                {a} {accessCounts[a]}
+              </button>
+            ))}
+          </fieldset>
+        )}
       </div>
       {view === 'graph' ? (
-        <RouteGraphView q={q} showAreas={Boolean(areas)} />
+        <RouteGraphView q={q} showAreas={Boolean(areas)} access={access} />
       ) : view === 'tree' ? (
         <RouteTreeView q={q} />
       ) : (
@@ -80,7 +117,13 @@ export function MapScreen({ view, q, areas }: { view: MapView; q: string; areas?
   )
 }
 
-function RouteGraphView({ q, showAreas }: { q: string; showAreas: boolean }) {
+const ACCESS_HINTS: Record<AccessFilter, string> = {
+  guarded: 'Pages that redirect or stop under a condition the scan read',
+  open: 'Pages where nothing redirects or stops them',
+  unknown: "Pages that may redirect or stop, under a condition the scan can't read",
+}
+
+function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolean; access?: AccessFilter }) {
   const { index } = useData()
   const [showShared, setShowShared] = useState(false)
   const hasSharedEdges = index.navEdges.some((e) => e.shared)
@@ -161,10 +204,15 @@ function RouteGraphView({ q, showAreas }: { q: string; showAreas: boolean }) {
       ...frames,
       ...nodes.map((n) => ({
         ...n,
-        data: { ...n.data, dimmed: !matches(q, n.data.route.path, n.data.route.file) },
+        data: {
+          ...n.data,
+          dimmed:
+            !matches(q, n.data.route.path, n.data.route.file) ||
+            (!!access && (n.data.route.kind !== 'page' || accessOf(n.data.route).status !== access)),
+        },
       })),
     ],
-    [frames, nodes, q],
+    [frames, nodes, q, access],
   )
 
   if (nodes.length === 0) return <p className="empty">No routes found.</p>
@@ -318,6 +366,7 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
         {route.slot && <span>@{route.slot}</span>}
         {route.intercepting && <span>intercepts</span>}
         {noteCount > 0 && <span className="warn">⚠ {noteCount}</span>}
+        {!handler && <AccessBadge route={route} compact />}
       </div>
       <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>
