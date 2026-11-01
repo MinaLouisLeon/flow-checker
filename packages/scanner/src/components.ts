@@ -129,27 +129,63 @@ export class ComponentGraph {
       const tag = element.getTagNameNode()
       if (isIntrinsic(tag)) continue
 
-      const target = this.#resolveTag(tag)
-      const key = target.componentId ?? `${target.module ?? ''}#${tag.getText()}`
-      const conditional = isConditional(element, body)
-      const existing = refs.get(key)
-      if (existing) {
-        // Conditional only if every occurrence is conditional.
-        if (!conditional) delete existing.conditional
-        continue
+      for (const target of this.#resolveTags(tag)) {
+        // A component picked at runtime is one choice of several: keyed by the tag too.
+        const id = target.componentId ?? `${target.module ?? ''}#${tag.getText()}`
+        const key = target.chosen ? `${tag.getText()}>${id}` : id
+        const conditional = target.chosen || isConditional(element, body)
+        const existing = refs.get(key)
+        if (existing) {
+          // Conditional only if every occurrence is conditional.
+          if (!conditional) delete existing.conditional
+          continue
+        }
+        refs.set(key, {
+          name: tag.getText(),
+          resolution: target.resolution,
+          ...(target.componentId ? { componentId: target.componentId } : {}),
+          ...(target.module ? { module: target.module } : {}),
+          ...(target.factory ? { factory: target.factory } : {}),
+          ...(conditional ? { conditional: true } : {}),
+          ...(target.dynamic ? { dynamic: true } : {}),
+          loc: this.#loc(element),
+        })
       }
-      refs.set(key, {
-        name: tag.getText(),
-        resolution: target.resolution,
-        ...(target.componentId ? { componentId: target.componentId } : {}),
-        ...(target.module ? { module: target.module } : {}),
-        ...(target.factory ? { factory: target.factory } : {}),
-        ...(conditional ? { conditional: true } : {}),
-        ...(target.dynamic ? { dynamic: true } : {}),
-        loc: this.#loc(element),
-      })
     }
     return [...refs.values()]
+  }
+
+  /**
+   * A tag held in a variable that picks a component at runtime (`asChild ? Slot : 'button'`,
+   * nested ternaries, `cond && A`, `ICONS[name]`): one `chosen` target per project component.
+   * When every choice is a library component or an HTML tag, it is one external target.
+   */
+  #resolveTags(tag: JsxTagNameExpression): (Target & { chosen?: boolean })[] {
+    const symbol = tag.getSymbol()
+    const decl = symbol ? unalias(symbol).getDeclarations()[0] : undefined
+    const choices = decl ? choicesOf(decl) : undefined
+    if (!choices) return [this.#resolveTag(tag)]
+    const targets: Target[] = []
+    for (const choice of choices) {
+      if (isIntrinsicValue(choice)) continue
+      const choiceSymbol = choice.getSymbol()
+      targets.push(
+        choiceSymbol
+          ? this.#resolveSymbol(choiceSymbol, importModuleOf(choice))
+          : { resolution: 'unresolved', module: importModuleOf(tag) },
+      )
+    }
+    const seen = new Set<string>()
+    const project = targets.filter((t) => {
+      if (!t.componentId || seen.has(t.componentId)) return false
+      seen.add(t.componentId)
+      return true
+    })
+    const open = targets.find((t) => t.resolution === 'unresolved' || t.resolution === 'prop')
+    if (project.length > 0) return [...project.map((t) => ({ ...t, chosen: true })), ...(open ? [open] : [])]
+    if (open) return [open]
+    const external = targets.find((t) => t.resolution === 'external')
+    return [{ resolution: 'external', ...(external?.module ? { module: external.module } : {}) }]
   }
 
   #resolveTag(tag: JsxTagNameExpression): Target {
@@ -330,6 +366,91 @@ function isPropBinding(node: Node): boolean {
     (a) => !N.isBindingElement(a) && !N.isObjectBindingPattern(a) && !N.isArrayBindingPattern(a),
   )
   return !!param && N.isParameterDeclaration(param)
+}
+
+/**
+ * The components a variable can hold when it picks one at runtime: the branches of a ternary
+ * (nested too), `cond && A`, `A ?? B`, or the values of a constant record it is looked up in
+ * (`ICONS[name]`). Undefined when the variable isn't such a choice.
+ */
+function choicesOf(decl: Node): Node[] | undefined {
+  if (!N.isVariableDeclaration(decl)) return undefined
+  const init = decl.getInitializer()
+  const value = init ? unwrap(init) : undefined
+  if (!value) return undefined
+  const isChoice =
+    N.isConditionalExpression(value) ||
+    N.isElementAccessExpression(value) ||
+    (N.isBinaryExpression(value) &&
+      [
+        ts.SyntaxKind.AmpersandAmpersandToken,
+        ts.SyntaxKind.BarBarToken,
+        ts.SyntaxKind.QuestionQuestionToken,
+      ].includes(value.getOperatorToken().getKind()))
+  if (!isChoice) return undefined
+  const out: Node[] = []
+  const visit = (node: Node, depth: number) => {
+    const n = unwrap(node)
+    if (depth > 8) return
+    if (N.isConditionalExpression(n)) {
+      visit(n.getWhenTrue(), depth + 1)
+      visit(n.getWhenFalse(), depth + 1)
+    } else if (N.isBinaryExpression(n)) {
+      const op = n.getOperatorToken().getKind()
+      if (op === ts.SyntaxKind.AmpersandAmpersandToken) visit(n.getRight(), depth + 1)
+      else if (op === ts.SyntaxKind.BarBarToken || op === ts.SyntaxKind.QuestionQuestionToken) {
+        visit(n.getLeft(), depth + 1)
+        visit(n.getRight(), depth + 1)
+      } else out.push(n)
+    } else if (N.isElementAccessExpression(n)) {
+      const record = recordOf(n.getExpression())
+      if (record) for (const entry of record) visit(entry, depth + 1)
+      else out.push(n)
+    } else out.push(n)
+  }
+  visit(value, 0)
+  return out
+}
+
+/** The values of a constant object or array (`{ info: InfoPanel }`, `as const`, imported). */
+function recordOf(expr: Node): Node[] | undefined {
+  let node = unwrap(expr)
+  for (let i = 0; i < 5 && N.isIdentifier(node); i++) {
+    const symbol = node.getSymbol()
+    const decl = symbol ? unalias(symbol).getDeclarations()[0] : undefined
+    const init = decl && N.isVariableDeclaration(decl) ? decl.getInitializer() : undefined
+    if (!init) return undefined
+    node = unwrap(init)
+  }
+  if (N.isArrayLiteralExpression(node)) return node.getElements()
+  if (!N.isObjectLiteralExpression(node)) return undefined
+  const out: Node[] = []
+  for (const p of node.getProperties()) {
+    if (N.isPropertyAssignment(p)) {
+      const value = p.getInitializer()
+      if (value) out.push(value)
+    } else if (N.isShorthandPropertyAssignment(p)) out.push(p.getNameNode())
+  }
+  return out
+}
+
+function unwrap(node: Node): Node {
+  let current = node
+  while (
+    N.isAsExpression(current) ||
+    N.isParenthesizedExpression(current) ||
+    N.isSatisfiesExpression(current)
+  )
+    current = current.getExpression()
+  return current
+}
+
+/** An HTML tag name, or no component at all: `'button'`, `null`, `undefined`, `false`. */
+function isIntrinsicValue(node: Node): boolean {
+  if (N.isStringLiteral(node) || N.isNoSubstitutionTemplateLiteral(node)) return true
+  const kind = node.getKind()
+  if (kind === ts.SyntaxKind.NullKeyword || kind === ts.SyntaxKind.FalseKeyword) return true
+  return N.isIdentifier(node) && node.getText() === 'undefined'
 }
 
 /** The value a constant is set to when it is just another name: `const Form = FormProvider`. */

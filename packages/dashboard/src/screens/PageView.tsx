@@ -159,7 +159,13 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
                 <li key={flow.id}>
                   <a href={href({ name: 'flows', flowId: flow.id, q: '' })}>{flow.name}</a>
                   <span className="spacer" />
-                  <span className="muted">{flow.routeId === routeId ? 'starts here' : 'passes through'}</span>
+                  <span className="muted">
+                    {flow.routeId === routeId
+                      ? 'starts here'
+                      : flow.startRouteIds?.includes(routeId)
+                        ? 'starts here (in a layout)'
+                        : 'passes through'}
+                  </span>
                 </li>
               ))}
             </ul>

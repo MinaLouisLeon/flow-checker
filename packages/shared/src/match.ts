@@ -160,9 +160,15 @@ function escapeRegex(text: string): string {
 
 /** Regex for a request site path pattern like `/users/:id` (a `:param` is one or more segments' text). */
 export function pathPatternRegex(pattern: string): RegExp {
-  const parts = pattern.split(/(:[A-Za-z_$][\w$]*)/)
+  // `:id` is one segment; `:path*` (a catch-all proxy's forwarded path, M25) is any number of them.
+  const parts = pattern.split(/(\/?:[A-Za-z_$][\w$]*\*?)/)
   const body = parts
-    .map((part) => (part.startsWith(':') && part.length > 1 ? '[^/?#]+' : escapeRegex(part)))
+    .map((part) => {
+      if (!/^\/?:./.test(part)) return escapeRegex(part)
+      const slash = part.startsWith('/')
+      if (part.endsWith('*')) return slash ? '(?:/[^?#]*)?' : '[^?#]*'
+      return `${slash ? '/' : ''}[^/?#]+`
+    })
     .join('')
   // A trailing slash on either side does not matter.
   return new RegExp(`^${body.replace(/\/$/, '')}/?$`)

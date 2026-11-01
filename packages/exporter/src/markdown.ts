@@ -21,6 +21,7 @@ import {
   formatQueryKey,
   type GraphqlInfo,
   type GraphqlOperation,
+  isInfoFlag,
   isVerified,
   type MatcherCondition,
   type MiddlewareMatcher,
@@ -1054,6 +1055,8 @@ function requestSection(
           : undefined,
       ],
       ['Handled by', target ? routeLink(ctx, target, from) : undefined],
+      ['Forwarded to', site.upstream ? code(urlText(site.upstream)) : undefined],
+      ['Conditional', site.conditional ? 'a side request of the helper that sends it' : undefined],
       [
         'Stream',
         site.stream
@@ -1077,7 +1080,7 @@ function requestSection(
         site.callStack.length > 1 ? site.callStack.map((f) => code(f.callee)).join(' → ') : undefined,
       ],
     ]),
-    site.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
+    site.flags.map((f) => `> ${isInfoFlag(f) ? 'ℹ' : '⚠'} **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
     site.bodyType && `**Request body**${typeSource(site.bodyType)} ${typeBlock(ctx, site.bodyType, from)}`,
     site.responseType &&
       `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,

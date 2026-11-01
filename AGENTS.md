@@ -95,5 +95,5 @@ re-run them on their own before assuming a regression.
 | M22 | Server hook placement check                       | Done    |
 | M23 | Dashboard fixes (bounded lists, scroll, handlers) | Done    |
 | M24 | React Query keys                                  | Done    |
-| M25 | Scanner fixes (triggers, URLs, components, types) | Planned |
+| M25 | Scanner fixes (triggers, URLs, components, types) | Done    |
 | M26 | Release v0.2.2                                    | Planned |

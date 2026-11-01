@@ -3,6 +3,7 @@
 import {
   formatQueryKey,
   hasCaptures,
+  isInfoFlag,
   isUnknownKey,
   type QueryLink,
   queryLinkTarget,
@@ -14,7 +15,7 @@ import { Children, type ReactNode, useState } from 'react'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
 import { GraphqlFact } from './GraphqlView'
-import { groupSame, hitsEveryQuery, siteOwner } from './lists'
+import { groupSame, hitsEveryQuery, siteOwner, warnings } from './lists'
 import type { ModelIndex } from './model-index'
 import { PostmanFact, PostmanTypeBadge } from './PostmanView'
 import { href } from './router'
@@ -208,9 +209,19 @@ export function SiteBadges({ site }: { site: RequestSite }) {
       >
         {triggerLabel(site.trigger)}
       </Badge>
-      {site.flags.length > 0 && (
-        <Badge tone="warn" title={site.flags.map((f) => f.message).join('\n')}>
-          ⚠ {site.flags.length}
+      {site.conditional && (
+        <Badge tone="muted" title="Sent only under a condition in a shared helper, next to the main request">
+          sometimes
+        </Badge>
+      )}
+      {warnings(site).length > 0 && (
+        <Badge
+          tone="warn"
+          title={warnings(site)
+            .map((f) => f.message)
+            .join('\n')}
+        >
+          ⚠ {warnings(site).length}
         </Badge>
       )}
       <SiteStatusBadge site={site} />
@@ -236,7 +247,9 @@ export function RequestItem({ site, open, owner }: { site: RequestSite; open: bo
         {site.flags.length > 0 && (
           <ul className="notes">
             {site.flags.map((f) => (
-              <li key={f.kind}>⚠ {f.message}</li>
+              <li key={f.kind} className={isInfoFlag(f) ? 'muted' : undefined}>
+                {isInfoFlag(f) ? 'ℹ' : '⚠'} {f.message}
+              </li>
             ))}
           </ul>
         )}
@@ -320,6 +333,15 @@ export function RequestItem({ site, open, owner }: { site: RequestSite; open: bo
               </dd>
             </>
           )}
+          {site.upstream && (
+            <>
+              <dt>Forwarded to</dt>
+              <dd>
+                <code>{urlText(site.upstream)}</code>{' '}
+                <span className="muted">by the catch-all route handler</span>
+              </dd>
+            </>
+          )}
         </dl>
 
         <TypeBlock
@@ -342,16 +364,32 @@ export function RequestItem({ site, open, owner }: { site: RequestSite; open: bo
           />
         )}
 
-        {chain.length > 0 && (
+        {chain.some((hop) => !hop.conditional) && (
           <div className="request-chain">
             <h4>Then on the server</h4>
             <ul>
-              {chain.map((hop) => (
-                <li key={hop.id}>
-                  <RequestSummary site={hop} />
-                  {hop.responseType && <span className="muted"> → {hop.responseType.text}</span>}
-                </li>
-              ))}
+              {chain
+                .filter((hop) => !hop.conditional)
+                .map((hop) => (
+                  <li key={hop.id}>
+                    <RequestSummary site={hop} />
+                    {hop.responseType && <span className="muted"> → {hop.responseType.text}</span>}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+        {chain.some((hop) => hop.conditional) && (
+          <div className="request-chain">
+            <h4>Sometimes also on the server</h4>
+            <ul>
+              {chain
+                .filter((hop) => hop.conditional)
+                .map((hop) => (
+                  <li key={hop.id}>
+                    <RequestSummary site={hop} />
+                  </li>
+                ))}
             </ul>
           </div>
         )}

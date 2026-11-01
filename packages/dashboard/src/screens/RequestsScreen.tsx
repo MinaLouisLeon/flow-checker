@@ -11,6 +11,7 @@ import {
   type RequestWhen,
   requestWhen,
   siteOwner,
+  warnings,
 } from '../lists'
 import { ownerHref, RequestItem, RequestSummary, SiteBadges } from '../RequestView'
 import { href, replaceScreen, type Screen } from '../router'
@@ -191,7 +192,7 @@ function RequestRow({
             return (
               <li key={site.id} className={site.id === siteId ? 'selected' : undefined}>
                 <a href={link(site.id)}>{siteOwner(site, index)}</a>
-                {site.flags.length > 0 && <Badge tone="warn">⚠ {site.flags.length}</Badge>}
+                {warnings(site).length > 0 && <Badge tone="warn">⚠ {warnings(site).length}</Badge>}
                 <span className="spacer" />
                 {call && <SourceLink file={call.file} line={call.line} column={call.column} />}
               </li>

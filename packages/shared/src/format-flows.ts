@@ -38,6 +38,7 @@ export function formatFlows(model: AppModel): string {
   if (model.flows.length === 0) out.push('', '(none)')
   for (const flow of model.flows) {
     out.push('', `## ${flow.name}  (${flow.routeIds.map(routePath).join(' -> ') || 'no page'})`)
+    if (flow.startRouteIds) out.push(`starts on: ${flow.startRouteIds.map(routePath).join(', ')}`)
     flow.steps.forEach((step, i) => {
       out.push(`${i + 1}. ${stepText(step)}`)
       for (const branch of flow.branches.filter((b) => b.after === i)) {

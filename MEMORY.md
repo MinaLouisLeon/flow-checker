@@ -32,6 +32,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M22 | Server hook placement | `cli/server-hook.ts` is shared by doctor, init and dev; the rule is shape-only (any wrapper around the blocks fails).    |
 | M23 | Dashboard fixes       | Lists that grow with the app use `CappedList` / `useCapped` (5, then "+N more"); request bodies render once opened.      |
 | M24 | React Query keys      | Model version 10. Unreadable key segments are `param` + `unknown`; shared queries are `matched` with `sharedWith`.       |
+| M25 | Scanner fixes         | Model version 11. Handed-on functions are placed by `#valueTrigger`; `runtime-url` is an info flag (`isInfoFlag`).       |
 
 ## Gotchas
 
@@ -258,3 +259,22 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   several sites. `sameQuery()` only covers `use*` hooks; imperative `queryClient` calls stay separate.
 - Changing a fixture file can change a site `hash` (the formatter turned `<T,>` into `<T>` in a `.ts` file): update
   the model snapshot after `biome check --write`.
+
+## M25 — Scanner fixes (branch `feat/m25-scanner-fixes`)
+
+- A function that is passed rather than called (`handleSubmit(save)`, `{ onSelect: save }`, a provider `value`) is
+  placed by `#valueTrigger()`: it climbs the value to a JSX prop, a variable (`#holderTrigger`) or a context
+  (`#providedTrigger`). An `on*` name only counts in configs that aren't call options: `commit({ onCompleted })` in
+  the graphql-relay fixture turned into `event onCompleted` until the call branch dropped it.
+- The walk only entered functions that are _called_; references passed into library calls were never walked
+  (`#passedFunctions` / `#configHandler`). Skip anything already in `Walk.hookFns` or the hook's site doubles.
+- Context consumers come from ts-morph `findReferencesAsNodes()` (language service), cached per context. Only reached
+  from provider values, so it costs nothing elsewhere.
+- `#followUses` can return `'unused'`; callers that build a frame from it must skip the mutation, not emit
+  `unknown`. When a hook returns another hook's result (`() => useX()`), the caller looks for the same members.
+- Fixture output didn't change for any M25 pattern: the fixtures don't have them. Each is covered in-memory
+  (`triggers`, `urls`, `component-choice`, `library-types`, `layout-flows` tests). The fixture twin check
+  (`has no duplicate sites`) guards the walked-twice bug.
+- A/B against `dev` without a worktree: `pnpm build`, copy `packages/flow-checker/dist` to a sibling folder (so
+  `node_modules` still resolves), `git stash`, build, copy, `git stash pop`, build; then scan one generated perf
+  app with both `cli.js` files.
