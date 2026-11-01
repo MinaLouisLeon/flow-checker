@@ -1,6 +1,16 @@
 // `flow-checker summary` (M32): prints Start here for a project and leaves it untouched.
 import { createHash } from 'node:crypto'
-import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync } from 'node:fs'
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, join, relative, resolve } from 'node:path'
 import type { Summary } from '@flow-checker/shared'
@@ -26,8 +36,24 @@ function copy(fixture: string, dirs: string[]): string {
   dirs.push(resolve(root, '..'))
   const from = join(fixturesDir, fixture)
   cpSync(from, root, { recursive: true, filter: (src) => !NOT_IN_CLONE.test(basename(src)) })
-  symlinkSync(join(from, 'node_modules'), join(root, 'node_modules'), 'junction')
+  linkPackages(join(from, 'node_modules'), join(root, 'node_modules'))
   return root
+}
+
+/**
+ * Links each installed package by its real path, not the whole `node_modules` folder. pnpm links
+ * packages with relative symlinks where the OS allows them (GitHub's Windows runners), and Windows
+ * resolves a relative link reached through a junction from the junction's side, so through one folder
+ * link every package lookup from the copy failed there.
+ */
+function linkPackages(from: string, to: string) {
+  mkdirSync(to, { recursive: true })
+  for (const entry of readdirSync(from, { withFileTypes: true })) {
+    if (entry.name === '.bin' || entry.name === '.pnpm' || entry.isFile()) continue
+    const source = join(from, entry.name)
+    if (entry.name.startsWith('@')) linkPackages(source, join(to, entry.name))
+    else symlinkSync(realpathSync(source), join(to, entry.name), 'junction')
+  }
 }
 
 function files(root: string): Record<string, string> {
