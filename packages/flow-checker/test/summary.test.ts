@@ -8,8 +8,11 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { type CliIO, runCli } from '../src/cli/run'
 
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
-// flow-checker's own files and build output: the summary must work without them.
-const NOT_IN_CLONE = /^(\.flow-checker|\.next|node_modules|AGENTS\.md|instrumentation(-client)?\.\w+)$/
+// flow-checker's own files and build output: the summary must work without them. The config is left out
+// too: it imports `@integr8-media/flow-checker/config`, which only resolves after `pnpm build`, and CI
+// runs the tests before the build.
+const NOT_IN_CLONE =
+  /^(\.flow-checker|\.next|node_modules|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
 
 function capture() {
   const out: string[] = []
