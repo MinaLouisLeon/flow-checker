@@ -33,6 +33,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M23 | Dashboard fixes       | Lists that grow with the app use `CappedList` / `useCapped` (5, then "+N more"); request bodies render once opened.      |
 | M24 | React Query keys      | Model version 10. Unreadable key segments are `param` + `unknown`; shared queries are `matched` with `sharedWith`.       |
 | M25 | Scanner fixes         | Model version 11. Handed-on functions are placed by `#valueTrigger`; `runtime-url` is an info flag (`isInfoFlag`).       |
+| M26 | Release v0.2.2        | Real-app before/after = scan + `export --html` with each `cli.js`, then open every page view in Playwright.              |
 
 ## Gotchas
 
@@ -278,3 +279,13 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - A/B against `dev` without a worktree: `pnpm build`, copy `packages/flow-checker/dist` to a sibling folder (so
   `node_modules` still resolves), `git stash`, build, copy, `git stash pop`, build; then scan one generated perf
   app with both `cli.js` files.
+
+## M26 — Release v0.2.2 (branch `feat/m26-release-v0.2.2`)
+
+- Real-app smoke check without touching the apps: back up `.flow-checker/model.json` (scan overwrites it), run
+  `scan` then `export --html <dir>` with each build's `cli.js` (export writes nothing into `.flow-checker/`), restore.
+  The export's `data.js` holds the model and captures, so site diffs and the dashboard numbers come from it.
+- An app's own `node_modules/@integr8-media/flow-checker/dist/cli.js` is a ready "before" build for bench A/B too.
+- Run the Next matrix and the real-app scans before the perf bench, not alongside it: scan times taken
+  while the matrix runs are not comparable.
+- A site count that goes up on a real app isn't a regression by itself: check repeated keys' call paths for twins.
