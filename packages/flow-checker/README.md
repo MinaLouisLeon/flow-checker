@@ -108,6 +108,8 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 - **Requests:** every request site, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status (verified, mismatch, needs re-check, not captured yet), transport and flags. The same request sent from several places is one row. A request opens on its own page with its body and response types, server hops, query-cache links, captures and the call path from the component.
 - **Flows**, **Types**, **Live** (captures as they arrive, with their match and type check) and **Export**.
 
+**Search everything:** press Ctrl+K (⌘K on a Mac) or `/` on any screen, or click Search in the top bar. One box finds pages, route handlers, components, requests, endpoints, types, flows and areas by name, file, URL pattern or route path; exact names come first, then names that start with what you typed, then word matches. Arrow keys move, Enter opens, Esc closes. It works in the static export too.
+
 Filters and searches stay in the URL, so a filtered list can be bookmarked or shared. Lists that grow with the app (the queries a cache call hits, a route handler's callers...) show five entries, then "+N more".
 
 ### React Query

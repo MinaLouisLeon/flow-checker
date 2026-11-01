@@ -5,6 +5,7 @@ import {
   type AreaList,
   buildAreas,
   buildEndpoints,
+  buildSearchIndex,
   type Component,
   type Endpoint,
   type EndpointList,
@@ -17,6 +18,7 @@ import {
   type QueryLink,
   type RequestSite,
   RequestSiteSchema,
+  type SearchIndex,
   urlText,
 } from '@flow-checker/shared'
 import type { ModelIndex } from './model-index'
@@ -440,4 +442,19 @@ export function areaRows(index: ModelIndex, list: AreaList = areasOf(index)): Ar
 export function filterAreas(rows: AreaRow[], q: string): Area[] {
   const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
   return rows.filter((r) => words.every((w) => r.text.includes(w))).map((r) => r.area)
+}
+
+// ---------------------------------------------------------------------------------------------
+// Global search (M33).
+
+const searchCache = new WeakMap<ModelIndex, SearchIndex>()
+
+/** The search index of a model, built once per index (so again after each re-scan). */
+export function searchOf(index: ModelIndex): SearchIndex {
+  let si = searchCache.get(index)
+  if (!si) {
+    si = buildSearchIndex(index, { endpoints: endpointsOf(index), areas: areasOf(index) })
+    searchCache.set(index, si)
+  }
+  return si
 }

@@ -103,3 +103,4 @@ re-run them on their own before assuming a regression.
 | M30 | Areas                                             | Done   |
 | M31 | Guarded pages                                     | Done   |
 | M32 | Start here                                        | Done   |
+| M33 | Global search                                     | Done   |
