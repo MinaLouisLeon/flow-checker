@@ -182,7 +182,7 @@ function RequestRow({
             from {owners.length === 1 ? owners[0] : `${owners.length} places`}
           </span>
           <span className="spacer" />
-          <Badge tone="neutral" title={`Sent from ${group.length} places in the code`}>
+          <Badge tone="neutral" term={['request', 'grouped']}>
             ×{group.length}
           </Badge>
           <SiteBadges site={first} />
@@ -193,7 +193,11 @@ function RequestRow({
             return (
               <li key={site.id} className={site.id === siteId ? 'selected' : undefined}>
                 <a href={link(site.id)}>{siteOwner(site, index)}</a>
-                {warnings(site).length > 0 && <Badge tone="warn">⚠ {warnings(site).length}</Badge>}
+                {warnings(site).length > 0 && (
+                  <Badge tone="warn" term={['request', 'warnings']}>
+                    ⚠ {warnings(site).length}
+                  </Badge>
+                )}
                 <span className="spacer" />
                 {call && <SourceLink file={call.file} line={call.line} column={call.column} />}
               </li>

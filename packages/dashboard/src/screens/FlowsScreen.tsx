@@ -102,20 +102,20 @@ function routeTrail(flow: Flow, index: ModelIndex): string {
 function FlowStatusBadge({ status }: { status?: FlowStatus }) {
   if (!status || status.status === 'unconfirmed') {
     return (
-      <Badge tone="muted" title="Inferred from the code. Not walked in the app yet.">
+      <Badge tone="muted" term={['flow-status', 'unconfirmed']}>
         not walked yet
       </Badge>
     )
   }
   if (status.status === 'partial') {
     return (
-      <Badge tone="warn" title="Started in the app, but not walked to the end yet">
+      <Badge tone="warn" term={['flow-status', 'partial']}>
         partial
       </Badge>
     )
   }
   return (
-    <Badge tone="ok" title={`Walked end to end ${status.runs} time(s)`}>
+    <Badge tone="ok" title={`Walked end to end ${status.runs} time(s)`} term={['flow-status', 'confirmed']}>
       ✓ confirmed
     </Badge>
   )

@@ -1,6 +1,8 @@
 // One request site: method + URL, how and when it is sent, body and response types,
 // the server hops it leads to, and the call stack from the component down to the network call.
 import {
+  explain,
+  type Flag,
   formatQueryKey,
   hasCaptures,
   isInfoFlag,
@@ -14,6 +16,7 @@ import {
 import { Children, type ReactNode, useState } from 'react'
 import { useSiteCaptures, useVerification } from './api'
 import { useData } from './context'
+import { useShowDetails } from './details'
 import { GraphqlFact } from './GraphqlView'
 import { groupSame, hitsEveryQuery, siteOwner, warnings } from './lists'
 import type { ModelIndex } from './model-index'
@@ -24,29 +27,7 @@ import { StreamEvents } from './SseView'
 import { TrpcFact } from './TrpcView'
 import { SiteStatusBadge, SiteTypeCheckView, StaleBadge, TypeCheckBadge } from './TypeCheckView'
 import { TypeShapeView } from './TypeShapeView'
-import { Badge, Empty, MoreButton, SourceLink, useCapped } from './ui'
-
-const TRIGGER_LABEL: Record<Trigger['kind'], string> = {
-  'server-render': 'server render',
-  'page-load': 'page load',
-  effect: 'effect',
-  event: 'event',
-  'route-handler': 'route handler',
-  'server-action': 'server action',
-  middleware: 'middleware',
-  unknown: 'unknown trigger',
-}
-
-const TRIGGER_TITLE: Record<Trigger['kind'], string> = {
-  'server-render': 'Sent while a server component renders',
-  'page-load': 'Sent when the client component renders (query hooks, render-time calls)',
-  effect: 'Sent from useEffect after the component mounts',
-  event: 'Sent when the user interacts',
-  'route-handler': 'Sent by a route handler when it is called',
-  'server-action': 'Sent by a server action when it is called',
-  middleware: 'Sent by middleware (middleware.ts / proxy.ts) before a matching request is handled',
-  unknown: 'The scan could not tell what starts this request',
-}
+import { Badge, CodeText, Empty, MoreButton, SourceLink, TermLink, useCapped } from './ui'
 
 /** Where a site starts plus what it sends, e.g. `LoginForm · POST /auth/login`. */
 export function siteLabel(site: RequestSite, index: ModelIndex): string {
@@ -74,7 +55,19 @@ export function ownerHref(site: RequestSite): string | undefined {
 }
 
 export function triggerLabel(trigger: Trigger): string {
-  return trigger.kind === 'event' && trigger.event ? trigger.event : TRIGGER_LABEL[trigger.kind]
+  return trigger.kind === 'event' && trigger.event
+    ? trigger.event
+    : (explain('trigger', trigger.kind)?.label ?? trigger.kind)
+}
+
+/** What to do about a note, from the glossary, and a link to its entry (M34). */
+function FlagHelp({ flag }: { flag: Flag }) {
+  const todo = explain('flag', flag.kind)?.todo
+  return (
+    <span className="muted flag-help">
+      {todo && <CodeText text={todo} />} <TermLink term={['flag', flag.kind]} />
+    </span>
+  )
 }
 
 /** Rows a request list shows before "+N more". */
@@ -100,6 +93,7 @@ export function RequestList({
   owners?: boolean
 }) {
   const { index } = useData()
+  const details = useShowDetails()
   const groups = owners ? groupSame(sites) : sites.map((s) => [s])
   const { shown, hidden, expand } = useCapped(groups, limit)
   if (sites.length === 0) return <Empty>{empty}</Empty>
@@ -123,12 +117,17 @@ export function RequestList({
                   from {names.length === 1 ? names[0] : `${names.length} places`}
                 </span>
                 <span className="spacer" />
-                <Badge tone="neutral" title={`Sent from ${group.length} places in the code`}>
+                <Badge tone="neutral" term={['request', 'grouped']}>
                   ×{group.length}
                 </Badge>
-                <Badge tone={first.trigger.kind === 'unknown' ? 'warn' : 'neutral'}>
-                  {triggerLabel(first.trigger)}
-                </Badge>
+                {details && (
+                  <Badge
+                    tone={first.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
+                    term={['trigger', first.trigger.kind]}
+                  >
+                    {triggerLabel(first.trigger)}
+                  </Badge>
+                )}
               </summary>
               <ul className="requests">
                 {group.map((site) => (
@@ -191,11 +190,24 @@ export function RequestSummary({ site }: { site: RequestSite }) {
   )
 }
 
-/** How it is sent, what starts it, its flags and its verification status. */
+/**
+ * How it is sent, what starts it, its notes and its verification status. Without "Details" (M34)
+ * only the main badge: the status once captured, else the number of notes.
+ */
 export function SiteBadges({ site }: { site: RequestSite }) {
+  const details = useShowDetails()
+  const notes = warnings(site)
+  if (!details) {
+    if (site.status !== 'inferred') return <SiteStatusBadge site={site} />
+    return notes.length > 0 ? <NotesBadge notes={notes} /> : null
+  }
   return (
     <>
-      <Badge tone="muted" title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}>
+      <Badge
+        tone="muted"
+        title={site.hook ? `${site.hook.name} from ${site.hook.module}` : undefined}
+        term={['transport', site.transport]}
+      >
         {site.transport === 'server-action'
           ? 'server action'
           : site.client
@@ -205,27 +217,26 @@ export function SiteBadges({ site }: { site: RequestSite }) {
       </Badge>
       <Badge
         tone={site.trigger.kind === 'unknown' ? 'warn' : 'neutral'}
-        title={TRIGGER_TITLE[site.trigger.kind]}
+        term={['trigger', site.trigger.kind]}
       >
         {triggerLabel(site.trigger)}
       </Badge>
       {site.conditional && (
-        <Badge tone="muted" title="Sent only under a condition in a shared helper, next to the main request">
+        <Badge tone="muted" term={['request', 'sometimes']}>
           sometimes
         </Badge>
       )}
-      {warnings(site).length > 0 && (
-        <Badge
-          tone="warn"
-          title={warnings(site)
-            .map((f) => f.message)
-            .join('\n')}
-        >
-          ⚠ {warnings(site).length}
-        </Badge>
-      )}
+      {notes.length > 0 && <NotesBadge notes={notes} />}
       <SiteStatusBadge site={site} />
     </>
+  )
+}
+
+function NotesBadge({ notes }: { notes: Flag[] }) {
+  return (
+    <Badge tone="warn" title={notes.map((f) => f.message).join('\n')} term={['request', 'warnings']}>
+      ⚠ {notes.length}
+    </Badge>
   )
 }
 
@@ -248,7 +259,7 @@ export function RequestItem({ site, open, owner }: { site: RequestSite; open: bo
           <ul className="notes">
             {site.flags.map((f) => (
               <li key={f.kind} className={isInfoFlag(f) ? 'muted' : undefined}>
-                {isInfoFlag(f) ? 'ℹ' : '⚠'} {f.message}
+                {isInfoFlag(f) ? 'ℹ' : '⚠'} {f.message} <FlagHelp flag={f} />
               </li>
             ))}
           </ul>

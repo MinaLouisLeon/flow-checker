@@ -499,14 +499,14 @@ function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?
   }
   if (match?.thirdParty) {
     return (
-      <Badge tone="muted" title="Sent by another site's script (an SDK), not by your code">
+      <Badge tone="muted" term={['capture', 'third-party']}>
         third-party
       </Badge>
     )
   }
   if (match?.status === 'ambiguous') {
     return (
-      <Badge tone="warn" title="Several request sites fit. Pick one.">
+      <Badge tone="warn" term={['capture', 'ambiguous']}>
         ? ambiguous
       </Badge>
     )
@@ -549,22 +549,32 @@ function MatchPanel({ capture }: { capture: Capture }) {
         <p className="muted">Not matched yet.</p>
       ) : match.status === 'matched' && current ? (
         <p>
-          <Badge tone="ok">✓ matched</Badge> <SiteLink site={current} />{' '}
+          <Badge tone="ok" term={['capture', 'matched']}>
+            ✓ matched
+          </Badge>{' '}
+          <SiteLink site={current} />{' '}
           <span className="muted">{match.by === 'manual' ? 'assigned by you' : `score ${match.score}`}</span>
         </p>
       ) : match.status === 'ambiguous' ? (
         <p>
-          <Badge tone="warn">? ambiguous</Badge> Several request sites fit about equally well. Pick the right
-          one below.
+          <Badge tone="warn" term={['capture', 'ambiguous']}>
+            ? ambiguous
+          </Badge>{' '}
+          Several request sites fit about equally well. Pick the right one below.
         </p>
       ) : match.thirdParty ? (
         <p>
-          <Badge tone="muted">third-party</Badge> Sent by another site's script (an SDK) to its own servers.
-          No project code is on its stack, so the scanner didn't miss anything.
+          <Badge tone="muted" term={['capture', 'third-party']}>
+            third-party
+          </Badge>{' '}
+          Sent by another site's script (an SDK) to its own servers. No project code is on its stack, so the
+          scanner didn't miss anything.
         </p>
       ) : (
         <p>
-          <Badge tone="warn">✗ unmatched</Badge>{' '}
+          <Badge tone="warn" term={['capture', 'unmatched']}>
+            ✗ unmatched
+          </Badge>{' '}
           {match.by === 'manual'
             ? 'You marked requests like this as not belonging to any request site.'
             : 'No scanned request site fits. The scanner probably missed the code that sends it.'}

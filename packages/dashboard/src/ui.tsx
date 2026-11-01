@@ -1,8 +1,19 @@
-import { accessOf, type Component, type ComponentRef, guardText, type Route } from '@flow-checker/shared'
+import {
+  accessOf,
+  type Component,
+  type ComponentRef,
+  explainTitle,
+  type GlossaryGroupId,
+  guardText,
+  type Route,
+  termId,
+} from '@flow-checker/shared'
 import { type ReactNode, useEffect, useState } from 'react'
 import { useData } from './context'
+import { setShowDetails, useShowDetails } from './details'
 import { CAP, capped } from './lists'
 import { editorUrl } from './model-index'
+import { href } from './router'
 
 /**
  * A page's access label (M31): `guarded`, `access unknown`, or `open` (left out when `compact`, so
@@ -14,21 +25,21 @@ export function AccessBadge({ route, compact }: { route: Route; compact?: boolea
   const lines = [...access.guards.map(guardText), ...(access.reasons ?? []).map((r) => `? ${r.text}`)].map(
     (line) => line.replaceAll('`', ''),
   )
-  const title = lines.length > 0 ? lines.join('\n') : 'Nothing redirects or stops this page'
+  const title = lines.length > 0 ? lines.join('\n') : undefined
   if (access.status === 'guarded')
     return (
-      <Badge tone="shared" title={title}>
+      <Badge tone="shared" title={title} term={['access', 'guarded']}>
         guarded
       </Badge>
     )
   if (access.status === 'unknown')
     return (
-      <Badge tone="muted" title={title}>
+      <Badge tone="muted" title={title} term={['access', 'unknown']}>
         access ?
       </Badge>
     )
   return compact ? null : (
-    <Badge tone="ok" title={title}>
+    <Badge tone="ok" title={title} term={['access', 'open']}>
       open
     </Badge>
   )
@@ -45,37 +56,42 @@ export function PageAccess({ route }: { route: Route | undefined }) {
   return route ? <AccessBadge route={route} compact /> : null
 }
 
+/** A glossary word (M34): its group and key, e.g. `['flag', 'dynamic-url']`. */
+export type Term = [GlossaryGroupId, string]
+
 export function Badge({
   tone = 'neutral',
   title,
+  term,
   children,
 }: {
   tone?: 'neutral' | 'server' | 'client' | 'shared' | 'warn' | 'ok' | 'muted'
+  /** Specific detail (the guards, the hook). The glossary explanation of `term` follows it. */
   title?: string
+  term?: Term
   children: ReactNode
 }) {
+  const explained = term ? explainTitle(...term) : undefined
+  const full = [title, explained].filter(Boolean).join('\n\n') || undefined
   return (
-    <span className={`badge badge-${tone}`} title={title}>
+    <span className={`badge badge-${tone}`} title={full} data-term={term?.join(':')}>
       {children}
     </span>
   )
 }
 
-export function KindBadge({ component }: { component: Component }) {
-  const titles = {
-    server: 'Server component: only rendered from server components',
-    client: component.clientBoundary
-      ? "Client component: the file starts with 'use client'"
-      : "Client component: rendered below a 'use client' boundary",
-    shared: 'Rendered from both server and client components',
-  }
+/**
+ * Server / client / shared. With `details` also `use client` on the file that starts the client
+ * boundary.
+ */
+export function KindBadge({ component, details = true }: { component: Component; details?: boolean }) {
   return (
     <>
-      <Badge tone={component.kind} title={titles[component.kind]}>
+      <Badge tone={component.kind} term={['component', component.kind]}>
         {component.kind}
       </Badge>
-      {component.clientBoundary && (
-        <Badge tone="muted" title="This file starts the client boundary">
+      {details && component.clientBoundary && (
+        <Badge tone="muted" term={['component', 'use-client']}>
           use client
         </Badge>
       )}
@@ -83,35 +99,69 @@ export function KindBadge({ component }: { component: Component }) {
   )
 }
 
-export function RefBadges({ site: r }: { site: ComponentRef }) {
+/** How a component is rendered. Without `details` only the warning (unresolved) is shown. */
+export function RefBadges({ site: r, details = true }: { site: ComponentRef; details?: boolean }) {
   return (
     <>
-      {r.conditional && (
-        <Badge tone="muted" title="Only rendered on some paths">
+      {details && r.conditional && (
+        <Badge tone="muted" term={['component', 'conditional']}>
           conditional
         </Badge>
       )}
-      {r.dynamic && (
-        <Badge tone="muted" title="Loaded with next/dynamic or React.lazy">
+      {details && r.dynamic && (
+        <Badge tone="muted" term={['component', 'lazy']}>
           lazy
         </Badge>
       )}
-      {r.resolution === 'excluded' && (
-        <Badge tone="muted" title="In a file the config's include/exclude leaves out">
+      {details && r.resolution === 'excluded' && (
+        <Badge tone="muted" term={['component', 'excluded']}>
           excluded
         </Badge>
       )}
       {r.resolution === 'unresolved' && (
-        <Badge tone="warn" title="The scanner could not find this component">
+        <Badge tone="warn" term={['component', 'unresolved']}>
           ⚠ unresolved
         </Badge>
       )}
-      {r.resolution === 'prop' && (
-        <Badge tone="muted" title="Passed in by the parent, e.g. an `as` prop">
+      {details && r.resolution === 'prop' && (
+        <Badge tone="muted" term={['component', 'prop']}>
           from props
         </Badge>
       )}
     </>
+  )
+}
+
+/** The "Details" switch in the top bar (M34). */
+export function DetailsToggle() {
+  const on = useShowDetails()
+  return (
+    <button
+      type="button"
+      className="button details-toggle"
+      aria-pressed={on}
+      title={
+        on
+          ? 'Showing every badge. Click to show only the main one (the status).'
+          : 'Showing only the main badge (the status). Click to also show triggers, transports and notes.'
+      }
+      onClick={() => setShowDetails(!on)}
+    >
+      {on ? 'Hide details' : 'Show details'}
+    </button>
+  )
+}
+
+/** A link to a word's Glossary entry. */
+export function TermLink({ term, children }: { term: Term; children?: ReactNode }) {
+  return (
+    <a
+      className="term-link"
+      href={href({ name: 'glossary', q: '', term: termId(...term) })}
+      title="What does this mean?"
+    >
+      {children ?? '?'}
+    </a>
   )
 }
 

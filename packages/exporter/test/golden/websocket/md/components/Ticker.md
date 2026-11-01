@@ -35,7 +35,7 @@ Takes no props.
 | URL | `ws://localhost:4011/live` |
 | Socket | WebSocket · protocols `ticker.v1` |
 
-> ⚠ **type-mismatch**: Received "message" doesn't match Quote: price is string "9.10" (expected number) (1 of 1 capture).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Received "message" doesn't match Quote: price is string "9.10" (expected number) (1 of 1 capture).
 
 **Sends `message`** [`Subscribe`](../types.md#typ_01lxex28a31)
 

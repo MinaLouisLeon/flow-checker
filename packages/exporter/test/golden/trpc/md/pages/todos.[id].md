@@ -160,7 +160,7 @@ Response body:
 | In procedure | [`user.byId`](../trpc.md#procedure-user_byId) (query) |
 | Call path | `fetchUser` → `api` → `fetch` |
 
-> ⚠ **unknown-response**: No response type was found (annotation, generic or cast).
+> ⚠ **[unknown-response](../GLOSSARY.md#flag-unknown-response)**: No response type was found (annotation, generic or cast).
 
 **Captured** `GET http://localhost:4010/users/1` → 200 OK · 3 ms · 2026-10-30 07:09 UTC
 

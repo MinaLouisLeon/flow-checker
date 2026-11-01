@@ -11,6 +11,7 @@ import {
 } from '@flow-checker/shared'
 import { useState } from 'react'
 import { useData } from '../context'
+import { useShowDetails } from '../details'
 import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
 import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
@@ -32,6 +33,7 @@ import { ComponentPanel } from './ComponentPanel'
 
 export function PageView({ routeId, componentId }: { routeId: string; componentId?: string }) {
   const { index, meta } = useData()
+  const details = useShowDetails()
   const route = index.routes.get(routeId)
   if (!route) {
     return (
@@ -66,7 +68,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
           <h1>
             <code>{route.path}</code>
           </h1>
-          <Badge>{route.kind === 'page' ? 'page' : 'route handler'}</Badge>
+          {details && <Badge>page</Badge>}
           <AccessBadge route={route} />
           {route.slot && <Badge tone="muted">slot @{route.slot}</Badge>}
           {route.intercepting && (
@@ -452,6 +454,7 @@ function TreeItem({
 }) {
   const { index } = useData()
   const [open, setOpen] = useState(true)
+  const details = useShowDetails()
   const component = index.components.get(componentId)
   if (!component) return null
 
@@ -478,15 +481,23 @@ function TreeItem({
           <span className="caret-space" />
         )}
         <a href={href({ name: 'page', routeId, componentId })}>{component.name}</a>
-        <KindBadge component={component} />
-        {site && <RefBadges site={site} />}
-        {requestCount > 0 && (
+        <KindBadge component={component} details={details} />
+        {site && <RefBadges site={site} details={details} />}
+        {details && requestCount > 0 && (
           <Badge tone="neutral" title={`Sends ${requestCount} request${requestCount === 1 ? '' : 's'}`}>
             ⇄ {requestCount}
           </Badge>
         )}
-        {noteCount > 0 && <Badge tone="warn">⚠ {noteCount}</Badge>}
-        {cycle && <Badge tone="muted">recursive</Badge>}
+        {noteCount > 0 && (
+          <Badge tone="warn" title={`${noteCount} note${noteCount === 1 ? '' : 's'} on this component`}>
+            ⚠ {noteCount}
+          </Badge>
+        )}
+        {cycle && (
+          <Badge tone="muted" term={['component', 'recursive']}>
+            recursive
+          </Badge>
+        )}
       </div>
       {hasChildren && open && (
         <ul>
@@ -505,8 +516,12 @@ function TreeItem({
                 <div className="tree-row">
                   <span className="caret-space" />
                   <span className="muted">{ref.name}</span>
-                  {ref.resolution === 'external' && <Badge tone="muted">{ref.module ?? 'external'}</Badge>}
-                  <RefBadges site={ref} />
+                  {details && ref.resolution === 'external' && (
+                    <Badge tone="muted" title="From a package">
+                      {ref.module ?? 'external'}
+                    </Badge>
+                  )}
+                  <RefBadges site={ref} details={details} />
                 </div>
               </li>
             ),

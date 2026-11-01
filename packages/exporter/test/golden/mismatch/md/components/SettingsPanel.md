@@ -34,7 +34,7 @@ Takes no props.
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings` |
 | Call path | `getSettings` → `fetch` |
 
-> ⚠ **type-mismatch**: Response doesn't match Settings: digest is null (expected { frequency: "daily" \| "weekly" }) (2 of 2 captures).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Response doesn't match Settings: digest is null (expected { frequency: "daily" \| "weekly" }) (2 of 2 captures).
 
 **Response** [`Settings`](../types.md#typ_0xjkp2la9ri)
 

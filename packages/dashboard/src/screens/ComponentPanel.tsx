@@ -1,4 +1,5 @@
 import { useData } from '../context'
+import { useShowDetails } from '../details'
 import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
@@ -15,6 +16,7 @@ export function ComponentPanel({
   componentHref?: (id: string) => string
 }) {
   const { index } = useData()
+  const details = useShowDetails()
   const component = index.components.get(componentId)
   if (!component) {
     return (
@@ -90,12 +92,12 @@ export function ComponentPanel({
             {component.children.map((ref) => (
               <li key={`${ref.name}:${ref.loc.line}:${ref.loc.column}`}>
                 {ref.componentId ? <a href={link(ref.componentId)}>{ref.name}</a> : <span>{ref.name}</span>}
-                {ref.resolution === 'external' && (
+                {details && ref.resolution === 'external' && (
                   <Badge tone="muted" title={ref.factory ? `Created by ${ref.factory}` : undefined}>
                     {ref.module ?? 'external'}
                   </Badge>
                 )}
-                <RefBadges site={ref} />
+                <RefBadges site={ref} details={details} />
                 <span className="spacer" />
                 <SourceLink file={ref.loc.file} line={ref.loc.line} column={ref.loc.column} />
               </li>
@@ -114,7 +116,7 @@ export function ComponentPanel({
             render={(p) => (
               <li key={`${p.parentId}:${p.ref.loc.line}`}>
                 <a href={link(p.parentId)}>{index.components.get(p.parentId)?.name ?? p.parentId}</a>
-                <RefBadges site={p.ref} />
+                <RefBadges site={p.ref} details={details} />
                 <span className="spacer" />
                 <SourceLink file={p.ref.loc.file} line={p.ref.loc.line} column={p.ref.loc.column} />
               </li>
