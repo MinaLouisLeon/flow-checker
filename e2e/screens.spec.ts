@@ -22,6 +22,7 @@ async function openCard(page: Page, label: string) {
 test('every overview card opens a screen', async ({ page }) => {
   const expected: [string, RegExp][] = [
     ['Pages', /#\/map$/],
+    ['Areas', /#\/areas$/],
     ['Route handlers', /#\/map\?view=handlers$/],
     ['Components', /#\/components$/],
     ['Types', /#\/types$/],
@@ -108,4 +109,39 @@ test('the Endpoints screen lists endpoints by host and shows who calls them', as
   await expect(page).toHaveURL(/#\/requests\/req_/)
   await page.locator('.split-side .request-facts a', { hasText: 'POST /auth/verify-otp' }).click()
   await expect(page).toHaveURL(/#\/endpoints\/ep_/)
+})
+
+test('the Areas screen shows one card per area and the Map frames them', async ({ page }) => {
+  await page.goto(`${dashboard}/#/`)
+  const total = await cardValue(page, 'Areas')
+  await openCard(page, 'Areas')
+  await expect(page.locator('.toolbar')).toContainText(`${total} of ${total}`)
+  // One card per area, then the card for what they share (the locale layout).
+  const cards = page.locator('.area-cards > li:not(.area-card-shared)')
+  await expect(cards).toHaveCount(total)
+  await expect(page.locator('.area-card-shared')).toBeVisible()
+
+  await cards.filter({ hasText: 'login' }).locator('a').click()
+  await expect(page).toHaveURL(/#\/areas\/ar_/)
+  const panel = page.locator('.split-side')
+  await expect(panel.locator('.panel-head h2')).toHaveText('login')
+  await expect(panel).toContainText('LoginForm submit')
+  await expect(panel).toContainText('/auth/login')
+
+  // A page links back to its area.
+  await panel.getByRole('link', { name: '/[locale]/login', exact: true }).click()
+  await expect(page).toHaveURL(/#\/page\/rt_/)
+  await page.locator('.page-file a[href^="#/areas"]').click()
+  await expect(page).toHaveURL(/#\/areas\/ar_/)
+
+  // The Map draws a frame per area; a frame opens its area.
+  await page.goto(`${dashboard}/#/map`)
+  await expect(page.locator('.area-frame')).toHaveCount(0)
+  await page.getByLabel('Areas').check()
+  await expect(page).toHaveURL(/#\/map\?areas=1$/)
+  await expect(page.locator('.area-frame')).toHaveCount(total)
+  // The name sits above the pages, where the frame isn't covered.
+  await page.locator('.area-frame-name', { hasText: 'verify' }).click()
+  await expect(page).toHaveURL(/#\/areas\/ar_/)
+  await expect(page.locator('.split-side .panel-head h2')).toHaveText('verify')
 })

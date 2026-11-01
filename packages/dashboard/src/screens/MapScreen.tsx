@@ -1,4 +1,4 @@
-import type { Route, RouteTreeNode } from '@flow-checker/shared'
+import type { Area, Route, RouteTreeNode } from '@flow-checker/shared'
 import {
   Background,
   Controls,
@@ -16,6 +16,8 @@ import { isVerified as isSiteVerified } from '@flow-checker/shared'
 import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
+import { areasOf } from '../lists'
+import type { ModelIndex } from '../model-index'
 import { href, type MapView, replaceScreen } from '../router'
 import { Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
 
@@ -29,11 +31,21 @@ interface RouteNodeData extends Record<string, unknown> {
 }
 type RouteNode = Node<RouteNodeData, 'route'>
 
-const nodeTypes = { route: RouteNodeView }
+interface AreaFrameData extends Record<string, unknown> {
+  area: Area
+}
+type AreaFrameNode = Node<AreaFrameData, 'area'>
 
-export function MapScreen({ view, q }: { view: MapView; q: string }) {
-  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q })
-  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next })
+const nodeTypes = { route: RouteNodeView, area: AreaFrameView }
+
+/** Space between an area's pages and its frame; the top leaves room for the name. */
+const FRAME_PAD = 12
+const FRAME_TOP = 26
+
+export function MapScreen({ view, q, areas }: { view: MapView; q: string; areas?: boolean }) {
+  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas })
+  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas })
+  const setAreas = (next: boolean) => replaceScreen({ name: 'map', view, q, areas: next || undefined })
 
   return (
     <div className="screen screen-full">
@@ -50,9 +62,15 @@ export function MapScreen({ view, q }: { view: MapView; q: string }) {
           </button>
         </fieldset>
         <SearchBox value={q} onChange={setQuery} placeholder="Search routes and files" />
+        {view === 'graph' && (
+          <label className="legend-toggle" title="Draw a frame around the pages of each area">
+            <input type="checkbox" checked={Boolean(areas)} onChange={(e) => setAreas(e.target.checked)} />{' '}
+            Areas
+          </label>
+        )}
       </div>
       {view === 'graph' ? (
-        <RouteGraphView q={q} />
+        <RouteGraphView q={q} showAreas={Boolean(areas)} />
       ) : view === 'tree' ? (
         <RouteTreeView q={q} />
       ) : (
@@ -62,7 +80,7 @@ export function MapScreen({ view, q }: { view: MapView; q: string }) {
   )
 }
 
-function RouteGraphView({ q }: { q: string }) {
+function RouteGraphView({ q, showAreas }: { q: string; showAreas: boolean }) {
   const { index } = useData()
   const [showShared, setShowShared] = useState(false)
   const hasSharedEdges = index.navEdges.some((e) => e.shared)
@@ -137,13 +155,16 @@ function RouteGraphView({ q }: { q: string }) {
     return { nodes, edges }
   }, [index, showShared])
 
+  const frames = useMemo(() => (showAreas ? areaFrames(index, nodes) : []), [index, nodes, showAreas])
   const shown = useMemo(
-    () =>
-      nodes.map((n) => ({
+    () => [
+      ...frames,
+      ...nodes.map((n) => ({
         ...n,
         data: { ...n.data, dimmed: !matches(q, n.data.route.path, n.data.route.file) },
       })),
-    [nodes, q],
+    ],
+    [frames, nodes, q],
   )
 
   if (nodes.length === 0) return <p className="empty">No routes found.</p>
@@ -164,6 +185,11 @@ function RouteGraphView({ q }: { q: string }) {
           fitViewOptions={{ padding: 0.1, minZoom: 0.8, maxZoom: 1.2 }}
           minZoom={0.1}
           onNodeClick={(_, node) => {
+            if (node.type === 'area') {
+              const area = (node as AreaFrameNode).data.area
+              window.location.hash = href({ name: 'areas', areaId: area.id, q: '' })
+              return
+            }
             const route = (node as RouteNode).data.route
             window.location.hash = href({ name: 'page', routeId: route.id })
           }}
@@ -200,6 +226,51 @@ function RouteGraphView({ q }: { q: string }) {
           </label>
         )}
       </div>
+    </div>
+  )
+}
+
+/** A frame behind each area's pages: the box around their nodes. */
+function areaFrames(index: ModelIndex, nodes: RouteNode[]): AreaFrameNode[] {
+  const list = areasOf(index)
+  const boxes = new Map<string, { x0: number; y0: number; x1: number; y1: number }>()
+  for (const node of nodes) {
+    const area = list.byRoute.get(node.id)
+    if (!area) continue
+    const { x, y } = node.position
+    const box = boxes.get(area.id)
+    if (box) {
+      box.x0 = Math.min(box.x0, x)
+      box.y0 = Math.min(box.y0, y)
+      box.x1 = Math.max(box.x1, x + NODE_WIDTH)
+      box.y1 = Math.max(box.y1, y + NODE_HEIGHT)
+    } else boxes.set(area.id, { x0: x, y0: y, x1: x + NODE_WIDTH, y1: y + NODE_HEIGHT })
+  }
+  return list.areas.flatMap((area) => {
+    const box = boxes.get(area.id)
+    if (!box) return []
+    const width = box.x1 - box.x0 + FRAME_PAD * 2
+    const height = box.y1 - box.y0 + FRAME_PAD + FRAME_TOP
+    return [
+      {
+        id: `area:${area.id}`,
+        type: 'area' as const,
+        position: { x: box.x0 - FRAME_PAD, y: box.y0 - FRAME_TOP },
+        width,
+        height,
+        zIndex: -1,
+        selectable: false,
+        style: { width, height },
+        data: { area },
+      },
+    ]
+  })
+}
+
+function AreaFrameView({ data }: NodeProps<AreaFrameNode>) {
+  return (
+    <div className="area-frame" title={`Area ${data.area.name}: open its card`}>
+      <span className="area-frame-name">{data.area.name}</span>
     </div>
   )
 }

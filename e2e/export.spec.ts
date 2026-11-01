@@ -73,6 +73,11 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await expect(endpoint).toContainText('LoginForm')
   await expect(endpoint.locator('.request-captures')).toContainText('/auth/login')
 
+  // Areas (M30) too.
+  await page.locator('.nav a', { hasText: 'Areas' }).click()
+  await page.locator('.area-cards a', { hasText: 'verify' }).click()
+  await expect(page.locator('.split-side')).toContainText('VerifyOtpForm')
+
   expect(errors).toEqual([])
 })
 

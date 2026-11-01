@@ -2,6 +2,7 @@ import { resolve } from 'node:path'
 import {
   type ApiClientConfig,
   type AppModel,
+  type AreasConfig,
   createPathFilter,
   DEFAULT_EXCLUDE,
   DEFAULT_INCLUDE,
@@ -51,6 +52,8 @@ export interface ScanOptions {
   apiClients?: readonly ApiClientConfig[]
   /** GraphQL schema, persisted queries and endpoint (config `graphql`), and a live introspection result. */
   graphql?: GraphqlScanOptions
+  /** How pages are grouped into areas (config `areas`, M30). Stored in the model as given. */
+  areas?: AreasConfig
   /** Called as the scan moves through its phases (CLI progress output). Must not throw. */
   onProgress?: (event: ScanProgress) => void
 }
@@ -85,6 +88,7 @@ export interface ScanSettings {
   scanned: (file: string) => boolean
   apiClients: readonly ApiClientConfig[]
   graphql?: GraphqlScanOptions
+  areas?: AreasConfig
 }
 
 /** Scans a Next.js App Router project into the model written to `.flow-checker/model.json`. */
@@ -133,6 +137,7 @@ export function createScanSession(options: ScanOptions): ScanSession {
     scanned: (file) => pathFilter(relativeTo(root, file)),
     apiClients: options.apiClients ?? [],
     ...(options.graphql ? { graphql: options.graphql } : {}),
+    ...(options.areas ? { areas: options.areas } : {}),
   }
 
   const report: Report = (event) => {
@@ -432,6 +437,7 @@ function analyze(
     ...(trpc ? { trpc } : {}),
     ...(graphql ? { graphql } : {}),
     ...(streams.length > 0 ? { streams } : {}),
+    ...(settings.areas ? { areas: settings.areas } : {}),
   }
 }
 

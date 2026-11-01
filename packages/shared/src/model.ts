@@ -1066,6 +1066,12 @@ export const ProjectInfoSchema = z.object({
 })
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 
+/** The `areas` config (M30), kept in the model so every view groups pages the same way. */
+export const AreasConfigSchema = z.object({
+  rename: z.record(z.string(), z.string()).optional(),
+  merge: z.record(z.string(), z.array(z.string())).optional(),
+})
+
 export const AppModelSchema = z.object({
   /**
    * Older files read as the current version: version 1 (before M13) has no query keys or links,
@@ -1114,5 +1120,7 @@ export const AppModelSchema = z.object({
   graphql: GraphqlInfoSchema.optional(),
   /** Route handlers that answer with an event stream (M18). */
   streams: z.array(SseEndpointSchema).optional(),
+  /** The `areas` config, when the project has one (M30). Areas themselves are derived (`areas.ts`). */
+  areas: AreasConfigSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

@@ -2,7 +2,7 @@ import { isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import { GraphqlSection } from '../GraphqlView'
-import { COMPONENT_KINDS, countWhen, endpointsOf, REQUEST_WHEN, type RequestWhen } from '../lists'
+import { areasOf, COMPONENT_KINDS, countWhen, endpointsOf, REQUEST_WHEN, type RequestWhen } from '../lists'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
@@ -38,12 +38,19 @@ export function Overview() {
   const notes = index.notes.filter((n) => !isPostmanNote(n, index))
   const endpoints = endpointsOf(index)
   const backends = endpoints.hosts.filter((h) => h.kind === 'external').length
+  const areas = areasOf(index)
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
     <div className="screen">
       <div className="stats">
         <Stat label="Pages" value={pages.length} link={href({ name: 'map', view: 'graph', q: '' })} />
+        <Stat
+          label="Areas"
+          value={areas.areas.length}
+          link={href({ name: 'areas', q: '' })}
+          detail={areas.by === 'folder' ? 'by feature folder' : 'by URL'}
+        />
         <Stat
           label="Route handlers"
           value={handlers.length}

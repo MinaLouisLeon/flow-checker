@@ -143,7 +143,7 @@ export function buildEndpoints(index: ModelIndex): EndpointList {
       ep.bodyType = betterType(ep.bodyType, site.bodyType)
       ep.responseType = betterType(ep.responseType, site.responseType)
     }
-    const callers = callersOf(site, index)
+    const callers = requestCallers(site, index)
     for (const id of callers.routeIds) addOnce(ep.routeIds, id)
     for (const id of callers.componentIds) addOnce(ep.componentIds, id)
     const list = bySite.get(site.id)
@@ -341,7 +341,7 @@ export function runsInBrowser(site: RequestSite, index: ModelIndex): boolean {
  * Pages and components behind a request: its component, or (for a request a route handler or
  * server action sends) the components that call that handler or action.
  */
-function callersOf(
+export function requestCallers(
   site: RequestSite,
   index: ModelIndex,
   seen = new Set<string>(),
@@ -368,7 +368,7 @@ function callersOf(
     )
   }
   for (const caller of callers) {
-    const more = callersOf(caller, index, seen)
+    const more = requestCallers(caller, index, seen)
     for (const id of more.routeIds) addOnce(out.routeIds, id)
     for (const id of more.componentIds) addOnce(out.componentIds, id)
   }

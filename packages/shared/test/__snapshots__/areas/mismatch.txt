@@ -1,0 +1,11 @@
+by route
+
+home from /
+  pages: /
+  components: RootLayout, HomePage, SettingsPanel, TodoPanel
+  shared components: -
+  requests: 4, endpoints: 4, notes: 0
+  flows: TodoPanel submit
+
+shared components: -
+shared requests: 0

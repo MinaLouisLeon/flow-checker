@@ -100,3 +100,4 @@ re-run them on their own before assuming a regression.
 | M27 | Early-return guards (v0.3.0)                      | Done   |
 | M28 | `flow-checker explore`                            | Done   |
 | M29 | Endpoints                                         | Done   |
+| M30 | Areas                                             | Done   |

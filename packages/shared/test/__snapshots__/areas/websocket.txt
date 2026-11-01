@@ -1,0 +1,18 @@
+by route
+
+home from /
+  pages: /
+  components: HomePage, Ping, Ticker
+  shared components: RootLayout
+  requests: 2, endpoints: 2, notes: 0
+  flows: Ping click
+
+chat from /chat
+  pages: /chat
+  components: ChatPage, Chat
+  shared components: RootLayout
+  requests: 1, endpoints: 1, notes: 0
+  flows: -
+
+shared components: RootLayout
+shared requests: 0

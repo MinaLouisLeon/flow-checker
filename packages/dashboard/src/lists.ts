@@ -1,6 +1,9 @@
 // Rows, filters and sorting for the Components and Requests screens (M21). Pure functions of the
 // model index, so they are unit-tested without rendering.
 import {
+  type Area,
+  type AreaList,
+  buildAreas,
   buildEndpoints,
   type Component,
   type Endpoint,
@@ -391,4 +394,45 @@ export function filterEndpoints(rows: EndpointRow[], filter: EndpointFilter): En
       (filter.side !== 'server' || !e.browser) &&
       words.every((w) => text.includes(w)),
   )
+}
+
+// ---------------------------------------------------------------------------------------------
+// Areas (M30).
+
+const areaCache = new WeakMap<ModelIndex, AreaList>()
+
+/** The areas of a model, built once per index (on top of its endpoint list). */
+export function areasOf(index: ModelIndex): AreaList {
+  let list = areaCache.get(index)
+  if (!list) {
+    list = buildAreas(index, endpointsOf(index))
+    areaCache.set(index, list)
+  }
+  return list
+}
+
+export interface AreaRow {
+  area: Area
+  /** Lowercased: name, key, folders, page paths and component names. */
+  text: string
+}
+
+/** One row per area, with its search text worked out once. */
+export function areaRows(index: ModelIndex, list: AreaList = areasOf(index)): AreaRow[] {
+  return list.areas.map((area) => {
+    const fields = [
+      area.name,
+      area.key,
+      ...area.from,
+      ...area.routeIds.map((id) => index.routes.get(id)?.path),
+      ...area.componentIds.map((id) => index.components.get(id)?.name),
+    ]
+    return { area, text: fields.filter(Boolean).join('\n').toLowerCase() }
+  })
+}
+
+/** The areas that have every word of the search. */
+export function filterAreas(rows: AreaRow[], q: string): Area[] {
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  return rows.filter((r) => words.every((w) => r.text.includes(w))).map((r) => r.area)
 }

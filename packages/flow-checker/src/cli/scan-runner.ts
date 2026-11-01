@@ -18,7 +18,7 @@ import { writeModel } from './scan'
 
 export type ScanOptions = Pick<
   ScannerOptions,
-  'root' | 'appDir' | 'types' | 'include' | 'exclude' | 'apiClients' | 'graphql'
+  'root' | 'appDir' | 'types' | 'include' | 'exclude' | 'apiClients' | 'graphql' | 'areas'
 > & {
   /** Write `model.json` after each scan. Default: true (`export` turns it off). */
   writeModel?: boolean

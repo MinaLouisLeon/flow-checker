@@ -17,6 +17,7 @@ export const POSTMAN = 'postman.md'
 export const TRPC = 'trpc.md'
 export const GRAPHQL = 'graphql.md'
 export const ENDPOINTS = 'endpoints.md'
+export const AREAS = 'areas.md'
 
 export function docNames(model: AppModel): DocNames {
   const routes = unique(model.routes, (r) => `pages/${routeSlug(r)}`)

@@ -145,6 +145,26 @@ Masked strings become `"[REDACTED:string]"`, numbers `0` and booleans `false`, s
 | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `maxDepth` | `6`     | How deep anonymous (inline) types are expanded. Named types are always referenced by name, so cycles are safe. Lower it if scans of very deep types are slow. |
 
+### `areas`
+
+The dashboard's Areas screen, the Map's area frames and `areas.md` group pages by feature. By default a page goes in the area named after the first static part of its URL, after route groups, dynamic segments and locale prefixes (`/[locale]/billing/invoices` is in `billing`); pages at the root are in `home`. When that gives a single area, pages are grouped by the feature folder that holds most of their components instead (`src/features/billing`, `src/modules/billing`: whatever the folder is called).
+
+| Field    | Meaning                                                                                                      |
+| -------- | ------------------------------------------------------------------------------------------------------------ |
+| `rename` | Display names by area: `{ billing: 'Billing & invoices' }`.                                                  |
+| `merge`  | Areas folded into another: `{ account: ['profile', 'settings'] }`. The target can be a name no page has yet. |
+
+Merges apply first, so `rename` uses the merged names. Names that match no area are listed on the Areas screen and in `areas.md`.
+
+```ts
+export default defineConfig({
+  areas: {
+    merge: { account: ['profile', 'settings'] },
+    rename: { account: 'Account', home: 'Landing' },
+  },
+})
+```
+
 ### `export`
 
 Folders `flow-checker export` (with neither `--md` nor `--html`) and the dashboard's Export screen write to, relative to the project root.
