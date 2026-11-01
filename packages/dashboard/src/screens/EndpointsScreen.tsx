@@ -8,11 +8,13 @@ import {
   type EndpointStatus,
   type EndpointTransport,
   endpointLabel,
+  explainTitle,
   type RequestSite,
 } from '@flow-checker/shared'
 import { useMemo } from 'react'
 import { useCaptures } from '../api'
 import { useData } from '../context'
+import { useShowDetails } from '../details'
 import { type EndpointSide, endpointRows, endpointsOf, filterEndpoints, siteOwner } from '../lists'
 import { TypeBlock } from '../RequestView'
 import { href, replaceScreen, type Screen } from '../router'
@@ -41,11 +43,6 @@ const SIDE_LABEL: Record<EndpointSide | 'all', string> = {
   all: 'All',
   browser: 'From the browser',
   server: 'Server only',
-}
-
-const SIDE_TITLE: Record<EndpointSide, string> = {
-  browser: 'Called by code that runs in the browser (client components, form actions)',
-  server: 'Only called by server code: server components, route handlers, server actions, middleware',
 }
 
 export function EndpointsScreen(screen: EndpointsScreen) {
@@ -82,7 +79,7 @@ export function EndpointsScreen(screen: EndpointsScreen) {
                 key={s ?? 'all'}
                 type="button"
                 aria-pressed={side === s}
-                title={s ? SIDE_TITLE[s] : undefined}
+                title={s ? explainTitle('endpoint-side', s) : undefined}
                 onClick={() => go({ side: s })}
               >
                 {SIDE_LABEL[s ?? 'all']}
@@ -216,17 +213,23 @@ export function EndpointSummary({ endpoint }: { endpoint: Endpoint }) {
   )
 }
 
+/** Kind, side and Postman with "Details" on (M34); the status always. */
 function EndpointBadges({ endpoint }: { endpoint: Endpoint }) {
+  const details = useShowDetails()
+  const side = endpoint.browser ? (endpoint.server ? 'both' : 'browser') : 'server'
   return (
     <>
-      {endpoint.transport !== 'http' && <Badge tone="muted">{TRANSPORT_LABEL[endpoint.transport]}</Badge>}
-      <Badge
-        tone={endpoint.browser ? 'client' : 'server'}
-        title={endpoint.browser ? SIDE_TITLE.browser : SIDE_TITLE.server}
-      >
-        {endpoint.browser ? (endpoint.server ? 'browser + server' : 'browser') : 'server'}
-      </Badge>
-      {endpoint.contracts.length > 0 && (
+      {details && endpoint.transport !== 'http' && (
+        <Badge tone="muted" term={['transport', endpoint.transport]}>
+          {TRANSPORT_LABEL[endpoint.transport]}
+        </Badge>
+      )}
+      {details && (
+        <Badge tone={endpoint.browser ? 'client' : 'server'} term={['endpoint-side', side]}>
+          {endpoint.browser ? (endpoint.server ? 'browser + server' : 'browser') : 'server'}
+        </Badge>
+      )}
+      {details && endpoint.contracts.length > 0 && (
         <Badge tone="muted" title={`Postman: ${endpoint.contracts.map((c) => c.name).join(', ')}`}>
           Postman
         </Badge>
@@ -241,19 +244,19 @@ export function EndpointStatusBadge({ endpoint }: { endpoint: Endpoint }) {
   switch (endpoint.status) {
     case 'verified':
       return (
-        <Badge tone="ok" title="Live capture recorded a call to it">
+        <Badge tone="ok" term={['endpoint-status', 'verified']}>
           ✓ verified{of}
         </Badge>
       )
     case 'mismatch':
       return (
-        <Badge tone="warn" title="Captured data doesn't match the types of a call site">
+        <Badge tone="warn" term={['endpoint-status', 'mismatch']}>
           ✗ type mismatch
         </Badge>
       )
     case 'needs-recheck':
       return (
-        <Badge tone="warn" title="The code changed after the last capture. Use the app again to re-check it.">
+        <Badge tone="warn" term={['endpoint-status', 'needs-recheck']}>
           ↻ needs re-check
         </Badge>
       )

@@ -39,7 +39,7 @@
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users` |
 | Call path | `getAccounts` → `fetch` |
 
-> ⚠ **type-mismatch**: Response doesn't match Account\[\]: \[\].id is number 1 (expected string); \[\].avatarUrl is missing (expected string); \[\].role is not in the type (2 of 2 captures).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Response doesn't match Account\[\]: \[\].id is number 1 (expected string); \[\].avatarUrl is missing (expected string); \[\].role is not in the type (2 of 2 captures).
 
 **Response** `Account[]` (see [`Account`](../types.md#typ_2fa1fwnmo05))
 
@@ -83,7 +83,7 @@ Response body:
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings` |
 | Call path | `getSettings` → `fetch` |
 
-> ⚠ **type-mismatch**: Response doesn't match Settings: digest is null (expected { frequency: "daily" \| "weekly" }) (2 of 2 captures).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Response doesn't match Settings: digest is null (expected { frequency: "daily" \| "weekly" }) (2 of 2 captures).
 
 **Response** [`Settings`](../types.md#typ_0xjkp2la9ri)
 
@@ -158,7 +158,7 @@ Response body:
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos` |
 | Call path | `createTodo` → `fetch` |
 
-> ⚠ **type-mismatch**: Response doesn't match Todo: userId is string "1" (expected number). Request body doesn't match NewTodo: userId is string "1" (expected number) (1 of 1 capture).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Response doesn't match Todo: userId is string "1" (expected number). Request body doesn't match NewTodo: userId is string "1" (expected number) (1 of 1 capture).
 
 **Request body** [`NewTodo`](../types.md#typ_1hvhy5iwv7p)
 

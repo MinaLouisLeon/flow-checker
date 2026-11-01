@@ -75,6 +75,8 @@ export type Screen =
   /** `flowId` is an inferred flow id, or a recorded flow id (`rec_...`, `var_...`). */
   | { name: 'flows'; flowId?: string; q: string }
   | { name: 'export' }
+  /** What each status, note and badge means (M34); `term` (`flag-dynamic-url`) is the one shown first. */
+  | { name: 'glossary'; q: string; term?: string }
   | { name: 'not-found' }
 
 export type MapView = 'graph' | 'tree' | 'handlers'
@@ -152,6 +154,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'flows', flowId: parts[1], q: params.get('q') ?? '' }
     case 'export':
       return { name: 'export' }
+    case 'glossary':
+      return { name: 'glossary', q: params.get('q') ?? '', term: params.get('term') ?? undefined }
     case 'live':
       return {
         name: 'live',
@@ -232,6 +236,8 @@ export function href(screen: Screen): string {
       })
     case 'export':
       return '#/export'
+    case 'glossary':
+      return withQuery('/glossary', { q: screen.q, term: screen.term })
     case 'live':
       return withQuery(screen.captureId ? `/live/${encodeURIComponent(screen.captureId)}` : '/live', {
         q: screen.q,

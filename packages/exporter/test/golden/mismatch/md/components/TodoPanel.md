@@ -73,7 +73,7 @@ Response body:
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos` |
 | Call path | `createTodo` → `fetch` |
 
-> ⚠ **type-mismatch**: Response doesn't match Todo: userId is string "1" (expected number). Request body doesn't match NewTodo: userId is string "1" (expected number) (1 of 1 capture).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Response doesn't match Todo: userId is string "1" (expected number). Request body doesn't match NewTodo: userId is string "1" (expected number) (1 of 1 capture).
 
 **Request body** [`NewTodo`](../types.md#typ_1hvhy5iwv7p)
 

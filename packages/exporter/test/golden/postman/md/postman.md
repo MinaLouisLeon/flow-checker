@@ -58,7 +58,7 @@ The collection is the API contract: each request in the code is matched to a col
 | URL | `http://localhost:4010/products/:id` |
 | Called by | nothing in the code |
 
-> ⚠ **unused-endpoint**: No request in the code calls this endpoint.
+> ⚠ **[unused-endpoint](GLOSSARY.md#flag-unused-endpoint)**: No request in the code calls this endpoint.
 
 ### Todos
 
@@ -81,7 +81,7 @@ The collection is the API contract: each request in the code is matched to a col
 | URL | `http://localhost:4010/todos/:id` |
 | Called by | nothing in the code |
 
-> ⚠ **unused-endpoint**: No request in the code calls this endpoint.
+> ⚠ **[unused-endpoint](GLOSSARY.md#flag-unused-endpoint)**: No request in the code calls this endpoint.
 
 #### <a id="pmr_1jsi4tlr1i9"></a>Create todo
 

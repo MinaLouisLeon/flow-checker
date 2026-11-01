@@ -1658,3 +1658,64 @@ kbd {
     display: none;
   }
 }
+
+/* Plain wording (M34): the details switch, help after a note, the Glossary screen. */
+.details-toggle {
+  flex: none;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.details-toggle[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.flag-help {
+  font-size: 12px;
+}
+.term-link {
+  display: inline-block;
+  min-width: 16px;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 14px;
+  text-align: center;
+  color: var(--muted);
+}
+.term-link:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.glossary-list {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0 0;
+}
+.glossary-entry {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  gap: 4px 16px;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+.glossary-entry.selected {
+  background: var(--accent-soft);
+}
+.glossary-entry dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+}
+.glossary-entry dd {
+  margin: 0;
+}
+.glossary-todo {
+  margin: 4px 0 0;
+}
+@media (max-width: 700px) {
+  .glossary-entry {
+    grid-template-columns: 1fr;
+  }
+}

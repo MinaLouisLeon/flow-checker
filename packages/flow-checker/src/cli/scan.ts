@@ -3,6 +3,7 @@ import { join, relative, resolve } from 'node:path'
 import { ScanError } from '@flow-checker/scanner'
 import {
   type AppModel,
+  CLI_NAME,
   type FlowCheckerConfig,
   formatFlows,
   formatModel,
@@ -80,7 +81,11 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
 
   if (options.tree) io.out(formatModel(model))
   if (options.types) io.out(formatTypes(model))
-  if (options.requests) io.out(formatRequests(model))
+  if (options.requests) {
+    io.out(formatRequests(model))
+    if (model.requests.some((r) => r.flags.length > 0))
+      io.out(`Run "${CLI_NAME} explain <note>" (e.g. explain dynamic-url) to see what a note means.`)
+  }
   if (options.flows) io.out(formatFlows(model))
 
   io.out(summary(model, performance.now() - started))

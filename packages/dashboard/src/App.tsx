@@ -11,6 +11,7 @@ import { ComponentsScreen } from './screens/ComponentsScreen'
 import { EndpointsScreen } from './screens/EndpointsScreen'
 import { ExportScreen } from './screens/ExportScreen'
 import { FlowsScreen } from './screens/FlowsScreen'
+import { GlossaryScreen } from './screens/GlossaryScreen'
 import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
@@ -19,7 +20,7 @@ import { RequestsScreen } from './screens/RequestsScreen'
 import { StartScreen } from './screens/StartScreen'
 import { TypesScreen } from './screens/TypesScreen'
 import { useScrollMemory } from './scroll'
-import { Empty } from './ui'
+import { DetailsToggle, Empty } from './ui'
 
 const NAV: {
   label: string
@@ -39,6 +40,7 @@ const NAV: {
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
   { label: 'Export', screen: { name: 'export' }, match: ['export'], needsExport: true },
+  { label: 'Glossary', screen: { name: 'glossary', q: '' }, match: ['glossary'] },
 ]
 
 export function App() {
@@ -88,6 +90,7 @@ export function App() {
           ))}
         </nav>
         <span className="spacer" />
+        <DetailsToggle />
         <button
           type="button"
           className="button search-open"
@@ -207,6 +210,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
     case 'export':
       return <ExportScreen />
+    case 'glossary':
+      return <GlossaryScreen q={screen.q} term={screen.term} />
     case 'not-found':
       return (
         <div className="screen">

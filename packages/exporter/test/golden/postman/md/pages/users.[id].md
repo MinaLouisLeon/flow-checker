@@ -68,7 +68,7 @@ Response body:
 | URL | `{NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id` (pattern) |
 | Call path | `deleteUser` → `fetch` |
 
-> ⚠ **not-in-collection**: The Postman collection "Fixture API" has no DELETE /users/:id request.
+> ⚠ **[not-in-collection](../GLOSSARY.md#flag-not-in-collection)**: The Postman collection "Fixture API" has no DELETE /users/:id request.
 
 **Response** `void`
 

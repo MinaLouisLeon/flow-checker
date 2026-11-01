@@ -41,6 +41,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M31 | Guarded pages         | Model version 12, `Route.access`. Scanner records render exits; `scanner/src/access.ts` builds each page's label.        |
 | M32 | Start here            | `buildSummary()` in `shared/src/summary.ts`; items carry a `SummaryLink` each view renders. `#/` = Start here.           |
 | M33 | Global search         | `buildSearchIndex()` / `search()` in `shared/src/search.ts`; `searchOf()` caches, `searchScreen()` links.                |
+| M34 | Plain wording         | `shared/src/glossary.ts` is the only wording table; `Badge term={[group, key]}`; `useShowDetails()` hides extra badges.  |
 
 ## Gotchas
 
@@ -385,3 +386,17 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   Playwright's `fill()` sends no key events, so it can't test that `/` in a field doesn't open the box: use
   `keyboard.type()`.
 - Ids are `rt_`, `cmp_`, `req_`, `typ_`, `flw_`, `ep_`, `ar_` (not `ty_` / `fl_`).
+
+## M34 — Plain wording (branch `feat/m34-plain-wording`)
+
+- New badge or status: add its words to `glossary.ts` (typed `Record<enum, …>`, so a missing model value fails the
+  typecheck) and pass `term` to `Badge`; don't write a `title` that repeats the glossary. `glossary.test.ts` reads the
+  zod enums, so a new flag kind, trigger, transport or status fails until it is explained.
+- Dashboard components can be rendered in node with `react-dom/server` (`dashboard/test/badges.test.ts`): wrap them in
+  a `QueryClientProvider` (queries `enabled: false`) and `DataContext.Provider`; effects don't run. Use
+  `createElement` in a `.ts` test rather than JSX.
+- Hooks like `useShowDetails()` must come before a component's early `return null` (the tree row had one).
+- The details switch lives outside React (`details.ts`, `useSyncExternalStore`), so tests set it with
+  `setShowDetails()` and reset it in `afterEach`.
+- Python patch scripts in bash heredocs still turned `'\n'` into a line break twice this milestone; write them to the
+  scratchpad with the Write tool and run them from there.

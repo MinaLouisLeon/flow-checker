@@ -41,7 +41,7 @@ sequenceDiagram
 | Handled by | [`/api/jobs/[id]/progress`](../pages/api.jobs.%5Bid%5D.progress.md) |
 | Stream | EventSource |
 
-> ⚠ **type-mismatch**: Event "progress" doesn't match Progress: percent is string "25%" (expected number) (1 of 1 capture).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Event "progress" doesn't match Progress: percent is string "25%" (expected number) (1 of 1 capture).
 
 **Event `progress`** [`Progress`](../types.md#typ_17hog64q8p8)
 

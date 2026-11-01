@@ -58,6 +58,7 @@ flow-checker dev        # scan + watch + dashboard + start your app with capture
 flow-checker explore    # scan + watch + dashboard only: no app, no setup, project files untouched
 flow-checker scan       # scan only, write .flow-checker/model.json
 flow-checker summary    # print Start here: stack, areas, entry pages, main flows, backends (--json)
+flow-checker explain dynamic-url   # what a status, note or badge means and what to do (no word: all)
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
 flow-checker export     # Markdown docs and/or a static HTML site
 flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitignore
@@ -77,7 +78,7 @@ flow-checker postman import   # read a Postman collection to check the code agai
 | `--no-watch`                                 | dev, explore              | Don't re-scan when files change                                                               |
 | `-y, --yes`                                  | init                      | Apply the changes without asking                                                              |
 | `--tree`, `--types`, `--requests`, `--flows` | scan                      | Also print the route/component trees, resolved types, request sites or flows                  |
-| `--json`                                     | summary                   | Print the summary as JSON, for scripts                                                        |
+| `--json`                                     | summary, explain          | Print JSON instead of text, for scripts                                                       |
 | `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
 | `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
 | `--force`                                    | export                    | Write into a folder that has other files                                                      |
@@ -107,6 +108,9 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared), by what it has (sends requests, things to check, not on any page) and sorted by name, requests or pages.
 - **Requests:** every request site, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status (verified, mismatch, needs re-check, not captured yet), transport and flags. The same request sent from several places is one row. A request opens on its own page with its body and response types, server hops, query-cache links, captures and the call path from the component.
 - **Flows**, **Types**, **Live** (captures as they arrive, with their match and type check) and **Export**.
+- **Glossary:** what each status, note (`dynamic-url`, `unknown-trigger`...), trigger, transport and badge means, and what to do about it. Hover any badge to read its line; each note on a request links to its entry. `flow-checker explain <word>` prints the same in the terminal, and the Markdown export writes it to `GLOSSARY.md`.
+
+**Show details:** lists and the page view show only the main badge of each row (its status, or the number of notes) so they stay easy to read. Click **Show details** in the top bar to also see how each request is sent, what triggers it, `use client`, conditional and lazy renders, request counts and the other badges. The choice is remembered in your browser.
 
 **Search everything:** press Ctrl+K (⌘K on a Mac) or `/` on any screen, or click Search in the top bar. One box finds pages, route handlers, components, requests, endpoints, types, flows and areas by name, file, URL pattern or route path; exact names come first, then names that start with what you typed, then word matches. Arrow keys move, Enter opens, Esc closes. It works in the static export too.
 
