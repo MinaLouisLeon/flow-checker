@@ -1,13 +1,14 @@
 // Start here (M32): the first screen. What the app is built with, its areas, where to start, its main
 // flows and backends, where things live and what to check, each item linking to its screen. The
 // items come from `buildSummary()` in shared, like `flow-checker summary` and `ONBOARDING.md`.
-import { buildSummary, type SummaryItem, type SummarySection } from '@flow-checker/shared'
+import { buildCoverage, buildSummary, type SummaryItem, type SummarySection } from '@flow-checker/shared'
 import { useMemo } from 'react'
 import { useFlows } from '../api'
 import { useData } from '../context'
 import { areasOf, endpointsOf } from '../lists'
 import { href, summaryScreen } from '../router'
 import { CaptureHint } from './LiveScreen'
+import { CoverageBars } from './WalkScreen'
 
 const MORE_TEXT: Record<SummarySection['id'], string> = {
   stack: 'Overview',
@@ -26,6 +27,7 @@ export function StartScreen() {
     () => buildSummary(index, { flows, endpoints: endpointsOf(index), areas: areasOf(index) }),
     [index, flows],
   )
+  const coverage = useMemo(() => buildCoverage(index, flows), [index, flows])
   const app = index.model.project
 
   return (
@@ -39,6 +41,7 @@ export function StartScreen() {
         </p>
       </div>
       {meta.explore && !meta.capture && <CaptureHint explore={meta.explore} />}
+      <CoverageBars coverage={coverage} link />
       <div className="start-grid">
         {summary.sections.map((section) => (
           <StartSection key={section.id} section={section} />

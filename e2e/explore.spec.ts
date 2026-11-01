@@ -78,6 +78,14 @@ test('explore opens the dashboard on a project with no setup', async ({ page }) 
   await expect(hint.locator('code').last()).toHaveText('npx flow-checker')
   await expect(hint).toContainText('outside the project')
 
+  // Walk the app (M35) is a reading guide here: the steps, how to turn capture on, no app links.
+  await page.locator('.nav').getByRole('link', { name: 'Walk the app' }).click()
+  await expect(page.getByTestId('capture-hint')).toContainText('Capture is off')
+  const walk = page.getByTestId('walk-item').filter({ hasText: 'DeleteUserButton click' })
+  await expect(walk).toContainText('Click in DeleteUserButton on /users/[id]')
+  await expect(walk.locator('[data-done]')).toHaveCount(0)
+  await expect(page.getByRole('link', { name: /Open in app/ })).toHaveCount(0)
+
   expect(readdirSync(root).sort()).toEqual(before)
   expect(existsSync(join(root, '.flow-checker'))).toBe(false)
 })

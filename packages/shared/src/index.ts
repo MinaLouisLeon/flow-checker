@@ -34,3 +34,4 @@ export { interceptLevels, isPrivateFolder, isUrlSegment, parseSegment, urlPart }
 export * from './summary'
 export * from './type-check'
 export * from './verification'
+export * from './walkthrough'

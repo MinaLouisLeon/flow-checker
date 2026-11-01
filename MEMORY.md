@@ -42,6 +42,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M32 | Start here            | `buildSummary()` in `shared/src/summary.ts`; items carry a `SummaryLink` each view renders. `#/` = Start here.           |
 | M33 | Global search         | `buildSearchIndex()` / `search()` in `shared/src/search.ts`; `searchOf()` caches, `searchScreen()` links.                |
 | M34 | Plain wording         | `shared/src/glossary.ts` is the only wording table; `Badge term={[group, key]}`; `useShowDetails()` hides extra badges.  |
+| M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
 
 ## Gotchas
 
@@ -400,3 +401,16 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `setShowDetails()` and reset it in `afterEach`.
 - Python patch scripts in bash heredocs still turned `'\n'` into a line break twice this milestone; write them to the
   scratchpad with the Write tool and run them from there.
+
+## M35 — Guided walk-through (branch `feat/m35-guided-walk-through`)
+
+- Ticks need no new server code: a step is done when it is inside `FlowStatus.best.steps`, and the live feed already
+  pushes the flows summary (`flows` event), so the walk screen updates while the app is used in another tab.
+- The tracker only counts a run from 2 steps on, so nothing ticks for a bare interaction; after login on next-intl
+  3 steps tick (interaction, request, navigation) before the OTP is typed.
+- e2e specs share one dev server and its captures: `e2e/walkthrough.spec.ts` starts with `DELETE /api/captures`
+  (like the SSE and WebSocket specs). Specs that run after it (alphabetical) must not need earlier captures.
+- In dashboard unit tests, seed the flows summary with `client.setQueryData(['flows'], summary)`: queries are
+  `enabled: false` there, but cached data is still returned.
+- The help line under the segment inputs also says "Open in app", so tests match the link (`Open in app ↗</a>` or
+  `getByRole('link')`), not the text.

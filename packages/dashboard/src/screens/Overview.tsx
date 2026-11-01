@@ -1,4 +1,4 @@
-import { isVerified } from '@flow-checker/shared'
+import { buildCoverage, isVerified } from '@flow-checker/shared'
 import { useFlows, useVerification } from '../api'
 import { useData } from '../context'
 import { GraphqlSection } from '../GraphqlView'
@@ -10,6 +10,7 @@ import { SocketsSection } from '../SocketView'
 import { StreamsSection } from '../SseView'
 import { TrpcSection } from '../TrpcView'
 import { Empty, Section, SourceLink } from '../ui'
+import { CoverageBars } from './WalkScreen'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
   'needs-recheck': 'Requests whose code changed since they were captured',
@@ -24,7 +25,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
 export function Overview() {
   const { index, meta } = useData()
   const verification = useVerification(Boolean(meta.capture))
-  const flowRuns = useFlows(Boolean(meta.capture)).data
+  const flowRuns = useFlows(Boolean(meta.capture || meta.exported)).data
   const confirmedFlows = index.model.flows.filter((f) => flowRuns?.flows[f.id]?.status === 'confirmed').length
   const counts = verification.data?.counts
   const { model } = index
@@ -90,6 +91,10 @@ export function Overview() {
           link={href({ name: 'flows', q: '' })}
         />
       </div>
+
+      <Section title="Coverage">
+        <CoverageBars coverage={buildCoverage(index, flowRuns)} link />
+      </Section>
 
       <Section title="Verification">
         <div

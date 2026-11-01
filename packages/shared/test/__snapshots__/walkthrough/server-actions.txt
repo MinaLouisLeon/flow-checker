@@ -1,0 +1,9 @@
+## CreateProductForm submit  /products/new  2 requests
+1. Submit the form in `CreateProductForm` on `/products/new`
+2. It sends `action createProduct`
+3. It goes to `/products/[id]`
+4. The server sends `GET /products/:id` while it renders the page  (not seen)
+
+## DeleteProductButton click  /products  1 request
+1. Click in `DeleteProductButton` on `/products`
+2. It sends `action deleteProduct`

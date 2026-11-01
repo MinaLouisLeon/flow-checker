@@ -105,3 +105,4 @@ re-run them on their own before assuming a regression.
 | M32 | Start here                                        | Done   |
 | M33 | Global search                                     | Done   |
 | M34 | Plain wording                                     | Done   |
+| M35 | Guided walk-through                               | Done   |

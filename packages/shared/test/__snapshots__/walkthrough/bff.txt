@@ -1,0 +1,5 @@
+## CreateProductForm submit  /  entry  2 requests
+1. Submit the form in `CreateProductForm` on `/`
+2. It sends `POST /api/products`
+3. It goes to `/products/[id]`
+4. The page loads `GET /api/products/:id`

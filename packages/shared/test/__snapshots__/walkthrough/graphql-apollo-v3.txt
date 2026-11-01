@@ -1,0 +1,20 @@
+params: [id]
+
+## AddTodoForm submit  /  entry  2 requests
+1. Submit the form in `AddTodoForm` on `/`
+2. It sends `GraphQL AddTodo`
+3. It refetches `GraphQL Todos` in the cache  (not seen)
+4. It refetches `GraphQL Viewer` in the cache  (not seen)
+5. It goes to `/todos/[id]`
+6. The page loads `GraphQL Todo`
+
+## Search submit  /search  entry  1 request
+1. Submit the form in `Search` on `/search`
+2. It sends `GraphQL Search`
+
+## TodoDetail click  /todos/[id]  3 requests
+1. Click in `TodoDetail` on `/todos/[id]`
+2. It sends `GraphQL DeleteTodo`
+3. It goes to `/`
+4. The page loads `GraphQL Todos`
+5. The page loads `GraphQL Viewer`

@@ -1,0 +1,7 @@
+params: [id]
+
+## DeleteUserButton click  /users/[id]  2 requests
+1. Click in `DeleteUserButton` on `/users/[id]`
+2. It sends `DELETE /users/:id`
+3. It goes to `/`
+4. The server sends `GET /users` while it renders the page  (not seen)

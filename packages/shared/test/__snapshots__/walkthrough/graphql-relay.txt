@@ -1,0 +1,15 @@
+params: [id]
+
+## AddTodoForm submit  /  entry  2 requests
+1. Submit the form in `AddTodoForm` on `/`
+2. It sends `GraphQL AddTodoFormMutation`
+3. It goes to `/todos/[id]`
+4. The page loads `GraphQL TodoDetailQuery`
+
+## UserList click  /users  entry  1 request
+1. Click in `UserList` on `/users`
+2. It sends `GraphQL UserListQuery`
+
+## TodoDetail click  /todos/[id]  1 request
+1. Click in `TodoDetail` on `/todos/[id]`
+2. It sends `GraphQL TodoDetailToggleMutation`

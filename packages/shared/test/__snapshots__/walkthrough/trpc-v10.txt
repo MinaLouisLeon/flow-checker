@@ -1,0 +1,13 @@
+params: [id]
+
+## AddTodoForm submit  /  entry  2 requests
+1. Submit the form in `AddTodoForm` on `/`
+2. It sends `tRPC todo.add`
+3. It refetches `tRPC todo.list` in the cache  (not seen)
+4. It goes to `/todos/[id]`
+5. The page loads `tRPC todo.byId`
+
+## TodoDetail click  /todos/[id]  1 request
+1. Click in `TodoDetail` on `/todos/[id]`
+2. It sends `tRPC todo.toggle`
+3. It refetches `tRPC todo.byId` in the cache  (not seen)

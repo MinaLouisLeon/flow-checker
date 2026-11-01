@@ -99,7 +99,7 @@ function routeTrail(flow: Flow, index: ModelIndex): string {
   return flow.routeIds.map((id) => index.routes.get(id)?.path ?? '?').join(' → ')
 }
 
-function FlowStatusBadge({ status }: { status?: FlowStatus }) {
+export function FlowStatusBadge({ status }: { status?: Pick<FlowStatus, 'status' | 'runs'> }) {
   if (!status || status.status === 'unconfirmed') {
     return (
       <Badge tone="muted" term={['flow-status', 'unconfirmed']}>
@@ -145,6 +145,12 @@ function FlowDetail({
           {status?.source === 'both' ? 'inferred + recorded' : 'inferred'}
         </Badge>
         {status && status.runs > 0 && <span className="muted">{status.runs} run(s)</span>}
+        <span className="spacer" />
+        {status?.status !== 'confirmed' && (
+          <a className="button button-small" href={href({ name: 'walk', flowId: flow.id })}>
+            Walk it
+          </a>
+        )}
       </div>
 
       {editing === undefined ? (

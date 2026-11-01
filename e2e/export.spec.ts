@@ -86,6 +86,14 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await page.locator('.area-cards a', { hasText: 'verify' }).click()
   await expect(page.locator('.split-side')).toContainText('VerifyOtpForm')
 
+  // Walk the app (M35): what was walked before the export is ticked; there is no app to open.
+  await page.locator('.nav a', { hasText: 'Walk the app' }).click()
+  const walked = page.getByTestId('walk-item').filter({ hasText: 'LoginForm submit' })
+  await expect(walked).toContainText('✓ confirmed')
+  await expect(walked.getByTestId('walk-percent')).toHaveText('100%')
+  await expect(page.getByTestId('coverage-flows')).toContainText('100%')
+  await expect(page.getByRole('link', { name: /Open in app/ })).toHaveCount(0)
+
   expect(errors).toEqual([])
 })
 
