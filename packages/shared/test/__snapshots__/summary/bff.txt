@@ -1,0 +1,30 @@
+Start here: bff (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 2 pages, 2 route handlers)
+  Rendering  2 server, 3 client, 0 shared  (5 components)
+  Data       fetch  (6 requests)
+
+Areas (2 areas by URL)
+  home      /  (1 page, 1 flow, 4 endpoints)
+  products  /products  (1 page, 2 endpoints)
+
+Entry pages
+  Start page  /  (1 page links here)
+
+Main flows (1 flow)
+  CreateProductForm submit  / → /products/[id]  (4 steps)
+
+Backends (6 endpoints)
+  This app  This app's API  (3 endpoints, 3 called from the browser)
+  External  {BACKEND_URL ?? http://localhost:4010}  (3 endpoints)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Sends requests  src/lib/backend.ts  (3 requests)
+  Route handlers  src/app/api/products/  (2 handlers)
+  Type            Product  (src/lib/schemas.ts, used 9 times)
+  Type            CreateProductInput  (src/lib/schemas.ts, used 2 times)
+
+To check
+  The scan resolved every page, component, type and request.

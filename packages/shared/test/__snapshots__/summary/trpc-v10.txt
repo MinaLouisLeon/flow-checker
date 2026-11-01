@@ -1,0 +1,35 @@
+Start here: trpc-v10 (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 3 pages, 1 route handler)
+  Rendering  4 server, 7 client, 0 shared  (11 components)
+  Data       React Query  (6 requests)
+  Data       tRPC  (7 requests)
+  Data       fetch  (6 requests)
+
+Areas (3 areas by URL)
+  home   /  (1 page, 1 flow, 9 endpoints)
+  feed   /feed  (1 page, 4 endpoints)
+  todos  /todos  (1 page, 1 flow, 7 endpoints)
+
+Entry pages (1 page nothing links to)
+  Start page  /
+  Not linked  /feed  (nothing in the app links here)
+
+Main flows (2 flows)
+  AddTodoForm submit  / → /todos/[id]  (5 steps)
+  TodoDetail click    /todos/[id]  (3 steps)
+
+Backends (12 endpoints)
+  This app  This app's API  (7 endpoints, 7 called from the browser)
+  External  {API_URL ?? http://localhost:4010}  (5 endpoints)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Sends requests  src/server/upstream.ts  (6 requests)
+  Route handlers  src/app/api/trpc/  (1 handler)
+  Type            Todo  (src/types/todo.ts, used 10 times)
+  Type            User  (src/types/user.ts, used 2 times)
+
+To check
+  The scan resolved every page, component, type and request.

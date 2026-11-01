@@ -130,6 +130,11 @@ export function filterRequests(index: ModelIndex, filter: RequestFilter): Reques
         site.url?.text,
         siteOwner(site, index),
         site.callStack[0]?.file,
+        // The file that sends it, the hook's library and the API client (Start here links, M32).
+        site.callStack[site.callStack.length - 1]?.file,
+        site.hook?.module,
+        site.client?.module,
+        site.socket?.api,
       ),
   )
 }

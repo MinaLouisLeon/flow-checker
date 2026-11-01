@@ -1,0 +1,219 @@
+{
+  "nextVersion": "<next-version>",
+  "appDir": "src/app",
+  "sections": [
+    {
+      "id": "stack",
+      "title": "Stack",
+      "items": [
+        {
+          "label": "Next.js",
+          "value": "<next-version>",
+          "detail": "App Router in src/app/, 2 pages, 2 route handlers",
+          "link": {
+            "to": "map"
+          }
+        },
+        {
+          "label": "Rendering",
+          "value": "2 server, 3 client, 0 shared",
+          "detail": "5 components",
+          "link": {
+            "to": "components"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "fetch",
+          "detail": "6 requests",
+          "link": {
+            "to": "requests",
+            "transport": "fetch"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "areas",
+      "title": "Areas",
+      "note": "2 areas by URL",
+      "items": [
+        {
+          "label": "home",
+          "value": "/",
+          "code": true,
+          "detail": "1 page, 1 flow, 4 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1vn39fso9m3"
+          }
+        },
+        {
+          "label": "products",
+          "value": "/products",
+          "code": true,
+          "detail": "1 page, 2 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_2erkuzrjb5u"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "areas"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "entry",
+      "title": "Entry pages",
+      "items": [
+        {
+          "label": "Start page",
+          "value": "/",
+          "code": true,
+          "detail": "1 page links here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_0h4e5x5madf"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "map"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "flows",
+      "title": "Main flows",
+      "note": "1 flow",
+      "items": [
+        {
+          "label": "CreateProductForm submit",
+          "value": "/ → /products/[id]",
+          "code": true,
+          "detail": "4 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_0fhg9qnt2e5"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "flows"
+      },
+      "empty": "No flows found: no event handler leads to a request or another page."
+    },
+    {
+      "id": "backends",
+      "title": "Backends",
+      "note": "6 endpoints",
+      "items": [
+        {
+          "label": "This app",
+          "value": "This app's API",
+          "code": false,
+          "detail": "3 endpoints, 3 called from the browser",
+          "link": {
+            "to": "endpoints",
+            "host": "app"
+          }
+        },
+        {
+          "label": "External",
+          "value": "{BACKEND_URL ?? http://localhost:4010}",
+          "code": true,
+          "detail": "3 endpoints",
+          "link": {
+            "to": "endpoints",
+            "host": "env:BACKEND_URL"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "endpoints"
+      },
+      "empty": "The app sends no requests."
+    },
+    {
+      "id": "places",
+      "title": "Where things live",
+      "items": [
+        {
+          "label": "Root layout",
+          "value": "src/app/layout.tsx",
+          "code": true,
+          "link": {
+            "to": "component",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        },
+        {
+          "label": "Sends requests",
+          "value": "src/lib/backend.ts",
+          "code": true,
+          "detail": "3 requests",
+          "link": {
+            "to": "requests",
+            "q": "src/lib/backend.ts"
+          }
+        },
+        {
+          "label": "Route handlers",
+          "value": "src/app/api/products/",
+          "code": true,
+          "detail": "2 handlers",
+          "link": {
+            "to": "map",
+            "view": "handlers"
+          }
+        },
+        {
+          "label": "Type",
+          "value": "Product",
+          "code": true,
+          "detail": "src/lib/schemas.ts, used 9 times",
+          "link": {
+            "to": "type",
+            "typeId": "typ_1rwhmsgdwtz"
+          }
+        },
+        {
+          "label": "Type",
+          "value": "CreateProductInput",
+          "code": true,
+          "detail": "src/lib/schemas.ts, used 2 times",
+          "link": {
+            "to": "type",
+            "typeId": "typ_2g53pdr4pws"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "components"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "check",
+      "title": "To check",
+      "items": [],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "The scan resolved every page, component, type and request."
+    }
+  ]
+}

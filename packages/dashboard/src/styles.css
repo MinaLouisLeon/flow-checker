@@ -1491,3 +1491,50 @@ a.stat:hover {
   font-weight: 600;
   color: var(--accent);
 }
+
+/* Start here (M32): one card per summary section */
+.start-head h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+.start-head p {
+  margin: 0 0 12px;
+}
+.start-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.start-note {
+  margin: -6px 0 8px;
+  font-size: 12px;
+}
+.list.start-list li {
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+.start-label {
+  flex: 0 0 110px;
+  font-size: 12px;
+}
+.start-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.start-detail {
+  font-size: 12px;
+}
+.start-all {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+}
+@media (max-width: 600px) {
+  .start-grid {
+    grid-template-columns: 1fr;
+  }
+  .start-label {
+    flex-basis: 100%;
+  }
+}

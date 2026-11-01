@@ -339,7 +339,7 @@ export async function startDev(options: DevCommandOptions, io: CliIO): Promise<D
         : `Capture is off. To turn it on, run: ${explore.enableCapture.join(', then ')}`,
     )
     io.out(`Dashboard: ${server.url}`)
-    io.out(`Next: open ${server.url} in your browser.`)
+    io.out(`Next: open ${server.url} in your browser. Start here gives a short tour of the app.`)
   } else {
     progress.finish()
     // Without --app the user starts it (Docker, a task runner...) and needs this env.

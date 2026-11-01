@@ -1,0 +1,35 @@
+Start here: trpc (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 3 pages, 1 route handler)
+  Rendering  4 server, 6 client, 0 shared  (10 components)
+  Data       React Query  (6 requests)
+  Data       tRPC  (7 requests)
+  Data       fetch  (6 requests)
+
+Areas (3 areas by URL)
+  home   /  (1 page, 1 flow, 9 endpoints)
+  todos  /todos  (1 page, 1 flow, 9 endpoints)
+  users  /users  (1 page, 5 endpoints)
+
+Entry pages (1 page nothing links to)
+  Start page  /
+  Not linked  /users  (nothing in the app links here)
+
+Main flows (2 flows)
+  AddTodoForm submit  / → /todos/[id]  (6 steps)
+  TodoDetail click    /todos/[id]  (3 steps)
+
+Backends (13 endpoints)
+  This app  This app's API  (7 endpoints, 7 called from the browser)
+  External  {API_URL ?? http://localhost:4010}  (6 endpoints)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Sends requests  src/server/upstream.ts  (6 requests)
+  Route handlers  src/app/api/trpc/  (1 handler)
+  Type            Todo  (src/types/todo.ts, used 8 times)
+
+To check (2 open notes)
+  Request  GET {API_URL ?? http://localhost:4010}/users: No response type was found (annotation, generic or cast).  (src/server/routers/user.ts:14)
+  Request  GET {API_URL ?? http://localhost:4010}/users/:id: No response type was found (annotation, generic or cast).  (src/server/routers/user.ts:18)

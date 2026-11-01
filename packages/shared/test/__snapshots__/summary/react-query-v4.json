@@ -1,0 +1,269 @@
+{
+  "nextVersion": "<next-version>",
+  "appDir": "src/app",
+  "sections": [
+    {
+      "id": "stack",
+      "title": "Stack",
+      "items": [
+        {
+          "label": "Next.js",
+          "value": "<next-version>",
+          "detail": "App Router in src/app/, 4 pages, 0 route handlers",
+          "link": {
+            "to": "map"
+          }
+        },
+        {
+          "label": "Rendering",
+          "value": "5 server, 9 client, 0 shared",
+          "detail": "14 components",
+          "link": {
+            "to": "components"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "React Query",
+          "detail": "11 requests",
+          "link": {
+            "to": "requests",
+            "q": "@tanstack/react-query"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "fetch",
+          "detail": "12 requests",
+          "link": {
+            "to": "requests",
+            "transport": "fetch"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "areas",
+      "title": "Areas",
+      "note": "4 areas by URL",
+      "items": [
+        {
+          "label": "home",
+          "value": "/",
+          "code": true,
+          "detail": "1 page, 2 flows, 3 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1vn39fso9m3"
+          }
+        },
+        {
+          "label": "settings",
+          "value": "/settings",
+          "code": true,
+          "detail": "1 page, 3 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1jfq6xl49zk"
+          }
+        },
+        {
+          "label": "todos",
+          "value": "/todos",
+          "code": true,
+          "detail": "1 page, 1 endpoint",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1zap1ick15k"
+          }
+        },
+        {
+          "label": "users",
+          "value": "/users",
+          "code": true,
+          "detail": "1 page, 1 flow, 2 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_0tirr3qjab5"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "areas"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "entry",
+      "title": "Entry pages",
+      "note": "2 pages nothing links to",
+      "items": [
+        {
+          "label": "Start page",
+          "value": "/",
+          "code": true,
+          "detail": "1 page links here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_0h4e5x5madf"
+          }
+        },
+        {
+          "label": "Not linked",
+          "value": "/settings",
+          "code": true,
+          "detail": "nothing in the app links here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_14nb5m1ywic"
+          }
+        },
+        {
+          "label": "Not linked",
+          "value": "/users",
+          "code": true,
+          "detail": "nothing in the app links here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_1xs1qhs4r3f"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "map"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "flows",
+      "title": "Main flows",
+      "note": "3 flows",
+      "items": [
+        {
+          "label": "AddTodoForm submit",
+          "value": "/ → /todos/[id]",
+          "code": true,
+          "detail": "5 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_00r3wc4s21x"
+          }
+        },
+        {
+          "label": "TodoList change",
+          "value": "/",
+          "code": true,
+          "detail": "4 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_1cd3kgk29ak"
+          }
+        },
+        {
+          "label": "UserList click",
+          "value": "/users",
+          "code": true,
+          "detail": "4 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_0i54kcmwytn"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "flows"
+      },
+      "empty": "No flows found: no event handler leads to a request or another page."
+    },
+    {
+      "id": "backends",
+      "title": "Backends",
+      "note": "7 endpoints",
+      "items": [
+        {
+          "label": "External",
+          "value": "{NEXT_PUBLIC_API_URL ?? http://localhost:4010}",
+          "code": true,
+          "detail": "7 endpoints, 7 called from the browser",
+          "link": {
+            "to": "endpoints",
+            "host": "env:NEXT_PUBLIC_API_URL"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "endpoints"
+      },
+      "empty": "The app sends no requests."
+    },
+    {
+      "id": "places",
+      "title": "Where things live",
+      "items": [
+        {
+          "label": "Root layout",
+          "value": "src/app/layout.tsx",
+          "code": true,
+          "link": {
+            "to": "component",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        },
+        {
+          "label": "Sends requests",
+          "value": "src/services/api.ts",
+          "code": true,
+          "detail": "12 requests",
+          "link": {
+            "to": "requests",
+            "q": "src/services/api.ts"
+          }
+        },
+        {
+          "label": "Type",
+          "value": "Todo",
+          "code": true,
+          "detail": "src/types/todo.ts, used 7 times",
+          "link": {
+            "to": "type",
+            "typeId": "typ_0fc96ucq8sd"
+          }
+        },
+        {
+          "label": "Type",
+          "value": "User",
+          "code": true,
+          "detail": "src/types/user.ts, used 4 times",
+          "link": {
+            "to": "type",
+            "typeId": "typ_25sov0zzv45"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "components"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "check",
+      "title": "To check",
+      "items": [],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "The scan resolved every page, component, type and request."
+    }
+  ]
+}

@@ -42,6 +42,14 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await expect(page.getByRole('button', { name: 'Re-scan' })).toHaveCount(0)
   await expect(page.locator('.nav')).not.toContainText('Export')
 
+  // Start here (M32) is the first screen; its items open their screens.
+  await expect(page.getByTestId('start-flows')).toContainText('LoginForm submit')
+  await expect(page.getByTestId('start-flows')).toContainText('confirmed')
+  await page.getByTestId('start-areas').locator('a', { hasText: '/[locale]/verify' }).click()
+  await expect(page).toHaveURL(/#\/areas\/ar_/)
+  await expect(page.locator('.split-side')).toContainText('VerifyOtpForm')
+  await page.goBack()
+
   // Captures from the embedded data, with no assign or record controls.
   await page.locator('.nav a', { hasText: 'Captures' }).click()
   const row = page.locator('.capture-list li', { hasText: '/auth/login' }).first()

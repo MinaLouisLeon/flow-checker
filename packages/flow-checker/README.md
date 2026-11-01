@@ -57,6 +57,7 @@ flow-checker            # same as `dev`
 flow-checker dev        # scan + watch + dashboard + start your app with capture on
 flow-checker explore    # scan + watch + dashboard only: no app, no setup, project files untouched
 flow-checker scan       # scan only, write .flow-checker/model.json
+flow-checker summary    # print Start here: stack, areas, entry pages, main flows, backends (--json)
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
 flow-checker export     # Markdown docs and/or a static HTML site
 flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitignore
@@ -76,6 +77,7 @@ flow-checker postman import   # read a Postman collection to check the code agai
 | `--no-watch`                                 | dev, explore              | Don't re-scan when files change                                                               |
 | `-y, --yes`                                  | init                      | Apply the changes without asking                                                              |
 | `--tree`, `--types`, `--requests`, `--flows` | scan                      | Also print the route/component trees, resolved types, request sites or flows                  |
+| `--json`                                     | summary                   | Print the summary as JSON, for scripts                                                        |
 | `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
 | `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
 | `--force`                                    | export                    | Write into a folder that has other files                                                      |
@@ -99,7 +101,8 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 
 `flow-checker dev` serves the dashboard on port 4400. The same screens are in the static HTML export, read-only.
 
-- **Overview:** counts for pages, route handlers, components, requests, types and flows, each a link to its list, and the things to check (unresolved URLs, unknown triggers, type mismatches...), one note per request.
+- **Start here** (the first screen): a short tour of the app for someone new to it. What it is built with (Next.js version, server / client components, data libraries such as React Query, SWR, tRPC, GraphQL or axios, next-intl, middleware, a Postman contract), its largest areas, the start page, the most-linked pages and the pages nothing links to, the longest flows, the backends it calls, where things live (the root layout, the files that send the most requests, route handlers, the most-used types) and the first things to check. Every item opens its screen. `flow-checker summary` prints the same in the terminal, and the Markdown export writes it to `ONBOARDING.md`.
+- **Overview** (`#/overview`): counts for pages, route handlers, components, requests, types and flows, each a link to its list, and the things to check (unresolved URLs, unknown triggers, type mismatches...), one note per request.
 - **Map:** the route map (graph or tree). A page shows its component tree, the requests it sends on load and on events (apart from those its layouts send on every page), where it leads and the flows that start on it.
 - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared), by what it has (sends requests, things to check, not on any page) and sorted by name, requests or pages.
 - **Requests:** every request site, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status (verified, mismatch, needs re-check, not captured yet), transport and flags. The same request sent from several places is one row. A request opens on its own page with its body and response types, server hops, query-cache links, captures and the call path from the component.

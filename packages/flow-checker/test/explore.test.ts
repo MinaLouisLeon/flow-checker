@@ -109,7 +109,9 @@ describe('explore without a setup', () => {
 
       const text = out.join('\n')
       expect(text).toContain('Capture is off. To turn it on, run:')
-      expect(text.split('\n').at(-1)).toBe(`Next: open ${session.url} in your browser.`)
+      expect(text.split('\n').at(-1)).toBe(
+        `Next: open ${session.url} in your browser. Start here gives a short tour of the app.`,
+      )
     } finally {
       await session.close()
     }
