@@ -23,7 +23,9 @@ M11 public release v0.1.0 · M12 CLI progress output · M13 React Query keys and
 M14 middleware / proxy · M15 Postman collection import · M16 tRPC · M17 GraphQL · M18 SSE ·
 M19 WebSockets · M20 release v0.2.0 (published; 0.2.1 followed with scan-accuracy fixes) ·
 M21 Components and Requests screens · M22 server hook placement check · M23 dashboard fixes ·
-M24 React Query keys · M25 scanner fixes (branch `feat/m25-scanner-fixes`).
+M24 React Query keys · M25 scanner fixes · M26 release v0.2.2 (branch `feat/m26-release-v0.2.2`; publish = push the
+`v0.2.2` tag after merging to `main`).
 
-Next: M26 release v0.2.2 (see `docs/PLAN.md`, "v0.2.2 milestones").
+Next: not planned yet. Candidate from the M26 smoke check: requests after an early-return guard in a helper aren't
+marked `conditional` (see M26 "Found, not fixed here" in `docs/PLAN.md`).
 Fixes must target code patterns, not the app they were found on.

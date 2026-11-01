@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.2.2
+
+New Components and Requests screens, plus fixes found by running 0.2.1 on a large real app (54 pages, a catch-all proxy route, react-hook-form forms, custom React Query hooks). Models saved by 0.2 still load.
+
+On that app: things to check 129 → 15, unknown triggers 64 → 8, unresolved URLs 35 → 2, `model.json` 24.5 MB → 7.6 MB, and the largest page view 68,000 → 14,000 DOM nodes. On a second app, 32 of 46 earlier captures now match a request site (0 before), with 2 ambiguous (8 before).
 
 - **Components and Requests screens.** The dashboard has two new screens, also in the static HTML export. The Overview's Components and Requests cards now open them.
   - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared) and by what it has (sends requests, things to check, not on any page), and sorted by name, requests or pages.

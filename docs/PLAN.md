@@ -635,7 +635,7 @@ Decided on 2026-10-31. A patch release: fixes and missing screens, no new transp
 | M23 | **Dashboard fixes:** bounded lists (query-cache targets, callers, navigations), scroll reset between screens, route handler callers shown by URL and de-duplicated, generic instantiations folded in Types                                    | A page view of a synthetic model with 200 queries and invalidations that hit all of them stays under 5,000 DOM nodes; each fix has a unit or e2e test                                                             | ✅ Done |
 | M24 | **React Query keys:** enum, `as const` and `const` members read as static segments, an unreadable segment is never a wildcard, keys passed to custom query hooks are read per call, one capture verifies every site that shares its query     | The react-query fixtures (v4 and v5) have a case for each and link and match as described in the notes                                                                                                            | ✅ Done |
 | M25 | **Scanner fixes:** triggers through call arguments, shared mutation hooks, context and hook callbacks, URLs built with `new URL()`, catch-all proxy handlers, URLs from data, components chosen at runtime, library types, flows from layouts | Every pattern in the notes has test cases with variants; no fixture has duplicate sites; fixture `unknown` triggers are only the expected ones; the perf app's `model.json` doesn't grow                          | ✅ Done |
-| M26 | **Release v0.2.2:** CHANGELOG (also rename the stale `Unreleased` heading on `dev` to `0.2.1`), README sections for the new screens and the hook rule, Next matrix, perf budgets, before/after numbers on real apps                           | v0.2.2 on npm                                                                                                                                                                                                     | Planned |
+| M26 | **Release v0.2.2:** CHANGELOG (also rename the stale `Unreleased` heading on `dev` to `0.2.1`), README sections for the new screens and the hook rule, Next matrix, perf budgets, before/after numbers on real apps                           | v0.2.2 on npm                                                                                                                                                                                                     | ✅ Done |
 
 ### v0.2.2 notes
 
@@ -822,6 +822,37 @@ Code is in `packages/scanner/src/requests.ts` unless named. Bracketed counts are
 - **Not done here:** the Next matrix and the real-app smoke check (M26).
 
 **M26 — Release v0.2.2:** same steps as M20, plus a smoke check on real apps (the test app and at least one other project), with before/after numbers: "To check" count (132 on the test app now), unknown triggers (64), unresolved URLs (35), ambiguous captures, server captures (0 now, until its hook is moved), largest page view DOM size and `model.json` size.
+
+**Built in M26:**
+
+- **Docs:** `CHANGELOG.md` has the 0.2.2 section (the `Unreleased` notes from M21–M25 under a short summary with the real-app numbers below); `0.2.1` already had its own heading on `dev`. The package version is 0.2.2. The package README has a Dashboard section (every screen, with the Components and Requests filters), a "server hook goes first in `register()`" section (an example, and what `init`, `doctor` and `dev` do about it), and `init` no longer says it only prints the lines for an existing `register()`. No config or CLI options changed, so `docs/config.md` is unchanged.
+- **Next matrix:** 13.4.19, 14.2.35, 15.2.9, 15.5.28 and 16.4.3 all pass (init edits the existing `register()`, doctor, scan, and every capture check from M20).
+- **Real apps** (published 0.2.1 vs. this branch, same machine, `scan` + `export --html`, then every page view opened in Chromium; each app's `.flow-checker/` was backed up and restored):
+
+  | Test app (54 pages, 993 components) | 0.2.1        | 0.2.2                |
+  | ----------------------------------- | ------------ | -------------------- |
+  | "To check"                          | 129          | 15                   |
+  | Unknown triggers                    | 64           | 8                    |
+  | Unresolved URLs (`dynamic-url`)     | 35           | 2 (+1 `runtime-url`) |
+  | Request sites                       | 423          | 407                  |
+  | Largest page view (DOM nodes)       | 68,188       | 14,069               |
+  | Mean page view (DOM nodes)          | 19,835       | 3,215                |
+  | `model.json`                        | 24,476,402 B | 7,609,312 B          |
+
+  | Second app (29 pages, 511 components) | 0.2.1        | 0.2.2        |
+  | ------------------------------------- | ------------ | ------------ |
+  | "To check"                            | 150          | 47           |
+  | Unknown triggers                      | 6            | 6            |
+  | Request sites                         | 116          | 248          |
+  | Earlier captures matched              | 0 of 46      | 32           |
+  | Ambiguous / unmatched captures        | 8 / 38       | 2 / 12       |
+  | Largest page view (DOM nodes)         | 30,859       | 16,471       |
+  | `model.json`                          | 52,988,264 B | 13,609,371 B |
+
+  The "To check" count on the test app was 132 when the plan was written; the app changed a little since. The second app's sites doubled because requests 0.2.1 showed as one unresolved `/api/:param` per form are now resolved one by one, and each component mounting a shared query hook is its own query site (M24); the repeated keys left are distinct call paths (one per exported method of its catch-all proxy, one per upload component), not twins. Server captures could not be re-measured: the test app no longer has the hooks (`doctor` says so), and measuring them means running it against its backend.
+- **Found, not fixed here:** a request sent after an early-return guard in a shared helper (`if (res.status !== 401) return res` then a token refresh) is not marked `conditional`: `#markSideRequests()` only looks at enclosing `if` blocks, so each exported method of a catch-all proxy lists the refresh as part of its chain. Same pattern family as M25's side requests; a candidate for the next patch.
+- **Performance:** `bench.mjs 200` against the published 0.2.1 on the same machine, three runs each (alternating order): cold scan 12.8 / 11.5 / 11.7 s → 12.7 / 12.0 / 12.1 s, re-scan median 3.7 / 4.1 / 4.0 s → 4.9 / 4.3 / 4.2 s (the first 0.2.2 run was the noisy one), slowest API answer 149–163 ms → 181–199 ms. About 4–7% slower from the M21–M25 work, well inside the CI budgets (25 s / 8 s / 1 s), which stay as they are. The README's scan times now say about 12 s / 4 s.
+- **Not done here:** the `v0.2.2` tag and npm publish (the Release workflow runs on the tag after merging to `main`).
 
 ### M11 notes
 
