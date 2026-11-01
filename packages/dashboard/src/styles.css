@@ -1390,3 +1390,22 @@ a.stat:hover {
 .type-instances {
   margin: 4px 0 0 18px;
 }
+
+/* Explore (M28) */
+.banner-info {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.capture-hint p {
+  margin: 0 0 8px;
+}
+.capture-hint p:last-child {
+  margin-bottom: 0;
+}
+.capture-commands {
+  margin: 0 0 8px;
+  padding-left: 22px;
+}
+.capture-commands li + li {
+  margin-top: 4px;
+}

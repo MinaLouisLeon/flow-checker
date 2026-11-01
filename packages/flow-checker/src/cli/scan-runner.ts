@@ -20,8 +20,10 @@ export type ScanOptions = Pick<
   ScannerOptions,
   'root' | 'appDir' | 'types' | 'include' | 'exclude' | 'apiClients' | 'graphql'
 > & {
-  /** Write `.flow-checker/model.json` after each scan. Default: true (`export` turns it off). */
+  /** Write `model.json` after each scan. Default: true (`export` turns it off). */
   writeModel?: boolean
+  /** Folder model.json goes to. Default: `<root>/.flow-checker` (`explore` without a setup moves it out). */
+  dataDir?: string
   /** Postman collection each scan is checked against (M15). */
   postman?: PostmanImport
   /** The app's own origins, e.g. `http://localhost:3000` (collection URLs there are same-origin). */
@@ -87,7 +89,7 @@ export function createScanHandler(options: ScanOptions) {
       const scanned = scan()
       const model = postman ? applyPostman(scanned, postman, { appOrigins: options.appOrigins }) : scanned
       const durationMs = performance.now() - started
-      if (options.writeModel !== false) writeModel(options.root, model)
+      if (options.writeModel !== false) writeModel(options.root, model, options.dataDir)
       return { model, durationMs }
     } finally {
       report = undefined
@@ -95,7 +97,7 @@ export function createScanHandler(options: ScanOptions) {
   }
   const fresh = () => {
     session = undefined
-    const { writeModel: _, postman: __, appOrigins: ___, ...scanOptions } = options
+    const { writeModel: _, postman: __, appOrigins: ___, dataDir: ____, ...scanOptions } = options
     session = createScanSession({ ...scanOptions, onProgress: (event) => report?.(event) })
     return session.model
   }

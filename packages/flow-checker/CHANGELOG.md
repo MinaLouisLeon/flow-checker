@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **`flow-checker explore`.** Scans the project, watches it and opens the dashboard, without starting your app, adding hooks or needing a config. Run it on a project you just cloned (`npx @integr8-media/flow-checker explore`): nothing in the project is created or changed, not even `.gitignore`. Without a flow-checker setup the scan (and any export from the dashboard) is kept in a folder in the OS temp folder, keyed by the project path. With a setup it uses `.flow-checker/` and shows the captures from earlier runs. The Live screen says capture is off and lists the commands that turn it on (install when missing, `init`, then `flow-checker`).
 - **Requests after an early exit.** A request a shared helper sends only after an early `return` or `throw` didn't happen (for example a token refresh and retry after `if (res.status !== 401) return res`) is now marked `conditional` ("sometimes"), like one inside an `if`. Before, each method of a catch-all proxy listed the refresh as part of its chain.
 
 ## 0.2.2

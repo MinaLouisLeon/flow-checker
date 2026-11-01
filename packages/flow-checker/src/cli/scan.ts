@@ -90,9 +90,9 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
   return 0
 }
 
-/** Writes `.flow-checker/model.json` and returns its path. */
-export function writeModel(root: string, model: AppModel): string {
-  const outDir = join(root, '.flow-checker')
+/** Writes `model.json` (default: in `<root>/.flow-checker`) and returns its path. */
+export function writeModel(root: string, model: AppModel, dataDir?: string): string {
+  const outDir = dataDir ?? join(root, '.flow-checker')
   const outFile = join(outDir, 'model.json')
   mkdirSync(outDir, { recursive: true })
   writeFileSync(outFile, `${JSON.stringify(model, null, 2)}\n`)

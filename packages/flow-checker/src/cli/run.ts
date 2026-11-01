@@ -4,6 +4,7 @@ import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { devCommand } from './dev'
 import { doctorCommand } from './doctor'
+import { exploreCommand } from './explore'
 import { exportCommand } from './export'
 import { initCommand } from './init'
 import { postmanCommand } from './postman'
@@ -12,6 +13,7 @@ import { scanCommand } from './scan'
 
 const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
+  explore: 'Scan, watch and open the dashboard only: no app, no setup, project files untouched',
   scan: 'Scan only and write .flow-checker/model.json',
   init: 'Add instrumentation hooks, config file and .gitignore entries',
   export: 'Export Markdown docs and a static HTML site (--md <dir>, --html <dir>)',
@@ -34,12 +36,12 @@ Options:
   --root <dir>            Project root (default: current directory)
   --app-dir <dir>         App Router directory, relative to the root (default: src/app or app)
   --config <file>         Config file (default: flow-checker.config.* in the root)
-  --port <n>              dev: dashboard port (default: 4400)
-  --app-port <n>          dev: port your Next.js app runs on (default: 3000)
+  --port <n>              dev, explore: dashboard port (default: 4400)
+  --app-port <n>          dev, explore: port your Next.js app runs on (default: 3000)
   --dev-command <cmd>     dev: command that starts your app (default: the "dev" script)
   --no-app                dev: don't start your app (start it yourself with the printed env)
-  --no-open               dev: don't open the browser
-  --no-watch              dev: don't re-scan when files change
+  --no-open               dev, explore: don't open the browser
+  --no-watch              dev, explore: don't re-scan when files change
   -y, --yes               init: apply the changes without asking
   --tree                  scan: also print the route and component trees
   --types                 scan: also print the resolved types
@@ -151,6 +153,24 @@ export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
         open: values.open,
         app: values.app,
         devCommand: values['dev-command'],
+        watch: values.watch,
+      },
+      io,
+    )
+  }
+
+  if (command === 'explore') {
+    const port = toPort(values.port, '--port', io)
+    const appPort = toPort(values['app-port'], '--app-port', io)
+    if (port === null || appPort === null) return 1
+    return exploreCommand(
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        port,
+        appPort,
+        open: values.open,
         watch: values.watch,
       },
       io,

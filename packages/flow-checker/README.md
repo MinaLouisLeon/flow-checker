@@ -55,6 +55,7 @@ It changes nothing unless the app was started by flow-checker, and returns your 
 ```
 flow-checker            # same as `dev`
 flow-checker dev        # scan + watch + dashboard + start your app with capture on
+flow-checker explore    # scan + watch + dashboard only: no app, no setup, project files untouched
 flow-checker scan       # scan only, write .flow-checker/model.json
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
 flow-checker export     # Markdown docs and/or a static HTML site
@@ -67,12 +68,12 @@ flow-checker postman import   # read a Postman collection to check the code agai
 | `--root <dir>`                               | all                       | Project root (default: current directory)                                                     |
 | `--app-dir <dir>`                            | all                       | App Router directory (default: `src/app` or `app`)                                            |
 | `--config <file>`                            | dev, scan, export, doctor | Config file (default: `flow-checker.config.*` in the root)                                    |
-| `--port <n>`                                 | dev, doctor               | Dashboard port (default 4400)                                                                 |
-| `--app-port <n>`                             | dev, doctor               | Port your app runs on (default 3000)                                                          |
+| `--port <n>`                                 | dev, explore, doctor      | Dashboard port (default 4400)                                                                 |
+| `--app-port <n>`                             | dev, explore, doctor      | Port your app runs on (default 3000)                                                          |
 | `--dev-command <cmd>`                        | dev                       | Command that starts your app (default: the `dev` script, or `next dev`)                       |
 | `--no-app`                                   | dev                       | Don't start the app. Start it yourself with the environment `dev` prints.                     |
-| `--no-open`                                  | dev                       | Don't open the browser                                                                        |
-| `--no-watch`                                 | dev                       | Don't re-scan when files change                                                               |
+| `--no-open`                                  | dev, explore              | Don't open the browser                                                                        |
+| `--no-watch`                                 | dev, explore              | Don't re-scan when files change                                                               |
 | `-y, --yes`                                  | init                      | Apply the changes without asking                                                              |
 | `--tree`, `--types`, `--requests`, `--flows` | scan                      | Also print the route/component trees, resolved types, request sites or flows                  |
 | `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |

@@ -55,7 +55,10 @@ export function App() {
         </a>
         <nav className="nav">
           {NAV.filter(
-            (item) => (!item.needsCapture || meta.data?.capture) && (!item.needsExport || meta.data?.export),
+            (item) =>
+              // Explore shows Live too, to explain how to turn capture on.
+              (!item.needsCapture || meta.data?.capture || meta.data?.explore) &&
+              (!item.needsExport || meta.data?.export),
           ).map((item) => (
             <a
               key={item.label}

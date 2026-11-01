@@ -35,6 +35,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M25 | Scanner fixes         | Model version 11. Handed-on functions are placed by `#valueTrigger`; `runtime-url` is an info flag (`isInfoFlag`).       |
 | M26 | Release v0.2.2        | Real-app before/after = scan + `export --html` with each `cli.js`, then open every page view in Playwright.              |
 | M27 | Early-return guards   | `SiteMeta.afterExit` beside `guarded`; side requests and twin choice use both, `isGuarded` itself is unchanged.          |
+| M28 | `explore`             | `startDev({ explore })`; no setup = capture off + `model.json` in `<tmp>/flow-checker/<name>-<hash>` (`dataDir`).        |
 
 ## Gotchas
 
@@ -298,3 +299,12 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   It is a separate `afterExit` list, and twins prefer the call before the exit only when the `if` guarding ties.
 - Quick A/B for a scanner change: make the new function return early, `pnpm --filter ./packages/flow-checker build`,
   bench, restore, build, bench. Compare runs from the same session only; absolute bench times drift between days.
+
+## M28 — `flow-checker explore` (branch `feat/m28-explore`)
+
+- Explore is `startDev()` with `explore: true`, not a separate server path, so watch, re-scan and export stay shared
+  with `dev`. Anything new that `dev` writes into the project must be skipped when `explore` has no setup
+  (`dataDir` set): `explore.test.ts` hashes every file of each fixture copy and fails on any write.
+- Tests that copy a fixture link its `node_modules` with a `junction` symlink (no admin rights needed on Windows)
+  instead of copying it. Remove the copy only after the CLI process has exited: on Windows its working directory or
+  open handles make `rmSync` fail with `EBUSY`, so spawn with `--root` rather than `cwd`.
