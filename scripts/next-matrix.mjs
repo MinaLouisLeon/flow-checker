@@ -234,8 +234,7 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     page.on('console', (msg) => log.push(`[browser ${msg.type()}] ${msg.text()}`))
     try {
       await page.goto(appUrl)
-      await page.getByRole('button', { name: 'Say hello' }).click()
-      await page.getByText('Hello from upstream').waitFor({ timeout: 60_000 })
+      await clickUntil(page.getByRole('button', { name: 'Say hello' }), page.getByText('Hello from upstream'))
       const captures = await waitForCaptures(dashboard, ingests)
       // v0.2.0 transports: the page loads the query, GraphQL, the event stream and the socket.
       await page.getByText('Matrix todo').waitFor({ timeout: 60_000 })
@@ -374,7 +373,9 @@ function writeApp(dir, proxy) {
           plugins: [{ name: 'next' }],
           paths: { '@/*': ['./*'] },
         },
-        include: ['next-env.d.ts', '**/*.ts', '**/*.tsx'],
+        // Old Next versions add `.next/types` on first start; that rewrite rebuilds the page and can
+        // swallow the first click, so it is already here.
+        include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
         exclude: ['node_modules'],
       },
       null,
@@ -803,6 +804,23 @@ function removeDir(dir) {
     rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 })
   } catch (error) {
     console.warn(`Could not remove ${dir}: ${error.message}`)
+  }
+}
+
+/**
+ * Clicks until `shown` appears. A click that lands before hydration, or during a Fast Refresh rebuild in
+ * a freshly started dev server, does nothing, so one lost click must not fail the run.
+ */
+async function clickUntil(button, shown, timeoutMs = 60_000) {
+  const until = Date.now() + timeoutMs
+  for (;;) {
+    await button.click()
+    try {
+      await shown.waitFor({ timeout: Math.min(10_000, Math.max(1, until - Date.now())) })
+      return
+    } catch (error) {
+      if (Date.now() >= until) throw error
+    }
   }
 }
 
