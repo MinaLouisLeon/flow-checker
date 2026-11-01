@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Requests after an early exit.** A request a shared helper sends only after an early `return` or `throw` didn't happen (for example a token refresh and retry after `if (res.status !== 401) return res`) is now marked `conditional` ("sometimes"), like one inside an `if`. Before, each method of a catch-all proxy listed the refresh as part of its chain.
+
 ## 0.2.2
 
 New Components and Requests screens, plus fixes found by running 0.2.1 on a large real app (54 pages, a catch-all proxy route, react-hook-form forms, custom React Query hooks). Models saved by 0.2 still load.

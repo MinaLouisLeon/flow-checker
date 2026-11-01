@@ -97,3 +97,4 @@ re-run them on their own before assuming a regression.
 | M24 | React Query keys                                  | Done   |
 | M25 | Scanner fixes (triggers, URLs, components, types) | Done   |
 | M26 | Release v0.2.2                                    | Done   |
+| M27 | Early-return guards (v0.3.0)                      | Done   |

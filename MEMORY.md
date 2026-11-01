@@ -34,6 +34,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M24 | React Query keys      | Model version 10. Unreadable key segments are `param` + `unknown`; shared queries are `matched` with `sharedWith`.       |
 | M25 | Scanner fixes         | Model version 11. Handed-on functions are placed by `#valueTrigger`; `runtime-url` is an info flag (`isInfoFlag`).       |
 | M26 | Release v0.2.2        | Real-app before/after = scan + `export --html` with each `cli.js`, then open every page view in Playwright.              |
+| M27 | Early-return guards   | `SiteMeta.afterExit` beside `guarded`; side requests and twin choice use both, `isGuarded` itself is unchanged.          |
 
 ## Gotchas
 
@@ -289,3 +290,11 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Run the Next matrix and the real-app scans before the perf bench, not alongside it: scan times taken
   while the matrix runs are not comparable.
 - A site count that goes up on a real app isn't a regression by itself: check repeated keys' call paths for twins.
+
+## M27 — Early-return guards (branch `feat/m27-early-return-guards`)
+
+- Don't fold "after an early exit" into `isGuarded()`: a wrapper's main `fetch` after `if (multipart) return ...`
+  would then count as guarded, and `#mergeTwins` / `#markSideRequests` lose the request they keep as the main one.
+  It is a separate `afterExit` list, and twins prefer the call before the exit only when the `if` guarding ties.
+- Quick A/B for a scanner change: make the new function return early, `pnpm --filter ./packages/flow-checker build`,
+  bench, restore, build, bench. Compare runs from the same session only; absolute bench times drift between days.
