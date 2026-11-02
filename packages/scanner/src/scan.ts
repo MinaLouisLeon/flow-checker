@@ -214,6 +214,8 @@ export function createScanSession(options: ScanOptions): ScanSession {
             project.addSourceFileAtPathIfExists(file)
         }
         if (resolveImports) project.resolveSourceFileDependencies()
+        // Files came or went, or imports changed: earlier module resolutions may be wrong now.
+        if (resolveImports || removed.length > 0) resolutionCaches.delete(project)
         report({
           phase: 'load',
           done: all.length,
@@ -453,9 +455,19 @@ function analyze(
 }
 
 /**
+ * Module resolutions of the import graph, kept across re-scans of the same project: most edits change
+ * no import, so each one is resolved once. `update()` drops it when files or imports change.
+ */
+const resolutionCaches = new WeakMap<Project, ts.ModuleResolutionCache>()
+
+/**
  * Project files reached from the app directory and the middleware, each with the project files it
  * imports. Walking from those roots (rather than listing the project's files) leaves out files a
  * warm session still holds but nothing imports any more, so a re-scan gives what a fresh scan does.
+ *
+ * Imports are resolved here with the compiler's module resolution, not ts-morph's
+ * `getReferencedSourceFiles()`: its cache keeps imports that didn't resolve (a package that isn't
+ * installed) and retries them on a later re-scan from nodes that were replaced, which throws.
  */
 function importGraph(
   project: Project,
@@ -465,6 +477,29 @@ function importGraph(
 ): Record<string, string[]> {
   const inProject = (file: SourceFile) =>
     !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(file.getFilePath())
+  const options = project.getCompilerOptions()
+  const host = project.getModuleResolutionHost()
+  let cache = resolutionCaches.get(project)
+  if (!cache) {
+    cache = ts.createModuleResolutionCache(root, (name) => name, options)
+    resolutionCaches.set(project, cache)
+  }
+  const referenced = (file: SourceFile): SourceFile[] => {
+    const out: SourceFile[] = []
+    for (const literal of file.getImportStringLiterals()) {
+      const resolved = ts.resolveModuleName(
+        literal.getLiteralValue(),
+        file.getFilePath(),
+        options,
+        host,
+        cache,
+      ).resolvedModule
+      if (!resolved || resolved.isExternalLibraryImport) continue
+      const target = project.getSourceFile(toPosix(resolved.resolvedFileName))
+      if (target) out.push(target)
+    }
+    return out
+  }
   const queue = project
     .getSourceFiles()
     .filter(
@@ -477,7 +512,7 @@ function importGraph(
   for (let i = 0; i < queue.length; i++) {
     const file = queue[i] as SourceFile
     const imported = new Set<string>()
-    for (const target of file.getReferencedSourceFiles()) {
+    for (const target of referenced(file)) {
       if (target === file || !inProject(target)) continue
       imported.add(relativeTo(root, target.getFilePath()))
       if (!seen.has(target)) {

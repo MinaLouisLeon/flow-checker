@@ -120,9 +120,9 @@ describe('explore without a setup', () => {
 
   it('watches and re-scans without writing into the project', { timeout: 60_000 }, async () => {
     const root = freshCopy('basic', dirs)
-    const { io } = capture()
-    // Route paths of each re-scan. On Windows the new folder and the page inside it can arrive in
-    // separate batches, so the first re-scan may not have the page yet: wait for the one that does.
+    const { io, err } = capture()
+    // Route paths of each re-scan: the folder and the page inside it may come in separate batches,
+    // so wait for the re-scan that has the page.
     const rescans: string[][] = []
     const session = await startDev(
       {
@@ -146,7 +146,11 @@ describe('explore without a setup', () => {
       const added = () => rescans.some((paths) => paths.includes('/explore-added'))
       while (!added() && Date.now() < deadline) await new Promise((r) => setTimeout(r, 100))
       const model = await getJson<AppModel>(`${session.url}/api/model`)
-      expect(model.routes.map((r) => r.path)).toContain('/explore-added')
+      // A failed re-scan is only printed: show it, or the test just says the page is missing.
+      expect(
+        model.routes.map((r) => r.path),
+        err.join('\n'),
+      ).toContain('/explore-added')
       const saved = JSON.parse(readFileSync(join(session.dataDir ?? '', 'model.json'), 'utf8')) as AppModel
       expect(saved.routes.map((r) => r.path)).toContain('/explore-added')
     } finally {
