@@ -29,7 +29,7 @@ import {
   readMiddleware,
   routesUnder,
 } from './middleware'
-import { relativeTo, resolveFrom, toPosix } from './paths'
+import { compare, relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { RequestScanner } from './requests'
 import { walkRoutes } from './routes'
@@ -448,7 +448,46 @@ function analyze(
     ...(graphql ? { graphql } : {}),
     ...(streams.length > 0 ? { streams } : {}),
     ...(settings.areas ? { areas: settings.areas } : {}),
+    imports: importGraph(project, root, discovery, settings),
   }
+}
+
+/**
+ * Project files reached from the app directory and the middleware, each with the project files it
+ * imports. Walking from those roots (rather than listing the project's files) leaves out files a
+ * warm session still holds but nothing imports any more, so a re-scan gives what a fresh scan does.
+ */
+function importGraph(
+  project: Project,
+  root: string,
+  discovery: Discovery,
+  settings: ScanSettings,
+): Record<string, string[]> {
+  const inProject = (file: SourceFile) =>
+    !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(file.getFilePath())
+  const queue = project
+    .getSourceFiles()
+    .filter(
+      (f) =>
+        inProject(f) &&
+        (f.getFilePath().startsWith(`${discovery.appDir}/`) || f.getFilePath() === discovery.middleware),
+    )
+  const seen = new Set(queue)
+  const graph: Record<string, string[]> = {}
+  for (let i = 0; i < queue.length; i++) {
+    const file = queue[i] as SourceFile
+    const imported = new Set<string>()
+    for (const target of file.getReferencedSourceFiles()) {
+      if (target === file || !inProject(target)) continue
+      imported.add(relativeTo(root, target.getFilePath()))
+      if (!seen.has(target)) {
+        seen.add(target)
+        queue.push(target)
+      }
+    }
+    if (imported.size > 0) graph[relativeTo(root, file.getFilePath())] = [...imported].sort(compare)
+  }
+  return Object.fromEntries(Object.entries(graph).sort(([a], [b]) => compare(a, b)))
 }
 
 interface TrpcFound {

@@ -928,5 +928,30 @@
       ]
     }
   ],
-  "queryLinks": []
+  "queryLinks": [],
+  "imports": {
+    "app/page.tsx": [
+      "components/UserList.tsx",
+      "lib/api.ts"
+    ],
+    "app/users/[id]/page.tsx": [
+      "components/DeleteUserButton.tsx",
+      "components/ProfileCard.tsx",
+      "lib/api.ts"
+    ],
+    "components/DeleteUserButton.tsx": [
+      "lib/api.ts"
+    ],
+    "components/ProfileCard.tsx": [
+      "lib/api.ts",
+      "types/user.ts"
+    ],
+    "components/UserList.tsx": [
+      "types/user.ts"
+    ],
+    "lib/api.ts": [
+      "lib/config.ts",
+      "types/user.ts"
+    ]
+  }
 }

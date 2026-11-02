@@ -1086,7 +1086,33 @@
         ]
       }
     ],
-    "queryLinks": []
+    "queryLinks": [],
+    "imports": {
+      "src/actions/products.ts": [
+        "src/lib/backend.ts",
+        "src/types/product.ts"
+      ],
+      "src/app/products/[id]/page.tsx": [
+        "src/lib/backend.ts"
+      ],
+      "src/app/products/new/page.tsx": [
+        "src/components/CreateProductForm.tsx"
+      ],
+      "src/app/products/page.tsx": [
+        "src/components/DeleteProductButton.tsx",
+        "src/lib/backend.ts"
+      ],
+      "src/components/CreateProductForm.tsx": [
+        "src/actions/products.ts",
+        "src/types/product.ts"
+      ],
+      "src/components/DeleteProductButton.tsx": [
+        "src/actions/products.ts"
+      ],
+      "src/lib/backend.ts": [
+        "src/types/product.ts"
+      ]
+    }
   },
   "verification": {
     "sites": {

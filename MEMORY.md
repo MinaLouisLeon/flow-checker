@@ -43,6 +43,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M33 | Global search         | `buildSearchIndex()` / `search()` in `shared/src/search.ts`; `searchOf()` caches, `searchScreen()` links.                |
 | M34 | Plain wording         | `shared/src/glossary.ts` is the only wording table; `Badge term={[group, key]}`; `useShowDetails()` hides extra badges.  |
 | M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
+| M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
 
 ## Gotchas
 
@@ -418,3 +419,17 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   uses relative symlinks there; locally it makes absolute junctions, so it passes here). The scan then misses axios
   calls and the flows built on them. Tests that check scan results on a copy must link each package by its real path
   (`linkPackages()` in `e2e/explore.spec.ts` and `flow-checker/test/summary.test.ts`). Failed PR #45 on Windows only.
+
+## M36 — Impact check (branch `feat/m36-impact-check`)
+
+- There was no dependency map to reuse (M9's warm session replaced it), so the scan writes `AppModel.imports`. Build
+  it by walking from the app files and the middleware, not from `project.getSourceFiles()`: a warm session keeps
+  files nothing imports any more, and `incremental.test.ts` (re-scan = fresh scan) fails otherwise.
+- A file with scan facts is followed through those facts only, not also through its importers: a hook file's
+  importers would pull in every other request of the components that import it. The import graph is only for files
+  with no facts (constants, utils), and stops at the nearest importers that have some.
+- Route-handler callers must be matched by method: `handlerCallers` is per route, so without the filter a `POST`
+  caller "led to" the handler's `GET` upstream fetch (the bff fixture showed it).
+- `renderToStaticMarkup` escapes apostrophes (`&#x27;`): dashboard tests must not match text that has one.
+- `pnpm check > log; echo EXIT $?` in a background task reports success either way; read the log for `ERR_PNPM` /
+  `Failed`. Run `pnpm typecheck` first: test files are only typechecked there, not by vitest.

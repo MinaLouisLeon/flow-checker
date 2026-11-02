@@ -1,0 +1,12 @@
+app/api/health/route.ts  code  0p 1h 0f 0r 0c 0t
+app/dashboard/page.tsx  code  1p 0h 0f 1r 1c 0t
+app/dashboard/settings/page.tsx  code  1p 0h 0f 1r 1c 0t
+app/layout.tsx  code  5p 0h 0f 0r 1c 0t
+app/login/page.tsx  code  1p 0h 0f 0r 1c 0t
+app/page.tsx  code  1p 0h 0f 0r 1c 0t
+app/products/page.tsx  code  1p 0h 0f 1r 1c 0t
+lib/api.ts  code  3p 0h 0f 3r 0c 0t
+lib/config.ts  imported via lib/api.ts, lib/session.ts  4p 0h 0f 4r 0c 0t
+lib/session.ts  code  3p 0h 0f 1r 0c 0t
+proxy.ts  code  3p 0h 0f 1r 0c 0t
+types/user.ts  code  4p 0h 0f 4r 0c 3t

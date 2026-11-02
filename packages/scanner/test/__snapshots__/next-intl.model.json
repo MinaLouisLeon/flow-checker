@@ -1244,5 +1244,44 @@
       }
     ],
     "rewrites": []
+  },
+  "imports": {
+    "src/app/[locale]/dashboard/page.tsx": [
+      "src/components/DashboardProfile.tsx"
+    ],
+    "src/app/[locale]/layout.tsx": [
+      "src/i18n/routing.ts"
+    ],
+    "src/app/[locale]/login/page.tsx": [
+      "src/components/LoginForm.tsx"
+    ],
+    "src/app/[locale]/page.tsx": [
+      "src/i18n/navigation.ts"
+    ],
+    "src/app/[locale]/verify/page.tsx": [
+      "src/components/VerifyOtpForm.tsx"
+    ],
+    "src/components/DashboardProfile.tsx": [
+      "src/i18n/navigation.ts",
+      "src/lib/auth-api.ts",
+      "src/types/auth.ts"
+    ],
+    "src/components/LoginForm.tsx": [
+      "src/i18n/navigation.ts",
+      "src/lib/auth-api.ts"
+    ],
+    "src/components/VerifyOtpForm.tsx": [
+      "src/i18n/navigation.ts",
+      "src/lib/auth-api.ts"
+    ],
+    "src/i18n/navigation.ts": [
+      "src/i18n/routing.ts"
+    ],
+    "src/lib/auth-api.ts": [
+      "src/types/auth.ts"
+    ],
+    "src/proxy.ts": [
+      "src/i18n/routing.ts"
+    ]
   }
 }

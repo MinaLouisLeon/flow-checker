@@ -972,6 +972,36 @@
       }
     ],
     "queryLinks": [],
+    "imports": {
+      "app/page.tsx": [
+        "components/ProductPanel.tsx",
+        "components/TodoPanel.tsx",
+        "lib/api.ts"
+      ],
+      "app/users/[id]/page.tsx": [
+        "components/DeleteUserButton.tsx",
+        "lib/api.ts"
+      ],
+      "components/DeleteUserButton.tsx": [
+        "lib/api.ts"
+      ],
+      "components/ProductPanel.tsx": [
+        "lib/api.ts",
+        "types/index.ts"
+      ],
+      "components/TodoPanel.tsx": [
+        "lib/api.ts",
+        "lib/todos.ts",
+        "types/index.ts"
+      ],
+      "lib/api.ts": [
+        "lib/config.ts",
+        "types/index.ts"
+      ],
+      "lib/todos.ts": [
+        "types/index.ts"
+      ]
+    },
     "postman": {
       "collection": {
         "name": "Fixture API",

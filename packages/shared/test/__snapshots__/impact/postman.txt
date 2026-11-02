@@ -1,0 +1,10 @@
+app/layout.tsx  code  2p 0h 0f 0r 1c 0t
+app/page.tsx  code  1p 0h 1f 1r 1c 0t
+app/users/[id]/page.tsx  code  1p 0h 0f 1r 1c 0t
+components/DeleteUserButton.tsx  code  1p 0h 1f 1r 1c 0t
+components/ProductPanel.tsx  code  1p 0h 1f 1r 1c 0t
+components/TodoPanel.tsx  code  1p 0h 2f 2r 1c 0t
+lib/api.ts  code  2p 0h 2f 5r 0c 0t
+lib/config.ts  imported via lib/api.ts  2p 0h 2f 5r 0c 0t
+lib/todos.ts  code  1p 0h 1f 1r 0c 0t
+types/index.ts  code  1p 0h 2f 4r 2c 4t

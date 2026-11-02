@@ -1,5 +1,5 @@
 import { buildCoverage, isVerified } from '@flow-checker/shared'
-import { useFlows, useVerification } from '../api'
+import { useFlows, useLastScan, useVerification } from '../api'
 import { useData } from '../context'
 import { GraphqlSection } from '../GraphqlView'
 import { areasOf, COMPONENT_KINDS, countWhen, endpointsOf, REQUEST_WHEN, type RequestWhen } from '../lists'
@@ -10,6 +10,7 @@ import { SocketsSection } from '../SocketView'
 import { StreamsSection } from '../SseView'
 import { TrpcSection } from '../TrpcView'
 import { Empty, Section, SourceLink } from '../ui'
+import { ImpactPanel } from './ChangesScreen'
 import { CoverageBars } from './WalkScreen'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
@@ -40,10 +41,15 @@ export function Overview() {
   const endpoints = endpointsOf(index)
   const backends = endpoints.hosts.filter((h) => h.kind === 'external').length
   const areas = areasOf(index)
+  const lastScan = useLastScan()
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
     <div className="screen">
+      {/* After a re-scan from a file change: what the change affects (M36). */}
+      {lastScan && lastScan.files.length > 0 && (
+        <ImpactPanel lastScan={lastScan} watching={Boolean(meta.watching)} exported={false} />
+      )}
       <div className="stats">
         <Stat label="Pages" value={pages.length} link={href({ name: 'map', view: 'graph', q: '' })} />
         <Stat

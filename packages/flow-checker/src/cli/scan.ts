@@ -1,9 +1,12 @@
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
+import { resolveCaptureOptions } from '@flow-checker/runtime/options'
 import { ScanError } from '@flow-checker/scanner'
+import { collectSnapshot } from '@flow-checker/server'
 import {
   type AppModel,
   CLI_NAME,
+  type Flag,
   type FlowCheckerConfig,
   formatFlows,
   formatModel,
@@ -12,6 +15,15 @@ import {
 } from '@flow-checker/shared'
 import { ConfigError, configDetails, loadConfig, scanSettings } from './config'
 import { graphqlForScan } from './graphql'
+import {
+  type ChangedFiles,
+  changedFiles,
+  formatDiff,
+  formatFailOn,
+  impactOfChanges,
+  openFlags,
+  parseFailOn,
+} from './impact'
 import { appOrigins, contractSummary, postmanForScan } from './postman'
 import { createProgress, scanReporter, scanSteps } from './progress'
 import type { CliIO } from './run'
@@ -26,11 +38,28 @@ export interface ScanCommandOptions {
   types?: boolean
   requests?: boolean
   flows?: boolean
+  /** `--diff <ref>` (M36): print what the files changed since this git ref affect. */
+  diff?: string
+  /** `--fail-on <kinds>` (M36): exit 1 when a flag of these kinds is open (comma-separated). */
+  failOn?: string
+  /** Print JSON instead of text (with `--diff` / `--fail-on`: their results). */
+  json?: boolean
 }
 
 /** `flow-checker scan`: scans the project and writes `.flow-checker/model.json`. */
 export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promise<number> {
   let root = resolve(options.root ?? process.cwd())
+  // With --fail-on, a check that couldn't run exits 2, so CI can tell it from open flags (1).
+  const broken = options.failOn !== undefined ? 2 : 1
+  let failOn: Flag['kind'][] | undefined
+  if (options.failOn !== undefined) {
+    const parsed = parseFailOn(options.failOn)
+    if (typeof parsed === 'string') {
+      io.err(parsed)
+      return broken
+    }
+    failOn = parsed
+  }
   const progress = createProgress(io, [{ id: 'config', weight: 2 }, ...scanSteps(98)])
 
   let config: FlowCheckerConfig
@@ -45,9 +74,20 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
     progress.finish()
     if (error instanceof ConfigError) {
       io.err(error.message)
-      return 1
+      return broken
     }
     throw error
+  }
+
+  let changed: ChangedFiles | undefined
+  if (options.diff !== undefined) {
+    const found = changedFiles(root, options.diff)
+    if (typeof found === 'string') {
+      progress.finish()
+      io.err(found)
+      return broken
+    }
+    changed = found
   }
 
   const postman = await postmanForScan(root, config, io, progress)
@@ -69,7 +109,7 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
   } catch (error) {
     if (error instanceof ScanError) {
       io.err(error.message)
-      return 1
+      return broken
     }
     throw error
   } finally {
@@ -78,6 +118,33 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
   }
 
   const outFile = join(root, '.flow-checker', 'model.json')
+  const elapsed = performance.now() - started
+  const impact = changed && impactOfChanges(model, changed)
+  let open: ReturnType<typeof openFlags> | undefined
+  if (failOn) {
+    // Captures from earlier runs add the flags only they can tell: `stale`, `type-mismatch`.
+    const checked = existsSync(join(root, '.flow-checker'))
+      ? collectSnapshot({ root, model, capture: resolveCaptureOptions(config.capture) }).model
+      : model
+    open = openFlags(checked, failOn, impact && new Set(impact.requests.map((r) => r.id)))
+  }
+
+  if (options.json) {
+    io.out(
+      JSON.stringify(
+        {
+          model: outFile,
+          scanned: counts(model),
+          durationMs: Math.round(elapsed),
+          ...(changed && impact ? { diff: { ref: options.diff, ...changed, impact } } : {}),
+          ...(failOn && open ? { failOn: { kinds: failOn, open, failed: open.length > 0 } } : {}),
+        },
+        null,
+        2,
+      ),
+    )
+    return open && open.length > 0 ? 1 : 0
+  }
 
   if (options.tree) io.out(formatModel(model))
   if (options.types) io.out(formatTypes(model))
@@ -88,11 +155,29 @@ export async function scanCommand(options: ScanCommandOptions, io: CliIO): Promi
   }
   if (options.flows) io.out(formatFlows(model))
 
-  io.out(summary(model, performance.now() - started))
+  io.out(summary(model, elapsed))
   const contract = contractSummary(model)
   if (contract) io.out(contract)
   io.out(`Wrote ${relative(process.cwd(), outFile) || outFile}`)
+  if (changed && impact && options.diff !== undefined)
+    io.out(`\n${formatDiff(options.diff, changed, impact)}`)
+  if (failOn && open) {
+    io.out(`\n${formatFailOn(failOn, open, Boolean(impact))}`)
+    if (open.length > 0) return 1
+  }
   return 0
+}
+
+function counts(model: AppModel) {
+  const pages = model.routes.filter((r) => r.kind === 'page').length
+  return {
+    pages,
+    routeHandlers: model.routes.length - pages,
+    components: model.components.length,
+    types: model.types.length,
+    requests: model.requests.length,
+    flows: model.flows.length,
+  }
 }
 
 /** Writes `model.json` (default: in `<root>/.flow-checker`) and returns its path. */

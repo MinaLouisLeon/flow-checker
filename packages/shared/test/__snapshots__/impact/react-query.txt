@@ -1,0 +1,20 @@
+src/app/layout.tsx  code  4p 0h 0f 0r 1c 0t
+src/app/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/providers.tsx  code  4p 0h 0f 0r 1c 0t
+src/app/settings/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/todos/[id]/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/users/page.tsx  code  1p 0h 0f 1r 1c 0t
+src/components/AddTodoForm.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/SettingsBadge.tsx  code  1p 0h 0f 1r 1c 0t
+src/components/SettingsPanel.tsx  code  1p 0h 0f 3r 1c 0t
+src/components/TodoDetail.tsx  code  1p 0h 1f 1r 1c 1t
+src/components/TodoList.tsx  code  1p 0h 1f 2r 1c 0t
+src/components/UserList.tsx  code  1p 0h 2f 4r 1c 0t
+src/hooks/useApiQuery.ts  code  1p 0h 0f 2r 0c 0t
+src/services/keys.ts  imported via src/components/SettingsBadge.tsx, src/components/SettingsPanel.tsx  1p 0h 0f 4r 2c 0t
+src/services/settings.ts  code  1p 0h 0f 2r 0c 0t
+src/services/todos.ts  code  4p 0h 4f 13r 0c 0t
+src/services/users.ts  code  2p 0h 2f 6r 0c 0t
+src/types/settings.ts  code  1p 0h 0f 2r 0c 1t
+src/types/todo.ts  code  4p 0h 2f 6r 2c 3t
+src/types/user.ts  code  2p 0h 2f 5r 0c 1t

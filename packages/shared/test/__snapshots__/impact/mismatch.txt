@@ -1,0 +1,7 @@
+app/layout.tsx  code  1p 0h 0f 0r 1c 0t
+app/page.tsx  code  1p 0h 0f 1r 1c 0t
+components/SettingsPanel.tsx  code  1p 0h 0f 1r 1c 0t
+components/TodoPanel.tsx  code  1p 0h 1f 2r 1c 0t
+lib/api.ts  code  1p 0h 1f 4r 0c 0t
+lib/config.ts  imported via lib/api.ts  1p 0h 1f 4r 0c 0t
+types/index.ts  code  1p 0h 1f 4r 2c 4t
