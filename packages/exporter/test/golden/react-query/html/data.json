@@ -2322,7 +2322,65 @@
           "req_1g8keamimjw"
         ]
       }
-    ]
+    ],
+    "imports": {
+      "src/app/layout.tsx": [
+        "src/app/providers.tsx"
+      ],
+      "src/app/page.tsx": [
+        "src/components/AddTodoForm.tsx",
+        "src/components/TodoList.tsx"
+      ],
+      "src/app/settings/page.tsx": [
+        "src/components/SettingsBadge.tsx",
+        "src/components/SettingsPanel.tsx"
+      ],
+      "src/app/todos/[id]/page.tsx": [
+        "src/components/TodoDetail.tsx"
+      ],
+      "src/app/users/page.tsx": [
+        "src/components/UserList.tsx",
+        "src/services/users.ts"
+      ],
+      "src/components/AddTodoForm.tsx": [
+        "src/services/todos.ts"
+      ],
+      "src/components/SettingsBadge.tsx": [
+        "src/hooks/useApiQuery.ts",
+        "src/services/keys.ts",
+        "src/services/settings.ts"
+      ],
+      "src/components/SettingsPanel.tsx": [
+        "src/hooks/useApiQuery.ts",
+        "src/services/keys.ts",
+        "src/services/settings.ts",
+        "src/services/todos.ts",
+        "src/services/users.ts"
+      ],
+      "src/components/TodoDetail.tsx": [
+        "src/services/todos.ts",
+        "src/types/todo.ts"
+      ],
+      "src/components/TodoList.tsx": [
+        "src/services/todos.ts",
+        "src/types/todo.ts"
+      ],
+      "src/components/UserList.tsx": [
+        "src/services/users.ts"
+      ],
+      "src/services/settings.ts": [
+        "src/services/todos.ts",
+        "src/types/settings.ts"
+      ],
+      "src/services/todos.ts": [
+        "src/types/todo.ts"
+      ],
+      "src/services/users.ts": [
+        "src/services/todos.ts",
+        "src/types/todo.ts",
+        "src/types/user.ts"
+      ]
+    }
   },
   "verification": {
     "sites": {

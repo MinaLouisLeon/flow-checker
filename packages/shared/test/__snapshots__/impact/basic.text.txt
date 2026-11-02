@@ -1,0 +1,59 @@
+Changed file
+  types/user.ts  3 types
+
+Affects 2 pages, 1 flow and 3 requests.
+
+Area home
+  page           /                                         renders UserList
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  its data type uses User
+
+Area users
+  page           /users/[id]                               renders ProfileCard
+  flow           DeleteUserButton click                    sends GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  its data type uses Todo
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  its data type uses User
+
+Also touched: 2 components and 5 types
+  component      ProfileCard  uses type Todo
+  component      UserList  uses type UserListProps
+  type           ProfileCardProps  uses type User
+  type           Role  defined in types/user.ts:1
+  type           Todo  defined in types/user.ts:10
+  type           User  defined in types/user.ts:3
+  type           UserListProps  uses type User
+
+---
+
+Changed file
+  lib/api.ts  4 requests
+
+Affects 2 pages, 1 flow and 4 requests.
+
+Area home
+  page           /                                         sends GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  sent through lib/api.ts:14
+
+Area users
+  page           /users/[id]                               sends GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+  flow           DeleteUserButton click                    sends DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+  request        DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  sent through lib/api.ts:9
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  sent through lib/api.ts:26
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  sent through lib/api.ts:20
+
+---
+
+Changed file
+  lib/config.ts  nothing of its own; imported by lib/api.ts
+
+Affects 2 pages, 1 flow and 4 requests.
+
+Area home
+  page           /                                         sends GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users  sent through lib/api.ts (imports lib/config.ts)
+
+Area users
+  page           /users/[id]                               sends GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+  flow           DeleteUserButton click                    sends DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id
+  request        DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  sent through lib/api.ts (imports lib/config.ts)
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos?userId=:userId  sent through lib/api.ts (imports lib/config.ts)
+  request        GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id  sent through lib/api.ts (imports lib/config.ts)

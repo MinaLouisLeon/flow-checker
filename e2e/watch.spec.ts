@@ -47,6 +47,15 @@ test('editing the code behind a verified request asks for a re-check', async ({ 
     test.info().annotations.push({ type: 'update time', description: `${Date.now() - started} ms` })
     await expect(page.locator('.banner-warn')).toContainText('changed')
     await expect(page.locator('.topbar-meta').first()).toContainText('LoginForm.tsx changed')
+
+    // M36: what the change affects, from the header link.
+    await page.getByRole('link', { name: 'what it affects' }).click()
+    const panel = page.getByTestId('impact-panel')
+    await expect(panel).toContainText('src/components/LoginForm.tsx')
+    await expect(panel).toContainText('/[locale]/login')
+    await expect(panel).toContainText('LoginForm submit')
+    await expect(panel).toContainText(/POST .*\/auth\/login/)
+    await page.goto(`${dashboard}/#/component/${component.id}`)
   } finally {
     writeFileSync(loginForm, original)
   }

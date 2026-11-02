@@ -1260,7 +1260,40 @@
           "req_2efgv3zloxh"
         ]
       }
-    ]
+    ],
+    "imports": {
+      "app/api/chat/route.ts": [
+        "lib/sse.ts",
+        "lib/types.ts"
+      ],
+      "app/api/clock/route.ts": [
+        "lib/types.ts"
+      ],
+      "app/api/jobs/[id]/progress/route.ts": [
+        "lib/sse.ts"
+      ],
+      "app/chat/page.tsx": [
+        "components/Chat.tsx"
+      ],
+      "app/jobs/[id]/page.tsx": [
+        "components/JobProgress.tsx"
+      ],
+      "app/page.tsx": [
+        "components/Clock.tsx"
+      ],
+      "components/Chat.tsx": [
+        "lib/chat.ts"
+      ],
+      "components/Clock.tsx": [
+        "lib/types.ts"
+      ],
+      "components/JobProgress.tsx": [
+        "lib/types.ts"
+      ],
+      "lib/chat.ts": [
+        "lib/types.ts"
+      ]
+    }
   },
   "verification": {
     "sites": {

@@ -779,5 +779,25 @@
       ]
     }
   ],
-  "queryLinks": []
+  "queryLinks": [],
+  "imports": {
+    "app/chat/page.tsx": [
+      "components/Chat.tsx"
+    ],
+    "app/page.tsx": [
+      "components/Ping.tsx",
+      "components/Ticker.tsx"
+    ],
+    "components/Chat.tsx": [
+      "lib/config.ts",
+      "lib/types.ts"
+    ],
+    "components/Ping.tsx": [
+      "lib/config.ts"
+    ],
+    "components/Ticker.tsx": [
+      "lib/config.ts",
+      "lib/types.ts"
+    ]
+  }
 }

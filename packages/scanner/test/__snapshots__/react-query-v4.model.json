@@ -2247,5 +2247,60 @@
         "req_10nfwo5qqhi"
       ]
     }
-  ]
+  ],
+  "imports": {
+    "src/app/layout.tsx": [
+      "src/app/providers.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/AddTodoForm.tsx",
+      "src/components/TodoList.tsx",
+      "src/components/TodoStats.tsx"
+    ],
+    "src/app/settings/page.tsx": [
+      "src/components/SettingsBadge.tsx",
+      "src/components/SettingsPanel.tsx"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/components/TodoDetail.tsx"
+    ],
+    "src/app/users/page.tsx": [
+      "src/components/HydrateClient.tsx",
+      "src/components/UserList.tsx",
+      "src/services/api.ts"
+    ],
+    "src/components/AddTodoForm.tsx": [
+      "src/services/api.ts"
+    ],
+    "src/components/SettingsBadge.tsx": [
+      "src/hooks/useApiQuery.ts",
+      "src/services/index.ts"
+    ],
+    "src/components/SettingsPanel.tsx": [
+      "src/hooks/useApiQuery.ts",
+      "src/services/index.ts"
+    ],
+    "src/components/TodoDetail.tsx": [
+      "src/services/api.ts"
+    ],
+    "src/components/TodoList.tsx": [
+      "src/services/api.ts",
+      "src/types/todo.ts"
+    ],
+    "src/components/TodoStats.tsx": [
+      "src/services/api.ts"
+    ],
+    "src/components/UserList.tsx": [
+      "src/services/api.ts"
+    ],
+    "src/services/api.ts": [
+      "src/types/settings.ts",
+      "src/types/todo.ts",
+      "src/types/user.ts"
+    ],
+    "src/services/index.ts": [
+      "src/services/api.ts",
+      "src/services/keys.ts"
+    ]
+  }
 }

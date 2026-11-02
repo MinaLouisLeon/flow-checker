@@ -1,0 +1,10 @@
+src/actions/products.ts  code  2p 0h 2f 4r 0c 0t
+src/app/layout.tsx  code  4p 0h 0f 0r 1c 0t
+src/app/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/products/[id]/page.tsx  code  1p 0h 1f 1r 1c 0t
+src/app/products/new/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/products/page.tsx  code  1p 0h 0f 1r 1c 0t
+src/components/CreateProductForm.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/DeleteProductButton.tsx  code  1p 0h 1f 1r 1c 0t
+src/lib/backend.ts  code  3p 0h 2f 6r 0c 0t
+src/types/product.ts  code  3p 0h 1f 4r 0c 3t

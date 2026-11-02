@@ -2294,5 +2294,51 @@
         ]
       }
     ]
+  },
+  "imports": {
+    "src/app/api/graphql/route.ts": [
+      "src/server/resolvers.ts"
+    ],
+    "src/app/layout.tsx": [
+      "src/app/providers.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/AddTodoForm.tsx",
+      "src/components/ClientOnly.tsx",
+      "src/components/TodoList.tsx"
+    ],
+    "src/app/providers.tsx": [
+      "src/relay/environment.ts"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/components/TodoPage.tsx"
+    ],
+    "src/app/users/page.tsx": [
+      "src/components/UserList.tsx"
+    ],
+    "src/components/AddTodoForm.tsx": [
+      "src/__generated__/AddTodoFormMutation.graphql.ts"
+    ],
+    "src/components/TodoDetail.tsx": [
+      "src/__generated__/TodoDetailQuery.graphql.ts",
+      "src/__generated__/TodoDetailToggleMutation.graphql.ts"
+    ],
+    "src/components/TodoItem.tsx": [
+      "src/__generated__/TodoItem_todo.graphql.ts"
+    ],
+    "src/components/TodoList.tsx": [
+      "src/__generated__/TodoListQuery.graphql.ts",
+      "src/components/TodoItem.tsx"
+    ],
+    "src/components/TodoPage.tsx": [
+      "src/__generated__/TodoDetailQuery.graphql.ts",
+      "src/components/TodoDetail.tsx"
+    ],
+    "src/components/UserList.tsx": [
+      "src/__generated__/UserListQuery.graphql.ts"
+    ],
+    "src/server/resolvers.ts": [
+      "src/server/data.ts"
+    ]
   }
 }
