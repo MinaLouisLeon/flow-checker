@@ -932,5 +932,28 @@
       ]
     }
   ],
-  "queryLinks": []
+  "queryLinks": [],
+  "imports": {
+    "src/app/api/products/[id]/route.ts": [
+      "src/lib/backend.ts",
+      "src/lib/schemas.ts"
+    ],
+    "src/app/api/products/route.ts": [
+      "src/lib/backend.ts",
+      "src/lib/schemas.ts"
+    ],
+    "src/app/page.tsx": [
+      "src/components/CreateProductForm.tsx",
+      "src/components/ProductsTable.tsx"
+    ],
+    "src/app/products/[id]/page.tsx": [
+      "src/lib/schemas.ts"
+    ],
+    "src/components/CreateProductForm.tsx": [
+      "src/lib/schemas.ts"
+    ],
+    "src/components/ProductsTable.tsx": [
+      "src/lib/schemas.ts"
+    ]
+  }
 }

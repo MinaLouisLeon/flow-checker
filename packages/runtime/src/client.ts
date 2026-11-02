@@ -7,7 +7,7 @@ import type { Capture, CapturedBody, Interaction, SessionEvent } from '@flow-che
 import { byteLength, callerStack, headersToObject, readStream, requestBody, textBody } from './body'
 import { splitGraphqlCapture } from './graphql'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
-import { createQueryTracker, findQueryClient } from './query'
+import { createQueryTracker, findQueryClient, sentByQueryLibrary } from './query'
 import { compileRules, redactCapture } from './redact'
 import { isSocketIoUrl, parseSocketIoFrame } from './socket'
 import { isEventStream, readEventStream, recordStream, type StreamRecorder } from './stream'
@@ -237,6 +237,22 @@ function start(config: RuntimeConfig) {
     // Found just now: the query that sends this request started before it could be wrapped.
     return queries.ready ? (queries.current() ?? queries.guess()) : undefined
   }
+  /**
+   * A request a React Query function sent before the client could be found: an earlier request in
+   * the same task looked and failed, then hydration committed the provider and ran the query in
+   * that task (lost keys on Next 13.4 in the matrix). One task later the provider is on screen, and
+   * the capture is only sent once its response is in, so its key can still be filled in.
+   */
+  const fillQueryLater = (capture: Capture) => {
+    setTimeout(() => {
+      try {
+        if (capture.query) return
+        lookForQueryClient()
+        const query = queries.ready ? queries.guess() : undefined
+        if (query) capture.query = query
+      } catch {}
+    }, 0)
+  }
 
   // --- Request filtering --------------------------------------------------------------------
 
@@ -268,6 +284,7 @@ function start(config: RuntimeConfig) {
     if (action) capture.serverAction = { id: action }
     const query = currentQuery()
     if (query) capture.query = query
+    else if (!queries.ready && sentByQueryLibrary(capture.stack)) fillQueryLater(capture)
     const interaction = currentInteraction()
     if (interaction) capture.interaction = interaction
     return capture

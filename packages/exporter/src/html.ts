@@ -67,9 +67,13 @@ function indexHtml(html: string, data: ExportData, classic: boolean): string {
   return at < 0 ? out.replace('</head>', `${tag}</head>`) : `${out.slice(0, at)}${tag}${out.slice(at)}`
 }
 
-/** No `import`/`export` statements or `import.meta`: it runs the same as a classic script. */
+/**
+ * No `import`/`export` statements or `import.meta`: it runs the same as a classic script. After
+ * `import` / `export` a statement has a space, `{`, `*` or a quote, never a letter, so text like
+ * `; imported by` in a string doesn't count, while minified `export{a}` does.
+ */
 function isClassicScript(source: string): boolean {
-  return !/(^|[;\n}])\s*(import\s*[\w{*'"]|export\s)|import\.meta|\bimport\(/.test(source)
+  return !/(^|[;\n}])\s*(import(\s+[\w$]|\s*[{*'"])|export(\s|[{*]))|import\.meta|\bimport\(/.test(source)
 }
 
 function escapeHtml(value: string): string {

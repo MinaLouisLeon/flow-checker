@@ -1,0 +1,13 @@
+src/app/[locale]/dashboard/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/[locale]/layout.tsx  code  4p 0h 0f 0r 1c 0t
+src/app/[locale]/login/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/[locale]/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/[locale]/verify/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/components/DashboardProfile.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/LoginForm.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/VerifyOtpForm.tsx  code  1p 0h 1f 1r 1c 1t
+src/i18n/navigation.ts  imported via src/app/[locale]/page.tsx, src/components/DashboardProfile.tsx, src/components/LoginForm.tsx, src/components/VerifyOtpForm.tsx  4p 0h 1f 3r 4c 1t
+src/i18n/routing.ts  imported via src/app/[locale]/layout.tsx, src/app/[locale]/page.tsx, src/components/DashboardProfile.tsx, src/components/LoginForm.tsx, src/components/VerifyOtpForm.tsx, src/proxy.ts  4p 0h 1f 3r 5c 1t
+src/lib/auth-api.ts  code  3p 0h 1f 3r 0c 0t
+src/proxy.ts  code  4p 0h 0f 0r 0c 0t
+src/types/auth.ts  code  3p 0h 1f 3r 1c 5t

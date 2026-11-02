@@ -57,6 +57,8 @@ flow-checker            # same as `dev`
 flow-checker dev        # scan + watch + dashboard + start your app with capture on
 flow-checker explore    # scan + watch + dashboard only: no app, no setup, project files untouched
 flow-checker scan       # scan only, write .flow-checker/model.json
+flow-checker scan --diff main --fail-on dynamic-url   # what the branch's changes affect; CI gate
+flow-checker impact src/lib/api.ts:12   # the pages, flows and requests a change to this file affects
 flow-checker summary    # print Start here: stack, areas, entry pages, main flows, backends (--json)
 flow-checker explain dynamic-url   # what a status, note or badge means and what to do (no word: all)
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
@@ -65,28 +67,30 @@ flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitig
 flow-checker postman import   # read a Postman collection to check the code against
 ```
 
-| Option                                       | Commands                  | Meaning                                                                                       |
-| -------------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------- |
-| `--root <dir>`                               | all                       | Project root (default: current directory)                                                     |
-| `--app-dir <dir>`                            | all                       | App Router directory (default: `src/app` or `app`)                                            |
-| `--config <file>`                            | dev, scan, export, doctor | Config file (default: `flow-checker.config.*` in the root)                                    |
-| `--port <n>`                                 | dev, explore, doctor      | Dashboard port (default 4400)                                                                 |
-| `--app-port <n>`                             | dev, explore, doctor      | Port your app runs on (default 3000)                                                          |
-| `--dev-command <cmd>`                        | dev                       | Command that starts your app (default: the `dev` script, or `next dev`)                       |
-| `--no-app`                                   | dev                       | Don't start the app. Start it yourself with the environment `dev` prints.                     |
-| `--no-open`                                  | dev, explore              | Don't open the browser                                                                        |
-| `--no-watch`                                 | dev, explore              | Don't re-scan when files change                                                               |
-| `-y, --yes`                                  | init                      | Apply the changes without asking                                                              |
-| `--tree`, `--types`, `--requests`, `--flows` | scan                      | Also print the route/component trees, resolved types, request sites or flows                  |
-| `--json`                                     | summary, explain          | Print JSON instead of text, for scripts                                                       |
-| `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
-| `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
-| `--force`                                    | export                    | Write into a folder that has other files                                                      |
-| `--collection <src>`                         | postman import            | v2.1 JSON file, v3 YAML folder or cloud collection id (default: `postman.collection`)         |
-| `--environment <src>`                        | postman import            | Environment file or cloud id for `{{variables}}`                                              |
-| `--api-key-env <name>`                       | postman import            | Env variable with the Postman API key, for cloud ids (default `POSTMAN_API_KEY`)              |
-| `--verbose`                                  | all                       | Also print the resolved config, where the scan runs and other details                         |
-| `-q, --quiet`                                | all                       | No progress output: only results, warnings and errors                                         |
+| Option                                       | Commands                       | Meaning                                                                                       |
+| -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `--root <dir>`                               | all                            | Project root (default: current directory)                                                     |
+| `--app-dir <dir>`                            | all                            | App Router directory (default: `src/app` or `app`)                                            |
+| `--config <file>`                            | dev, scan, export, doctor      | Config file (default: `flow-checker.config.*` in the root)                                    |
+| `--port <n>`                                 | dev, explore, doctor           | Dashboard port (default 4400)                                                                 |
+| `--app-port <n>`                             | dev, explore, doctor           | Port your app runs on (default 3000)                                                          |
+| `--dev-command <cmd>`                        | dev                            | Command that starts your app (default: the `dev` script, or `next dev`)                       |
+| `--no-app`                                   | dev                            | Don't start the app. Start it yourself with the environment `dev` prints.                     |
+| `--no-open`                                  | dev, explore                   | Don't open the browser                                                                        |
+| `--no-watch`                                 | dev, explore                   | Don't re-scan when files change                                                               |
+| `-y, --yes`                                  | init                           | Apply the changes without asking                                                              |
+| `--tree`, `--types`, `--requests`, `--flows` | scan                           | Also print the route/component trees, resolved types, request sites or flows                  |
+| `--diff <ref>`                               | scan                           | Also print what the files changed since this git ref (commit, branch, tag) affect             |
+| `--fail-on <kinds>`                          | scan                           | Exit 1 when a note of these kinds is open (`dynamic-url,type-mismatch`); see Impact check     |
+| `--json`                                     | scan, impact, summary, explain | Print JSON instead of text, for scripts                                                       |
+| `--md <dir>`, `--html <dir>`                 | export                         | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
+| `--raw`                                      | export                         | Keep captures as saved, without redacting them again                                          |
+| `--force`                                    | export                         | Write into a folder that has other files                                                      |
+| `--collection <src>`                         | postman import                 | v2.1 JSON file, v3 YAML folder or cloud collection id (default: `postman.collection`)         |
+| `--environment <src>`                        | postman import                 | Environment file or cloud id for `{{variables}}`                                              |
+| `--api-key-env <name>`                       | postman import                 | Env variable with the Postman API key, for cloud ids (default `POSTMAN_API_KEY`)              |
+| `--verbose`                                  | all                            | Also print the resolved config, where the scan runs and other details                         |
+| `-q, --quiet`                                | all                            | No progress output: only results, warnings and errors                                         |
 
 Every command shows its progress on stderr. In a terminal, a live line shows a spinner, a bar for the whole command, the current step and its time, and each finished step leaves a `✓` line with what it found:
 
@@ -115,7 +119,27 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 
 **Search everything:** press Ctrl+K (⌘K on a Mac) or `/` on any screen, or click Search in the top bar. One box finds pages, route handlers, components, requests, endpoints, types, flows and areas by name, file, URL pattern or route path; exact names come first, then names that start with what you typed, then word matches. Arrow keys move, Enter opens, Esc closes. It works in the static export too.
 
+**Affected by changes:** when you save a file, the overview (and `#/changes`, linked from the scan time in the top bar) lists what the change touches: the pages, flows and requests to check, by area, each with why. It needs `dev` or `explore` watching files, so the static export doesn't have it.
+
 Filters and searches stay in the URL, so a filtered list can be bookmarked or shared. Lists that grow with the app (the queries a cache call hits, a route handler's callers...) show five entries, then "+N more".
+
+### Impact check
+
+`flow-checker impact <file>[:line]` says what a change to a file touches before you make it: the pages, route handlers, flows and requests, grouped by area, each with the reason (`sent through src/lib/api.ts:14`, `its data type uses User`, `renders ProfileCard`). With a line, only the declaration around it counts (the function or component); several files can be given at once. It scans without writing anything.
+
+- **Components, hooks, API clients:** what is defined in the file or sends a request through it, then the pages that render it or send the request, and the flows with those steps.
+- **Types:** everything that uses them, also through other types (a props type that holds a `User`).
+- **Route handlers and server actions:** the requests that call them, and their pages.
+- **Layouts, `loading` / `error` files, the middleware:** every page under them or that it runs on.
+- **Files with none of that** (constants, utils): the nearest files that import them and have something the scan knows.
+
+`flow-checker scan --diff <ref>` does the same for every source file changed since a git ref (committed, staged, unstaged and new files). `--fail-on <kinds>` makes `scan` exit 1 when a request has an open note of those kinds, with `--diff` only the requests the changes affect, so a CI job can stop a branch that adds a URL the scan can't read:
+
+```bash
+npx @integr8-media/flow-checker scan --diff origin/main --fail-on dynamic-url,unknown-trigger
+```
+
+Kinds are the note names from `flow-checker explain` (`dynamic-url`, `unknown-method`, `unknown-response`, `unknown-trigger`, `runtime-url`, `type-mismatch`, `stale`, `not-in-collection`, `contract-mismatch`, `unused-endpoint`). `type-mismatch` and `stale` come from captures, so they count when `.flow-checker/` holds some. Exit codes with `--fail-on`: 0 nothing open, 1 open notes, 2 the check couldn't run (an unknown kind, a ref git doesn't know, a config or scan error). `--json` prints the scan counts, the changed files with their impact and the open notes.
 
 ### React Query
 

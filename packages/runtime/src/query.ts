@@ -189,6 +189,18 @@ export function createQueryTracker(): QueryTracker {
   }
 }
 
+/** A stack frame in React Query's core (v4, v5: `@tanstack/query-core`; v3: `react-query/lib`...). */
+const QUERY_LIBRARY_FRAME = /@tanstack[\\/]query-core[\\/]|[\\/]react-query[\\/](lib|es|build|dist)[\\/]/
+
+/**
+ * Whether a request was sent from inside a React Query function: its call stack goes through the
+ * library's core, which calls the query and mutation functions. Production bundles have no package
+ * paths in their stacks, so this is only true in development builds.
+ */
+export function sentByQueryLibrary(stack: readonly string[]): boolean {
+  return stack.some((frame) => QUERY_LIBRARY_FRAME.test(frame))
+}
+
 function isQueryClient(value: unknown): value is ClientLike {
   return (
     !!value &&

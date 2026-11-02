@@ -1174,5 +1174,12 @@ export const AppModelSchema = z.object({
   streams: z.array(SseEndpointSchema).optional(),
   /** The `areas` config, when the project has one (M30). Areas themselves are derived (`areas.ts`). */
   areas: AreasConfigSchema.optional(),
+  /**
+   * The import graph (M36): each project file reached from the app directory or the middleware, with
+   * the project files it imports (static and dynamic imports, re-exports, `require()`), both sorted.
+   * Files that import nothing from the project are left out. The impact check follows it for files
+   * the scan has no other facts about (constants, utils). Absent in older models.
+   */
+  imports: z.record(z.string(), z.array(z.string())).optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

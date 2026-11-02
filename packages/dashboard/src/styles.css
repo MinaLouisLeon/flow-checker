@@ -1793,3 +1793,29 @@ kbd {
     grid-column: 1 / -1;
   }
 }
+
+/* Affected by changes (M36) */
+.list.impact-files li,
+.list.impact-items li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.impact-kind {
+  min-width: 96px;
+  font-size: 12px;
+}
+.impact-reason {
+  font-size: 12px;
+}
+.impact-summary {
+  margin: 10px 0;
+}
+.impact-group h3 {
+  margin: 12px 0 4px;
+  font-size: 14px;
+}
+.impact-also {
+  margin-top: 12px;
+}

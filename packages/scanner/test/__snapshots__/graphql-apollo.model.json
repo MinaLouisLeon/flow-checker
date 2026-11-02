@@ -2253,5 +2253,61 @@
         ]
       }
     ]
+  },
+  "imports": {
+    "src/app/api/graphql/route.ts": [
+      "src/server/resolvers.ts"
+    ],
+    "src/app/layout.tsx": [
+      "src/app/providers.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/AddTodoForm.tsx",
+      "src/components/TodoList.tsx",
+      "src/components/ViewerBadge.tsx"
+    ],
+    "src/app/providers.tsx": [
+      "src/lib/apollo.ts"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/components/TodoDetail.tsx"
+    ],
+    "src/app/users/page.tsx": [
+      "src/components/UserSearch.tsx"
+    ],
+    "src/components/AddTodoForm.tsx": [
+      "src/gql/index.ts"
+    ],
+    "src/components/TodoDetail.tsx": [
+      "src/components/ClientOnly.tsx",
+      "src/gql/index.ts"
+    ],
+    "src/components/TodoItem.tsx": [
+      "src/gql/index.ts"
+    ],
+    "src/components/TodoList.tsx": [
+      "src/components/TodoItem.tsx",
+      "src/gql/index.ts"
+    ],
+    "src/components/UserSearch.tsx": [
+      "src/gql/graphql.ts",
+      "src/gql/index.ts"
+    ],
+    "src/components/ViewerBadge.tsx": [
+      "src/gql/index.ts"
+    ],
+    "src/gql/fragment-masking.ts": [
+      "src/gql/graphql.ts"
+    ],
+    "src/gql/gql.ts": [
+      "src/gql/graphql.ts"
+    ],
+    "src/gql/index.ts": [
+      "src/gql/fragment-masking.ts",
+      "src/gql/gql.ts"
+    ],
+    "src/server/resolvers.ts": [
+      "src/server/data.ts"
+    ]
   }
 }

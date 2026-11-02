@@ -6,6 +6,7 @@ import { GlobalSearch, shortcutLabel, useSearchShortcut } from './GlobalSearch'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { AreasScreen } from './screens/AreasScreen'
+import { ChangesScreen } from './screens/ChangesScreen'
 import { ComponentPanel } from './screens/ComponentPanel'
 import { ComponentsScreen } from './screens/ComponentsScreen'
 import { EndpointsScreen } from './screens/EndpointsScreen'
@@ -122,7 +123,14 @@ export function App() {
               </span>
             )}
             Scanned {new Date(meta.data.scannedAt).toLocaleTimeString()}
-            {lastScan?.files.length ? ` · ${shortFiles(lastScan.files)}` : ''}
+            {lastScan?.files.length ? (
+              <>
+                {` · ${shortFiles(lastScan.files)} · `}
+                <a href={href({ name: 'changes' })}>what it affects</a>
+              </>
+            ) : (
+              ''
+            )}
           </span>
         )}
         {meta.data?.canRescan && (
@@ -214,6 +222,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
     case 'export':
       return <ExportScreen />
+    case 'changes':
+      return <ChangesScreen />
     case 'glossary':
       return <GlossaryScreen q={screen.q} term={screen.term} />
     case 'not-found':

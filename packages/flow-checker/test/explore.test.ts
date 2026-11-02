@@ -29,8 +29,9 @@ const FIXTURES = readdirSync(fixturesDir, { withFileTypes: true })
   .map((d) => d.name)
 
 // What a fresh clone doesn't have: flow-checker's own files and build output.
+// `.test-copy-*`: other tests' copies inside the fixture, made and removed while this one copies it.
 const NOT_IN_CLONE =
-  /^(\.flow-checker|\.next|node_modules|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
+  /^(\.flow-checker|\.next|node_modules|\.test-copy-.*|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
 
 function capture() {
   const out: string[] = []
@@ -120,10 +121,18 @@ describe('explore without a setup', () => {
 
   it('watches and re-scans without writing into the project', { timeout: 60_000 }, async () => {
     const root = freshCopy('basic', dirs)
-    const { io } = capture()
+    const { io, err } = capture()
+    // Route paths of each re-scan: the folder and the page inside it may come in separate batches,
+    // so wait for the re-scan that has the page.
     const rescans: string[][] = []
     const session = await startDev(
-      { root, port: 0, open: false, explore: true, onRescan: (_, files) => rescans.push(files) },
+      {
+        root,
+        port: 0,
+        open: false,
+        explore: true,
+        onRescan: (model) => rescans.push(model.routes.map((r) => r.path)),
+      },
       io,
     )
     if (typeof session === 'number') throw new Error(`explore failed with ${session}`)
@@ -135,9 +144,14 @@ describe('explore without a setup', () => {
         'export default function Added() { return null }',
       )
       const deadline = Date.now() + 30_000
-      while (rescans.length === 0 && Date.now() < deadline) await new Promise((r) => setTimeout(r, 100))
+      const added = () => rescans.some((paths) => paths.includes('/explore-added'))
+      while (!added() && Date.now() < deadline) await new Promise((r) => setTimeout(r, 100))
       const model = await getJson<AppModel>(`${session.url}/api/model`)
-      expect(model.routes.map((r) => r.path)).toContain('/explore-added')
+      // A failed re-scan is only printed: show it, or the test just says the page is missing.
+      expect(
+        model.routes.map((r) => r.path),
+        err.join('\n'),
+      ).toContain('/explore-added')
       const saved = JSON.parse(readFileSync(join(session.dataDir ?? '', 'model.json'), 'utf8')) as AppModel
       expect(saved.routes.map((r) => r.path)).toContain('/explore-added')
     } finally {

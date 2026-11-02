@@ -1,0 +1,10 @@
+app/(marketing)/about/page.tsx  code  1p 0h 0f 0r 1c 0t
+app/layout.tsx  code  3p 0h 0f 0r 1c 0t
+app/page.tsx  code  1p 0h 1f 1r 1c 0t
+app/users/[id]/page.tsx  code  1p 0h 0f 1r 1c 0t
+components/DeleteUserButton.tsx  code  1p 0h 1f 1r 1c 1t
+components/ProfileCard.tsx  code  1p 0h 0f 1r 1c 1t
+components/UserList.tsx  code  1p 0h 0f 0r 1c 1t
+lib/api.ts  code  2p 0h 1f 4r 0c 0t
+lib/config.ts  imported via lib/api.ts  2p 0h 1f 4r 0c 0t
+types/user.ts  code  2p 0h 1f 3r 2c 5t

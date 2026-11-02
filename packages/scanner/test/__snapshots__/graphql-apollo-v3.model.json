@@ -1832,5 +1832,50 @@
         "componentIds": []
       }
     ]
+  },
+  "imports": {
+    "src/app/api/graphql/route.ts": [
+      "src/server/resolvers.ts"
+    ],
+    "src/app/layout.tsx": [
+      "src/app/providers.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/AddTodoForm.tsx",
+      "src/components/TodoList.tsx",
+      "src/components/ViewerBadge.tsx"
+    ],
+    "src/app/providers.tsx": [
+      "src/lib/apollo.ts"
+    ],
+    "src/app/search/page.tsx": [
+      "src/components/Search.tsx"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/components/TodoDetail.tsx"
+    ],
+    "src/components/AddTodoForm.tsx": [
+      "src/graphql/todos.ts",
+      "src/types/todo.ts"
+    ],
+    "src/components/Search.tsx": [
+      "src/graphql/todos.ts",
+      "src/types/search.ts"
+    ],
+    "src/components/TodoDetail.tsx": [
+      "src/graphql/todos.ts",
+      "src/types/todo.ts"
+    ],
+    "src/components/TodoList.tsx": [
+      "src/graphql/todos.ts",
+      "src/types/todo.ts"
+    ],
+    "src/components/ViewerBadge.tsx": [
+      "src/graphql/todos.ts",
+      "src/types/todo.ts"
+    ],
+    "src/server/resolvers.ts": [
+      "src/server/data.ts"
+    ]
   }
 }

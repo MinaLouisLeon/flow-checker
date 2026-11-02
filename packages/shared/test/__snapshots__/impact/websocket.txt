@@ -1,0 +1,8 @@
+app/chat/page.tsx  code  1p 0h 0f 0r 1c 0t
+app/layout.tsx  code  2p 0h 0f 0r 1c 0t
+app/page.tsx  code  1p 0h 0f 0r 1c 0t
+components/Chat.tsx  code  1p 0h 0f 1r 1c 0t
+components/Ping.tsx  code  1p 0h 1f 1r 1c 0t
+components/Ticker.tsx  code  1p 0h 0f 1r 1c 0t
+lib/config.ts  imported via components/Chat.tsx, components/Ping.tsx, components/Ticker.tsx  2p 0h 1f 3r 3c 0t
+lib/types.ts  code  2p 0h 0f 0r 2c 7t

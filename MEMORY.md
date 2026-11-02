@@ -43,11 +43,14 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M33 | Global search         | `buildSearchIndex()` / `search()` in `shared/src/search.ts`; `searchOf()` caches, `searchScreen()` links.                |
 | M34 | Plain wording         | `shared/src/glossary.ts` is the only wording table; `Badge term={[group, key]}`; `useShowDetails()` hides extra badges.  |
 | M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
+| M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
 
 ## Gotchas
 
-- Slow CLI tests (`watch.test.ts`, `export.test.ts`, `config-options.test.ts` doctor case) and the bff HTML golden can
-  time out when the whole suite runs in parallel; re-run them alone before assuming a regression.
+- Tests that scan fixture apps take 4-6 s when the whole suite runs in parallel, so `vitest.config.ts` sets
+  `testTimeout: 30_000` (the 5 s default failed the bff / next-intl HTML goldens and the Postman GraphQL test at
+  random). Tests that copy a fixture must skip `.test-copy-*`: `incremental.test.ts` and `watch.test.ts` make and
+  remove those inside `fixtures/basic` while other files copy it (`EBUSY` / `ENOENT`).
 - `next dev` writes `AGENTS.md` into each fixture; it is gitignored there (`fixtures/*/AGENTS.md`).
 - Next middleware matchers use path-to-regexp v6 semantics (anchored both ends, optional trailing slash,
   case-insensitive, `:param*` modifiers). Next adds optional `_next/data` / `.rsc` forms
@@ -418,3 +421,34 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   uses relative symlinks there; locally it makes absolute junctions, so it passes here). The scan then misses axios
   calls and the flows built on them. Tests that check scan results on a copy must link each package by its real path
   (`linkPackages()` in `e2e/explore.spec.ts` and `flow-checker/test/summary.test.ts`). Failed PR #45 on Windows only.
+
+## M36 — Impact check (branch `feat/m36-impact-check`)
+
+- There was no dependency map to reuse (M9's warm session replaced it), so the scan writes `AppModel.imports`. Build
+  it by walking from the app files and the middleware, not from `project.getSourceFiles()`: a warm session keeps
+  files nothing imports any more, and `incremental.test.ts` (re-scan = fresh scan) fails otherwise.
+- A file with scan facts is followed through those facts only, not also through its importers: a hook file's
+  importers would pull in every other request of the components that import it. The import graph is only for files
+  with no facts (constants, utils), and stops at the nearest importers that have some.
+- Route-handler callers must be matched by method: `handlerCallers` is per route, so without the filter a `POST`
+  caller "led to" the handler's `GET` upstream fetch (the bff fixture showed it).
+- `renderToStaticMarkup` escapes apostrophes (`&#x27;`): dashboard tests must not match text that has one.
+- `pnpm check > log; echo EXIT $?` in a background task reports success either way; read the log for `ERR_PNPM` /
+  `Failed`. Run `pnpm typecheck` first: test files are only typechecked there, not by vitest.
+- The static export loads the dashboard as a classic script only when `isClassicScript()` (exporter `html.ts`) finds no
+  `import` / `export` statement in the bundle. UI text like `; imported by` matched the old regex, the export fell back
+  to `type="module"`, which Chrome blocks on `file://`, and every export e2e spec failed on CI (PR #46). Unit tests
+  use a stand-in bundle, so run `pnpm test:e2e` (or check the real bundle) after adding dashboard text.
+- `getReferencedSourceFiles()` (ts-morph) reads a reference cache that keeps imports that didn't resolve and retries
+  them on the next re-scan from replaced nodes, which throws ("node that was removed or forgotten"). The import
+  graph resolves each `getImportStringLiterals()` with `ts.resolveModuleName` instead. It failed only where packages
+  don't resolve (Windows CI, a whole `node_modules` junction in `explore.test.ts`), so `incremental.test.ts` now
+  re-scans a copy with no `node_modules`. A failed re-scan in `dev` is only printed: tests that wait for one should
+  show the captured stderr when they fail.
+- The Next 13.4 matrix job sometimes failed with `Missing: react-query` / `query=null` (also on other branches before
+  M36). A failed QueryClient lookup is reused for the rest of the browser task (`lookedUpThisTask`), and hydration can
+  commit the provider and run the query in that same task. Requests whose stack goes through `@tanstack/query-core`
+  (`sentByQueryLibrary()`) now get `fillQueryLater()`: one task later, look again and `guess()`. It only works in dev
+  builds (stacks with package paths), which is where capture runs.
+- Perf tests in `shared` must time only the function under test: `buildImpact()` without passed-in areas rebuilt
+  them on each call, and 26 ms locally became 104 ms on a loaded Windows runner.

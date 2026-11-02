@@ -1,0 +1,9 @@
+src/app/api/products/[id]/route.ts  code  1p 1h 1f 2r 0c 0t
+src/app/api/products/route.ts  code  1p 1h 1f 4r 0c 0t
+src/app/layout.tsx  code  2p 0h 0f 0r 1c 0t
+src/app/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/products/[id]/page.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/CreateProductForm.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/ProductsTable.tsx  code  1p 0h 0f 1r 1c 0t
+src/lib/backend.ts  code  2p 2h 1f 6r 0c 0t
+src/lib/schemas.ts  code  2p 2h 1f 6r 3c 3t

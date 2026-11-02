@@ -2037,6 +2037,72 @@
           ]
         }
       ]
+    },
+    "imports": {
+      "src/app/api/trpc/[trpc]/route.ts": [
+        "src/server/root.ts"
+      ],
+      "src/app/feed/page.tsx": [
+        "src/components/TodoFeed.tsx"
+      ],
+      "src/app/layout.tsx": [
+        "src/app/providers.tsx"
+      ],
+      "src/app/page.tsx": [
+        "src/components/AddTodoForm.tsx",
+        "src/components/HealthBadge.tsx",
+        "src/components/TodoList.tsx",
+        "src/components/UserList.tsx"
+      ],
+      "src/app/providers.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/app/todos/[id]/page.tsx": [
+        "src/components/TodoDetail.tsx"
+      ],
+      "src/components/AddTodoForm.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/components/HealthBadge.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/components/TodoDetail.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/components/TodoFeed.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/components/TodoList.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/components/UserList.tsx": [
+        "src/utils/trpc.ts"
+      ],
+      "src/server/root.ts": [
+        "src/server/routers/health.ts",
+        "src/server/routers/todo.ts",
+        "src/server/routers/user.ts",
+        "src/server/trpc.ts"
+      ],
+      "src/server/routers/health.ts": [
+        "src/server/trpc.ts"
+      ],
+      "src/server/routers/todo.ts": [
+        "src/server/trpc.ts",
+        "src/server/upstream.ts",
+        "src/types/todo.ts"
+      ],
+      "src/server/routers/user.ts": [
+        "src/server/trpc.ts",
+        "src/server/upstream.ts"
+      ],
+      "src/server/upstream.ts": [
+        "src/types/todo.ts",
+        "src/types/user.ts"
+      ],
+      "src/utils/trpc.ts": [
+        "src/server/root.ts"
+      ]
     }
   },
   "verification": {

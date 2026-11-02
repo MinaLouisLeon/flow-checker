@@ -29,7 +29,7 @@ import {
   readMiddleware,
   routesUnder,
 } from './middleware'
-import { relativeTo, resolveFrom, toPosix } from './paths'
+import { compare, relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
 import { RequestScanner } from './requests'
 import { walkRoutes } from './routes'
@@ -214,6 +214,8 @@ export function createScanSession(options: ScanOptions): ScanSession {
             project.addSourceFileAtPathIfExists(file)
         }
         if (resolveImports) project.resolveSourceFileDependencies()
+        // Files came or went, or imports changed: earlier module resolutions may be wrong now.
+        if (resolveImports || removed.length > 0) resolutionCaches.delete(project)
         report({
           phase: 'load',
           done: all.length,
@@ -448,7 +450,79 @@ function analyze(
     ...(graphql ? { graphql } : {}),
     ...(streams.length > 0 ? { streams } : {}),
     ...(settings.areas ? { areas: settings.areas } : {}),
+    imports: importGraph(project, root, discovery, settings),
   }
+}
+
+/**
+ * Module resolutions of the import graph, kept across re-scans of the same project: most edits change
+ * no import, so each one is resolved once. `update()` drops it when files or imports change.
+ */
+const resolutionCaches = new WeakMap<Project, ts.ModuleResolutionCache>()
+
+/**
+ * Project files reached from the app directory and the middleware, each with the project files it
+ * imports. Walking from those roots (rather than listing the project's files) leaves out files a
+ * warm session still holds but nothing imports any more, so a re-scan gives what a fresh scan does.
+ *
+ * Imports are resolved here with the compiler's module resolution, not ts-morph's
+ * `getReferencedSourceFiles()`: its cache keeps imports that didn't resolve (a package that isn't
+ * installed) and retries them on a later re-scan from nodes that were replaced, which throws.
+ */
+function importGraph(
+  project: Project,
+  root: string,
+  discovery: Discovery,
+  settings: ScanSettings,
+): Record<string, string[]> {
+  const inProject = (file: SourceFile) =>
+    !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(file.getFilePath())
+  const options = project.getCompilerOptions()
+  const host = project.getModuleResolutionHost()
+  let cache = resolutionCaches.get(project)
+  if (!cache) {
+    cache = ts.createModuleResolutionCache(root, (name) => name, options)
+    resolutionCaches.set(project, cache)
+  }
+  const referenced = (file: SourceFile): SourceFile[] => {
+    const out: SourceFile[] = []
+    for (const literal of file.getImportStringLiterals()) {
+      const resolved = ts.resolveModuleName(
+        literal.getLiteralValue(),
+        file.getFilePath(),
+        options,
+        host,
+        cache,
+      ).resolvedModule
+      if (!resolved || resolved.isExternalLibraryImport) continue
+      const target = project.getSourceFile(toPosix(resolved.resolvedFileName))
+      if (target) out.push(target)
+    }
+    return out
+  }
+  const queue = project
+    .getSourceFiles()
+    .filter(
+      (f) =>
+        inProject(f) &&
+        (f.getFilePath().startsWith(`${discovery.appDir}/`) || f.getFilePath() === discovery.middleware),
+    )
+  const seen = new Set(queue)
+  const graph: Record<string, string[]> = {}
+  for (let i = 0; i < queue.length; i++) {
+    const file = queue[i] as SourceFile
+    const imported = new Set<string>()
+    for (const target of referenced(file)) {
+      if (target === file || !inProject(target)) continue
+      imported.add(relativeTo(root, target.getFilePath()))
+      if (!seen.has(target)) {
+        seen.add(target)
+        queue.push(target)
+      }
+    }
+    if (imported.size > 0) graph[relativeTo(root, file.getFilePath())] = [...imported].sort(compare)
+  }
+  return Object.fromEntries(Object.entries(graph).sort(([a], [b]) => compare(a, b)))
 }
 
 interface TrpcFound {

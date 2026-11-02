@@ -1647,5 +1647,29 @@
       }
     ],
     "fragments": []
+  },
+  "imports": {
+    "src/app/api/graphql/route.ts": [
+      "src/server/resolvers.ts"
+    ],
+    "src/app/layout.tsx": [
+      "src/app/providers.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/AddTodoForm.tsx",
+      "src/components/TodoList.tsx"
+    ],
+    "src/app/providers.tsx": [
+      "src/lib/urql.ts"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/components/TodoDetail.tsx"
+    ],
+    "src/app/users/page.tsx": [
+      "src/components/UserList.tsx"
+    ],
+    "src/server/resolvers.ts": [
+      "src/server/data.ts"
+    ]
   }
 }

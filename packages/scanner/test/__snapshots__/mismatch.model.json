@@ -550,5 +550,24 @@
       ]
     }
   ],
-  "queryLinks": []
+  "queryLinks": [],
+  "imports": {
+    "app/page.tsx": [
+      "components/SettingsPanel.tsx",
+      "components/TodoPanel.tsx",
+      "lib/api.ts"
+    ],
+    "components/SettingsPanel.tsx": [
+      "lib/api.ts",
+      "types/index.ts"
+    ],
+    "components/TodoPanel.tsx": [
+      "lib/api.ts",
+      "types/index.ts"
+    ],
+    "lib/api.ts": [
+      "lib/config.ts",
+      "types/index.ts"
+    ]
+  }
 }

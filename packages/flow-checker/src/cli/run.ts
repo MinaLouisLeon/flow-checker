@@ -7,6 +7,7 @@ import { doctorCommand } from './doctor'
 import { explainCommand } from './explain'
 import { exploreCommand } from './explore'
 import { exportCommand } from './export'
+import { impactCommand } from './impact'
 import { initCommand } from './init'
 import { postmanCommand } from './postman'
 import { isLiveTerminal, type ProgressDisplay, terminalDisplay } from './progress'
@@ -17,6 +18,7 @@ const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
   explore: 'Scan, watch and open the dashboard only: no app, no setup, project files untouched',
   scan: 'Scan only and write .flow-checker/model.json',
+  impact: 'impact <file>[:line]: the pages, flows and requests a change to these files affects (--json)',
   summary: 'Print a short tour of the app: stack, areas, entry pages, flows, backends (--json)',
   explain: 'Say what a status, note or badge means, e.g. explain dynamic-url (no word: all of them)',
   init: 'Add instrumentation hooks, config file and .gitignore entries',
@@ -51,7 +53,10 @@ Options:
   --types                 scan: also print the resolved types
   --requests              scan: also print the request sites
   --flows                 scan: also print navigation and inferred flows
-  --json                  summary, explain: print JSON instead of text
+  --diff <ref>            scan: also print what the files changed since this git ref affect
+  --fail-on <kinds>       scan: exit 1 when a note of these kinds is open, e.g. dynamic-url,stale
+                          (with --diff: only on the changed requests; exit 2 when the check can't run)
+  --json                  scan, impact, summary, explain: print JSON instead of text
   --md <dir>              export: write Markdown docs to this folder
   --html <dir>            export: write the static HTML site to this folder
                           (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
@@ -139,7 +144,18 @@ export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
         types: values.types,
         requests: values.requests,
         flows: values.flows,
+        diff: values.diff,
+        failOn: values['fail-on'],
+        json: values.json,
       },
+      io,
+    )
+  }
+
+  if (command === 'impact') {
+    return impactCommand(
+      positionals.slice(1),
+      { root: values.root, appDir: values['app-dir'], config: values.config, json: values.json },
       io,
     )
   }
@@ -249,6 +265,8 @@ function parse(argv: string[]) {
       types: { type: 'boolean' },
       requests: { type: 'boolean' },
       flows: { type: 'boolean' },
+      diff: { type: 'string' },
+      'fail-on': { type: 'string' },
       json: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },

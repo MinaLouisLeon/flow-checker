@@ -76,6 +76,8 @@ export type Screen =
   | { name: 'flows'; flowId?: string; q: string }
   /** Guided walk-through (M35); `flowId` is listed first. */
   | { name: 'walk'; flowId?: string }
+  /** Affected by changes (M36): what the latest re-scan's files affect. */
+  | { name: 'changes' }
   | { name: 'export' }
   /** What each status, note and badge means (M34); `term` (`flag-dynamic-url`) is the one shown first. */
   | { name: 'glossary'; q: string; term?: string }
@@ -158,6 +160,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'walk', flowId: parts[1] }
     case 'export':
       return { name: 'export' }
+    case 'changes':
+      return { name: 'changes' }
     case 'glossary':
       return { name: 'glossary', q: params.get('q') ?? '', term: params.get('term') ?? undefined }
     case 'live':
@@ -240,6 +244,8 @@ export function href(screen: Screen): string {
       })
     case 'export':
       return '#/export'
+    case 'changes':
+      return '#/changes'
     case 'glossary':
       return withQuery('/glossary', { q: screen.q, term: screen.term })
     case 'live':

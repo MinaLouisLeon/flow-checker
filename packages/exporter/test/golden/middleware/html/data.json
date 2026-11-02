@@ -1145,6 +1145,28 @@
           "targetRouteId": "rt_0pkd6801g1s"
         }
       ]
+    },
+    "imports": {
+      "app/dashboard/page.tsx": [
+        "lib/api.ts"
+      ],
+      "app/dashboard/settings/page.tsx": [
+        "lib/api.ts"
+      ],
+      "app/products/page.tsx": [
+        "lib/api.ts"
+      ],
+      "lib/api.ts": [
+        "lib/config.ts",
+        "types/user.ts"
+      ],
+      "lib/session.ts": [
+        "lib/config.ts",
+        "types/user.ts"
+      ],
+      "proxy.ts": [
+        "lib/session.ts"
+      ]
     }
   },
   "verification": {

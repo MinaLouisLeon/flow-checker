@@ -1,0 +1,17 @@
+src/app/api/graphql/route.ts  code  3p 1h 3f 6r 0c 0t
+src/app/layout.tsx  code  3p 0h 0f 0r 1c 0t
+src/app/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/providers.tsx  code  3p 0h 0f 0r 1c 0t
+src/app/search/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/todos/[id]/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/components/AddTodoForm.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/Search.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/TodoDetail.tsx  code  1p 0h 2f 2r 1c 0t
+src/components/TodoList.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/ViewerBadge.tsx  code  1p 0h 1f 1r 1c 0t
+src/graphql/todos.ts  code  3p 0h 3f 6r 0c 0t
+src/lib/apollo.ts  imported via src/app/providers.tsx  3p 0h 0f 0r 1c 0t
+src/server/data.ts  imported via src/app/api/graphql/route.ts  3p 1h 3f 6r 0c 0t
+src/server/resolvers.ts  imported via src/app/api/graphql/route.ts  3p 1h 3f 6r 0c 0t
+src/types/search.ts  code  1p 0h 1f 1r 1c 3t
+src/types/todo.ts  code  2p 0h 2f 5r 4c 10t

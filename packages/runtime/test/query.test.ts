@@ -4,7 +4,7 @@ import * as v5 from '@tanstack/query-core'
 import * as v4 from 'query-core-v4'
 import { describe, expect, it } from 'vitest'
 import { resolveCaptureOptions } from '../src/options'
-import { createQueryTracker, findQueryClient, toJsonKey } from '../src/query'
+import { createQueryTracker, findQueryClient, sentByQueryLibrary, toJsonKey } from '../src/query'
 import { compileRules, redactCapture } from '../src/redact'
 
 type Core = typeof v5
@@ -56,6 +56,20 @@ describe.each(versions)('React Query %s', (_name, core) => {
     expect(guessed).toEqual({ kind: 'query', key: ['first', 1] })
     // Nothing fetching: no guess.
     expect(tracker.guess()).toBeUndefined()
+  })
+
+  it('tells a request sent from a query function by its stack', async () => {
+    const { client } = setup()
+    let stack: string[] = []
+    await client.fetchQuery({
+      queryKey: ['stack'],
+      queryFn: async () => {
+        stack = (new Error().stack ?? '').split('\n')
+        return 1
+      },
+    })
+    expect(sentByQueryLibrary(stack)).toBe(true)
+    expect(sentByQueryLibrary((new Error().stack ?? '').split('\n'))).toBe(false)
   })
 
   it('recognizes a QueryClient and nothing else', () => {
@@ -123,6 +137,26 @@ describe.each(versions)('React Query %s', (_name, core) => {
       }),
     ).rejects.toThrow('boom')
     expect(tracker.current()).toBeUndefined()
+  })
+})
+
+describe('sentByQueryLibrary', () => {
+  it('reads the stacks of development builds', () => {
+    for (const frame of [
+      'at fetchFn (webpack-internal:///(app-pages-browser)/./node_modules/@tanstack/query-core/build/modern/query.js:211:16)',
+      'at run (http://localhost:3000/_next/static/chunks/node_modules_.pnpm_@tanstack+query-core@5.0.0/node_modules/@tanstack/query-core/build/modern/retryer.js:91:49)',
+      'fetchFn@http://localhost:3000/node_modules/react-query/lib/core/query.js:300:20',
+    ])
+      expect(sentByQueryLibrary([frame]), frame).toBe(true)
+    for (const frame of [
+      'at queryFn (webpack-internal:///(app-pages-browser)/./components/Todos.tsx:14:31)',
+      'at urqlFetch (webpack-internal:///(app-pages-browser)/./node_modules/@urql/core/dist/urql-core.mjs:10:1)',
+      'at x (webpack-internal:///./node_modules/@tanstack/react-query-devtools/build/index.js:1:1)',
+      // Bundled without package paths (production, Vite's pre-bundled deps): it can't tell.
+      'at y (http://localhost:3000/_next/static/chunks/app/page-abc123.js:1:9000)',
+      'at fetchFn (http://localhost:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=1:300:20)',
+    ])
+      expect(sentByQueryLibrary([frame]), frame).toBe(false)
   })
 })
 
