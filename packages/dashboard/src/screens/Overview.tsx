@@ -1,8 +1,8 @@
-import { isVerified } from '@flow-checker/shared'
-import { useFlows, useVerification } from '../api'
+import { buildCoverage, isVerified } from '@flow-checker/shared'
+import { useFlows, useLastScan, useVerification } from '../api'
 import { useData } from '../context'
 import { GraphqlSection } from '../GraphqlView'
-import { COMPONENT_KINDS, countWhen, REQUEST_WHEN, type RequestWhen } from '../lists'
+import { areasOf, COMPONENT_KINDS, countWhen, endpointsOf, REQUEST_WHEN, type RequestWhen } from '../lists'
 import type { NoteKind, ScanNote } from '../model-index'
 import { isPostmanNote, PostmanSection } from '../PostmanView'
 import { href } from '../router'
@@ -10,6 +10,8 @@ import { SocketsSection } from '../SocketView'
 import { StreamsSection } from '../SseView'
 import { TrpcSection } from '../TrpcView'
 import { Empty, Section, SourceLink } from '../ui'
+import { ImpactPanel } from './ChangesScreen'
+import { CoverageBars } from './WalkScreen'
 
 const NOTE_GROUPS: Record<NoteKind, string> = {
   'needs-recheck': 'Requests whose code changed since they were captured',
@@ -24,7 +26,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
 export function Overview() {
   const { index, meta } = useData()
   const verification = useVerification(Boolean(meta.capture))
-  const flowRuns = useFlows(Boolean(meta.capture)).data
+  const flowRuns = useFlows(Boolean(meta.capture || meta.exported)).data
   const confirmedFlows = index.model.flows.filter((f) => flowRuns?.flows[f.id]?.status === 'confirmed').length
   const counts = verification.data?.counts
   const { model } = index
@@ -36,12 +38,26 @@ export function Overview() {
   const mismatched = model.requests.filter((s) => s.status === 'mismatch').length
   // Postman flags get their own section below, not the generic "could not resolve" group.
   const notes = index.notes.filter((n) => !isPostmanNote(n, index))
+  const endpoints = endpointsOf(index)
+  const backends = endpoints.hosts.filter((h) => h.kind === 'external').length
+  const areas = areasOf(index)
+  const lastScan = useLastScan()
   const percent = model.requests.length > 0 ? Math.round((verified / model.requests.length) * 100) : 0
 
   return (
     <div className="screen">
+      {/* After a re-scan from a file change: what the change affects (M36). */}
+      {lastScan && lastScan.files.length > 0 && (
+        <ImpactPanel lastScan={lastScan} watching={Boolean(meta.watching)} exported={false} />
+      )}
       <div className="stats">
         <Stat label="Pages" value={pages.length} link={href({ name: 'map', view: 'graph', q: '' })} />
+        <Stat
+          label="Areas"
+          value={areas.areas.length}
+          link={href({ name: 'areas', q: '' })}
+          detail={areas.by === 'folder' ? 'by feature folder' : 'by URL'}
+        />
         <Stat
           label="Route handlers"
           value={handlers.length}
@@ -67,6 +83,12 @@ export function Overview() {
           }))}
         />
         <Stat
+          label="Endpoints"
+          value={endpoints.endpoints.length}
+          link={href({ name: 'endpoints', q: '' })}
+          detail={`${backends} backend${backends === 1 ? '' : 's'}`}
+        />
+        <Stat
           label="Flows"
           value={model.flows.length}
           detail={
@@ -75,6 +97,10 @@ export function Overview() {
           link={href({ name: 'flows', q: '' })}
         />
       </div>
+
+      <Section title="Coverage">
+        <CoverageBars coverage={buildCoverage(index, flowRuns)} link />
+      </Section>
 
       <Section title="Verification">
         <div

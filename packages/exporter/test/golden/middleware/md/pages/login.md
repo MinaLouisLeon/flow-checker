@@ -6,6 +6,11 @@
 | --- | --- |
 | File | `app/login/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
+| Access | guarded |
+
+## Access
+
+- redirects to `/dashboard` when `cookie session is set` (middleware), `proxy.ts:20`
 
 ## Component tree
 

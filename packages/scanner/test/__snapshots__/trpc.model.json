@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -103,7 +103,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_2flvqsq9ypc"
+      "componentId": "cmp_2flvqsq9ypc",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     },
     {
       "id": "rt_044xcwxfqfa",
@@ -157,7 +161,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_1an2304y5ca"
+      "componentId": "cmp_1an2304y5ca",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     },
     {
       "id": "rt_1xs1qhs4r3f",
@@ -178,7 +186,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_0zsf7mc3ftx"
+      "componentId": "cmp_0zsf7mc3ftx",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     }
   ],
   "components": [
@@ -1936,6 +1948,63 @@
           "req_0mfdzrz4ekf"
         ]
       }
+    ]
+  },
+  "imports": {
+    "src/app/api/trpc/[trpc]/route.ts": [
+      "src/server/root.ts"
+    ],
+    "src/app/layout.tsx": [
+      "src/app/providers.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/AddTodoForm.tsx",
+      "src/components/HealthBadge.tsx",
+      "src/components/TodoList.tsx"
+    ],
+    "src/app/providers.tsx": [
+      "src/server/root.ts",
+      "src/trpc/client.ts"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/components/TodoDetail.tsx"
+    ],
+    "src/app/users/page.tsx": [
+      "src/components/UserList.tsx"
+    ],
+    "src/components/AddTodoForm.tsx": [
+      "src/trpc/client.ts"
+    ],
+    "src/components/HealthBadge.tsx": [
+      "src/trpc/client.ts"
+    ],
+    "src/components/TodoDetail.tsx": [
+      "src/trpc/client.ts"
+    ],
+    "src/components/TodoList.tsx": [
+      "src/trpc/client.ts"
+    ],
+    "src/components/UserList.tsx": [
+      "src/trpc/client.ts"
+    ],
+    "src/server/root.ts": [
+      "src/server/routers/todo.ts",
+      "src/server/routers/user.ts",
+      "src/server/trpc.ts"
+    ],
+    "src/server/routers/todo.ts": [
+      "src/server/trpc.ts",
+      "src/server/upstream.ts"
+    ],
+    "src/server/routers/user.ts": [
+      "src/server/trpc.ts",
+      "src/server/upstream.ts"
+    ],
+    "src/server/upstream.ts": [
+      "src/types/todo.ts"
+    ],
+    "src/trpc/client.ts": [
+      "src/server/root.ts"
     ]
   }
 }

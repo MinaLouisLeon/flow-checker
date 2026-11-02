@@ -81,6 +81,18 @@ export interface GraphqlConfig {
   endpoint?: string
 }
 
+/**
+ * Areas (M30): how pages are grouped by feature. By default each page goes in the area named after
+ * the first static segment of its URL (`/billing/invoices` → `billing`), or after its feature
+ * folder when the URLs give a single area.
+ */
+export interface AreasConfig {
+  /** Display names, by area: `{ billing: 'Billing & invoices' }`. */
+  rename?: Record<string, string>
+  /** Areas folded into another one: `{ account: ['profile', 'settings'] }`. The target may be new. */
+  merge?: Record<string, string[]>
+}
+
 /** Default `include`: every file under the project root. */
 export const DEFAULT_INCLUDE: readonly string[] = ['**']
 
@@ -117,6 +129,8 @@ export interface FlowCheckerConfig {
   postman?: PostmanConfig
   /** GraphQL schema, live introspection and persisted queries (M17). */
   graphql?: GraphqlConfig
+  /** Rename or merge the areas pages are grouped into (M30). */
+  areas?: AreasConfig
   /** Default export folders: Markdown (default `docs/flow`) and the static site (`.flow-checker/site`). */
   export?: { md?: string; html?: string }
 }

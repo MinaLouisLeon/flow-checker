@@ -6,6 +6,7 @@
 | --- | --- |
 | File | `app/chat/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
+| Access | open |
 | Status | ✓ 1 verified |
 
 ## Component tree

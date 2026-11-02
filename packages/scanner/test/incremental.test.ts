@@ -10,6 +10,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { AppModel, RequestSite } from '@flow-checker/shared'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -138,5 +139,33 @@ describe('scan session', () => {
     const started = performance.now()
     session.update({ changed: ['lib/api.ts'] })
     expect(performance.now() - started).toBeLessThan(1000)
+  })
+})
+
+describe('scan session without installed packages', () => {
+  // M36: the import graph used ts-morph's reference cache, which keeps imports that didn't resolve
+  // (`react` with no node_modules) and retried them from replaced nodes on the next re-scan, so
+  // adding a page threw. Seen on Windows CI, where a linked node_modules doesn't resolve.
+  it('re-scans after a page is added, like a fresh scan', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'fc-no-modules-'))
+    const project = join(dir, 'basic')
+    try {
+      cpSync(fixture, project, {
+        recursive: true,
+        filter: (src) => !/[\\/](node_modules|\.next|\.flow-checker|\.test-copy-[^\\/]*)$/.test(src),
+      })
+      const noModules = createScanSession({ root: project })
+      noModules.warm()
+      mkdirSync(join(project, 'app', 'added'))
+      writeFileSync(
+        join(project, 'app', 'added', 'page.tsx'),
+        'export default function Added() { return null }\n',
+      )
+      const model = noModules.update({ added: ['app/added', 'app/added/page.tsx'] })
+      expect(model.routes.map((r) => r.path)).toContain('/added')
+      expect(model).toEqual(scanProject({ root: project }))
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })

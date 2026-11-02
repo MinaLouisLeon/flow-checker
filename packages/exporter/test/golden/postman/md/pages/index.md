@@ -6,6 +6,7 @@
 | --- | --- |
 | File | `app/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
+| Access | open |
 | Status | ✓ 3 verified, ✗ 1 mismatch |
 
 ## Component tree
@@ -75,9 +76,9 @@ Response body:
 | Postman | [List products](../postman.md#pmr_266pqs2sv5q) |
 | Call path | `getProducts` → `fetch` |
 
-> ⚠ **contract-mismatch**: The response type Product\[\] doesn't match the Postman example "200 OK": \[\].price is number 49.9 (expected string).
+> ⚠ **[contract-mismatch](../GLOSSARY.md#flag-contract-mismatch)**: The response type Product\[\] doesn't match the Postman example "200 OK": \[\].price is number 49.9 (expected string).
 >
-> ⚠ **type-mismatch**: Response doesn't match Product\[\]: \[\].price is number 49.9 (expected string) (4 of 4 captures).
+> ⚠ **[type-mismatch](../GLOSSARY.md#flag-type-mismatch)**: Response doesn't match Product\[\]: \[\].price is number 49.9 (expected string) (4 of 4 captures).
 
 **Response** `Product[]` (see [`Product`](../types.md#typ_1f1vojxmn7g))
 

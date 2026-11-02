@@ -32,13 +32,16 @@ HomePage  server  src/app/page.tsx:6
 │  └─ Link  external next/link  [conditional]
 ├─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:7
 └─ UserList  client (use client)  src/components/UserList.tsx:5
+access: open
 
 ## /feed  src/app/feed/page.tsx
 layouts: src/app/layout.tsx
 FeedPage  server  src/app/feed/page.tsx:3
 └─ TodoFeed  client (use client)  src/components/TodoFeed.tsx:5
+access: open
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
 TodoPage  server  src/app/todos/[id]/page.tsx:3
 └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:5
+access: open

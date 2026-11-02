@@ -3,6 +3,7 @@ export {
   type AppOptions,
   type CaptureOptions,
   createApp,
+  type ExploreInfo,
   type ExporterOptions,
   type ExportFormat,
   type ServerMeta,

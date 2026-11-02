@@ -1,0 +1,237 @@
+{
+  "nextVersion": "<next-version>",
+  "appDir": "src/app",
+  "sections": [
+    {
+      "id": "stack",
+      "title": "Stack",
+      "items": [
+        {
+          "label": "Next.js",
+          "value": "<next-version>",
+          "detail": "App Router in src/app/, 4 pages, 0 route handlers",
+          "link": {
+            "to": "map"
+          }
+        },
+        {
+          "label": "Rendering",
+          "value": "5 server, 2 client, 0 shared",
+          "detail": "7 components",
+          "link": {
+            "to": "components"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "fetch",
+          "detail": "4 requests",
+          "link": {
+            "to": "requests",
+            "transport": "fetch"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "Server actions",
+          "detail": "2 requests",
+          "link": {
+            "to": "requests",
+            "transport": "server-action"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "areas",
+      "title": "Areas",
+      "note": "2 areas by URL",
+      "items": [
+        {
+          "label": "products",
+          "value": "/products",
+          "code": true,
+          "detail": "3 pages, 2 flows, 6 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_2erkuzrjb5u"
+          }
+        },
+        {
+          "label": "home",
+          "value": "/",
+          "code": true,
+          "detail": "1 page",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1vn39fso9m3"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "areas"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "entry",
+      "title": "Entry pages",
+      "items": [
+        {
+          "label": "Start page",
+          "value": "/",
+          "code": true,
+          "link": {
+            "to": "page",
+            "routeId": "rt_0h4e5x5madf"
+          }
+        },
+        {
+          "label": "Most linked",
+          "value": "/products",
+          "code": true,
+          "detail": "2 pages link here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_0te2vdgan2u"
+          }
+        },
+        {
+          "label": "Most linked",
+          "value": "/products/[id]",
+          "code": true,
+          "detail": "2 pages link here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_1kdazzrvrkg"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "map"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "flows",
+      "title": "Main flows",
+      "note": "2 flows",
+      "items": [
+        {
+          "label": "CreateProductForm submit",
+          "value": "/products/new → /products/[id]",
+          "code": true,
+          "detail": "4 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_14lgyscxig3"
+          }
+        },
+        {
+          "label": "DeleteProductButton click",
+          "value": "/products",
+          "code": true,
+          "detail": "2 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_0vf3cfh7187"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "flows"
+      },
+      "empty": "No flows found: no event handler leads to a request or another page."
+    },
+    {
+      "id": "backends",
+      "title": "Backends",
+      "note": "6 endpoints",
+      "items": [
+        {
+          "label": "This app",
+          "value": "This app's API",
+          "code": false,
+          "detail": "2 endpoints, 2 called from the browser",
+          "link": {
+            "to": "endpoints",
+            "host": "app"
+          }
+        },
+        {
+          "label": "External",
+          "value": "{API_URL ?? http://localhost:4010}",
+          "code": true,
+          "detail": "4 endpoints",
+          "link": {
+            "to": "endpoints",
+            "host": "env:API_URL"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "endpoints"
+      },
+      "empty": "The app sends no requests."
+    },
+    {
+      "id": "places",
+      "title": "Where things live",
+      "items": [
+        {
+          "label": "Root layout",
+          "value": "src/app/layout.tsx",
+          "code": true,
+          "link": {
+            "to": "component",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        },
+        {
+          "label": "Sends requests",
+          "value": "src/lib/backend.ts",
+          "code": true,
+          "detail": "4 requests",
+          "link": {
+            "to": "requests",
+            "q": "src/lib/backend.ts"
+          }
+        },
+        {
+          "label": "Type",
+          "value": "Product",
+          "code": true,
+          "detail": "src/types/product.ts, used 3 times",
+          "link": {
+            "to": "type",
+            "typeId": "typ_0c608pp860k"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "components"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "check",
+      "title": "To check",
+      "items": [],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "The scan resolved every page, component, type and request."
+    }
+  ]
+}

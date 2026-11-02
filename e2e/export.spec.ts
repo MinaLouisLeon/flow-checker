@@ -42,6 +42,14 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await expect(page.getByRole('button', { name: 'Re-scan' })).toHaveCount(0)
   await expect(page.locator('.nav')).not.toContainText('Export')
 
+  // Start here (M32) is the first screen; its items open their screens.
+  await expect(page.getByTestId('start-flows')).toContainText('LoginForm submit')
+  await expect(page.getByTestId('start-flows')).toContainText('confirmed')
+  await page.getByTestId('start-areas').locator('a', { hasText: '/[locale]/verify' }).click()
+  await expect(page).toHaveURL(/#\/areas\/ar_/)
+  await expect(page.locator('.split-side')).toContainText('VerifyOtpForm')
+  await page.goBack()
+
   // Captures from the embedded data, with no assign or record controls.
   await page.locator('.nav a', { hasText: 'Captures' }).click()
   const row = page.locator('.capture-list li', { hasText: '/auth/login' }).first()
@@ -65,6 +73,26 @@ test('the exported site opens from disk and shows the scan, captures and flows',
   await expect(page.locator('.split-side')).toContainText('LoginForm')
   await page.locator('.nav a', { hasText: 'Components' }).click()
   await expect(page.locator('.component-list')).toContainText('VerifyOtpForm')
+
+  // Endpoints (M29) are worked out from the embedded model, captures included.
+  await page.locator('.nav a', { hasText: 'Endpoints' }).click()
+  await page.locator('.endpoint-list a.row-link', { hasText: '/auth/login' }).click()
+  const endpoint = page.locator('.split-side')
+  await expect(endpoint).toContainText('LoginForm')
+  await expect(endpoint.locator('.request-captures')).toContainText('/auth/login')
+
+  // Areas (M30) too.
+  await page.locator('.nav a', { hasText: 'Areas' }).click()
+  await page.locator('.area-cards a', { hasText: 'verify' }).click()
+  await expect(page.locator('.split-side')).toContainText('VerifyOtpForm')
+
+  // Walk the app (M35): what was walked before the export is ticked; there is no app to open.
+  await page.locator('.nav a', { hasText: 'Walk the app' }).click()
+  const walked = page.getByTestId('walk-item').filter({ hasText: 'LoginForm submit' })
+  await expect(walked).toContainText('✓ confirmed')
+  await expect(walked.getByTestId('walk-percent')).toHaveText('100%')
+  await expect(page.getByTestId('coverage-flows')).toContainText('100%')
+  await expect(page.getByRole('link', { name: /Open in app/ })).toHaveCount(0)
 
   expect(errors).toEqual([])
 })

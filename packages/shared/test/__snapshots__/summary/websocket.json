@@ -1,0 +1,188 @@
+{
+  "nextVersion": "<next-version>",
+  "appDir": "app",
+  "sections": [
+    {
+      "id": "stack",
+      "title": "Stack",
+      "items": [
+        {
+          "label": "Next.js",
+          "value": "<next-version>",
+          "detail": "App Router in app/, 2 pages, 0 route handlers",
+          "link": {
+            "to": "map"
+          }
+        },
+        {
+          "label": "Rendering",
+          "value": "3 server, 3 client, 0 shared",
+          "detail": "6 components",
+          "link": {
+            "to": "components"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "socket.io",
+          "detail": "1 request",
+          "link": {
+            "to": "requests",
+            "transport": "websocket",
+            "q": "socket.io"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "WebSocket",
+          "detail": "2 requests",
+          "link": {
+            "to": "requests",
+            "transport": "websocket"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "areas",
+      "title": "Areas",
+      "note": "2 areas by URL",
+      "items": [
+        {
+          "label": "home",
+          "value": "/",
+          "code": true,
+          "detail": "1 page, 1 flow, 2 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1vn39fso9m3"
+          }
+        },
+        {
+          "label": "chat",
+          "value": "/chat",
+          "code": true,
+          "detail": "1 page, 1 endpoint",
+          "link": {
+            "to": "area",
+            "areaId": "ar_19t50bf2akw"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "areas"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "entry",
+      "title": "Entry pages",
+      "items": [
+        {
+          "label": "Start page",
+          "value": "/",
+          "code": true,
+          "link": {
+            "to": "page",
+            "routeId": "rt_12v7saiyoj2"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "map"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "flows",
+      "title": "Main flows",
+      "note": "1 flow",
+      "items": [
+        {
+          "label": "Ping click",
+          "value": "/",
+          "code": true,
+          "detail": "2 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_1ogren7ws05"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "flows"
+      },
+      "empty": "No flows found: no event handler leads to a request or another page."
+    },
+    {
+      "id": "backends",
+      "title": "Backends",
+      "note": "3 endpoints",
+      "items": [
+        {
+          "label": "External",
+          "value": "http://localhost:4011",
+          "code": true,
+          "detail": "3 endpoints, 3 called from the browser",
+          "link": {
+            "to": "endpoints",
+            "host": "base:http://localhost:4011"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "endpoints"
+      },
+      "empty": "The app sends no requests."
+    },
+    {
+      "id": "places",
+      "title": "Where things live",
+      "items": [
+        {
+          "label": "Root layout",
+          "value": "app/layout.tsx",
+          "code": true,
+          "link": {
+            "to": "component",
+            "componentId": "cmp_2dznycb4aq7"
+          }
+        },
+        {
+          "label": "Type",
+          "value": "ChatMessage",
+          "code": true,
+          "detail": "lib/types.ts, used 2 times",
+          "link": {
+            "to": "type",
+            "typeId": "typ_165m1q160hg"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "components"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "check",
+      "title": "To check",
+      "items": [],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "The scan resolved every page, component, type and request."
+    }
+  ]
+}

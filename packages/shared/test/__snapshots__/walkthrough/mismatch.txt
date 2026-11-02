@@ -1,0 +1,3 @@
+## TodoPanel submit  /  entry  1 request
+1. Submit the form in `TodoPanel` on `/`
+2. It sends `POST /todos`

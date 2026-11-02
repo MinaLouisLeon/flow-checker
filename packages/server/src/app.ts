@@ -64,6 +64,18 @@ export interface AppOptions {
   scans?: ScanFeed
   /** Export from the dashboard (M10). Without it, `POST /api/export` is off. */
   exporter?: ExporterOptions
+  /** Started by `flow-checker explore` (M28): the app isn't run from here. */
+  explore?: ExploreInfo
+}
+
+/** What the dashboard says about `flow-checker explore` (M28). */
+export interface ExploreInfo {
+  /** The project has a flow-checker setup (config, hooks or `.flow-checker/`), so its data is used. */
+  setup: boolean
+  /** Without a setup: the folder outside the project that holds the scan and exports. */
+  dataDir?: string
+  /** Commands that turn capture on, in order. */
+  enableCapture: string[]
 }
 
 export type ExportFormat = 'md' | 'html'
@@ -94,6 +106,8 @@ export interface ServerMeta {
   capture?: { storeRaw: boolean }
   /** Present when the dashboard can export (M10): the target folder of each format. */
   export?: Record<ExportFormat, string>
+  /** Present when started by `flow-checker explore` (M28). */
+  explore?: ExploreInfo
 }
 
 // The server only listens on loopback. Checking the Host header as well blocks DNS
@@ -193,6 +207,7 @@ export function createApp(options: AppOptions): Hono {
       watching: Boolean(options.scans),
       capture: options.capture ? { storeRaw: options.capture.options.storeRaw } : undefined,
       export: options.exporter?.dirs,
+      explore: options.explore,
     } satisfies ServerMeta),
   )
 

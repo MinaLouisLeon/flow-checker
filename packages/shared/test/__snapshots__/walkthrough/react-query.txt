@@ -1,0 +1,20 @@
+## AddTodoForm submit  /  entry  2 requests
+1. Submit the form in `AddTodoForm` on `/`
+2. It sends `POST /todos`
+3. It refetches `['todos']` in the cache  (not seen)
+4. It goes to `/todos/[id]`
+5. The page loads `GET /todos/:id`
+
+## TodoList change  /  entry  1 request
+1. Change a field in `TodoList` on `/`
+2. It sends `PATCH /todos/:id`
+3. It updates `['todos', 'detail', :id]` in the cache  (not seen)
+4. It refetches `['todos', 'list']` in the cache  (not seen)
+
+## UserList click  /users  entry  1 request
+1. Click in `UserList` on `/users`
+2. It sends `GET /users/:id`
+
+## UserList mouseenter  /users  entry  1 request
+1. Hover over `UserList` on `/users`
+2. It sends `GET /users/:id`

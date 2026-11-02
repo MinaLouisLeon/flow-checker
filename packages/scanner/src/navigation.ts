@@ -56,6 +56,22 @@ export function navigationCall(call: CallExpression): { kind: NavKind; api: NavA
   return undefined
 }
 
+export type ExitKind = 'not-found' | 'forbidden' | 'unauthorized'
+
+const EXIT_NAMES: Record<string, ExitKind> = {
+  notFound: 'not-found',
+  forbidden: 'forbidden',
+  unauthorized: 'unauthorized',
+}
+
+/** `notFound()`, `forbidden()` or `unauthorized()` from next/navigation: the page stops rendering (M31). */
+export function renderExitCall(call: CallExpression): ExitKind | undefined {
+  const expr = call.getExpression()
+  if (!N.isIdentifier(expr)) return undefined
+  const kind = EXIT_NAMES[unaliasedName(expr)]
+  return kind && importModuleOf(expr) === 'next/navigation' ? kind : undefined
+}
+
 /** The API of `useRouter()` behind a router value: the call itself, or a variable set from it. */
 function routerApi(target: Node): NavApi | undefined {
   const inner = skip(target)

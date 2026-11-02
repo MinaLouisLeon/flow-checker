@@ -7,7 +7,7 @@ import type { Capture, CapturedBody, Interaction, SessionEvent } from '@flow-che
 import { byteLength, callerStack, headersToObject, readStream, requestBody, textBody } from './body'
 import { splitGraphqlCapture } from './graphql'
 import { createIgnoreMatcher, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig, randomId } from './options'
-import { createQueryTracker, findQueryClient } from './query'
+import { createQueryTracker, findQueryClient, sentByQueryLibrary } from './query'
 import { compileRules, redactCapture } from './redact'
 import { isSocketIoUrl, parseSocketIoFrame } from './socket'
 import { isEventStream, readEventStream, recordStream, type StreamRecorder } from './stream'
@@ -22,6 +22,8 @@ const QUERY_CLIENT_POLL_MS = 300
 const QUERY_CLIENT_POLLS = 100
 /** Interactions older than this are not linked to a request. */
 const INTERACTION_WINDOW_MS = 5000
+/** Statuses Next answers with when `notFound()`, `forbidden()` or `unauthorized()` stops a page (M31). */
+const STOP_STATUSES = new Set([401, 403, 404])
 const FLUSH_MS = 400
 const MAX_QUEUE = 200
 const OWN_FRAMES = /flowChecker|FlowChecker|flow-checker[\\/_]dist|runtime[-_]client/
@@ -235,6 +237,22 @@ function start(config: RuntimeConfig) {
     // Found just now: the query that sends this request started before it could be wrapped.
     return queries.ready ? (queries.current() ?? queries.guess()) : undefined
   }
+  /**
+   * A request a React Query function sent before the client could be found: an earlier request in
+   * the same task looked and failed, then hydration committed the provider and ran the query in
+   * that task (lost keys on Next 13.4 in the matrix). One task later the provider is on screen, and
+   * the capture is only sent once its response is in, so its key can still be filled in.
+   */
+  const fillQueryLater = (capture: Capture) => {
+    setTimeout(() => {
+      try {
+        if (capture.query) return
+        lookForQueryClient()
+        const query = queries.ready ? queries.guess() : undefined
+        if (query) capture.query = query
+      } catch {}
+    }, 0)
+  }
 
   // --- Request filtering --------------------------------------------------------------------
 
@@ -266,10 +284,57 @@ function start(config: RuntimeConfig) {
     if (action) capture.serverAction = { id: action }
     const query = currentQuery()
     if (query) capture.query = query
+    else if (!queries.ready && sentByQueryLibrary(capture.stack)) fillQueryLater(capture)
     const interaction = currentInteraction()
     if (interaction) capture.interaction = interaction
     return capture
   }
+
+  // --- Redirects (M31) ----------------------------------------------------------------------
+
+  /** Next's own navigation request for a page (RSC), not a prefetch. */
+  const isNavigationFetch = (input: RequestInfo | URL, init?: RequestInit): boolean => {
+    try {
+      const request = input instanceof Request ? input : undefined
+      const url = new URL(request ? request.url : String(input), location.href)
+      if (url.origin !== location.origin) return false
+      const headers = { ...headersToObject(request?.headers), ...headersToObject(init?.headers) }
+      if (headers['next-router-prefetch']) return false
+      return headers.rsc === '1' || url.searchParams.has('_rsc')
+    } catch {
+      return false
+    }
+  }
+
+  const withoutRsc = (raw: string): string => {
+    const url = new URL(raw, location.href)
+    url.searchParams.delete('_rsc')
+    return url.href
+  }
+
+  /** A page navigation that was redirected, or answered 401 / 403 / 404, becomes a `redirect` event. */
+  const noteNavigationResponse = (input: RequestInfo | URL, response: Response) => {
+    try {
+      const asked = withoutRsc(input instanceof Request ? input.url : String(input))
+      if (response.redirected && response.url) {
+        const to = withoutRsc(response.url)
+        if (to !== asked) pushEvent({ kind: 'redirect', at: now(), from: asked, to })
+      } else if (STOP_STATUSES.has(response.status)) {
+        pushEvent({ kind: 'redirect', at: now(), from: asked, to: asked, status: response.status })
+      }
+    } catch {}
+  }
+
+  // The first page of the tab answered 401 / 403 / 404: `notFound()`, `forbidden()`, `unauthorized()`.
+  try {
+    const entry = performance.getEntriesByType('navigation')[0] as
+      | (PerformanceNavigationTiming & { responseStatus?: number })
+      | undefined
+    const status = entry?.responseStatus
+    if (status !== undefined && STOP_STATUSES.has(status)) {
+      pushEvent({ kind: 'redirect', at: now(), from: location.href, to: location.href, status })
+    }
+  } catch {}
 
   // --- fetch --------------------------------------------------------------------------------
 
@@ -304,7 +369,12 @@ function start(config: RuntimeConfig) {
       capture = undefined
     }
 
-    if (!capture) return nativeFetch(input, init)
+    if (!capture) {
+      if (!isNavigationFetch(input, init)) return nativeFetch(input, init)
+      const response = await nativeFetch(input, init)
+      noteNavigationResponse(input, response)
+      return response
+    }
     const current = capture
     try {
       const response = await nativeFetch(input, init)

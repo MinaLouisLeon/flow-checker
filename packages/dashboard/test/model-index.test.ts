@@ -255,6 +255,7 @@ describe('graph layout', () => {
 describe('router', () => {
   it('round-trips every screen through the hash', () => {
     const screens: Screen[] = [
+      { name: 'start' },
       { name: 'overview' },
       { name: 'map', view: 'graph', q: '' },
       { name: 'map', view: 'tree', q: 'users' },
@@ -274,6 +275,9 @@ describe('router', () => {
   it('treats unknown paths as not found', () => {
     expect(parseHash('#/nope')).toEqual({ name: 'not-found' })
     expect(parseHash('#/page')).toEqual({ name: 'not-found' })
-    expect(parseHash('')).toEqual({ name: 'overview' })
+    // Start here is the first screen (M32); the overview moved to #/overview.
+    expect(parseHash('')).toEqual({ name: 'start' })
+    expect(parseHash('#/')).toEqual({ name: 'start' })
+    expect(parseHash('#/overview')).toEqual({ name: 'overview' })
   })
 })

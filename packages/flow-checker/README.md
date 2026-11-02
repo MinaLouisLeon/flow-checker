@@ -2,13 +2,32 @@
 
 Maps a Next.js **App Router** project (its pages, components, requests, types and user flows), checks that map against real traffic while you use the app, and exports it as documentation.
 
+## Just cloned a Next.js project? Start here
+
+Run this in the project folder. Nothing to install or set up, and no file in the project is created or changed:
+
+```bash
+npx @integr8-media/flow-checker explore
+```
+
+It scans the code and opens the dashboard on **Start here**, a short tour of the app:
+
+1. **Start here:** what the app is built with, its areas (features), the pages to start from, the main flows (_login → verify OTP → dashboard_), the backends it calls and where things live. Every item opens its screen.
+2. **Look around:** **Areas** groups everything by feature, **Endpoints** lists every backend call with the pages that make it, and the **Map** shows each page with its components, requests and whether it needs a login (`guarded`). Press Ctrl+K (⌘K) to find anything by name, file or URL. Hover any badge to read what it means.
+3. **Walk the app:** to see it run, turn capture on (below) and follow **Walk the app**, a checklist of flows to try, each step ticking as you use the app.
+4. **Before you change a file:** `npx @integr8-media/flow-checker impact src/lib/api.ts` lists the pages, flows and requests the change affects.
+
+`npx @integr8-media/flow-checker summary` prints Start here in the terminal instead.
+
+## Capture real traffic
+
 ```bash
 npm install -D @integr8-media/flow-checker
 npx flow-checker init     # adds two capture hooks and a config file
 npx flow-checker          # scans, opens the dashboard and starts your app with capture on
 ```
 
-Then use your app as usual. Each request the app sends shows up in the dashboard, linked to the line of code that sent it.
+Then use your app as usual. Each request the app sends shows up in the dashboard, linked to the line of code that sent it, and the flows you walk are confirmed.
 
 ## What it does
 
@@ -17,7 +36,9 @@ Then use your app as usual. Each request the app sends shows up in the dashboard
 - **Verifies the map.** Each capture is matched to the request site that sent it, which marks that site `✓ verified`. The captured data is compared with the declared types (missing fields, extra fields, wrong types, unexpected `null`), and flows are confirmed when you walk them.
 - **Checks the code against your Postman collection** (optional): requests the collection doesn't have, endpoints nothing calls, and types from saved examples.
 - **Keeps up with your edits.** Files are watched and re-scanned incrementally. Requests whose code changed since they were captured are marked `↻ needs re-check`.
-- **Exports documentation:** Markdown (with Mermaid route maps and sequence diagrams) and a static, read-only copy of the dashboard you can host anywhere.
+- **Explains the app to newcomers:** areas by feature, backend endpoints, which pages are guarded (and by what), a Start here tour and a walk-through of the flows. See [Dashboard](#dashboard).
+- **Says what a change affects** before you make it, and in CI: `impact <file>`, `scan --diff <ref> --fail-on <kinds>`. See [Impact check](#impact-check).
+- **Exports documentation:** Markdown (`ONBOARDING.md`, areas, endpoints, pages, flows, a glossary, with Mermaid route maps and sequence diagrams) and a static, read-only copy of the dashboard you can host anywhere.
 
 ## Requirements
 
@@ -55,34 +76,42 @@ It changes nothing unless the app was started by flow-checker, and returns your 
 ```
 flow-checker            # same as `dev`
 flow-checker dev        # scan + watch + dashboard + start your app with capture on
+flow-checker explore    # scan + watch + dashboard only: no app, no setup, project files untouched
 flow-checker scan       # scan only, write .flow-checker/model.json
+flow-checker scan --diff main --fail-on dynamic-url   # what the branch's changes affect; CI gate
+flow-checker impact src/lib/api.ts:12   # the pages, flows and requests a change to this file affects
+flow-checker summary    # print Start here: stack, areas, entry pages, main flows, backends (--json)
+flow-checker explain dynamic-url   # what a status, note or badge means and what to do (no word: all)
 flow-checker init       # add the capture hooks, a config file and .gitignore entries
 flow-checker export     # Markdown docs and/or a static HTML site
 flow-checker doctor     # check Node, Next.js, hooks, tsconfig, ports and .gitignore
 flow-checker postman import   # read a Postman collection to check the code against
 ```
 
-| Option                                       | Commands                  | Meaning                                                                                       |
-| -------------------------------------------- | ------------------------- | --------------------------------------------------------------------------------------------- |
-| `--root <dir>`                               | all                       | Project root (default: current directory)                                                     |
-| `--app-dir <dir>`                            | all                       | App Router directory (default: `src/app` or `app`)                                            |
-| `--config <file>`                            | dev, scan, export, doctor | Config file (default: `flow-checker.config.*` in the root)                                    |
-| `--port <n>`                                 | dev, doctor               | Dashboard port (default 4400)                                                                 |
-| `--app-port <n>`                             | dev, doctor               | Port your app runs on (default 3000)                                                          |
-| `--dev-command <cmd>`                        | dev                       | Command that starts your app (default: the `dev` script, or `next dev`)                       |
-| `--no-app`                                   | dev                       | Don't start the app. Start it yourself with the environment `dev` prints.                     |
-| `--no-open`                                  | dev                       | Don't open the browser                                                                        |
-| `--no-watch`                                 | dev                       | Don't re-scan when files change                                                               |
-| `-y, --yes`                                  | init                      | Apply the changes without asking                                                              |
-| `--tree`, `--types`, `--requests`, `--flows` | scan                      | Also print the route/component trees, resolved types, request sites or flows                  |
-| `--md <dir>`, `--html <dir>`                 | export                    | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
-| `--raw`                                      | export                    | Keep captures as saved, without redacting them again                                          |
-| `--force`                                    | export                    | Write into a folder that has other files                                                      |
-| `--collection <src>`                         | postman import            | v2.1 JSON file, v3 YAML folder or cloud collection id (default: `postman.collection`)         |
-| `--environment <src>`                        | postman import            | Environment file or cloud id for `{{variables}}`                                              |
-| `--api-key-env <name>`                       | postman import            | Env variable with the Postman API key, for cloud ids (default `POSTMAN_API_KEY`)              |
-| `--verbose`                                  | all                       | Also print the resolved config, where the scan runs and other details                         |
-| `-q, --quiet`                                | all                       | No progress output: only results, warnings and errors                                         |
+| Option                                       | Commands                       | Meaning                                                                                       |
+| -------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `--root <dir>`                               | all                            | Project root (default: current directory)                                                     |
+| `--app-dir <dir>`                            | all                            | App Router directory (default: `src/app` or `app`)                                            |
+| `--config <file>`                            | dev, scan, export, doctor      | Config file (default: `flow-checker.config.*` in the root)                                    |
+| `--port <n>`                                 | dev, explore, doctor           | Dashboard port (default 4400)                                                                 |
+| `--app-port <n>`                             | dev, explore, doctor           | Port your app runs on (default 3000)                                                          |
+| `--dev-command <cmd>`                        | dev                            | Command that starts your app (default: the `dev` script, or `next dev`)                       |
+| `--no-app`                                   | dev                            | Don't start the app. Start it yourself with the environment `dev` prints.                     |
+| `--no-open`                                  | dev, explore                   | Don't open the browser                                                                        |
+| `--no-watch`                                 | dev, explore                   | Don't re-scan when files change                                                               |
+| `-y, --yes`                                  | init                           | Apply the changes without asking                                                              |
+| `--tree`, `--types`, `--requests`, `--flows` | scan                           | Also print the route/component trees, resolved types, request sites or flows                  |
+| `--diff <ref>`                               | scan                           | Also print what the files changed since this git ref (commit, branch, tag) affect             |
+| `--fail-on <kinds>`                          | scan                           | Exit 1 when a note of these kinds is open (`dynamic-url,type-mismatch`); see Impact check     |
+| `--json`                                     | scan, impact, summary, explain | Print JSON instead of text, for scripts                                                       |
+| `--md <dir>`, `--html <dir>`                 | export                         | Write Markdown docs / the static site to this folder. Neither: both, to the config's folders. |
+| `--raw`                                      | export                         | Keep captures as saved, without redacting them again                                          |
+| `--force`                                    | export                         | Write into a folder that has other files                                                      |
+| `--collection <src>`                         | postman import                 | v2.1 JSON file, v3 YAML folder or cloud collection id (default: `postman.collection`)         |
+| `--environment <src>`                        | postman import                 | Environment file or cloud id for `{{variables}}`                                              |
+| `--api-key-env <name>`                       | postman import                 | Env variable with the Postman API key, for cloud ids (default `POSTMAN_API_KEY`)              |
+| `--verbose`                                  | all                            | Also print the resolved config, where the scan runs and other details                         |
+| `-q, --quiet`                                | all                            | No progress output: only results, warnings and errors                                         |
 
 Every command shows its progress on stderr. In a terminal, a live line shows a spinner, a bar for the whole command, the current step and its time, and each finished step leaves a `✓` line with what it found:
 
@@ -96,15 +125,44 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 
 ### Dashboard
 
-`flow-checker dev` serves the dashboard on port 4400. The same screens are in the static HTML export, read-only.
+`flow-checker dev` and `flow-checker explore` serve the dashboard on port 4400. The same screens are in the static HTML export, read-only.
 
-- **Overview:** counts for pages, route handlers, components, requests, types and flows, each a link to its list, and the things to check (unresolved URLs, unknown triggers, type mismatches...), one note per request.
-- **Map:** the route map (graph or tree). A page shows its component tree, the requests it sends on load and on events (apart from those its layouts send on every page), where it leads and the flows that start on it.
+- **Start here** (the first screen): a short tour of the app for someone new to it. What it is built with (Next.js version, server / client components, data libraries such as React Query, SWR, tRPC, GraphQL or axios, next-intl, middleware, a Postman contract), its largest areas, the start page, the most-linked pages and the pages nothing links to, the longest flows, the backends it calls, where things live (the root layout, the files that send the most requests, route handlers, the most-used types) and the first things to check. Every item opens its screen. `flow-checker summary` prints the same in the terminal, and the Markdown export writes it to `ONBOARDING.md`.
+- **Walk the app** (`#/walk`): the flows not confirmed yet as a checklist, the ones that start on an entry page first. Each step says what to do ("Submit the form in `LoginForm` on `/[locale]/login`") or what should happen next ("It sends `POST /auth/login`", "It goes to `/[locale]/verify`"). **Open in app** opens the start page in your running app, with dynamic segments (`[locale]`, `[id]`) filled in from values you type once (the next-intl default locale is suggested). Steps tick as the captures and page changes arrive, and a walked flow moves to Walked. Start here and the overview show the coverage: confirmed flows and captured requests, in percent. Without capture (`explore`) it is a reading guide and says how to turn capture on.
+- **Overview** (`#/overview`): counts for pages, route handlers, components, requests, types and flows, each a link to its list, and the things to check (unresolved URLs, unknown triggers, type mismatches...), one note per request.
+- **Areas:** pages grouped by feature (the first part of their URL, else the feature folder that holds their components), one card per area with its pages, flows, endpoints, shared components and things to check. Rename or merge areas with the [`areas`](https://github.com/MinaLouisLeon/flow-checker/blob/main/docs/config.md#areas) config option. The Markdown export writes `areas.md`.
+- **Endpoints:** every backend endpoint the app calls, one row per method and URL pattern, grouped by host (this app's route handlers and server actions, each base URL, URLs the scan couldn't read), with the pages and components that call it, its types and its captures. The Markdown export writes `endpoints.md`.
+- **Map:** the route map (graph or tree), with an optional frame around each area. A page shows its component tree, the requests it sends on load and on events (apart from those its layouts send on every page), where it leads, the flows that start on it, and its access: `guarded` with what can stop it ("redirects to `/login` when `!session` (middleware)"), `open`, or `access unknown` when the scan can't tell. Filter the map by access. Guards are read from middleware redirects and `redirect()` / `notFound()` / `forbidden()` / `unauthorized()` in the page, its layouts and the helpers they call; with capture on, a redirect you hit marks its guard as seen.
 - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared), by what it has (sends requests, things to check, not on any page) and sorted by name, requests or pages.
 - **Requests:** every request site, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status (verified, mismatch, needs re-check, not captured yet), transport and flags. The same request sent from several places is one row. A request opens on its own page with its body and response types, server hops, query-cache links, captures and the call path from the component.
 - **Flows**, **Types**, **Live** (captures as they arrive, with their match and type check) and **Export**.
+- **Glossary:** what each status, note (`dynamic-url`, `unknown-trigger`...), trigger, transport and badge means, and what to do about it. Hover any badge to read its line; each note on a request links to its entry. `flow-checker explain <word>` prints the same in the terminal, and the Markdown export writes it to `GLOSSARY.md`.
+
+**Show details:** lists and the page view show only the main badge of each row (its status, or the number of notes) so they stay easy to read. Click **Show details** in the top bar to also see how each request is sent, what triggers it, `use client`, conditional and lazy renders, request counts and the other badges. The choice is remembered in your browser.
+
+**Search everything:** press Ctrl+K (⌘K on a Mac) or `/` on any screen, or click Search in the top bar. One box finds pages, route handlers, components, requests, endpoints, types, flows and areas by name, file, URL pattern or route path; exact names come first, then names that start with what you typed, then word matches. Arrow keys move, Enter opens, Esc closes. It works in the static export too.
+
+**Affected by changes:** when you save a file, the overview (and `#/changes`, linked from the scan time in the top bar) lists what the change touches: the pages, flows and requests to check, by area, each with why. It needs `dev` or `explore` watching files, so the static export doesn't have it.
 
 Filters and searches stay in the URL, so a filtered list can be bookmarked or shared. Lists that grow with the app (the queries a cache call hits, a route handler's callers...) show five entries, then "+N more".
+
+### Impact check
+
+`flow-checker impact <file>[:line]` says what a change to a file touches before you make it: the pages, route handlers, flows and requests, grouped by area, each with the reason (`sent through src/lib/api.ts:14`, `its data type uses User`, `renders ProfileCard`). With a line, only the declaration around it counts (the function or component); several files can be given at once. It scans without writing anything.
+
+- **Components, hooks, API clients:** what is defined in the file or sends a request through it, then the pages that render it or send the request, and the flows with those steps.
+- **Types:** everything that uses them, also through other types (a props type that holds a `User`).
+- **Route handlers and server actions:** the requests that call them, and their pages.
+- **Layouts, `loading` / `error` files, the middleware:** every page under them or that it runs on.
+- **Files with none of that** (constants, utils): the nearest files that import them and have something the scan knows.
+
+`flow-checker scan --diff <ref>` does the same for every source file changed since a git ref (committed, staged, unstaged and new files). `--fail-on <kinds>` makes `scan` exit 1 when a request has an open note of those kinds, with `--diff` only the requests the changes affect, so a CI job can stop a branch that adds a URL the scan can't read:
+
+```bash
+npx @integr8-media/flow-checker scan --diff origin/main --fail-on dynamic-url,unknown-trigger
+```
+
+Kinds are the note names from `flow-checker explain` (`dynamic-url`, `unknown-method`, `unknown-response`, `unknown-trigger`, `runtime-url`, `type-mismatch`, `stale`, `not-in-collection`, `contract-mismatch`, `unused-endpoint`). `type-mismatch` and `stale` come from captures, so they count when `.flow-checker/` holds some. Exit codes with `--fail-on`: 0 nothing open, 1 open notes, 2 the check couldn't run (an unknown kind, a ref git doesn't know, a config or scan error). `--json` prints the scan counts, the changed files with their impact and the open notes.
 
 ### React Query
 
@@ -218,6 +276,8 @@ export default defineConfig({
   postman: { collection: 'postman/collections/My API', environment: 'postman/environments/dev.yaml' },
   // GraphQL types when the code has none: a schema file, or live introspection (env:NAME headers).
   graphql: { schema: 'schema.graphql' },
+  // Areas (features) on the Areas screen: fold some into one, give others a display name.
+  areas: { merge: { account: ['profile', 'settings'] }, rename: { account: 'Account' } },
 })
 ```
 
@@ -255,7 +315,7 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 - Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.
 - tRPC: procedures called through `createCaller` or a server-side `createTRPCOptionsProxy({ router })` run without an HTTP request and are not request sites. Subscriptions are found in the code, but their streams are captured as plain requests. The router must be reachable from `fetchRequestHandler({ router })` or the client's `AppRouter` type.
 - Next.js before 15.3: browser capture needs webpack (no Turbopack) and `withFlowChecker()`.
-- Large repositories: the first scan of a ~1,800-file app takes about 12 s and a re-scan after an edit about 4 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
+- Large repositories: the first scan of a ~1,800-file app takes about 10 s and a re-scan after an edit about 3 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
 
 ## License
 

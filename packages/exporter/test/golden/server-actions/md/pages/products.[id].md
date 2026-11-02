@@ -6,7 +6,12 @@
 | --- | --- |
 | File | `src/app/products/[id]/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
+| Access | guarded |
 | Status | ✓ 1 verified |
+
+## Access
+
+- shows the not-found page (404) when `!product` (page), `src/app/products/[id]/page.tsx:10`
 
 ## Component tree
 

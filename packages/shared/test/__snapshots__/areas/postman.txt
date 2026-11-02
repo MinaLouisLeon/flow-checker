@@ -1,0 +1,18 @@
+by route
+
+home from /
+  pages: /
+  components: HomePage, ProductPanel, TodoPanel
+  shared components: RootLayout
+  requests: 4, endpoints: 4, notes: 1
+  flows: TodoPanel submit
+
+users from /users
+  pages: /users/[id]
+  components: UserPage, DeleteUserButton
+  shared components: RootLayout
+  requests: 2, endpoints: 2, notes: 1
+  flows: DeleteUserButton click
+
+shared components: RootLayout
+shared requests: 0

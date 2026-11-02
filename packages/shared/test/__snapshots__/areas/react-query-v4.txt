@@ -1,0 +1,32 @@
+by route
+
+home from /
+  pages: /
+  components: TodosPage, AddTodoForm, TodoList, TodoStats
+  shared components: RootLayout, Providers
+  requests: 4, endpoints: 3, notes: 0
+  flows: AddTodoForm submit, TodoList change
+
+settings from /settings
+  pages: /settings
+  components: SettingsPage, SettingsBadge, SettingsPanel
+  shared components: RootLayout, Providers
+  requests: 4, endpoints: 3, notes: 0
+  flows: -
+
+todos from /todos
+  pages: /todos/[id]
+  components: TodoPage, TodoDetail
+  shared components: RootLayout, Providers
+  requests: 1, endpoints: 1, notes: 0
+  flows: -
+
+users from /users
+  pages: /users
+  components: UsersPage, HydrateClient, UserList
+  shared components: RootLayout, Providers
+  requests: 3, endpoints: 2, notes: 0
+  flows: UserList click
+
+shared components: RootLayout, Providers
+shared requests: 0

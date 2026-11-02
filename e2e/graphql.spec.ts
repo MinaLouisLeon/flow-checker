@@ -29,7 +29,7 @@ function exportSite(): string {
 
 test('the overview lists operations and requests show the one they send', async ({ page }) => {
   const site = exportSite()
-  await page.goto(pathToFileURL(join(site, 'index.html')).href)
+  await page.goto(`${pathToFileURL(join(site, 'index.html')).href}#/overview`)
 
   const section = page.locator('section', {
     has: page.getByRole('heading', { name: 'GraphQL', exact: true }),

@@ -1,4 +1,5 @@
 // Plain-text rendering of a model: used by `flow-checker scan --tree` and snapshot tests.
+import { accessOf, guardText } from './access'
 import { urlText } from './format-requests'
 import type {
   AppModel,
@@ -42,9 +43,18 @@ export function formatModel(model: AppModel): string {
       out.push(`layouts: ${route.layoutChain.map((l) => l.file).join(' > ')}`)
     }
     out.push(...(route.componentId ? formatComponentTree(route.componentId, components) : ['(no component)']))
+    out.push(...formatAccess(route))
   }
 
   return `${out.join('\n')}\n`
+}
+
+function formatAccess(route: Route): string[] {
+  const access = accessOf(route)
+  const out = [`access: ${access.status}`]
+  for (const guard of access.guards) out.push(`  ${guardText(guard)}  ${guard.loc.file}:${guard.loc.line}`)
+  for (const reason of access.reasons ?? []) out.push(`  ? ${reason.text}`)
+  return out
 }
 
 function formatMiddleware(mw: Middleware, routeList: Route[]): string[] {

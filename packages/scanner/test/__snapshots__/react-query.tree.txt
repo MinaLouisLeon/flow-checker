@@ -27,21 +27,25 @@ TodosPage  server  src/app/page.tsx:4
 ├─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:9
 └─ TodoList  client (use client)  src/components/TodoList.tsx:9
    └─ Link  external next/link  [conditional]
+access: open
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
 SettingsPage  server  src/app/settings/page.tsx:4
 ├─ SettingsBadge  client (use client)  src/components/SettingsBadge.tsx:8
 └─ SettingsPanel  client (use client)  src/components/SettingsPanel.tsx:13
+access: open
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
 TodoPage  server  src/app/todos/[id]/page.tsx:3
 └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:13
    └─ Link  external next/link  [conditional]
+access: open
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:6
 ├─ HydrationBoundary  external @tanstack/react-query
 └─ UserList  client (use client)  src/components/UserList.tsx:7
+access: open

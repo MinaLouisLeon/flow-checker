@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -93,7 +93,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_2flvqsq9ypc"
+      "componentId": "cmp_2flvqsq9ypc",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     },
     {
       "id": "rt_1kkymdue03z",
@@ -169,7 +173,11 @@
           "componentId": "cmp_17dqv782ua7"
         }
       ],
-      "componentId": "cmp_0w4ykuez903"
+      "componentId": "cmp_0w4ykuez903",
+      "access": {
+        "status": "open",
+        "guards": []
+      }
     }
   ],
   "components": [
@@ -924,5 +932,28 @@
       ]
     }
   ],
-  "queryLinks": []
+  "queryLinks": [],
+  "imports": {
+    "src/app/api/products/[id]/route.ts": [
+      "src/lib/backend.ts",
+      "src/lib/schemas.ts"
+    ],
+    "src/app/api/products/route.ts": [
+      "src/lib/backend.ts",
+      "src/lib/schemas.ts"
+    ],
+    "src/app/page.tsx": [
+      "src/components/CreateProductForm.tsx",
+      "src/components/ProductsTable.tsx"
+    ],
+    "src/app/products/[id]/page.tsx": [
+      "src/lib/schemas.ts"
+    ],
+    "src/components/CreateProductForm.tsx": [
+      "src/lib/schemas.ts"
+    ],
+    "src/components/ProductsTable.tsx": [
+      "src/lib/schemas.ts"
+    ]
+  }
 }

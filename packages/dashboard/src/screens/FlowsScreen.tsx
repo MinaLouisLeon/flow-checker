@@ -99,23 +99,23 @@ function routeTrail(flow: Flow, index: ModelIndex): string {
   return flow.routeIds.map((id) => index.routes.get(id)?.path ?? '?').join(' → ')
 }
 
-function FlowStatusBadge({ status }: { status?: FlowStatus }) {
+export function FlowStatusBadge({ status }: { status?: Pick<FlowStatus, 'status' | 'runs'> }) {
   if (!status || status.status === 'unconfirmed') {
     return (
-      <Badge tone="muted" title="Inferred from the code. Not walked in the app yet.">
+      <Badge tone="muted" term={['flow-status', 'unconfirmed']}>
         not walked yet
       </Badge>
     )
   }
   if (status.status === 'partial') {
     return (
-      <Badge tone="warn" title="Started in the app, but not walked to the end yet">
+      <Badge tone="warn" term={['flow-status', 'partial']}>
         partial
       </Badge>
     )
   }
   return (
-    <Badge tone="ok" title={`Walked end to end ${status.runs} time(s)`}>
+    <Badge tone="ok" title={`Walked end to end ${status.runs} time(s)`} term={['flow-status', 'confirmed']}>
       ✓ confirmed
     </Badge>
   )
@@ -145,6 +145,12 @@ function FlowDetail({
           {status?.source === 'both' ? 'inferred + recorded' : 'inferred'}
         </Badge>
         {status && status.runs > 0 && <span className="muted">{status.runs} run(s)</span>}
+        <span className="spacer" />
+        {status?.status !== 'confirmed' && (
+          <a className="button button-small" href={href({ name: 'walk', flowId: flow.id })}>
+            Walk it
+          </a>
+        )}
       </div>
 
       {editing === undefined ? (

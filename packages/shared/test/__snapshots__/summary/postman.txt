@@ -1,0 +1,31 @@
+Start here: postman (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in app/, 2 pages, 0 route handlers)
+  Rendering  3 server, 3 client, 0 shared  (6 components)
+  Data       fetch  (6 requests)
+
+Areas (2 areas by URL)
+  home   /  (1 page, 1 flow, 4 endpoints)
+  users  /users  (1 page, 1 flow, 2 endpoints)
+
+Entry pages
+  Start page  /  (1 page links here)
+
+Main flows (2 flows)
+  DeleteUserButton click  /users/[id] → /  (6 steps)
+  TodoPanel submit    /  (2 steps)
+
+Backends (6 endpoints)
+  External  {NEXT_PUBLIC_API_URL ?? http://localhost:4010}  (5 endpoints, 3 called from the browser)
+  Unknown   URL not known  (1 endpoint, 1 called from the browser)
+
+Where things live
+  Root layout     app/layout.tsx
+  Sends requests  lib/api.ts  (5 requests)
+  Type            Todo  (types/index.ts, used 3 times)
+  Type            Product  (types/index.ts, used 2 times)
+
+To check (2 open notes)
+  Request  GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id: No response type was found (annotation, generic or cast).  (app/users/[id]/page.tsx:9)
+  Request  GET ? todosUrl(): The URL could not be resolved: todosUrl()  (components/TodoPanel.tsx:12)

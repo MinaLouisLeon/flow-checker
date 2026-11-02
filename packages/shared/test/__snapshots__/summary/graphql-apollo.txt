@@ -1,0 +1,33 @@
+Start here: graphql-apollo (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 3 pages, 1 route handler)
+  Rendering  4 server, 9 client, 0 shared  (13 components)
+  Data       GraphQL (apollo)  (7 requests)
+
+Areas (3 areas by URL)
+  home   /  (1 page, 1 flow, 3 endpoints)
+  todos  /todos  (1 page, 1 flow, 2 endpoints)
+  users  /users  (1 page, 2 flows, 2 endpoints)
+
+Entry pages (1 page nothing links to)
+  Start page  /
+  Not linked  /users  (nothing in the app links here)
+
+Main flows (4 flows)
+  AddTodoForm submit  / → /todos/[id]  (5 steps)
+  TodoView click      /todos/[id]  (2 steps)
+  UserSearch click    /users  (2 steps)
+  UserSearch submit   /users  (2 steps)
+
+Backends (7 endpoints)
+  This app  This app's API  (7 endpoints, 7 called from the browser)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Route handlers  src/app/api/  (1 handler)
+  Type            TodoItemFragment  (src/gql/graphql.ts, used 2 times)
+  Type            TodoStatus  (src/gql/graphql.ts, used 2 times)
+
+To check
+  The scan resolved every page, component, type and request.

@@ -1,4 +1,4 @@
-import type { Route, RouteTreeNode } from '@flow-checker/shared'
+import type { Area, Route, RouteTreeNode } from '@flow-checker/shared'
 import {
   Background,
   Controls,
@@ -12,12 +12,14 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { isVerified as isSiteVerified } from '@flow-checker/shared'
+import { accessOf, isVerified as isSiteVerified } from '@flow-checker/shared'
 import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
-import { href, type MapView, replaceScreen } from '../router'
-import { Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
+import { areasOf } from '../lists'
+import type { ModelIndex } from '../model-index'
+import { ACCESS_FILTERS, type AccessFilter, href, type MapView, replaceScreen } from '../router'
+import { AccessBadge, Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
 
 interface RouteNodeData extends Record<string, unknown> {
   route: Route
@@ -29,11 +31,40 @@ interface RouteNodeData extends Record<string, unknown> {
 }
 type RouteNode = Node<RouteNodeData, 'route'>
 
-const nodeTypes = { route: RouteNodeView }
+interface AreaFrameData extends Record<string, unknown> {
+  area: Area
+}
+type AreaFrameNode = Node<AreaFrameData, 'area'>
 
-export function MapScreen({ view, q }: { view: MapView; q: string }) {
-  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q })
-  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next })
+const nodeTypes = { route: RouteNodeView, area: AreaFrameView }
+
+/** Space between an area's pages and its frame; the top leaves room for the name. */
+const FRAME_PAD = 12
+const FRAME_TOP = 26
+
+export function MapScreen({
+  view,
+  q,
+  areas,
+  access,
+}: {
+  view: MapView
+  q: string
+  areas?: boolean
+  access?: AccessFilter
+}) {
+  const { index } = useData()
+  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas, access })
+  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas, access })
+  const setAreas = (next: boolean) =>
+    replaceScreen({ name: 'map', view, q, areas: next || undefined, access })
+  const setAccess = (next: AccessFilter | undefined) =>
+    replaceScreen({ name: 'map', view, q, areas, access: next })
+  const accessCounts = useMemo(() => {
+    const counts: Record<AccessFilter, number> = { guarded: 0, open: 0, unknown: 0 }
+    for (const route of index.model.routes) if (route.kind === 'page') counts[accessOf(route).status]++
+    return counts
+  }, [index])
 
   return (
     <div className="screen screen-full">
@@ -50,9 +81,33 @@ export function MapScreen({ view, q }: { view: MapView; q: string }) {
           </button>
         </fieldset>
         <SearchBox value={q} onChange={setQuery} placeholder="Search routes and files" />
+        {view === 'graph' && (
+          <label className="legend-toggle" title="Draw a frame around the pages of each area">
+            <input type="checkbox" checked={Boolean(areas)} onChange={(e) => setAreas(e.target.checked)} />{' '}
+            Areas
+          </label>
+        )}
+        {view === 'graph' && (
+          <fieldset className="segmented" aria-label="Page access">
+            <button type="button" aria-pressed={!access} onClick={() => setAccess(undefined)}>
+              All pages
+            </button>
+            {ACCESS_FILTERS.map((a) => (
+              <button
+                key={a}
+                type="button"
+                aria-pressed={access === a}
+                onClick={() => setAccess(access === a ? undefined : a)}
+                title={ACCESS_HINTS[a]}
+              >
+                {a} {accessCounts[a]}
+              </button>
+            ))}
+          </fieldset>
+        )}
       </div>
       {view === 'graph' ? (
-        <RouteGraphView q={q} />
+        <RouteGraphView q={q} showAreas={Boolean(areas)} access={access} />
       ) : view === 'tree' ? (
         <RouteTreeView q={q} />
       ) : (
@@ -62,7 +117,13 @@ export function MapScreen({ view, q }: { view: MapView; q: string }) {
   )
 }
 
-function RouteGraphView({ q }: { q: string }) {
+const ACCESS_HINTS: Record<AccessFilter, string> = {
+  guarded: 'Pages that redirect or stop under a condition the scan read',
+  open: 'Pages where nothing redirects or stops them',
+  unknown: "Pages that may redirect or stop, under a condition the scan can't read",
+}
+
+function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolean; access?: AccessFilter }) {
   const { index } = useData()
   const [showShared, setShowShared] = useState(false)
   const hasSharedEdges = index.navEdges.some((e) => e.shared)
@@ -137,13 +198,21 @@ function RouteGraphView({ q }: { q: string }) {
     return { nodes, edges }
   }, [index, showShared])
 
+  const frames = useMemo(() => (showAreas ? areaFrames(index, nodes) : []), [index, nodes, showAreas])
   const shown = useMemo(
-    () =>
-      nodes.map((n) => ({
+    () => [
+      ...frames,
+      ...nodes.map((n) => ({
         ...n,
-        data: { ...n.data, dimmed: !matches(q, n.data.route.path, n.data.route.file) },
+        data: {
+          ...n.data,
+          dimmed:
+            !matches(q, n.data.route.path, n.data.route.file) ||
+            (!!access && (n.data.route.kind !== 'page' || accessOf(n.data.route).status !== access)),
+        },
       })),
-    [nodes, q],
+    ],
+    [frames, nodes, q, access],
   )
 
   if (nodes.length === 0) return <p className="empty">No routes found.</p>
@@ -164,6 +233,11 @@ function RouteGraphView({ q }: { q: string }) {
           fitViewOptions={{ padding: 0.1, minZoom: 0.8, maxZoom: 1.2 }}
           minZoom={0.1}
           onNodeClick={(_, node) => {
+            if (node.type === 'area') {
+              const area = (node as AreaFrameNode).data.area
+              window.location.hash = href({ name: 'areas', areaId: area.id, q: '' })
+              return
+            }
             const route = (node as RouteNode).data.route
             window.location.hash = href({ name: 'page', routeId: route.id })
           }}
@@ -200,6 +274,51 @@ function RouteGraphView({ q }: { q: string }) {
           </label>
         )}
       </div>
+    </div>
+  )
+}
+
+/** A frame behind each area's pages: the box around their nodes. */
+function areaFrames(index: ModelIndex, nodes: RouteNode[]): AreaFrameNode[] {
+  const list = areasOf(index)
+  const boxes = new Map<string, { x0: number; y0: number; x1: number; y1: number }>()
+  for (const node of nodes) {
+    const area = list.byRoute.get(node.id)
+    if (!area) continue
+    const { x, y } = node.position
+    const box = boxes.get(area.id)
+    if (box) {
+      box.x0 = Math.min(box.x0, x)
+      box.y0 = Math.min(box.y0, y)
+      box.x1 = Math.max(box.x1, x + NODE_WIDTH)
+      box.y1 = Math.max(box.y1, y + NODE_HEIGHT)
+    } else boxes.set(area.id, { x0: x, y0: y, x1: x + NODE_WIDTH, y1: y + NODE_HEIGHT })
+  }
+  return list.areas.flatMap((area) => {
+    const box = boxes.get(area.id)
+    if (!box) return []
+    const width = box.x1 - box.x0 + FRAME_PAD * 2
+    const height = box.y1 - box.y0 + FRAME_PAD + FRAME_TOP
+    return [
+      {
+        id: `area:${area.id}`,
+        type: 'area' as const,
+        position: { x: box.x0 - FRAME_PAD, y: box.y0 - FRAME_TOP },
+        width,
+        height,
+        zIndex: -1,
+        selectable: false,
+        style: { width, height },
+        data: { area },
+      },
+    ]
+  })
+}
+
+function AreaFrameView({ data }: NodeProps<AreaFrameNode>) {
+  return (
+    <div className="area-frame" title={`Area ${data.area.name}: open its card`}>
+      <span className="area-frame-name">{data.area.name}</span>
     </div>
   )
 }
@@ -247,6 +366,7 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
         {route.slot && <span>@{route.slot}</span>}
         {route.intercepting && <span>intercepts</span>}
         {noteCount > 0 && <span className="warn">⚠ {noteCount}</span>}
+        {!handler && <AccessBadge route={route} compact />}
       </div>
       <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>

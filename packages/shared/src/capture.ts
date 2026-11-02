@@ -240,6 +240,17 @@ export const SessionEventSchema = z.discriminatedUnion('kind', [
     url: z.string(),
   }),
   z.object({ kind: z.literal('capture'), at: z.string(), captureId: z.string() }),
+  /**
+   * A page the browser asked for that didn't render (M31): Next's navigation request was redirected
+   * (`to` is where it ended up), or the page answered 401 / 403 / 404 (`status`, `to` = `from`).
+   */
+  z.object({
+    kind: z.literal('redirect'),
+    at: z.string(),
+    from: z.string(),
+    to: z.string(),
+    status: z.number().int().optional(),
+  }),
 ])
 export type SessionEvent = z.infer<typeof SessionEventSchema>
 

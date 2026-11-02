@@ -1,9 +1,10 @@
 // Every request site in the scan, searchable and filterable, with the selected one beside the list (M21).
-import type { RequestSite } from '@flow-checker/shared'
+import { endpointLabel, type RequestSite } from '@flow-checker/shared'
 import { useMemo } from 'react'
 import { useData } from '../context'
 import {
   countWhen,
+  endpointsOf,
   filterRequests,
   groupSame,
   REQUEST_STATUSES,
@@ -15,7 +16,7 @@ import {
 } from '../lists'
 import { ownerHref, RequestItem, RequestSummary, SiteBadges } from '../RequestView'
 import { href, replaceScreen, type Screen } from '../router'
-import { Badge, Empty, SearchBox, Select, ShowMore, SourceLink, usePaged } from '../ui'
+import { Badge, Empty, PageAccess, SearchBox, Select, ShowMore, SourceLink, usePaged } from '../ui'
 
 type RequestsScreen = Extract<Screen, { name: 'requests' }>
 
@@ -181,7 +182,7 @@ function RequestRow({
             from {owners.length === 1 ? owners[0] : `${owners.length} places`}
           </span>
           <span className="spacer" />
-          <Badge tone="neutral" title={`Sent from ${group.length} places in the code`}>
+          <Badge tone="neutral" term={['request', 'grouped']}>
             ×{group.length}
           </Badge>
           <SiteBadges site={first} />
@@ -192,7 +193,11 @@ function RequestRow({
             return (
               <li key={site.id} className={site.id === siteId ? 'selected' : undefined}>
                 <a href={link(site.id)}>{siteOwner(site, index)}</a>
-                {warnings(site).length > 0 && <Badge tone="warn">⚠ {warnings(site).length}</Badge>}
+                {warnings(site).length > 0 && (
+                  <Badge tone="warn" term={['request', 'warnings']}>
+                    ⚠ {warnings(site).length}
+                  </Badge>
+                )}
                 <span className="spacer" />
                 {call && <SourceLink file={call.file} line={call.line} column={call.column} />}
               </li>
@@ -215,6 +220,7 @@ function RequestPanel({ site }: { site: RequestSite }) {
     : site.routeId
       ? [site.routeId]
       : []
+  const endpoints = endpointsOf(index).bySite.get(site.id) ?? []
 
   return (
     <div className="panel">
@@ -231,6 +237,21 @@ function RequestPanel({ site }: { site: RequestSite }) {
           {owner ? <a href={owner}>{siteOwner(site, index)}</a> : siteOwner(site, index)}{' '}
           <span className="muted">{ORIGIN_LABEL[site.origin]}</span>
         </dd>
+        {endpoints.length > 0 && (
+          <>
+            <dt>Endpoint</dt>
+            <dd>
+              {endpoints.map((e, i) => (
+                <span key={e.key}>
+                  {i > 0 && <span className="muted"> then forwarded to </span>}
+                  <a href={href({ name: 'endpoints', endpointId: e.key, q: '' })}>
+                    <code>{endpointLabel(e)}</code>
+                  </a>
+                </span>
+              ))}
+            </dd>
+          </>
+        )}
         {routeIds.length > 0 && (
           <>
             <dt>On pages</dt>
@@ -244,6 +265,7 @@ function RequestPanel({ site }: { site: RequestSite }) {
                     >
                       {index.routes.get(id)?.path ?? id}
                     </a>
+                    <PageAccess route={index.routes.get(id)} />
                   </li>
                 ))}
                 {routeIds.length > MAX_PAGES && (

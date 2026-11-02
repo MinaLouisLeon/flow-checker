@@ -1,0 +1,13 @@
+app/api/chat/route.ts  code  1p 1h 1f 1r 0c 0t
+app/api/clock/route.ts  code  1p 1h 0f 1r 0c 0t
+app/api/jobs/[id]/progress/route.ts  code  1p 1h 1f 1r 0c 0t
+app/chat/page.tsx  code  1p 0h 0f 0r 1c 0t
+app/jobs/[id]/page.tsx  code  1p 0h 0f 0r 1c 0t
+app/layout.tsx  code  3p 0h 0f 0r 1c 0t
+app/page.tsx  code  1p 0h 0f 0r 1c 0t
+components/Chat.tsx  code  1p 0h 1f 1r 1c 0t
+components/Clock.tsx  code  1p 0h 0f 1r 1c 0t
+components/JobProgress.tsx  code  1p 0h 1f 1r 1c 0t
+lib/chat.ts  code  1p 0h 1f 1r 0c 0t
+lib/sse.ts  imported via app/api/chat/route.ts, app/api/jobs/[id]/progress/route.ts  2p 2h 2f 2r 0c 0t
+lib/types.ts  code  3p 0h 2f 1r 2c 6t

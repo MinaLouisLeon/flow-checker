@@ -30,6 +30,7 @@ HomePage  server  src/app/page.tsx:5
 │  └─ TodoItem  client (use client)  src/components/TodoItem.tsx:15
 │     └─ Link  external next/link  [conditional]
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:17
+access: open
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -38,8 +39,10 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
    ├─ ClientOnly  client (use client)  src/components/ClientOnly.tsx:8
    ├─ Suspense  external react
    └─ TodoView  client (use client)  src/components/TodoDetail.tsx:32
+access: open
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:3
 └─ UserSearch  client (use client)  src/components/UserSearch.tsx:34
+access: open

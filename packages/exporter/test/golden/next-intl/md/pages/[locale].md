@@ -6,6 +6,11 @@
 | --- | --- |
 | File | `src/app/[locale]/page.tsx` |
 | Layouts | [`LocaleLayout`](../components/LocaleLayout.md) (`src/app/[locale]/layout.tsx`) |
+| Access | guarded |
+
+## Access
+
+- shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout), `src/app/[locale]/layout.tsx:19`
 
 ## Component tree
 

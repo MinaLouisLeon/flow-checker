@@ -1,0 +1,219 @@
+{
+  "nextVersion": "<next-version>",
+  "appDir": "src/app",
+  "sections": [
+    {
+      "id": "stack",
+      "title": "Stack",
+      "items": [
+        {
+          "label": "Next.js",
+          "value": "<next-version>",
+          "detail": "App Router in src/app/, 3 pages, 1 route handler",
+          "link": {
+            "to": "map"
+          }
+        },
+        {
+          "label": "Rendering",
+          "value": "4 server, 5 client, 0 shared",
+          "detail": "9 components",
+          "link": {
+            "to": "components"
+          }
+        },
+        {
+          "label": "Data",
+          "value": "GraphQL (urql)",
+          "detail": "5 requests",
+          "link": {
+            "to": "requests",
+            "transport": "graphql"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "areas",
+      "title": "Areas",
+      "note": "3 areas by URL",
+      "items": [
+        {
+          "label": "home",
+          "value": "/",
+          "code": true,
+          "detail": "1 page, 1 flow, 2 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1vn39fso9m3"
+          }
+        },
+        {
+          "label": "todos",
+          "value": "/todos",
+          "code": true,
+          "detail": "1 page, 1 flow, 2 endpoints",
+          "link": {
+            "to": "area",
+            "areaId": "ar_1zap1ick15k"
+          }
+        },
+        {
+          "label": "users",
+          "value": "/users",
+          "code": true,
+          "detail": "1 page, 1 flow, 1 endpoint",
+          "link": {
+            "to": "area",
+            "areaId": "ar_0tirr3qjab5"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "areas"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "entry",
+      "title": "Entry pages",
+      "note": "1 page nothing links to",
+      "items": [
+        {
+          "label": "Start page",
+          "value": "/",
+          "code": true,
+          "link": {
+            "to": "page",
+            "routeId": "rt_0h4e5x5madf"
+          }
+        },
+        {
+          "label": "Not linked",
+          "value": "/users",
+          "code": true,
+          "detail": "nothing in the app links here",
+          "link": {
+            "to": "page",
+            "routeId": "rt_1xs1qhs4r3f"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "map"
+      },
+      "empty": "No pages."
+    },
+    {
+      "id": "flows",
+      "title": "Main flows",
+      "note": "3 flows",
+      "items": [
+        {
+          "label": "AddTodoForm submit",
+          "value": "/ → /todos/[id]",
+          "code": true,
+          "detail": "4 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_1enqdlr0za3"
+          }
+        },
+        {
+          "label": "TodoDetail click",
+          "value": "/todos/[id]",
+          "code": true,
+          "detail": "2 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_1up04upjmns"
+          }
+        },
+        {
+          "label": "UserList click",
+          "value": "/users",
+          "code": true,
+          "detail": "2 steps",
+          "link": {
+            "to": "flow",
+            "flowId": "flw_1xb1viwmunk"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "flows"
+      },
+      "empty": "No flows found: no event handler leads to a request or another page."
+    },
+    {
+      "id": "backends",
+      "title": "Backends",
+      "note": "5 endpoints",
+      "items": [
+        {
+          "label": "This app",
+          "value": "This app's API",
+          "code": false,
+          "detail": "5 endpoints, 5 called from the browser",
+          "link": {
+            "to": "endpoints",
+            "host": "app"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "endpoints"
+      },
+      "empty": "The app sends no requests."
+    },
+    {
+      "id": "places",
+      "title": "Where things live",
+      "items": [
+        {
+          "label": "Root layout",
+          "value": "src/app/layout.tsx",
+          "code": true,
+          "link": {
+            "to": "component",
+            "componentId": "cmp_17dqv782ua7"
+          }
+        },
+        {
+          "label": "Route handlers",
+          "value": "src/app/api/",
+          "code": true,
+          "detail": "1 handler",
+          "link": {
+            "to": "map",
+            "view": "handlers"
+          }
+        }
+      ],
+      "more": 0,
+      "link": {
+        "to": "components"
+      },
+      "empty": "Nothing found."
+    },
+    {
+      "id": "check",
+      "title": "To check",
+      "items": [],
+      "more": 0,
+      "link": {
+        "to": "overview"
+      },
+      "empty": "The scan resolved every page, component, type and request."
+    }
+  ]
+}

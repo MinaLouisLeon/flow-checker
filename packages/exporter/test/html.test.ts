@@ -64,10 +64,30 @@ describe('renderHtmlSite', () => {
   })
 
   it('keeps a module script when the bundle imports', () => {
-    const files = renderHtmlSite(data, fakeDashboard('import{a}from"./chunk.js";a()'))
-    expect(String(files['index.html'])).toContain(
-      '<script type="module" crossorigin src="./assets/index-abc.js">',
-    )
+    for (const bundle of [
+      'import{a}from"./chunk.js";a()',
+      'import a from"./chunk.js";a()',
+      'import*as a from"./chunk.js";a()',
+      'import"./side.js";var b=1',
+      'var a=1\nexport{a}',
+    ]) {
+      const files = renderHtmlSite(data, fakeDashboard(bundle))
+      expect(String(files['index.html']), bundle).toContain(
+        '<script type="module" crossorigin src="./assets/index-abc.js">',
+      )
+    }
+  })
+
+  it('keeps a classic script when only text in the bundle looks like an import', () => {
+    // Words that start with `import` / `export` after `;` or `}` in strings (M36's impact panel).
+    for (const bundle of [
+      'var t=`nothing of its own; imported by `+x',
+      'var t="a; important note"',
+      'var t=`}exported`',
+    ]) {
+      const html = String(renderHtmlSite(data, fakeDashboard(bundle))['index.html'])
+      expect(html, bundle).toContain('<script defer src="./assets/index-abc.js">')
+    }
   })
 
   it('embeds the snapshot as window.__FLOW_CHECKER__', () => {

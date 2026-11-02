@@ -34,11 +34,24 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M24 | React Query keys      | Model version 10. Unreadable key segments are `param` + `unknown`; shared queries are `matched` with `sharedWith`.       |
 | M25 | Scanner fixes         | Model version 11. Handed-on functions are placed by `#valueTrigger`; `runtime-url` is an info flag (`isInfoFlag`).       |
 | M26 | Release v0.2.2        | Real-app before/after = scan + `export --html` with each `cli.js`, then open every page view in Playwright.              |
+| M27 | Early-return guards   | `SiteMeta.afterExit` beside `guarded`; side requests and twin choice use both, `isGuarded` itself is unchanged.          |
+| M28 | `explore`             | `startDev({ explore })`; no setup = capture off + `model.json` in `<tmp>/flow-checker/<name>-<hash>` (`dataDir`).        |
+| M29 | Endpoints             | Derived in `shared/src/endpoints.ts` (no model change); dashboard caches it per index in `endpointsOf()`.                |
+| M30 | Areas                 | Derived in `shared/src/areas.ts`; only the `areas` config is stored (`AppModel.areas`, optional, no version bump).       |
+| M31 | Guarded pages         | Model version 12, `Route.access`. Scanner records render exits; `scanner/src/access.ts` builds each page's label.        |
+| M32 | Start here            | `buildSummary()` in `shared/src/summary.ts`; items carry a `SummaryLink` each view renders. `#/` = Start here.           |
+| M33 | Global search         | `buildSearchIndex()` / `search()` in `shared/src/search.ts`; `searchOf()` caches, `searchScreen()` links.                |
+| M34 | Plain wording         | `shared/src/glossary.ts` is the only wording table; `Badge term={[group, key]}`; `useShowDetails()` hides extra badges.  |
+| M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
+| M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
+| M37 | Release v0.3.0        | Matrix also runs `explore` (project files hashed before/after), `summary` and `impact`. Publish = tag.                   |
 
 ## Gotchas
 
-- Slow CLI tests (`watch.test.ts`, `export.test.ts`, `config-options.test.ts` doctor case) and the bff HTML golden can
-  time out when the whole suite runs in parallel; re-run them alone before assuming a regression.
+- Tests that scan fixture apps take 4-6 s when the whole suite runs in parallel, so `vitest.config.ts` sets
+  `testTimeout: 30_000` (the 5 s default failed the bff / next-intl HTML goldens and the Postman GraphQL test at
+  random). Tests that copy a fixture must skip `.test-copy-*`: `incremental.test.ts` and `watch.test.ts` make and
+  remove those inside `fixtures/basic` while other files copy it (`EBUSY` / `ENOENT`).
 - `next dev` writes `AGENTS.md` into each fixture; it is gitignored there (`fixtures/*/AGENTS.md`).
 - Next middleware matchers use path-to-regexp v6 semantics (anchored both ends, optional trailing slash,
   case-insensitive, `:param*` modifiers). Next adds optional `_next/data` / `.rsc` forms
@@ -289,3 +302,170 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Run the Next matrix and the real-app scans before the perf bench, not alongside it: scan times taken
   while the matrix runs are not comparable.
 - A site count that goes up on a real app isn't a regression by itself: check repeated keys' call paths for twins.
+
+## M27 — Early-return guards (branch `feat/m27-early-return-guards`)
+
+- Don't fold "after an early exit" into `isGuarded()`: a wrapper's main `fetch` after `if (multipart) return ...`
+  would then count as guarded, and `#mergeTwins` / `#markSideRequests` lose the request they keep as the main one.
+  It is a separate `afterExit` list, and twins prefer the call before the exit only when the `if` guarding ties.
+- Quick A/B for a scanner change: make the new function return early, `pnpm --filter ./packages/flow-checker build`,
+  bench, restore, build, bench. Compare runs from the same session only; absolute bench times drift between days.
+
+## M28 — `flow-checker explore` (branch `feat/m28-explore`)
+
+- Explore is `startDev()` with `explore: true`, not a separate server path, so watch, re-scan and export stay shared
+  with `dev`. Anything new that `dev` writes into the project must be skipped when `explore` has no setup
+  (`dataDir` set): `explore.test.ts` hashes every file of each fixture copy and fails on any write.
+- Tests that copy a fixture link its `node_modules` with a `junction` symlink (no admin rights needed on Windows)
+  instead of copying it. Remove the copy only after the CLI process has exited: on Windows its working directory or
+  open handles make `rmSync` fail with `EBUSY`, so spawn with `--root` rather than `cwd`.
+
+## M29 — Endpoints (branch `feat/m29-endpoints`)
+
+- Never name a `Screen` field `key`: `App.tsx` spreads the screen into the screen component's props
+  (`<X {...screen} />`), and React keeps `key` for itself, so the component never gets it. The endpoints screen
+  uses `endpointId`. Only the e2e test caught it; the router round-trip unit test passed.
+- Endpoint keys normalize param names (`/users/:id` = `/users/:userId`) and drop the query string; the
+  fixture test recomputes the "distinct (base, method, URL pattern)" count on its own, so a change to the key
+  rules has to change both on purpose.
+- Uncalled route handler methods are listed under this app, except on tRPC, GraphQL and catch-all handlers,
+  whose callers send whatever path or method they like.
+- The perf app's 1,000 sites give 1,000 endpoints (each generated URL is distinct), so it is the worst case for
+  the list size, not a folding test; the react-query fixture is the one where sites fold (13 → 7).
+
+## M30 — Areas (branch `feat/m30-areas`)
+
+- The `areas` config reaches every view through the model: the scanner copies it to `AppModel.areas` (like
+  `apiClients` reaches the scan), so the dashboard, the static export and the Markdown never need the config file.
+  An optional field doesn't need a `MODEL_VERSION` bump (older files load, older readers drop it).
+- No fixture has feature folders or a single URL area with folders, so the folder fallback is only covered by
+  hand-written models in `shared/test/areas.test.ts` (three base folder names, `.tsx` / `.jsx`). Components most pages
+  use (a `Button`) are left out when picking a page's folder, or a shared `src/components` would win.
+- Area frames on the Map are extra React Flow nodes behind the pages (`zIndex: -1`); the page nodes cover the middle of
+  a frame, so tests click its name label.
+- Nested `doc()` sections in the Markdown exporter end with a newline; `.trimEnd()` them (like `endpointSection`) or
+  the file gets double blank lines.
+
+## M31 — Guarded pages (branch `feat/m31-guarded-pages`)
+
+- Guards are found on the request walk: `#emitExit` records `redirect()` / `notFound()`-like calls (and `router.push` /
+  `.replace` from an effect) when their trigger is render-time; event handlers and server actions don't count.
+  `renderExitCall` is also in `#reachesNetwork`, or helpers that only call `notFound()` are never entered.
+- The label is `open` only when nothing was found and nothing was skipped: calls into excluded files or imports that
+  don't resolve (`#unfollow`), a guard in a loop or a callback (`unclear`), an unread matcher and package middleware
+  (other than next-intl) all make it `unknown`.
+- `#pathChecks` now splits `a && b` into terms, so a middleware condition no longer repeats the path check it is
+  narrowed by, and drops an earlier `if (onApp && !sid) return` that can't apply on the redirect's own path. M14
+  navigations' `condition` text changed with it (the fixtures didn't have the pattern).
+- Seen guards ride on the flows summary (`FlowsSummary.guards`), so the live dashboard and the static export get
+  them with no new endpoint. The runtime reports `redirect` session events from Next's RSC navigation fetch
+  (`response.redirected`, or a 401 / 403 / 404 status) and from the first page's navigation timing status. A full
+  page load that was redirected can't be seen: the browser doesn't expose the URL it asked for.
+- `App.tsx` passes the Map's props one by one (not spread): a new Map option must be added there too. Only the e2e
+  test caught it.
+- A Python patch script in a bash heredoc turns an escaped newline inside a TS string into a real line break; check
+  with `grep` after patching, or use the Edit tool for those lines.
+
+## M32 — Start here (branch `feat/m32-start-here`)
+
+- One derivation, three renderers: `buildSummary()` returns sections of items with a `SummaryLink`; the dashboard
+  maps links with `summaryScreen()`, the exporter with `summaryTarget()`, the CLI prints `formatSummary()`. Add new
+  facts to the summary there, not in one view. The CLI golden (`flow-checker/test/__snapshots__/summary/`) equals
+  the shared text snapshot for the same fixture, which is how the three are kept in line.
+- `#/` is Start here and the overview is `#/overview`. Tests and e2e specs that want the overview's stat cards or
+  its GraphQL / tRPC sections must open `#/overview` (a bare `index.html` now opens Start here).
+- A Start here link to a filtered request list (`q` = a file, hook module or API client) only works because
+  `filterRequests` searches those fields; `dashboard/test/start.test.ts` fails when such a list comes up empty.
+- `flow-checker summary` must not write into the project (`writeModel: false`, `save: false` for the Postman and
+  GraphQL caches); it calls `collectSnapshot` only when `.flow-checker/` exists.
+
+## M33 — Global search (branch `feat/m33-global-search`)
+
+- The ranking is pure (`shared/src/search.ts`) so a v0.4.0 agent tool can reuse it; the dashboard only adds the box
+  and `searchScreen()`. Add a new kind there, in `SEARCH_KINDS`, `searchScreen()` and the link test.
+- Word matching keeps each field on its own line in `allWords`: without that, `src/user` matched a component named
+  `User` in `src/b.tsx` (pieces from two fields).
+- `localeCompare` in the sort was most of the cost of a one-letter query on the perf app (28 ms → 15 ms with plain
+  `<` / `>`).
+- e2e: `getByRole('combobox')` also finds `<select>`s (the Components screen has two); scope it to the dialog.
+  Playwright's `fill()` sends no key events, so it can't test that `/` in a field doesn't open the box: use
+  `keyboard.type()`.
+- Ids are `rt_`, `cmp_`, `req_`, `typ_`, `flw_`, `ep_`, `ar_` (not `ty_` / `fl_`).
+
+## M34 — Plain wording (branch `feat/m34-plain-wording`)
+
+- New badge or status: add its words to `glossary.ts` (typed `Record<enum, …>`, so a missing model value fails the
+  typecheck) and pass `term` to `Badge`; don't write a `title` that repeats the glossary. `glossary.test.ts` reads the
+  zod enums, so a new flag kind, trigger, transport or status fails until it is explained.
+- Dashboard components can be rendered in node with `react-dom/server` (`dashboard/test/badges.test.ts`): wrap them in
+  a `QueryClientProvider` (queries `enabled: false`) and `DataContext.Provider`; effects don't run. Use
+  `createElement` in a `.ts` test rather than JSX.
+- Hooks like `useShowDetails()` must come before a component's early `return null` (the tree row had one).
+- The details switch lives outside React (`details.ts`, `useSyncExternalStore`), so tests set it with
+  `setShowDetails()` and reset it in `afterEach`.
+- Python patch scripts in bash heredocs still turned `'\n'` into a line break twice this milestone; write them to the
+  scratchpad with the Write tool and run them from there.
+
+## M35 — Guided walk-through (branch `feat/m35-guided-walk-through`)
+
+- Ticks need no new server code: a step is done when it is inside `FlowStatus.best.steps`, and the live feed already
+  pushes the flows summary (`flows` event), so the walk screen updates while the app is used in another tab.
+- The tracker only counts a run from 2 steps on, so nothing ticks for a bare interaction; after login on next-intl
+  3 steps tick (interaction, request, navigation) before the OTP is typed.
+- e2e specs share one dev server and its captures: `e2e/walkthrough.spec.ts` starts with `DELETE /api/captures`
+  (like the SSE and WebSocket specs). Specs that run after it (alphabetical) must not need earlier captures.
+- In dashboard unit tests, seed the flows summary with `client.setQueryData(['flows'], summary)`: queries are
+  `enabled: false` there, but cached data is still returned.
+- The help line under the segment inputs also says "Open in app", so tests match the link (`Open in app ↗</a>` or
+  `getByRole('link')`), not the text.
+- A fixture copy whose whole `node_modules` is one junction resolves no package on GitHub's Windows runners (pnpm
+  uses relative symlinks there; locally it makes absolute junctions, so it passes here). The scan then misses axios
+  calls and the flows built on them. Tests that check scan results on a copy must link each package by its real path
+  (`linkPackages()` in `e2e/explore.spec.ts` and `flow-checker/test/summary.test.ts`). Failed PR #45 on Windows only.
+
+## M36 — Impact check (branch `feat/m36-impact-check`)
+
+- There was no dependency map to reuse (M9's warm session replaced it), so the scan writes `AppModel.imports`. Build
+  it by walking from the app files and the middleware, not from `project.getSourceFiles()`: a warm session keeps
+  files nothing imports any more, and `incremental.test.ts` (re-scan = fresh scan) fails otherwise.
+- A file with scan facts is followed through those facts only, not also through its importers: a hook file's
+  importers would pull in every other request of the components that import it. The import graph is only for files
+  with no facts (constants, utils), and stops at the nearest importers that have some.
+- Route-handler callers must be matched by method: `handlerCallers` is per route, so without the filter a `POST`
+  caller "led to" the handler's `GET` upstream fetch (the bff fixture showed it).
+- `renderToStaticMarkup` escapes apostrophes (`&#x27;`): dashboard tests must not match text that has one.
+- `pnpm check > log; echo EXIT $?` in a background task reports success either way; read the log for `ERR_PNPM` /
+  `Failed`. Run `pnpm typecheck` first: test files are only typechecked there, not by vitest.
+- The static export loads the dashboard as a classic script only when `isClassicScript()` (exporter `html.ts`) finds no
+  `import` / `export` statement in the bundle. UI text like `; imported by` matched the old regex, the export fell back
+  to `type="module"`, which Chrome blocks on `file://`, and every export e2e spec failed on CI (PR #46). Unit tests
+  use a stand-in bundle, so run `pnpm test:e2e` (or check the real bundle) after adding dashboard text.
+- `getReferencedSourceFiles()` (ts-morph) reads a reference cache that keeps imports that didn't resolve and retries
+  them on the next re-scan from replaced nodes, which throws ("node that was removed or forgotten"). The import
+  graph resolves each `getImportStringLiterals()` with `ts.resolveModuleName` instead. It failed only where packages
+  don't resolve (Windows CI, a whole `node_modules` junction in `explore.test.ts`), so `incremental.test.ts` now
+  re-scans a copy with no `node_modules`. A failed re-scan in `dev` is only printed: tests that wait for one should
+  show the captured stderr when they fail.
+- The Next 13.4 matrix job sometimes failed with `Missing: react-query` / `query=null` (also on other branches before
+  M36). A failed QueryClient lookup is reused for the rest of the browser task (`lookedUpThisTask`), and hydration can
+  commit the provider and run the query in that same task. Requests whose stack goes through `@tanstack/query-core`
+  (`sentByQueryLibrary()`) now get `fillQueryLater()`: one task later, look again and `guess()`. It only works in dev
+  builds (stacks with package paths), which is where capture runs.
+- Perf tests in `shared` must time only the function under test: `buildImpact()` without passed-in areas rebuilt
+  them on each call, and 26 ms locally became 104 ms on a loaded Windows runner.
+
+## M37 — Release v0.3.0 (branch `feat/m37-release-v0.3.0`)
+
+- Real-app check without touching the user's repos: `git -c core.longpaths=true clone` each app into the scratchpad
+  (its routes are too deep for Windows' path limit otherwise) and link `node_modules` from the working copy with a
+  junction. `explore` keeps its data in `<tmp>/flow-checker/<name>-<hash>`; remove it first for a cold timing. The
+  0.2.2 numbers come from `npm install @integr8-media/flow-checker@0.2.2` in a scratch folder (its `cli.js` needs its
+  dependencies), counted with today's `buildIndex()` (loaded through the repo's jiti) so both use one yardstick.
+- The test app is `work/jobseekk_frontend` (54 pages), the second app `work/ur-dr-temp/ur-dr-frontend` (29 pages).
+- `summary` text columns are padded to the longest label, so scripts must match with `/Label +value/`, not fixed
+  spaces. The matrix's summary check failed twice on its own regex before it passed.
+- Query-library sites also carry their transport (`fetch`), so per-transport counts include them. Say so instead of
+  splitting the count: a count must match the filtered list its link opens.
+- Found, not fixed (next patch): links from config data or through the project's own link components aren't
+  navigations ("nothing links here" on most pages of a data-driven menu), and `router.push()` in listeners an effect
+  registers, or in handlers chosen with a ternary, is read as a guard / `page-load`.

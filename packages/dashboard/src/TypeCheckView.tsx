@@ -23,21 +23,21 @@ const PART_LABEL = { request: 'Request body', response: 'Response', message: 'Ev
 export function SiteStatusBadge({ site }: { site: RequestSite }) {
   if (site.status === 'needs-recheck') {
     return (
-      <Badge tone="warn" title="The code changed after the last capture. Use the app again to re-check it.">
+      <Badge tone="warn" term={['request-status', 'needs-recheck']}>
         ↻ needs re-check
       </Badge>
     )
   }
   if (site.status === 'verified') {
     return (
-      <Badge tone="ok" title="Live capture recorded this request">
+      <Badge tone="ok" term={['request-status', 'verified']}>
         ✓ verified
       </Badge>
     )
   }
   if (site.status === 'mismatch') {
     return (
-      <Badge tone="warn" title="Live capture recorded this request, but its data doesn't match the types">
+      <Badge tone="warn" term={['request-status', 'mismatch']}>
         ✗ type mismatch
       </Badge>
     )
@@ -49,7 +49,7 @@ export function SiteStatusBadge({ site }: { site: RequestSite }) {
 export function StaleBadge({ stale }: { stale?: boolean }) {
   if (!stale) return null
   return (
-    <Badge tone="muted" title="Taken before the code that sends this request changed">
+    <Badge tone="muted" term={['capture', 'stale']}>
       stale
     </Badge>
   )
@@ -59,18 +59,18 @@ export function StaleBadge({ stale }: { stale?: boolean }) {
 export function TypeCheckBadge({ status, quiet }: { status?: TypeCheckStatus; quiet?: boolean }) {
   if (status === 'mismatch') {
     return (
-      <Badge tone="warn" title="The data doesn't match the request site's types">
+      <Badge tone="warn" term={['type-check', 'mismatch']}>
         ✗ types
       </Badge>
     )
   }
   if (quiet || !status) return null
   return status === 'ok' ? (
-    <Badge tone="ok" title="The data matches the request site's types">
+    <Badge tone="ok" term={['type-check', 'ok']}>
       ✓ types
     </Badge>
   ) : (
-    <Badge tone="muted" title="The data could not be compared with the types">
+    <Badge tone="muted" term={['type-check', 'skipped']}>
       types not checked
     </Badge>
   )

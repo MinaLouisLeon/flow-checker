@@ -35,20 +35,28 @@ LocaleLayout  server  src/app/[locale]/layout.tsx:11
 layouts: src/app/[locale]/layout.tsx
 HomePage  server  src/app/[locale]/page.tsx:4
 └─ Link  external @/i18n/navigation (from next-intl/navigation)
+access: guarded
+  shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
 
 ## /[locale]/dashboard  src/app/[locale]/dashboard/page.tsx
 layouts: src/app/[locale]/layout.tsx
 DashboardPage  server  src/app/[locale]/dashboard/page.tsx:3
 └─ DashboardProfile  client (use client)  src/components/DashboardProfile.tsx:10
    └─ Link  external @/i18n/navigation (from next-intl/navigation)  [conditional]
+access: guarded
+  shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
 
 ## /[locale]/login  src/app/[locale]/login/page.tsx
 layouts: src/app/[locale]/layout.tsx
 LoginPage  server  src/app/[locale]/login/page.tsx:3
 └─ LoginForm  client (use client)  src/components/LoginForm.tsx:9
+access: guarded
+  shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
 
 ## /[locale]/verify  src/app/[locale]/verify/page.tsx
 layouts: src/app/[locale]/layout.tsx
 VerifyPage  server  src/app/[locale]/verify/page.tsx:3
 └─ VerifyOtpForm  client (use client)  src/components/VerifyOtpForm.tsx:13
    └─ Link  external @/i18n/navigation (from next-intl/navigation)  [conditional]
+access: guarded
+  shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19

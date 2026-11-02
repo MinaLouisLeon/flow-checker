@@ -4,15 +4,23 @@ import { CLI_NAME, PACKAGE_NAME } from '@flow-checker/shared'
 import { version } from '../../package.json'
 import { devCommand } from './dev'
 import { doctorCommand } from './doctor'
+import { explainCommand } from './explain'
+import { exploreCommand } from './explore'
 import { exportCommand } from './export'
+import { impactCommand } from './impact'
 import { initCommand } from './init'
 import { postmanCommand } from './postman'
 import { isLiveTerminal, type ProgressDisplay, terminalDisplay } from './progress'
 import { scanCommand } from './scan'
+import { summaryCommand } from './summary'
 
 const COMMANDS = {
   dev: 'Scan, watch, open the dashboard and run your app with capture (default)',
+  explore: 'Scan, watch and open the dashboard only: no app, no setup, project files untouched',
   scan: 'Scan only and write .flow-checker/model.json',
+  impact: 'impact <file>[:line]: the pages, flows and requests a change to these files affects (--json)',
+  summary: 'Print a short tour of the app: stack, areas, entry pages, flows, backends (--json)',
+  explain: 'Say what a status, note or badge means, e.g. explain dynamic-url (no word: all of them)',
   init: 'Add instrumentation hooks, config file and .gitignore entries',
   export: 'Export Markdown docs and a static HTML site (--md <dir>, --html <dir>)',
   doctor: 'Check Next.js version, hooks, ports and tsconfig',
@@ -34,17 +42,21 @@ Options:
   --root <dir>            Project root (default: current directory)
   --app-dir <dir>         App Router directory, relative to the root (default: src/app or app)
   --config <file>         Config file (default: flow-checker.config.* in the root)
-  --port <n>              dev: dashboard port (default: 4400)
-  --app-port <n>          dev: port your Next.js app runs on (default: 3000)
+  --port <n>              dev, explore: dashboard port (default: 4400)
+  --app-port <n>          dev, explore: port your Next.js app runs on (default: 3000)
   --dev-command <cmd>     dev: command that starts your app (default: the "dev" script)
   --no-app                dev: don't start your app (start it yourself with the printed env)
-  --no-open               dev: don't open the browser
-  --no-watch              dev: don't re-scan when files change
+  --no-open               dev, explore: don't open the browser
+  --no-watch              dev, explore: don't re-scan when files change
   -y, --yes               init: apply the changes without asking
   --tree                  scan: also print the route and component trees
   --types                 scan: also print the resolved types
   --requests              scan: also print the request sites
   --flows                 scan: also print navigation and inferred flows
+  --diff <ref>            scan: also print what the files changed since this git ref affect
+  --fail-on <kinds>       scan: exit 1 when a note of these kinds is open, e.g. dynamic-url,stale
+                          (with --diff: only on the changed requests; exit 2 when the check can't run)
+  --json                  scan, impact, summary, explain: print JSON instead of text
   --md <dir>              export: write Markdown docs to this folder
   --html <dir>            export: write the static HTML site to this folder
                           (neither: both, to the config's export folders or docs/flow and .flow-checker/site)
@@ -132,10 +144,30 @@ export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
         types: values.types,
         requests: values.requests,
         flows: values.flows,
+        diff: values.diff,
+        failOn: values['fail-on'],
+        json: values.json,
       },
       io,
     )
   }
+
+  if (command === 'impact') {
+    return impactCommand(
+      positionals.slice(1),
+      { root: values.root, appDir: values['app-dir'], config: values.config, json: values.json },
+      io,
+    )
+  }
+
+  if (command === 'summary') {
+    return summaryCommand(
+      { root: values.root, appDir: values['app-dir'], config: values.config, json: values.json },
+      io,
+    )
+  }
+
+  if (command === 'explain') return explainCommand(positionals.slice(1), { json: values.json }, io)
 
   if (command === 'dev') {
     const port = toPort(values.port, '--port', io)
@@ -151,6 +183,24 @@ export async function runCli(argv: string[], baseIO?: CliIO): Promise<number> {
         open: values.open,
         app: values.app,
         devCommand: values['dev-command'],
+        watch: values.watch,
+      },
+      io,
+    )
+  }
+
+  if (command === 'explore') {
+    const port = toPort(values.port, '--port', io)
+    const appPort = toPort(values['app-port'], '--app-port', io)
+    if (port === null || appPort === null) return 1
+    return exploreCommand(
+      {
+        root: values.root,
+        appDir: values['app-dir'],
+        config: values.config,
+        port,
+        appPort,
+        open: values.open,
         watch: values.watch,
       },
       io,
@@ -215,6 +265,9 @@ function parse(argv: string[]) {
       types: { type: 'boolean' },
       requests: { type: 'boolean' },
       flows: { type: 'boolean' },
+      diff: { type: 'string' },
+      'fail-on': { type: 'string' },
+      json: { type: 'boolean' },
       port: { type: 'string' },
       'app-port': { type: 'string' },
       config: { type: 'string' },

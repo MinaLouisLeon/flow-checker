@@ -9,6 +9,7 @@ import {
 import { useState } from 'react'
 import {
   type LiveStatus,
+  type Meta,
   useAssignMatch,
   useCapture,
   useCaptures,
@@ -85,7 +86,11 @@ export function LiveScreen({
   if (!enabled) {
     return (
       <div className="screen">
-        <Empty>Live capture is off. Start the dashboard with "flow-checker" to capture requests.</Empty>
+        {meta.explore ? (
+          <CaptureHint explore={meta.explore} />
+        ) : (
+          <Empty>Live capture is off. Start the dashboard with "flow-checker" to capture requests.</Empty>
+        )}
       </div>
     )
   }
@@ -164,6 +169,7 @@ export function LiveScreen({
             </>
           )}
         </div>
+        {meta.explore && <CaptureHint explore={meta.explore} />}
         {captures.error && <div className="banner banner-error">{captures.error.message}</div>}
         {serverCapture.data?.state === 'missing' && (
           <div className="banner banner-warn" role="alert" data-testid="server-capture-banner">
@@ -493,14 +499,14 @@ function MatchBadge({ match, parent }: { match: CaptureSummary['match']; parent?
   }
   if (match?.thirdParty) {
     return (
-      <Badge tone="muted" title="Sent by another site's script (an SDK), not by your code">
+      <Badge tone="muted" term={['capture', 'third-party']}>
         third-party
       </Badge>
     )
   }
   if (match?.status === 'ambiguous') {
     return (
-      <Badge tone="warn" title="Several request sites fit. Pick one.">
+      <Badge tone="warn" term={['capture', 'ambiguous']}>
         ? ambiguous
       </Badge>
     )
@@ -543,22 +549,32 @@ function MatchPanel({ capture }: { capture: Capture }) {
         <p className="muted">Not matched yet.</p>
       ) : match.status === 'matched' && current ? (
         <p>
-          <Badge tone="ok">✓ matched</Badge> <SiteLink site={current} />{' '}
+          <Badge tone="ok" term={['capture', 'matched']}>
+            ✓ matched
+          </Badge>{' '}
+          <SiteLink site={current} />{' '}
           <span className="muted">{match.by === 'manual' ? 'assigned by you' : `score ${match.score}`}</span>
         </p>
       ) : match.status === 'ambiguous' ? (
         <p>
-          <Badge tone="warn">? ambiguous</Badge> Several request sites fit about equally well. Pick the right
-          one below.
+          <Badge tone="warn" term={['capture', 'ambiguous']}>
+            ? ambiguous
+          </Badge>{' '}
+          Several request sites fit about equally well. Pick the right one below.
         </p>
       ) : match.thirdParty ? (
         <p>
-          <Badge tone="muted">third-party</Badge> Sent by another site's script (an SDK) to its own servers.
-          No project code is on its stack, so the scanner didn't miss anything.
+          <Badge tone="muted" term={['capture', 'third-party']}>
+            third-party
+          </Badge>{' '}
+          Sent by another site's script (an SDK) to its own servers. No project code is on its stack, so the
+          scanner didn't miss anything.
         </p>
       ) : (
         <p>
-          <Badge tone="warn">✗ unmatched</Badge>{' '}
+          <Badge tone="warn" term={['capture', 'unmatched']}>
+            ✗ unmatched
+          </Badge>{' '}
           {match.by === 'manual'
             ? 'You marked requests like this as not belonging to any request site.'
             : 'No scanned request site fits. The scanner probably missed the code that sends it.'}
@@ -764,4 +780,33 @@ function formatBytes(n: number | undefined): string {
   if (n < 1024) return `${n} B`
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
   return `${(n / 1024 / 1024).toFixed(1)} MB`
+}
+
+/**
+ * `flow-checker explore` (M28) doesn't run the app: says whether capture is off or just has no app
+ * sending to it, and lists the commands that turn it on.
+ */
+export function CaptureHint({ explore }: { explore: NonNullable<Meta['explore']> }) {
+  const commands = explore.enableCapture
+  return (
+    <div className="banner banner-info capture-hint" data-testid="capture-hint">
+      <p>
+        {explore.setup
+          ? 'This dashboard was started with explore, so your app is not running from here: the captures below are from earlier runs.'
+          : 'Capture is off. This dashboard was started with explore, which reads the code only and leaves the project untouched.'}{' '}
+        To check the map against real requests while you use the app, run{' '}
+        {commands.length === 1 ? 'this command' : 'these commands'} in the project:
+      </p>
+      <ol className="capture-commands">
+        {commands.map((command) => (
+          <li key={command}>
+            <code>{command}</code>
+          </li>
+        ))}
+      </ol>
+      {explore.dataDir && (
+        <p className="muted">The scan is kept outside the project, in {explore.dataDir}.</p>
+      )}
+    </div>
+  )
 }

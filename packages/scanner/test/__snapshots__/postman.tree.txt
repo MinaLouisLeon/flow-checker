@@ -21,8 +21,10 @@ HomePage  server  app/page.tsx:9
 ├─ Link  external next/link
 ├─ ProductPanel  client (use client)  components/ProductPanel.tsx:7
 └─ TodoPanel  client (use client)  components/TodoPanel.tsx:8
+access: open
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
 UserPage  server  app/users/[id]/page.tsx:7
 └─ DeleteUserButton  client (use client)  components/DeleteUserButton.tsx:7
+access: open

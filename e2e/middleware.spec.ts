@@ -70,3 +70,37 @@ test('pages show the middleware that runs on them', async ({ page }) => {
   await open('/')
   await expect(page.getByRole('heading', { name: 'Middleware', exact: true })).toHaveCount(0)
 })
+
+// M31: each page says whether something can stop it, and the Map filters by it.
+test('pages show their access, and the Map filters guarded and open pages', async ({ page }) => {
+  const { site, routes } = exportSite()
+  const base = pathToFileURL(join(site, 'index.html')).href
+  const id = (path: string) => routes.find((r) => r.path === path)?.id ?? ''
+  const access = () =>
+    page.locator('section', { has: page.getByRole('heading', { name: 'Access', exact: true }) })
+
+  await page.goto(`${base}#/page/${encodeURIComponent(id('/dashboard'))}`)
+  await expect(page.locator('.page-head .badge', { hasText: 'guarded' })).toBeVisible()
+  await expect(access()).toContainText('redirects to /login when !token')
+  await expect(access()).toContainText('when token && !user')
+  await expect(access()).toContainText('proxy.ts:23')
+  // The target is a link to the login page.
+  await access().getByRole('link', { name: '/login', exact: true }).click()
+  await expect(page).toHaveURL(new RegExp(`#/page/${id('/login')}$`))
+  await expect(access()).toContainText('cookie session is set')
+
+  await page.goto(`${base}#/page/${encodeURIComponent(id('/products'))}`)
+  await expect(page.locator('.page-head .badge', { hasText: 'open' })).toBeVisible()
+  await expect(access()).toContainText('Nothing in the middleware')
+
+  // Map: three guarded pages stand out, the others are dimmed.
+  await page.goto(`${base}#/map`)
+  await page.getByRole('button', { name: 'guarded 3' }).click()
+  await expect(page).toHaveURL(/#\/map\?access=guarded$/)
+  await expect(page.locator('.route-node:not(.dimmed)')).toHaveCount(3)
+  await expect(page.locator('.route-node:not(.dimmed) .badge', { hasText: 'guarded' })).toHaveCount(3)
+  await page.getByRole('button', { name: 'open 2' }).click()
+  await expect(page.locator('.route-node:not(.dimmed)')).toHaveCount(2)
+  await page.getByRole('button', { name: 'All pages' }).click()
+  await expect(page).toHaveURL(/#\/map$/)
+})

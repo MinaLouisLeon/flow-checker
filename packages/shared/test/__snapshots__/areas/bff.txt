@@ -1,0 +1,18 @@
+by route
+
+home from /
+  pages: /
+  components: HomePage, CreateProductForm, ProductsTable
+  shared components: RootLayout
+  requests: 4, endpoints: 4, notes: 0
+  flows: CreateProductForm submit
+
+products from /products
+  pages: /products/[id]
+  components: ProductPage
+  shared components: RootLayout
+  requests: 2, endpoints: 2, notes: 0
+  flows: -
+
+shared components: RootLayout
+shared requests: 0

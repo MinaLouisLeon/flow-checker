@@ -1,0 +1,32 @@
+Start here: graphql-relay (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 3 pages, 1 route handler)
+  Rendering  4 server, 8 client, 0 shared  (12 components)
+  Data       GraphQL (relay)  (5 requests)
+
+Areas (3 areas by URL)
+  home   /  (1 page, 1 flow, 2 endpoints)
+  todos  /todos  (1 page, 1 flow, 2 endpoints)
+  users  /users  (1 page, 1 flow, 1 endpoint)
+
+Entry pages (1 page nothing links to)
+  Start page  /
+  Not linked  /users  (nothing in the app links here)
+
+Main flows (3 flows)
+  AddTodoForm submit  / → /todos/[id]  (4 steps)
+  TodoDetail click    /todos/[id]  (2 steps)
+  UserList click      /users  (2 steps)
+
+Backends (5 endpoints)
+  This app  This app's API  (5 endpoints, 5 called from the browser)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Route handlers  src/app/api/  (1 handler)
+  Type            TodoDetailQuery$variables  (src/__generated__/TodoDetailQuery.graphql.ts, used 3 times)
+  Type            UserListQuery$data  (src/__generated__/UserListQuery.graphql.ts, used 3 times)
+
+To check
+  The scan resolved every page, component, type and request.

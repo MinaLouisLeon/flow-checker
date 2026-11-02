@@ -6,7 +6,13 @@
 | --- | --- |
 | File | `app/dashboard/settings/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
+| Access | guarded |
 | Status | ✓ 1 verified |
+
+## Access
+
+- redirects to `/login` when `!token` (middleware), `proxy.ts:23`
+- redirects to `/login?expired=1` when `token && !user` (middleware), `proxy.ts:27`
 
 ## Component tree
 

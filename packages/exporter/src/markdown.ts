@@ -7,20 +7,39 @@
 //   issues.md            open flags, type mismatches, unmatched captures
 //   middleware.md        middleware / proxy: matcher, routes it runs on, redirects, rewrites, requests
 //   postman.md           the imported Postman collection: its requests, callers, unused endpoints, gaps
+//   endpoints.md         backend endpoints by host: callers, pages, types, a captured example (M29)
+//   areas.md             pages grouped by feature: their components, flows, endpoints and open notes (M30)
+//   ONBOARDING.md        Start here: stack, areas, entry pages, main flows, backends, where things live (M32)
+//   GLOSSARY.md          what each status, note, trigger, transport and badge means, and what to do (M34)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
+  type Area,
+  type AreaList,
+  accessOf,
+  buildAreas,
+  buildEndpoints,
   buildIndex,
+  buildSummary,
   type CapturedBody,
   type Component,
+  type Endpoint,
+  type EndpointHost,
+  type EndpointList,
+  type EndpointStatus,
+  type EndpointTransport,
   type ExportCapture,
   type ExportData,
+  endpointLabel,
+  type Flag,
   type Flow,
   type FlowStatus,
   type FlowStep,
   formatQueryKey,
+  GLOSSARY,
   type GraphqlInfo,
   type GraphqlOperation,
+  guardText,
   isInfoFlag,
   isVerified,
   type MatcherCondition,
@@ -42,19 +61,26 @@ import {
   type ScanNote,
   type SiteTypeCheck,
   type SseEndpoint,
+  type SummaryLink,
+  type SummarySectionId,
   type Trpc,
   type TypeRef,
+  termId,
   triggerText,
   typeRefs,
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
 import {
+  AREAS,
   type DocNames,
   docNames,
+  ENDPOINTS,
+  GLOSSARY_DOC,
   GRAPHQL,
   ISSUES,
   MIDDLEWARE,
+  ONBOARDING,
   POSTMAN,
   README,
   RECORDED,
@@ -81,6 +107,8 @@ interface Ctx {
   captures: Map<string, ExportCapture[]>
   /** Site id → the site whose `chain` leads to it. */
   callers: Map<string, RequestSite>
+  endpoints: EndpointList
+  areas: AreaList
 }
 
 export function renderMarkdown(data: ExportData): ExportFiles {
@@ -101,7 +129,17 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   for (const site of model.requests) {
     for (const id of site.chain ?? []) if (!callers.has(id)) callers.set(id, site)
   }
-  const ctx: Ctx = { data, model, index, names: docNames(model), captures, callers }
+  const endpoints = buildEndpoints(index)
+  const ctx: Ctx = {
+    data,
+    model,
+    index,
+    names: docNames(model),
+    captures,
+    callers,
+    endpoints,
+    areas: buildAreas(index, endpoints),
+  }
 
   const files: ExportFiles = {}
   files[README] = readme(ctx)
@@ -123,9 +161,132 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
+  files[ENDPOINTS] = endpointsDoc(ctx)
+  files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
   files[ISSUES] = issuesDoc(ctx)
+  files[ONBOARDING] = onboardingDoc(ctx)
+  files[GLOSSARY_DOC] = glossaryDoc()
   return Object.fromEntries(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+}
+
+// --- Glossary (M34) --------------------------------------------------------------------------
+
+function glossaryDoc(): string {
+  const from = GLOSSARY_DOC
+  return doc([
+    '# Glossary',
+    link('← Overview', from, README),
+    'What each status, note, trigger, transport and badge in these docs and the dashboard means, and what to do about it.',
+    ...GLOSSARY.flatMap((group) => [
+      `## ${text(group.title)}`,
+      codeText(group.intro),
+      table(
+        ['Word', 'Means', 'What to do'],
+        Object.entries(group.entries).map(([key, entry]) => [
+          `${anchor(termId(group.id, key))}**${text(entry.label)}**${entry.label === key ? '' : ` (${code(key)})`}`,
+          codeText(entry.means),
+          entry.todo ? codeText(entry.todo) : '',
+        ]),
+      ),
+    ]),
+  ])
+}
+
+/** A flag's kind, bold, linked to its glossary entry. */
+function flagName(flag: Flag, from: string): string {
+  return `**${link(flag.kind, from, GLOSSARY_DOC, termId('flag', flag.kind))}**`
+}
+
+/** Glossary text: `code` spans as written, the rest escaped. */
+function codeText(value: string): string {
+  return value
+    .split('`')
+    .map((part, i) => (i % 2 === 1 ? code(part) : text(part)))
+    .join('')
+}
+
+// --- Start here (M32) ------------------------------------------------------------------------
+
+function onboardingDoc(ctx: Ctx): string {
+  const from = ONBOARDING
+  const summary = buildSummary(ctx.index, {
+    flows: ctx.data.flows,
+    endpoints: ctx.endpoints,
+    areas: ctx.areas,
+  })
+  const sections = summary.sections.map((section) => {
+    const items = section.items.map((item) => {
+      const value = item.code ? code(item.value) : text(item.value)
+      const target = summaryTarget(ctx, item.link)
+      const linked = target ? link(value, from, target.file, target.anchor) : value
+      return `- ${text(item.label)}: ${linked}${item.detail ? ` (${text(item.detail)})` : ''}`
+    })
+    const all = section.id === 'check' ? { file: ISSUES } : summaryTarget(ctx, section.link)
+    const more =
+      section.more > 0 && all
+        ? `${section.more} more: ${link(MORE_TEXT[section.id], from, all.file, all.anchor)}.`
+        : ''
+    return doc([
+      `## ${section.title}`,
+      section.note ? `${text(section.note)}.` : '',
+      items.length > 0 ? items.join('\n') : text(section.empty),
+      more,
+    ]).trimEnd()
+  })
+  const project = ctx.model.project
+  return doc([
+    `# ${text(ctx.data.projectName)}: start here`,
+    `A short tour of this ${project.nextVersion ? `Next.js ${text(project.nextVersion)}` : 'Next.js'} app, read from its code by flow-checker. ${link('The full docs', from, README)} have every page, component, request and flow.`,
+    ...sections,
+  ])
+}
+
+const MORE_TEXT: Record<SummarySectionId, string> = {
+  stack: 'the overview',
+  areas: 'all areas',
+  entry: 'the route map',
+  flows: 'all flows',
+  backends: 'all endpoints',
+  places: 'all components',
+  check: 'all open issues',
+}
+
+/** The file (and anchor) a Start here link points to. Undefined for lists that have no file. */
+function summaryTarget(ctx: Ctx, target: SummaryLink): { file: string; anchor?: string } | undefined {
+  const file = (name: string | undefined) => (name ? { file: name } : undefined)
+  switch (target.to) {
+    case 'overview':
+    case 'map':
+    case 'flows':
+    case 'components':
+      return { file: README }
+    case 'page':
+      return file(ctx.names.route(target.routeId))
+    case 'middleware':
+      return { file: MIDDLEWARE }
+    case 'areas':
+      return { file: AREAS }
+    case 'area':
+      return { file: AREAS, anchor: anchorId(target.areaId) }
+    case 'flow':
+      return file(ctx.names.flow(target.flowId))
+    case 'endpoints': {
+      const host = target.host ? ctx.endpoints.hosts.find((h) => h.key === target.host) : undefined
+      return { file: ENDPOINTS, anchor: host ? anchorId(hostAnchor(host)) : undefined }
+    }
+    case 'component':
+      return file(ctx.names.component(target.componentId))
+    case 'requests': {
+      const site = target.siteId ? ctx.index.requests.get(target.siteId) : undefined
+      const home = site ? siteHome(ctx, site) : undefined
+      return home && site ? { file: home, anchor: anchorId(site.id) } : undefined
+    }
+    case 'types':
+      return { file: TYPES }
+    case 'type':
+      return { file: TYPES, anchor: anchorId(target.typeId) }
+  }
 }
 
 // --- README -------------------------------------------------------------------------------
@@ -139,6 +300,7 @@ function readme(ctx: Ctx): string {
   const source = `${code(project.appDir)}${project.nextVersion ? ` (Next.js ${project.nextVersion})` : ''}`
 
   const intro = [
+    `New to this app? ${link('Start here', from, ONBOARDING)} for a short tour; the ${link('glossary', from, GLOSSARY_DOC)} says what each status and note means.`,
     `Generated by flow-checker${data.toolVersion ? ` v${data.toolVersion}` : ''} on ${time(data.generatedAt)} from a scan of ${source}.`,
     data.captureCounts.total > 0
       ? data.redacted
@@ -151,9 +313,11 @@ function readme(ctx: Ctx): string {
     ['', 'Count'],
     [
       ['Pages', String(pages.length)],
+      ['Areas', link(String(ctx.areas.areas.length), from, AREAS)],
       ['Route handlers', String(handlers.length)],
       ['Components', String(model.components.length)],
       ['Requests', String(model.requests.length)],
+      ['Endpoints', link(String(ctx.endpoints.endpoints.length), from, ENDPOINTS)],
       ['Flows', String(model.flows.length)],
       ['Types', String(model.types.length)],
     ],
@@ -179,11 +343,32 @@ function readme(ctx: Ctx): string {
     sections.push(
       '## Pages',
       table(
-        ['Page', 'File', 'Requests', 'Status'],
+        ['Page', 'File', 'Access', 'Requests', 'Status'],
         pages.map((route) => {
           const sites = routeSites(ctx, route)
-          return [routeLink(ctx, route, from), code(route.file), String(sites.length), statusCounts(sites)]
+          return [
+            routeLink(ctx, route, from),
+            code(route.file),
+            accessOf(route).status,
+            String(sites.length),
+            statusCounts(sites),
+          ]
         }),
+      ),
+    )
+  }
+  if (ctx.areas.areas.length > 1) {
+    sections.push(
+      '## Areas',
+      table(
+        ['Area', 'Pages', 'Flows', 'Endpoints'],
+        ctx.areas.areas.map((a) => [
+          link(text(a.name), from, AREAS, anchorId(a.id)),
+          String(a.routeIds.length),
+          String(a.flowIds.length),
+          String(a.endpointKeys.length),
+        ]),
+        ['left', 'right', 'right', 'right'],
       ),
     )
   }
@@ -198,6 +383,20 @@ function readme(ctx: Ctx): string {
           code(route.file),
           String(index.handlerRequests.get(route.id)?.length ?? 0),
         ]),
+      ),
+    )
+  }
+  if (ctx.endpoints.hosts.length > 0) {
+    sections.push(
+      '## Backends',
+      table(
+        ['Host', 'Endpoints', 'Called from the browser'],
+        ctx.endpoints.hosts.map((h) => [
+          link(hostTitle(h), from, ENDPOINTS, anchorId(hostAnchor(h))),
+          String(h.endpoints.length),
+          String(h.endpoints.filter((e) => e.browser).length),
+        ]),
+        ['left', 'right', 'right'],
       ),
     )
   }
@@ -420,8 +619,10 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
           : undefined,
       ],
       ['Layouts', layouts.join(' → ') || undefined],
+      ['Access', accessOf(route).status],
       ['Status', sites.length > 0 ? statusCounts(sites) : undefined],
     ]),
+    ...accessSection(ctx, route),
     '## Component tree',
     route.componentId
       ? componentTree(ctx, route.componentId, from)
@@ -443,6 +644,21 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     sites.length === 0 ? 'This page sends no requests the scan found.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
   ])
+}
+
+/** What can stop the page (M31), with the guards a captured session hit marked "seen". */
+function accessSection(ctx: Ctx, route: Route): string[] {
+  const access = accessOf(route)
+  if (access.guards.length === 0 && !access.reasons?.length) return []
+  const seen = new Set(ctx.data.flows?.guards?.[route.id] ?? [])
+  const lines = [
+    ...access.guards.map((g) => {
+      const where = code(`${g.loc.file}:${g.loc.line}`)
+      return `- ${guardText(g)}, ${where}${seen.has(g.id) ? ' (seen)' : ''}`
+    }),
+    ...(access.reasons ?? []).map((r) => `- Not sure: ${r.text}`),
+  ]
+  return ['## Access', lines.join('\n')]
 }
 
 function handlerDoc(ctx: Ctx, route: Route, from: string): string {
@@ -890,7 +1106,7 @@ function postmanRequestSection(ctx: Ctx, r: PostmanRequest, from: string): strin
       ['Called by', callers.length === 0 ? 'nothing in the code' : callers.map(caller).join('<br>')],
       ['Examples', examples.join(', ') || undefined],
     ]),
-    r.flags.map((f) => `> ⚠ **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
+    r.flags.map((f) => `> ⚠ ${flagName(f, from)}: ${text(f.message)}`).join('\n>\n'),
     r.bodyType && `**Request body** ${typeBlock(ctx, r.bodyType, from)}`,
     r.responseType && `**Response** (from the examples) ${typeBlock(ctx, r.responseType, from)}`,
   ]).trimEnd()
@@ -1080,7 +1296,9 @@ function requestSection(
         site.callStack.length > 1 ? site.callStack.map((f) => code(f.callee)).join(' → ') : undefined,
       ],
     ]),
-    site.flags.map((f) => `> ${isInfoFlag(f) ? 'ℹ' : '⚠'} **${f.kind}**: ${text(f.message)}`).join('\n>\n'),
+    site.flags
+      .map((f) => `> ${isInfoFlag(f) ? 'ℹ' : '⚠'} ${flagName(f, from)}: ${text(f.message)}`)
+      .join('\n>\n'),
     site.bodyType && `**Request body**${typeSource(site.bodyType)} ${typeBlock(ctx, site.bodyType, from)}`,
     site.responseType &&
       `**Response**${typeSource(site.responseType)} ${typeBlock(ctx, site.responseType, from)}`,
@@ -1724,6 +1942,136 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
   return `${target ? `${target}: ` : ''}${text(message)} (${where})`
 }
 
+// --- Endpoints (M29) ------------------------------------------------------------------------
+
+const ENDPOINT_TRANSPORT: Record<EndpointTransport, string> = {
+  http: 'HTTP',
+  trpc: 'tRPC',
+  graphql: 'GraphQL',
+  sse: 'event stream',
+  websocket: 'WebSocket',
+  'server-action': 'server action',
+}
+
+function hostTitle(h: EndpointHost): string {
+  return h.kind === 'app' ? text(h.label) : code(h.label)
+}
+
+function hostAnchor(h: EndpointHost): string {
+  return `host-${h.key}`
+}
+
+function endpointStatusText(e: Endpoint): string {
+  const of = e.siteIds.length > 1 ? ` (${e.verifiedSites} of ${e.siteIds.length} call sites)` : ''
+  const labels: Record<EndpointStatus, string> = {
+    verified: `✓ verified${of}`,
+    mismatch: '✗ type mismatch',
+    'needs-recheck': '↻ needs re-check',
+    'not-captured': 'not captured',
+  }
+  return labels[e.status]
+}
+
+function endpointSide(e: Endpoint): string {
+  if (e.browser) return e.server ? 'browser + server' : 'browser'
+  return e.siteIds.length + e.forwardedSiteIds.length > 0 ? 'server' : '—'
+}
+
+function endpointsDoc(ctx: Ctx): string {
+  const from = ENDPOINTS
+  const { hosts, endpoints } = ctx.endpoints
+  const browser = endpoints.filter((e) => e.browser).length
+  return doc([
+    '# Endpoints',
+    link('← Overview', from, README),
+    endpoints.length === 0
+      ? 'No requests found, so no endpoints.'
+      : `${plural(endpoints.length, 'endpoint')} on ${plural(hosts.length, 'host')}, ${browser} called from the browser. One endpoint is a method and URL pattern; tRPC procedures, GraphQL operations and server actions count one each. Requests to this app's own route handlers are listed under "This app's API", and what those handlers send on under the host it goes to.`,
+    ...hosts.flatMap((h) => [
+      `## ${anchor(hostAnchor(h))}${hostTitle(h)}`,
+      h.baseEnv
+        ? `Base URL from ${code(`process.env.${h.baseEnv}`)}${h.base ? `, falls back to ${code(h.base)}` : ''}.`
+        : h.kind === 'unknown'
+          ? 'The scan could not read where these go: the URL is built at runtime. Use the app with capture on to see it.'
+          : undefined,
+      table(
+        ['Endpoint', 'Transport', 'Called from', 'Call sites', 'Pages', 'Status'],
+        h.endpoints.map((e) => [
+          `[${code(endpointLabel(e))}](#${anchorId(e.key)})`,
+          ENDPOINT_TRANSPORT[e.transport],
+          endpointSide(e),
+          String(e.siteIds.length + e.forwardedSiteIds.length),
+          String(e.routeIds.length),
+          endpointStatusText(e),
+        ]),
+        ['left', 'left', 'left', 'right', 'right', 'left'],
+      ),
+      ...h.endpoints.map((e) => endpointSection(ctx, e, from)),
+    ]),
+  ])
+}
+
+function endpointSection(ctx: Ctx, e: Endpoint, from: string): string {
+  const sites = e.siteIds.map((id) => ctx.index.requests.get(id)).filter((s): s is RequestSite => !!s)
+  const forwarded = e.forwardedSiteIds
+    .map((id) => ctx.index.requests.get(id))
+    .filter((s): s is RequestSite => !!s)
+  const handler = e.routeId ? ctx.index.routes.get(e.routeId) : undefined
+  const pages = e.routeIds
+    .map((id) => ctx.index.routes.get(id))
+    .filter((r): r is Route => !!r)
+    .map((r) => routeLink(ctx, r, from))
+  const callerList = (list: RequestSite[]) =>
+    list.map((s) => `${siteLink(ctx, s, from)} in ${ownerText(ctx, s, from)}`).join('<br>')
+  const rpc = [
+    e.procedure
+      ? ` · ${link(code(e.procedure.path), from, TRPC, anchorId(trpcAnchor(e.procedure.path)))} (${e.procedure.type})`
+      : '',
+    e.operation
+      ? ` · ${link(code(e.operation.name || '(anonymous)'), from, GRAPHQL, anchorId(graphqlAnchor(e.operation)))}`
+      : '',
+  ].join('')
+  return doc([
+    `### ${anchor(e.key)}${code(endpointLabel(e))}`,
+    facts([
+      ['Status', endpointStatusText(e)],
+      ['Transport', `${ENDPOINT_TRANSPORT[e.transport]}${rpc}`],
+      ['Called from', endpointSide(e)],
+      ['Served by', handler ? routeLink(ctx, handler, from) : undefined],
+      ['Query', e.queries.length > 0 ? e.queries.map((q) => code(`?${q}`)).join(', ') : undefined],
+      [
+        'Postman',
+        e.contracts.length > 0
+          ? e.contracts.map((c) => link(text(c.name), from, POSTMAN, anchorId(c.requestId))).join(', ')
+          : undefined,
+      ],
+      ['Pages', pages.length > 0 ? pages.join(', ') : undefined],
+      ['Call sites', sites.length > 0 ? callerList(sites) : 'nothing in the code calls it'],
+      ['Forwarded here', forwarded.length > 0 ? callerList(forwarded) : undefined],
+    ]),
+    e.bodyType && `**Request body**${typeSource(e.bodyType)} ${typeBlock(ctx, e.bodyType, from)}`,
+    e.responseType && `**Response**${typeSource(e.responseType)} ${typeBlock(ctx, e.responseType, from)}`,
+    endpointExample(ctx, e),
+  ]).trimEnd()
+}
+
+/** The newest successful capture of any of its call sites (else the newest one). */
+function endpointExample(ctx: Ctx, e: Endpoint): string | undefined {
+  const seen = new Set<string>()
+  const list: ExportCapture[] = []
+  for (const id of e.siteIds) {
+    for (const c of ctx.captures.get(id) ?? []) {
+      if (seen.has(c.id)) continue
+      seen.add(c.id)
+      list.push(c)
+    }
+  }
+  if (list.length === 0) return undefined
+  list.sort((a, b) => (a.timestamp < b.timestamp ? 1 : a.timestamp > b.timestamp ? -1 : 0))
+  const ok = list.find((c) => !c.error && (c.response?.status ?? 0) < 400) ?? list[0]
+  return ok ? example(ok, list.length) : undefined
+}
+
 // --- Links and labels --------------------------------------------------------------------------
 
 function routeLink(ctx: Ctx, route: Route, from: string): string {
@@ -1802,4 +2150,84 @@ function statusCounts(sites: RequestSite[]): string {
     n('inferred') > 0 && `${n('inferred')} inferred`,
   ]
   return parts.filter(Boolean).join(', ')
+}
+
+// --- Areas (M30) ----------------------------------------------------------------------------
+
+const AREAS_BY: Record<AreaList['by'], string> = {
+  route:
+    'Pages are grouped by the first static part of their URL (after route groups, dynamic segments and locales).',
+  folder:
+    'The URLs give a single area, so pages are grouped by the feature folder that holds most of their components.',
+}
+
+function areasDoc(ctx: Ctx): string {
+  const from = AREAS
+  const { areas, sharedComponentIds, sharedRequestIds, unknownConfig } = ctx.areas
+  return doc([
+    '# Areas',
+    link('← Overview', from, README),
+    areas.length === 0
+      ? 'No pages found, so no areas.'
+      : `${plural(areas.length, 'area')}. ${AREAS_BY[ctx.areas.by]} Rename or merge them with the ${code('areas')} option in ${code('flow-checker.config.ts')}.`,
+    unknownConfig.length > 0 &&
+      `> ⚠ The ${code('areas')} config names areas the scan didn't find: ${unknownConfig.map(code).join(', ')}.`,
+    areas.length > 0 &&
+      table(
+        ['Area', 'From', 'Pages', 'Components', 'Flows', 'Endpoints', 'Shared components', 'To check'],
+        areas.map((a) => [
+          `[${text(a.name)}](#${anchorId(a.id)})`,
+          a.from.map(code).join(', '),
+          String(a.routeIds.length),
+          String(a.componentIds.length),
+          String(a.flowIds.length),
+          String(a.endpointKeys.length),
+          String(a.sharedComponentIds.length),
+          String(a.notes.length),
+        ]),
+        ['left', 'left', 'right', 'right', 'right', 'right', 'right', 'right'],
+      ),
+    ...areas.map((a) => areaSection(ctx, a, from)),
+    sharedComponentIds.length > 0 &&
+      doc([
+        '## Shared',
+        'Components used by more than half of the areas, and the requests only they send.',
+        facts([
+          ['Components', sharedComponentIds.map((id) => componentLink(ctx, id, from)).join(', ')],
+          [
+            'Requests',
+            sharedRequestIds.length > 0
+              ? sharedRequestIds
+                  .map((id) => ctx.index.requests.get(id))
+                  .filter((s): s is RequestSite => !!s)
+                  .map((s) => siteLink(ctx, s, from))
+                  .join(', ')
+              : undefined,
+          ],
+        ]),
+      ]).trimEnd(),
+  ])
+}
+
+function areaSection(ctx: Ctx, a: Area, from: string): string {
+  const routes = a.routeIds.map((id) => ctx.index.routes.get(id)).filter((r): r is Route => !!r)
+  const flows = a.flowIds.map((id) => ctx.index.flows.get(id)).filter((f): f is Flow => !!f)
+  const endpoints = a.endpointKeys.map((k) => ctx.endpoints.byKey.get(k)).filter((e): e is Endpoint => !!e)
+  const list = (items: string[]) => (items.length > 0 ? items.join(', ') : undefined)
+  return doc([
+    `## ${anchor(a.id)}${text(a.name)}`,
+    facts([
+      ['Key', a.name === a.key ? undefined : code(a.key)],
+      ['From', a.from.map(code).join(', ')],
+      ['Pages', list(routes.map((r) => routeLink(ctx, r, from)))],
+      ['Components', list(a.componentIds.map((id) => componentLink(ctx, id, from)))],
+      ['Shared components', list(a.sharedComponentIds.map((id) => componentLink(ctx, id, from)))],
+      ['Flows', list(flows.map((f) => flowLink(ctx, f, from)))],
+      [
+        'Endpoints',
+        list(endpoints.map((e) => link(code(endpointLabel(e)), from, ENDPOINTS, anchorId(e.key)))),
+      ],
+      ['To check', a.notes.length > 0 ? link(plural(a.notes.length, 'open note'), from, ISSUES) : undefined],
+    ]),
+  ]).trimEnd()
 }

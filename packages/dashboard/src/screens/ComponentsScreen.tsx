@@ -1,6 +1,7 @@
 // Every component in the scan, searchable and filterable, with the selected one beside the list (M21).
 import { useMemo } from 'react'
 import { useData } from '../context'
+import { useShowDetails } from '../details'
 import {
   COMPONENT_KINDS,
   type ComponentHas,
@@ -30,6 +31,7 @@ const SORT_OPTIONS: { value: ComponentSort; label: string }[] = [
 
 export function ComponentsScreen(screen: ComponentsScreen) {
   const { index } = useData()
+  const details = useShowDetails()
   const { componentId, q, kind, has, sort } = screen
   const rows = useMemo(() => componentRows(index), [index])
   // Kind counts follow the other filters, so each button says what it would show.
@@ -88,7 +90,7 @@ export function ComponentsScreen(screen: ComponentsScreen) {
             {paged.items.map(({ component, pages, requests, notes }) => (
               <li key={component.id} className={component.id === componentId ? 'selected' : undefined}>
                 <a href={link(component.id)}>{component.name}</a>
-                <KindBadge component={component} />
+                <KindBadge component={component} details={details} />
                 <span className="muted entity-counts">
                   {count(pages, 'page')} · {count(requests, 'request')}
                 </span>

@@ -24,9 +24,37 @@ describe('cli', () => {
   it('prints help listing every command', async () => {
     const { io, out } = capture()
     expect(await runCli(['--help'], io)).toBe(0)
-    for (const command of ['dev', 'scan', 'init', 'export', 'doctor']) {
+    for (const command of ['dev', 'scan', 'init', 'export', 'doctor', 'explain']) {
       expect(out.join('\n')).toContain(command)
     }
+  })
+
+  it('explains a word from the glossary (M34)', async () => {
+    const one = capture()
+    expect(await runCli(['explain', 'dynamic-url'], one.io)).toBe(0)
+    expect(one.out.join('\n')).toContain('What to do:')
+    expect(one.out.join('\n')).toContain('apiClients')
+
+    // Several words, and the same word in two groups.
+    const two = capture()
+    expect(await runCli(['explain', 'needs', 're-check'], two.io)).toBe(0)
+    expect(two.out.join('\n')).toContain('Request status')
+    expect(two.out.join('\n')).toContain('Endpoint status')
+
+    const all = capture()
+    expect(await runCli(['explain'], all.io)).toBe(0)
+    expect(all.out.join('\n')).toContain('What sends a request')
+
+    const json = capture()
+    expect(await runCli(['explain', 'stale', '--json'], json.io)).toBe(0)
+    expect(JSON.parse(json.out.join('\n')).map((t: { group: string }) => t.group)).toEqual([
+      'flag',
+      'capture',
+    ])
+
+    const none = capture()
+    expect(await runCli(['explain', 'zzz'], none.io)).toBe(1)
+    expect(none.err[0]).toContain('not in the glossary')
   })
 
   it('rejects unknown commands', async () => {

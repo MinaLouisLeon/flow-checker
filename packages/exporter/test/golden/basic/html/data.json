@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "basic",
   "model": {
-    "version": 11,
+    "version": 12,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -85,7 +85,11 @@
             "componentId": "cmp_2dznycb4aq7"
           }
         ],
-        "componentId": "cmp_0ku4o3jpe9o"
+        "componentId": "cmp_0ku4o3jpe9o",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       },
       {
         "id": "rt_20chr3ve23a",
@@ -111,7 +115,11 @@
             "componentId": "cmp_2dznycb4aq7"
           }
         ],
-        "componentId": "cmp_1x4w21saxh9"
+        "componentId": "cmp_1x4w21saxh9",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       },
       {
         "id": "rt_2656kti2wza",
@@ -137,7 +145,11 @@
             "componentId": "cmp_2dznycb4aq7"
           }
         ],
-        "componentId": "cmp_0vmo84pmvzo"
+        "componentId": "cmp_0vmo84pmvzo",
+        "access": {
+          "status": "open",
+          "guards": []
+        }
       }
     ],
     "components": [
@@ -921,7 +933,32 @@
         ]
       }
     ],
-    "queryLinks": []
+    "queryLinks": [],
+    "imports": {
+      "app/page.tsx": [
+        "components/UserList.tsx",
+        "lib/api.ts"
+      ],
+      "app/users/[id]/page.tsx": [
+        "components/DeleteUserButton.tsx",
+        "components/ProfileCard.tsx",
+        "lib/api.ts"
+      ],
+      "components/DeleteUserButton.tsx": [
+        "lib/api.ts"
+      ],
+      "components/ProfileCard.tsx": [
+        "lib/api.ts",
+        "types/user.ts"
+      ],
+      "components/UserList.tsx": [
+        "types/user.ts"
+      ],
+      "lib/api.ts": [
+        "lib/config.ts",
+        "types/user.ts"
+      ]
+    }
   },
   "verification": {
     "sites": {

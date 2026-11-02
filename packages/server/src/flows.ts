@@ -15,16 +15,20 @@ import {
   type FlowStatus,
   type FlowsSummary,
   matchedSiteIds,
+  type ObservedStop,
   type RecordedFlow,
   type RecordedStep,
   type Route,
   routePathRegex,
   type Session,
+  seenGuards,
   servedPaths,
 } from '@flow-checker/shared'
 import type { OverridesFile } from './overrides'
 import type { CaptureStore } from './store'
 
+/** A page left this soon after it loaded, with no click between, was redirected by the browser (M31). */
+const BROWSER_REDIRECT_MS = 3_000
 /** A later step must happen within this long of the previous one. */
 const STEP_WINDOW_MS = 60_000
 /** The next interaction of a flow (e.g. typing the OTP) may take longer. */
@@ -223,12 +227,52 @@ export class FlowTracker {
       flows[flow.id] = status
     }
 
+    const guards = seenGuards(this.#model.routes, this.#stops())
     this.#summary = {
       flows,
       recorded: [...this.#overrides.get().recordings, ...variants.values()],
       ...(this.#recording ? { recording: this.#recording } : {}),
+      ...(Object.keys(guards).length > 0 ? { guards } : {}),
     }
     return this.#summary
+  }
+
+  /**
+   * Pages that didn't render in the captured sessions (M31): redirected or stopped navigations the
+   * runtime saw, and a page left again in the browser right after it loaded, with no click between.
+   */
+  #stops(): ObservedStop[] {
+    const out: ObservedStop[] = []
+    for (const session of this.#store.allSessions()) {
+      let last: { routeId: string; at: number } | undefined
+      for (const event of session.events) {
+        const at = Date.parse(event.at)
+        if (event.kind === 'redirect') {
+          const routeId = this.#routeOf(event.from)
+          if (!routeId) continue
+          const toRouteId = event.status === undefined ? this.#routeOf(event.to) : undefined
+          out.push({
+            routeId,
+            ...(toRouteId ? { toRouteId } : {}),
+            ...(event.status !== undefined ? { status: event.status } : {}),
+          })
+        } else if (event.kind === 'interaction') {
+          last = undefined
+        } else if (event.kind === 'navigation') {
+          const routeId = this.#routeOf(event.url)
+          if (
+            last &&
+            routeId &&
+            routeId !== last.routeId &&
+            event.how !== 'pop' &&
+            at - last.at <= BROWSER_REDIRECT_MS
+          )
+            out.push({ routeId: last.routeId, toRouteId: routeId, inBrowser: true })
+          last = routeId && Number.isFinite(at) ? { routeId, at } : undefined
+        }
+      }
+    }
+    return out
   }
 
   /** Called after flow results may have changed. */
@@ -393,7 +437,7 @@ export class FlowTracker {
         })
       } else if (event.kind === 'navigation') {
         out.push({ at, iso: event.at, kind: 'navigation', how: event.how, url: event.url })
-      } else {
+      } else if (event.kind === 'capture') {
         const capture = this.#store.get(event.captureId)
         // Another site's script talking to its servers is not a step of the app's flow.
         if (capture && !capture.match?.thirdParty) out.push({ at, iso: event.at, kind: 'capture', capture })

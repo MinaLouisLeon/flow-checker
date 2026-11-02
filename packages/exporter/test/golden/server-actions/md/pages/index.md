@@ -6,6 +6,11 @@
 | --- | --- |
 | File | `src/app/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
+| Access | guarded |
+
+## Access
+
+- redirects to `/products` always (page), `src/app/page.tsx:4`
 
 ## Component tree
 

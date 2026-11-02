@@ -1,0 +1,32 @@
+Start here: server-actions (Next.js <next-version>)
+
+Stack
+  Next.js    <next-version>  (App Router in src/app/, 4 pages, 0 route handlers)
+  Rendering  5 server, 2 client, 0 shared  (7 components)
+  Data       fetch  (4 requests)
+  Data       Server actions  (2 requests)
+
+Areas (2 areas by URL)
+  products  /products  (3 pages, 2 flows, 6 endpoints)
+  home      /  (1 page)
+
+Entry pages
+  Start page   /
+  Most linked  /products  (2 pages link here)
+  Most linked  /products/[id]  (2 pages link here)
+
+Main flows (2 flows)
+  CreateProductForm submit  /products/new → /products/[id]  (4 steps)
+  DeleteProductButton click  /products  (2 steps)
+
+Backends (6 endpoints)
+  This app  This app's API  (2 endpoints, 2 called from the browser)
+  External  {API_URL ?? http://localhost:4010}  (4 endpoints)
+
+Where things live
+  Root layout     src/app/layout.tsx
+  Sends requests  src/lib/backend.ts  (4 requests)
+  Type            Product  (src/types/product.ts, used 3 times)
+
+To check
+  The scan resolved every page, component, type and request.

@@ -28,13 +28,16 @@ HomePage  server  src/app/page.tsx:4
 ├─ TodoList  client (use client)  src/components/TodoList.tsx:17
 │  └─ Link  external next/link  [conditional]
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:16
+access: open
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
 TodoPage  server  src/app/todos/[id]/page.tsx:3
 └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:30
+access: open
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:3
 └─ UserList  client (use client)  src/components/UserList.tsx:16
+access: open

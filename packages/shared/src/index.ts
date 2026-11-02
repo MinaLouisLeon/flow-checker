@@ -1,6 +1,9 @@
+export * from './access'
+export * from './areas'
 export * from './capture'
 export type {
   ApiClientConfig,
+  AreasConfig,
   CaptureConfig,
   FlowCheckerConfig,
   GraphqlConfig,
@@ -11,6 +14,7 @@ export type {
 export { DEFAULT_EXCLUDE, DEFAULT_INCLUDE, defineConfig } from './config'
 export { CLI_NAME, DEFAULT_PORTS, MODEL_VERSION, PACKAGE_NAME } from './constants'
 export * from './diff'
+export * from './endpoints'
 export * from './export'
 export * from './flow-runs'
 export { formatModel } from './format'
@@ -18,12 +22,17 @@ export { formatFlows } from './format-flows'
 export { formatRequests, isInfoFlag, triggerText, urlText } from './format-requests'
 export { formatTypeShape, formatTypes } from './format-types'
 export { createPathFilter, globToRegExp } from './glob'
+export * from './glossary'
 export { contentHash, type IdPrefix, makeId } from './ids'
+export * from './impact'
 export * from './match'
 export * from './middleware'
 export * from './model'
 export * from './model-index'
 export * from './query-keys'
+export * from './search'
 export { interceptLevels, isPrivateFolder, isUrlSegment, parseSegment, urlPart } from './segments'
+export * from './summary'
 export * from './type-check'
 export * from './verification'
+export * from './walkthrough'

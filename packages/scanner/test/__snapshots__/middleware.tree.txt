@@ -38,20 +38,30 @@ RootLayout  server  app/layout.tsx:6
 layouts: app/layout.tsx
 HomePage  server  app/page.tsx:3
 └─ Link  external next/link
+access: open
 
 ## /dashboard  app/dashboard/page.tsx
 layouts: app/layout.tsx
 DashboardPage  server  app/dashboard/page.tsx:6
 └─ Link  external next/link
+access: guarded
+  redirects to `/login` when `!token` (middleware)  proxy.ts:23
+  redirects to `/login?expired=1` when `token && !user` (middleware)  proxy.ts:27
 
 ## /dashboard/settings  app/dashboard/settings/page.tsx
 layouts: app/layout.tsx
 SettingsPage  server  app/dashboard/settings/page.tsx:5
+access: guarded
+  redirects to `/login` when `!token` (middleware)  proxy.ts:23
+  redirects to `/login?expired=1` when `token && !user` (middleware)  proxy.ts:27
 
 ## /login  app/login/page.tsx
 layouts: app/layout.tsx
 LoginPage  server  app/login/page.tsx:1
+access: guarded
+  redirects to `/dashboard` when `cookie session is set` (middleware)  proxy.ts:20
 
 ## /products  app/products/page.tsx
 layouts: app/layout.tsx
 ProductsPage  server  app/products/page.tsx:5
+access: open

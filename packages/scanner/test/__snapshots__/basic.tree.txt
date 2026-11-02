@@ -24,13 +24,16 @@ layouts: app/layout.tsx
 HomePage  server  app/page.tsx:7
 └─ UserList  server  components/UserList.tsx:9
    └─ Link  external next/link
+access: open
 
 ## /about  app/(marketing)/about/page.tsx
 layouts: app/layout.tsx
 AboutPage  server  app/(marketing)/about/page.tsx:2
+access: open
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
 UserPage  server  app/users/[id]/page.tsx:8
 ├─ ProfileCard  client (use client)  components/ProfileCard.tsx:12
 └─ DeleteUserButton  client (use client)  components/DeleteUserButton.tsx:12
+access: open

@@ -2,7 +2,9 @@
 // installs that Next.js version with the packed @integr8-media/flow-checker, sets it up the way the
 // docs say (`flow-checker init`, plus withFlowChecker() before 15.3), and checks:
 //
-//   init    → the app's existing register() (non-async, with a production-only `if`) gets the
+//   explore → before any setup, the dashboard serves the scan (with the guarded page) and no
+//             project file is created or changed (M28)
+//   init    →the app's existing register() (non-async, with a production-only `if`) gets the
 //             flow-checker blocks as its first statements and becomes async (M22)
 //
 //   doctor  → no failed check
@@ -10,8 +12,10 @@
 //             (`middleware.ts` before 16, `proxy.ts` from 16): its matcher, redirect and fetch;
 //             and the v0.2.0 sites: a React Query query with its key, two tRPC procedures, a
 //             urql GraphQL operation, an EventSource, a native WebSocket, and the Postman
-//             collection matched to the code
-//   dev     → a page-load server fetch, a click-triggered browser fetch and the route handler's
+//             collection matched to the code; and v0.3.0: the account page is `guarded`
+//   summary → Start here names the Next.js version, the middleware and the start page (M32)
+//   impact  → the route handler file affects the page that calls it (M36)
+//   dev     →a page-load server fetch, a click-triggered browser fetch and the route handler's
 //             upstream fetch are captured, matched to their sites and linked (two-hop chain); the
 //             middleware's fetch is captured and matched (edge runtime before 16, Node.js on 16);
 //             the query is matched by key, the tRPC batch is split per procedure, the GraphQL
@@ -139,6 +143,9 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   const cli = join(app, 'node_modules', '@integr8-media', 'flow-checker', 'dist', 'cli.js')
   const fc = (...a) => run(process.execPath, [cli, ...a], app)
 
+  // M28: explore on the app as cloned (no config, no hooks), leaving every project file as it was.
+  await checkExplore(cli, app, log)
+
   // Set up as a user would: init, then (before 15.3) the next.config wrapper init asks for.
   const init = fc('init', '--yes')
   if (legacy !== init.includes('withFlowChecker')) {
@@ -193,11 +200,29 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     'receives message: Echo',
     // Postman: /api/todos is in the collection, /api/archive is called by nothing.
     'Postman "Matrix API": 1 of 2 collection requests called',
+    // v0.3.0 (M31): the account page redirects when there is no session cookie.
+    'access: guarded',
+    'redirects to `/` when `!session` (page)',
   ]
   for (const expected of expectations) {
     if (!scan.includes(expected)) throw new Error(`scan is missing "${expected}":\n${scan}`)
   }
   console.log('  scan ok')
+
+  // v0.3.0: Start here in the terminal (M32) and the impact of a route handler file (M36).
+  const summary = fc('summary')
+  for (const expected of [
+    new RegExp(`Next\\.js +${next.replaceAll('.', '\\.')}`),
+    atLeast(next, 16, 0) ? /Proxy +proxy\.ts/ : /Middleware +middleware\.ts/,
+    /^ *Start page +\/ /m,
+  ]) {
+    if (!expected.test(summary)) throw new Error(`summary is missing ${expected}:\n${summary}`)
+  }
+  const impact = fc('impact', join('app', 'api', 'hello', 'route.ts'))
+  if (!/page +\/ +sends GET \/api\/hello/.test(impact) || !impact.includes('route handler  /api/hello')) {
+    throw new Error(`impact of app/api/hello/route.ts is missing the page or the handler:\n${impact}`)
+  }
+  console.log('  summary and impact ok')
 
   // dev: dashboard + the app with capture on.
   const env = {
@@ -234,8 +259,7 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     page.on('console', (msg) => log.push(`[browser ${msg.type()}] ${msg.text()}`))
     try {
       await page.goto(appUrl)
-      await page.getByRole('button', { name: 'Say hello' }).click()
-      await page.getByText('Hello from upstream').waitFor({ timeout: 60_000 })
+      await clickUntil(page.getByRole('button', { name: 'Say hello' }), page.getByText('Hello from upstream'))
       const captures = await waitForCaptures(dashboard, ingests)
       // v0.2.0 transports: the page loads the query, GraphQL, the event stream and the socket.
       await page.getByText('Matrix todo').waitFor({ timeout: 60_000 })
@@ -258,6 +282,86 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   } finally {
     await stop(dev)
   }
+}
+
+/**
+ * `explore` before any setup (M28): the dashboard serves the scan (pages, the route handler and the
+ * guarded page's access) and no file in the project is created, changed or removed.
+ */
+async function checkExplore(cli, app, log) {
+  const before = projectFiles(app)
+  const port = await freePort()
+  const env = { ...process.env, NEXT_TELEMETRY_DISABLED: '1' }
+  delete env.FLOW_CHECKER
+  const explore = spawn(
+    process.execPath,
+    [cli, 'explore', '--no-open', '--no-watch', '--port', String(port)],
+    {
+      cwd: app,
+      env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: !isWin,
+    },
+  )
+  const output = []
+  for (const stream of [explore.stdout, explore.stderr]) {
+    stream.setEncoding('utf8')
+    stream.on('data', (chunk) => output.push(...chunk.split(/\r?\n/).filter(Boolean)))
+  }
+  try {
+    const dashboard = `http://127.0.0.1:${port}`
+    const model = await waitFor(
+      async () => {
+        const res = await fetch(`${dashboard}/api/model`)
+        const body = res.ok ? await res.json() : undefined
+        return body?.routes?.length ? body : undefined
+      },
+      'the explore dashboard to serve a scan',
+      120_000,
+    ).catch((error) => {
+      error.message += `\nexplore output:\n${output.join('\n')}`
+      throw error
+    })
+    const route = (path) => model.routes.find((r) => r.path === path)
+    if (route('/')?.kind !== 'page' || route('/api/hello')?.kind !== 'route-handler') {
+      throw new Error(
+        `explore's model is missing / or /api/hello: ${model.routes.map((r) => r.path).join(', ')}`,
+      )
+    }
+    if (route('/account')?.access?.status !== 'guarded') {
+      throw new Error(`explore's /account is not guarded: ${JSON.stringify(route('/account')?.access)}`)
+    }
+    if (!output.some((line) => line.includes('Start here gives a short tour'))) {
+      throw new Error(`explore did not point to Start here:\n${output.join('\n')}`)
+    }
+  } finally {
+    log.push(...output)
+    await stop(explore)
+    // The scan explore kept in the OS temp folder.
+    const kept = output.join('\n').match(/the scan is kept in (.+), outside the project/)?.[1]
+    if (kept && !keep) removeDir(kept)
+  }
+  const after = projectFiles(app)
+  if (after !== before) throw new Error(`explore changed the project:\nbefore:\n${before}\nafter:\n${after}`)
+  console.log('  explore ok (project untouched)')
+}
+
+/** Every file in the app with its content hash, apart from installed packages. */
+function projectFiles(dir, prefix = '') {
+  const out = []
+  for (const entry of readdirSync(join(dir, prefix), { withFileTypes: true })) {
+    const path = prefix ? `${prefix}/${entry.name}` : entry.name
+    if (path === 'node_modules') continue
+    if (entry.isDirectory()) out.push(`${path}/`, projectFiles(dir, path))
+    else {
+      const hash = createHash('sha256')
+        .update(readFileSync(join(dir, path)))
+        .digest('hex')
+        .slice(0, 12)
+      out.push(`${path} ${hash}`)
+    }
+  }
+  return out.filter(Boolean).join('\n')
 }
 
 function waitForCaptures(dashboard, ingests) {
@@ -374,7 +478,9 @@ function writeApp(dir, proxy) {
           plugins: [{ name: 'next' }],
           paths: { '@/*': ['./*'] },
         },
-        include: ['next-env.d.ts', '**/*.ts', '**/*.tsx'],
+        // Old Next versions add `.next/types` on first start; that rewrite rebuilds the page and can
+        // swallow the first click, so it is already here.
+        include: ['next-env.d.ts', '**/*.ts', '**/*.tsx', '.next/types/**/*.ts'],
         exclude: ['node_modules'],
       },
       null,
@@ -394,6 +500,17 @@ function writeApp(dir, proxy) {
       <body>{children}</body>
     </html>
   )
+}
+`,
+    // v0.3.0 (M31): a page that redirects without a session, so it is labeled `guarded`. Not
+    // visited: only the scan reads it.
+    'app/account/page.tsx': `import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+export default async function Account() {
+  const session = (await cookies()).get('session')
+  if (!session) redirect('/')
+  return <p>Account</p>
 }
 `,
     'app/page.tsx': `import { EchoSocket } from '@/components/Echo'
@@ -803,6 +920,23 @@ function removeDir(dir) {
     rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 })
   } catch (error) {
     console.warn(`Could not remove ${dir}: ${error.message}`)
+  }
+}
+
+/**
+ * Clicks until `shown` appears. A click that lands before hydration, or during a Fast Refresh rebuild in
+ * a freshly started dev server, does nothing, so one lost click must not fail the run.
+ */
+async function clickUntil(button, shown, timeoutMs = 60_000) {
+  const until = Date.now() + timeoutMs
+  for (;;) {
+    await button.click()
+    try {
+      await shown.waitFor({ timeout: Math.min(10_000, Math.max(1, until - Date.now())) })
+      return
+    } catch (error) {
+      if (Date.now() >= until) throw error
+    }
   }
 }
 

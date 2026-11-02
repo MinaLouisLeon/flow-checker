@@ -1,21 +1,28 @@
 import { CLI_NAME } from '@flow-checker/shared'
-import { useMemo } from 'react'
-import { useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
+import { useCallback, useMemo, useState } from 'react'
+import { useFlows, useLastScan, useLiveFeed, useMeta, useModel, useRescan } from './api'
 import { DataContext } from './context'
+import { GlobalSearch, shortcutLabel, useSearchShortcut } from './GlobalSearch'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
+import { AreasScreen } from './screens/AreasScreen'
+import { ChangesScreen } from './screens/ChangesScreen'
 import { ComponentPanel } from './screens/ComponentPanel'
 import { ComponentsScreen } from './screens/ComponentsScreen'
+import { EndpointsScreen } from './screens/EndpointsScreen'
 import { ExportScreen } from './screens/ExportScreen'
 import { FlowsScreen } from './screens/FlowsScreen'
+import { GlossaryScreen } from './screens/GlossaryScreen'
 import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
 import { RequestsScreen } from './screens/RequestsScreen'
+import { StartScreen } from './screens/StartScreen'
 import { TypesScreen } from './screens/TypesScreen'
+import { WalkScreen } from './screens/WalkScreen'
 import { useScrollMemory } from './scroll'
-import { Empty } from './ui'
+import { DetailsToggle, Empty } from './ui'
 
 const NAV: {
   label: string
@@ -24,14 +31,19 @@ const NAV: {
   needsCapture?: boolean
   needsExport?: boolean
 }[] = [
+  { label: 'Start here', screen: { name: 'start' }, match: ['start'] },
+  { label: 'Walk the app', screen: { name: 'walk' }, match: ['walk'] },
   { label: 'Overview', screen: { name: 'overview' }, match: ['overview'] },
   { label: 'Map', screen: { name: 'map', view: 'graph', q: '' }, match: ['map', 'page'] },
+  { label: 'Areas', screen: { name: 'areas', q: '' }, match: ['areas'] },
   { label: 'Components', screen: { name: 'components', q: '' }, match: ['components', 'component'] },
   { label: 'Requests', screen: { name: 'requests', q: '' }, match: ['requests'] },
+  { label: 'Endpoints', screen: { name: 'endpoints', q: '' }, match: ['endpoints'] },
   { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
   { label: 'Export', screen: { name: 'export' }, match: ['export'], needsExport: true },
+  { label: 'Glossary', screen: { name: 'glossary', q: '' }, match: ['glossary'] },
 ]
 
 export function App() {
@@ -45,6 +57,16 @@ export function App() {
   const live = useLiveFeed(captureOn || Boolean(meta.data?.watching))
   const lastScan = useLastScan()
   const index = useMemo(() => (model.data ? buildIndex(model.data) : undefined), [model.data])
+  // Page guards a captured session hit (M31), from the flows summary.
+  const flows = useFlows(captureOn || Boolean(exported))
+  const seenGuards = useMemo(() => {
+    const guards = flows.data?.guards
+    return guards ? new Map(Object.entries(guards).map(([id, list]) => [id, new Set(list)])) : undefined
+  }, [flows.data])
+
+  const [searching, setSearching] = useState(false)
+  useSearchShortcut(setSearching)
+  const closeSearch = useCallback(() => setSearching(false), [])
 
   const error = model.error ?? meta.error
   return (
@@ -55,7 +77,10 @@ export function App() {
         </a>
         <nav className="nav">
           {NAV.filter(
-            (item) => (!item.needsCapture || meta.data?.capture) && (!item.needsExport || meta.data?.export),
+            (item) =>
+              // Explore shows Live too, to explain how to turn capture on.
+              (!item.needsCapture || meta.data?.capture || meta.data?.explore) &&
+              (!item.needsExport || meta.data?.export),
           ).map((item) => (
             <a
               key={item.label}
@@ -68,6 +93,16 @@ export function App() {
           ))}
         </nav>
         <span className="spacer" />
+        <DetailsToggle />
+        <button
+          type="button"
+          className="button search-open"
+          disabled={!index}
+          aria-keyshortcuts="Control+K Meta+K /"
+          onClick={() => setSearching(true)}
+        >
+          Search <kbd>{shortcutLabel()}</kbd>
+        </button>
         {exported && (
           <span className="muted topbar-meta" title={exported.generatedAt}>
             {exported.projectName} · exported {new Date(exported.generatedAt).toLocaleString()}
@@ -88,7 +123,14 @@ export function App() {
               </span>
             )}
             Scanned {new Date(meta.data.scannedAt).toLocaleTimeString()}
-            {lastScan?.files.length ? ` · ${shortFiles(lastScan.files)}` : ''}
+            {lastScan?.files.length ? (
+              <>
+                {` · ${shortFiles(lastScan.files)} · `}
+                <a href={href({ name: 'changes' })}>what it affects</a>
+              </>
+            ) : (
+              ''
+            )}
           </span>
         )}
         {meta.data?.canRescan && (
@@ -124,8 +166,11 @@ export function App() {
             <div className="banner banner-error">Could not load the scan: {error.message}</div>
           </div>
         ) : index && meta.data ? (
-          <DataContext.Provider value={{ index, meta: meta.data, live: captureOn ? live : undefined }}>
+          <DataContext.Provider
+            value={{ index, meta: meta.data, live: captureOn ? live : undefined, seenGuards }}
+          >
             <ScreenView screen={screen} />
+            {searching && <GlobalSearch onClose={closeSearch} />}
           </DataContext.Provider>
         ) : (
           <div className="screen">
@@ -145,10 +190,14 @@ function shortFiles(files: string[]): string {
 
 function ScreenView({ screen }: { screen: Screen }) {
   switch (screen.name) {
+    case 'start':
+      return <StartScreen />
     case 'overview':
       return <Overview />
     case 'map':
-      return <MapScreen view={screen.view} q={screen.q} />
+      return <MapScreen view={screen.view} q={screen.q} areas={screen.areas} access={screen.access} />
+    case 'areas':
+      return <AreasScreen areaId={screen.areaId} q={screen.q} />
     case 'page':
       return <PageView routeId={screen.routeId} componentId={screen.componentId} />
     case 'component':
@@ -161,19 +210,27 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <ComponentsScreen {...screen} />
     case 'requests':
       return <RequestsScreen {...screen} />
+    case 'endpoints':
+      return <EndpointsScreen {...screen} />
     case 'types':
       return <TypesScreen typeId={screen.typeId} q={screen.q} unused={screen.unused} />
     case 'flows':
       return <FlowsScreen flowId={screen.flowId} q={screen.q} />
+    case 'walk':
+      return <WalkScreen flowId={screen.flowId} />
     case 'live':
       return <LiveScreen captureId={screen.captureId} q={screen.q} filter={screen.filter} />
     case 'export':
       return <ExportScreen />
+    case 'changes':
+      return <ChangesScreen />
+    case 'glossary':
+      return <GlossaryScreen q={screen.q} term={screen.term} />
     case 'not-found':
       return (
         <div className="screen">
           <Empty>
-            Nothing here. <a href="#/">Go to the overview</a>
+            Nothing here. <a href="#/">Go to Start here</a>
           </Empty>
         </div>
       )

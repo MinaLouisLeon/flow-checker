@@ -1,13 +1,24 @@
 // Rows, filters and sorting for the Components and Requests screens (M21). Pure functions of the
 // model index, so they are unit-tested without rendering.
 import {
+  type Area,
+  type AreaList,
+  buildAreas,
+  buildEndpoints,
+  buildSearchIndex,
   type Component,
+  type Endpoint,
+  type EndpointList,
+  type EndpointStatus,
+  type EndpointTransport,
+  endpointLabel,
   isInfoFlag,
   type NamedType,
   type Navigation,
   type QueryLink,
   type RequestSite,
   RequestSiteSchema,
+  type SearchIndex,
   urlText,
 } from '@flow-checker/shared'
 import type { ModelIndex } from './model-index'
@@ -121,6 +132,11 @@ export function filterRequests(index: ModelIndex, filter: RequestFilter): Reques
         site.url?.text,
         siteOwner(site, index),
         site.callStack[0]?.file,
+        // The file that sends it, the hook's library and the API client (Start here links, M32).
+        site.callStack[site.callStack.length - 1]?.file,
+        site.hook?.module,
+        site.client?.module,
+        site.socket?.api,
       ),
   )
 }
@@ -318,4 +334,127 @@ function matchesAll(query: string, ...fields: (string | undefined)[]): boolean {
 /** A site's flags that ask for a check (`runtime-url` only informs). */
 export function warnings(site: RequestSite) {
   return site.flags.filter((f) => !isInfoFlag(f))
+}
+
+// ---------------------------------------------------------------------------------------------
+// Endpoints (M29).
+
+/** `browser`: sent from code in the browser. `server`: only sent from server code. */
+export const ENDPOINT_SIDES = ['browser', 'server'] as const
+export type EndpointSide = (typeof ENDPOINT_SIDES)[number]
+
+const endpointCache = new WeakMap<ModelIndex, EndpointList>()
+
+/** The endpoint list of a model, built once per index. */
+export function endpointsOf(index: ModelIndex): EndpointList {
+  let list = endpointCache.get(index)
+  if (!list) {
+    list = buildEndpoints(index)
+    endpointCache.set(index, list)
+  }
+  return list
+}
+
+export interface EndpointRow {
+  endpoint: Endpoint
+  /** Lowercased text the search box looks in: method, pattern, host, callers and their files. */
+  text: string
+}
+
+export interface EndpointFilter {
+  q: string
+  host?: string
+  transport?: EndpointTransport
+  status?: EndpointStatus
+  side?: EndpointSide
+}
+
+/** One row per endpoint, in host order, with its search text worked out once. */
+export function endpointRows(index: ModelIndex, list: EndpointList = endpointsOf(index)): EndpointRow[] {
+  const hostLabel = new Map(list.hosts.map((h) => [h.key, h.label]))
+  return list.endpoints.map((endpoint) => {
+    const sites = [...endpoint.siteIds, ...endpoint.forwardedSiteIds]
+      .map((id) => index.requests.get(id))
+      .filter((s): s is RequestSite => !!s)
+    const fields = [
+      endpointLabel(endpoint),
+      hostLabel.get(endpoint.host),
+      ...sites.map((s) => s.url?.text),
+      ...sites.map((s) => siteOwner(s, index)),
+      ...sites.map((s) => s.callStack[0]?.file),
+      ...endpoint.routeIds.map((id) => index.routes.get(id)?.path),
+      ...endpoint.componentIds.map((id) => index.components.get(id)?.name),
+      ...endpoint.contracts.map((c) => c.name),
+    ]
+    return { endpoint, text: fields.filter(Boolean).join('\n').toLowerCase() }
+  })
+}
+
+export function filterEndpoints(rows: EndpointRow[], filter: EndpointFilter): EndpointRow[] {
+  const words = filter.q.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  return rows.filter(
+    ({ endpoint: e, text }) =>
+      (!filter.host || e.host === filter.host) &&
+      (!filter.transport || e.transport === filter.transport) &&
+      (!filter.status || e.status === filter.status) &&
+      (filter.side !== 'browser' || e.browser) &&
+      (filter.side !== 'server' || !e.browser) &&
+      words.every((w) => text.includes(w)),
+  )
+}
+
+// ---------------------------------------------------------------------------------------------
+// Areas (M30).
+
+const areaCache = new WeakMap<ModelIndex, AreaList>()
+
+/** The areas of a model, built once per index (on top of its endpoint list). */
+export function areasOf(index: ModelIndex): AreaList {
+  let list = areaCache.get(index)
+  if (!list) {
+    list = buildAreas(index, endpointsOf(index))
+    areaCache.set(index, list)
+  }
+  return list
+}
+
+export interface AreaRow {
+  area: Area
+  /** Lowercased: name, key, folders, page paths and component names. */
+  text: string
+}
+
+/** One row per area, with its search text worked out once. */
+export function areaRows(index: ModelIndex, list: AreaList = areasOf(index)): AreaRow[] {
+  return list.areas.map((area) => {
+    const fields = [
+      area.name,
+      area.key,
+      ...area.from,
+      ...area.routeIds.map((id) => index.routes.get(id)?.path),
+      ...area.componentIds.map((id) => index.components.get(id)?.name),
+    ]
+    return { area, text: fields.filter(Boolean).join('\n').toLowerCase() }
+  })
+}
+
+/** The areas that have every word of the search. */
+export function filterAreas(rows: AreaRow[], q: string): Area[] {
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  return rows.filter((r) => words.every((w) => r.text.includes(w))).map((r) => r.area)
+}
+
+// ---------------------------------------------------------------------------------------------
+// Global search (M33).
+
+const searchCache = new WeakMap<ModelIndex, SearchIndex>()
+
+/** The search index of a model, built once per index (so again after each re-scan). */
+export function searchOf(index: ModelIndex): SearchIndex {
+  let si = searchCache.get(index)
+  if (!si) {
+    si = buildSearchIndex(index, { endpoints: endpointsOf(index), areas: areasOf(index) })
+    searchCache.set(index, si)
+  }
+  return si
 }

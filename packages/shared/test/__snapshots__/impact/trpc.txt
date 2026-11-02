@@ -1,0 +1,18 @@
+src/app/api/trpc/[trpc]/route.ts  code  3p 1h 2f 7r 0c 0t
+src/app/layout.tsx  code  3p 0h 0f 0r 1c 0t
+src/app/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/providers.tsx  code  3p 0h 0f 0r 1c 0t
+src/app/todos/[id]/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/app/users/page.tsx  code  1p 0h 0f 0r 1c 0t
+src/components/AddTodoForm.tsx  code  1p 0h 1f 1r 1c 0t
+src/components/HealthBadge.tsx  code  1p 0h 0f 1r 1c 0t
+src/components/TodoDetail.tsx  code  1p 0h 2f 3r 1c 0t
+src/components/TodoList.tsx  code  1p 0h 0f 1r 1c 0t
+src/components/UserList.tsx  code  1p 0h 0f 1r 1c 0t
+src/server/root.ts  code  1p 0h 0f 1r 0c 0t
+src/server/routers/todo.ts  code  3p 1h 2f 11r 0c 0t
+src/server/routers/user.ts  code  3p 1h 1f 7r 0c 0t
+src/server/trpc.ts  imported via src/server/root.ts, src/server/routers/todo.ts, src/server/routers/user.ts  3p 1h 2f 13r 0c 0t
+src/server/upstream.ts  code  3p 1h 2f 13r 0c 0t
+src/trpc/client.ts  imported via src/app/providers.tsx, src/components/AddTodoForm.tsx, src/components/HealthBadge.tsx, src/components/TodoDetail.tsx, src/components/TodoList.tsx, src/components/UserList.tsx  3p 0h 2f 7r 6c 0t
+src/types/todo.ts  code  3p 1h 2f 11r 0c 1t
