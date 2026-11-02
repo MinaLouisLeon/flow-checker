@@ -8,7 +8,7 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 - Rendering: [5 server, 7 client, 0 shared](README.md) (12 components)
 - Data: React Query (9 requests)
 - Data: SWR (1 request)
-- Data: fetch (13 requests)
+- Data: fetch (13 requests, 9 through React Query, 1 through SWR)
 
 ## Areas
 

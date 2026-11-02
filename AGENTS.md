@@ -107,3 +107,4 @@ re-run them on their own before assuming a regression.
 | M34 | Plain wording                                     | Done   |
 | M35 | Guided walk-through                               | Done   |
 | M36 | Impact check                                      | Done   |
+| M37 | Release v0.3.0                                    | Done   |

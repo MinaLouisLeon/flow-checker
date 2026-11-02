@@ -1,6 +1,6 @@
 # flow-checker — Implementation Plan
 
-> Status: M0–M27 done. **v0.2.2 is the latest release** (published versions: 0.1.0, 0.2.0, 0.2.1, 0.2.2). Next: **v0.3.0** (onboarding, M27–M37), then **v0.4.0** (coding-agent context, M38–M40). Updated: 2026-11-01.
+> Status: M0–M37 done. **v0.2.2 is the latest release** (published versions: 0.1.0, 0.2.0, 0.2.1, 0.2.2); **v0.3.0** (onboarding, M27–M37) is ready to tag. Next: **v0.4.0** (coding-agent context, M38–M40). Updated: 2026-11-02.
 
 ## 1. Goal
 
@@ -873,7 +873,7 @@ Same rules as v0.2.2: fixes and views target **code patterns**, never names or p
 | M34 | **Plain wording:** a short explanation for every status, flag, badge and trigger, shown where it appears (tooltip + a Glossary screen); fewer badges by default with a "show details" toggle                                           | A test fails when a status, flag kind, trigger kind or transport has no explanation; the page view of a fixture shows fewer badges by default than in 0.2.2                                  | ✅ Done |
 | M35 | **Guided walk-through:** a checklist of flows not yet confirmed, each step with "open in app", live ticks as captures arrive, and a coverage % (flows, requests) on the overview                                                       | An e2e test follows the checklist on the auth fixture (login → OTP → dashboard): the flow becomes confirmed and its coverage reaches 100%                                                    | ✅ Done |
 | M36 | **Impact check:** `flow-checker impact <file>`, `scan --diff <git ref>`, `scan --fail-on <flag kinds>`, `--json` for both, and an "Affected by changes" panel in the dashboard                                                         | Editing a type, a hook, an API client and a constants file in fixture tests lists the expected pages, flows and requests; `--diff` works against a commit; `--fail-on` exit codes are tested | ✅ Done |
-| M37 | **Release v0.3.0:** README (onboarding quick start with `explore` first), config docs for `areas`, CHANGELOG, Next matrix, perf budgets, and a newcomer check on two real apps                                                         | v0.3.0 on npm                                                                                                                                                                                | Planned |
+| M37 | **Release v0.3.0:** README (onboarding quick start with `explore` first), config docs for `areas`, CHANGELOG, Next matrix, perf budgets, and a newcomer check on two real apps                                                         | v0.3.0 on npm                                                                                                                                                                                | ✅ Done |
 
 ### v0.3.0 notes
 
@@ -1063,6 +1063,48 @@ Same rules as v0.2.2: fixes and views target **code patterns**, never names or p
 - **Check:** `shared/test/impact.test.ts` (every fixture: each call-path file reaches its request, each component file its pages, each flow's start file the flow, only-imported files reach their importers, every item in exactly one group, a per-file count snapshot in `shared/test/__snapshots__/impact/`, and basic's text for a type, an API client and a constants file; patterns: layouts, special files, middleware, an import chain with a cycle, a file nothing imports, line ranges and the whole-file fallback, types through props types, server action chains, tRPC procedures, several files; a util 200 features import under 100 ms), `flow-checker/test/impact.test.ts` (copies of basic, react-query and bff: a type, an API client, a constants file and a hook list the expected pages, flows and requests; `file:line`; route handler callers by method; text output; errors; `--diff` against `HEAD` with an untracked file and against an older commit with a removed page; a bad ref; `--fail-on` exit codes 0 / 1 / 2, JSON, and scoping to the diff), `dashboard/test/changes.test.ts` (route, panel content and links, the empty states, the overview) and `e2e/watch.spec.ts` (after editing `LoginForm.tsx`, "what it affects" opens the panel with `/[locale]/login`, `LoginForm submit` and `POST /auth/login`).
 
 **M37 — Release v0.3.0:** same steps as M26. The README starts with the newcomer path (`npx @integr8-media/flow-checker explore` → Start here → walk the app). Real-app check: time from clone to the first useful screen, and whether each Start here section is right, on the test app and one other project.
+
+**Built in M37:**
+
+- **Docs:** the package README now starts with "Just cloned a Next.js project? Start here" (`npx @integr8-media/flow-checker explore`, then Start here → look around (Areas, Endpoints, the Map with guarded pages, Ctrl+K, badge explanations) → Walk the app with capture on → `impact` before a change), then "Capture real traffic" with the old quick start. "What it does" names the onboarding screens and the impact check; the Dashboard section has Areas, Endpoints and the Map's access labels and area frames, and says `explore` serves it too; the config example has `areas`; the scan times say about 10 s / 3 s. The root README puts `explore` first and its release example is `v0.3.0`. `docs/config.md` already had `areas` (M30), and `scripts/verify-config.mjs` already checks `areas.rename` in the packed package. `CHANGELOG.md` has the 0.3.0 section: a short summary with the real-app numbers below, then the M27–M36 notes in the order a newcomer meets them (explore, Start here, areas, endpoints, guards, search, wording, walk-through, impact, fixes). The package version is 0.3.0.
+- **Next matrix:** the matrix app has a guarded page (`app/account/page.tsx`: `redirect('/')` without a session cookie). Before `init`, each version runs `explore` on the app as installed: the dashboard must serve the scan with `/`, `/api/hello` and `/account` as `guarded`, the output must point to Start here, and no project file (outside `node_modules`) may be created, changed or removed (compared by content hash, since the app's `.git` is only a marker); the scan `explore` keeps in the OS temp folder is removed afterwards. After `scan` (which must print `access: guarded` and the guard), `summary` must name the Next.js version, the middleware or proxy file and the start page, and `impact app/api/hello/route.ts` must list the page that calls it and the handler. 13.4.19, 14.2.35, 15.2.9, 15.5.28 and 16.4.3 all pass.
+- **Fixed here:** Start here's Stack counted React Query and SWR sites twice: once under the library and again under their transport (`React Query (303)`, `fetch (407)` on the test app, where 407 is every request). The transport line now says how many go through a query library (`fetch (407 requests, 303 through React Query)`); its count still matches the Requests list it links to. Goldens: the react-query, trpc and trpc-v10 summaries and `ONBOARDING.md`.
+- **Real apps** (a fresh `git clone` of each into a temp folder with long paths on, `node_modules` linked from the working copy so install time is left out; `explore` with its temp data folder removed first; then `scan` with the published 0.2.2 and with this branch, counted with the same `buildIndex()`):
+
+  | Test app (54 pages, 993 components) | 0.2.2       | 0.3.0                      |
+  | ----------------------------------- | ----------- | -------------------------- |
+  | `explore` → Start here served       |             | 38.0 s                     |
+  | `git status` after `explore`        |             | clean                      |
+  | Scan                                | 32.6 s      | 35.3 s                     |
+  | "To check" / unknown triggers       | 15 / 8      | 15 / 8                     |
+  | Unresolved URLs (`dynamic-url`)     | 2           | 2                          |
+  | Request sites / flows               | 407 / 109   | 407 / 109                  |
+  | `model.json`                        | 7,609,312 B | 8,495,892 B (import graph) |
+  | Areas / endpoints / guarded pages   |             | 31 / 384 / 54 of 54        |
+  | `summary` lines                     |             | 53                         |
+
+  | Second app (29 pages, 511 components) | 0.2.2        | 0.3.0              |
+  | ------------------------------------- | ------------ | ------------------ |
+  | `explore` → Start here served         |              | 21.5 s             |
+  | `git status` after `explore`          |              | clean              |
+  | Scan                                  | 18.0 s       | 20.2 s             |
+  | "To check" / unknown triggers         | 10 / 6       | 10 / 6             |
+  | Request sites / flows                 | 248 / 44     | 248 / 44           |
+  | `model.json`                          | 13,609,371 B | 13,904,636 B       |
+  | Areas / endpoints / guarded pages     |              | 8 / 186 / 29 of 29 |
+  | `summary` lines                       |              | 52                 |
+
+  The time to the first useful screen is the scan; the dashboard answers as soon as it ends. The second app's "To check" was 47 in M26's table, counted by the dashboard of that day; here both versions are counted by today's `buildIndex()`, so only the before/after matters.
+- **Start here, section by section** (checked against each app's code):
+  - Stack: right after the fix above (Next.js version, components by kind, React Query, next-intl, the `src/proxy.ts` matcher).
+  - Areas: right; both apps have one URL segment per feature, so the test app's 31 areas are mostly one or two pages.
+  - Entry pages: the start page and the most-linked pages (`/[locale]/login`, reached by the proxy's auth redirect from every page) are right. "Not linked" is wrong on the second app for most of its 23 pages: its menus are data (`PANELS[role].nav = [{ href: '/doctor/dashboard' }]`, rendered by one shell) and its breadcrumbs pass `href` to its own link components, and the scan doesn't follow links built that way.
+  - Main flows, backends, where things live, to check: right (flows start where the forms are, the catch-all proxy's requests appear under this app and the backend, the API client files are the top senders).
+- **Found, not fixed here** (scanner patterns, candidates for the next patch):
+  - **Links from data and through link components:** an `href` read from a config array or object that a component maps into `<Link>`, or passed as a prop to the project's own component that renders `<Link href={href}>`, is not a navigation. Pages reached only that way are listed as "nothing in the app links here", and flows through those menus are missing.
+  - **Client redirects that aren't guards:** every page of both apps is `guarded`, which is right (the proxy redirects to login without a session, with its condition shown), but the Access section also lists `router.push()` calls that can't stop a page, with no condition: a push inside a listener or callback an effect only registers (`addEventListener('message', onMessage)`, `registerNavigator(navigate)`), and pushes whose trigger the scan reads as `page-load` (a click handler chosen with a ternary, `onClick={navigates ? (e) => go() : undefined}`, and callbacks a hook returns). The same trigger mistake can mark requests `page-load`.
+- **Performance:** `bench.mjs 200` against the published 0.2.2 on the same machine, three runs each (alternating): cold scan 9.3 / 8.5 / 8.4 s → 9.6 / 9.2 / 9.5 s, re-scan median 2.6 / 2.6 / 2.7 s → 2.7 / 2.7 / 2.9 s, slowest API answer 105–129 ms → 114–128 ms. About 7% slower to scan (the import graph and the access labels), inside the CI budgets (25 s / 8 s / 1 s), which stay as they are.
+- **Not done here:** the `v0.3.0` tag and npm publish (the Release workflow runs on the tag after merging to `main`).
 
 ### v0.4.0 milestones
 

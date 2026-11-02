@@ -2,6 +2,14 @@
 
 Maps a Next.js App Router project: its pages, components, requests, types and user flows. It verifies that map against real traffic while you use the app, and exports it as documentation.
 
+New to a project? Run this in its folder: no install, no setup, no project file changed. The dashboard opens on Start here, a short tour of the app (stack, areas, entry pages, main flows, backends).
+
+```bash
+npx @integr8-media/flow-checker explore
+```
+
+To capture real traffic while you use the app:
+
 ```bash
 npm install -D @integr8-media/flow-checker
 npx flow-checker init     # adds the capture hooks and a config file
@@ -41,14 +49,14 @@ pnpm test:e2e           # after pnpm build: Playwright capture test (once: pnpm 
 node scripts/record-captures.mjs   # after pnpm build: re-record the fixture captures the matcher tests use
 pnpm vitest run packages/exporter -u   # rewrite the export golden files (packages/exporter/test/golden) after a format change
 pnpm --filter @flow-checker/dashboard dev   # dashboard with hot reload on :4401 (API proxied to :4400)
-node scripts/next-matrix.mjs [13.4 14.2 15.2 15.5 16]   # after pnpm build: init/doctor/scan/capture on each Next.js version (needs network)
+node scripts/next-matrix.mjs [13.4 14.2 15.2 15.5 16]   # after pnpm build: explore/init/doctor/scan/summary/impact/capture on each Next.js version (needs network)
 node scripts/perf/bench.mjs [features]   # after pnpm build: scan, re-scan and API times on a synthetic large app
 ```
 
 ## Releasing
 
 1. Update the version in `packages/flow-checker/package.json` and the [changelog](packages/flow-checker/CHANGELOG.md), and merge to `main`.
-2. Tag it: `git tag v0.2.0 && git push origin v0.2.0`.
+2. Tag it: `git tag v0.3.0 && git push origin v0.3.0`.
 3. The [Release workflow](.github/workflows/release.yml) runs every check, then publishes to npm with provenance. It needs the `NPM_TOKEN` secret (or npm trusted publishing) and an `npm` environment.
 
 The repo tooling is pinned to TypeScript 6.x because TypeScript 7 (the native compiler) has no stable JavaScript API yet, and tsup's declaration build needs one. The scanner uses `ts-morph`, which ships its own compiler.

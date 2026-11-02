@@ -5,7 +5,7 @@ Stack
   Rendering  5 server, 7 client, 0 shared  (12 components)
   Data       React Query  (9 requests)
   Data       SWR  (1 request)
-  Data       fetch  (13 requests)
+  Data       fetch  (13 requests, 9 through React Query, 1 through SWR)
 
 Areas (4 areas by URL)
   home      /  (1 page, 2 flows, 3 endpoints)

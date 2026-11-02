@@ -44,6 +44,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M34 | Plain wording         | `shared/src/glossary.ts` is the only wording table; `Badge term={[group, key]}`; `useShowDetails()` hides extra badges.  |
 | M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
 | M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
+| M37 | Release v0.3.0        | Matrix also runs `explore` (project files hashed before/after), `summary` and `impact`. Publish = tag.                   |
 
 ## Gotchas
 
@@ -452,3 +453,19 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   builds (stacks with package paths), which is where capture runs.
 - Perf tests in `shared` must time only the function under test: `buildImpact()` without passed-in areas rebuilt
   them on each call, and 26 ms locally became 104 ms on a loaded Windows runner.
+
+## M37 — Release v0.3.0 (branch `feat/m37-release-v0.3.0`)
+
+- Real-app check without touching the user's repos: `git -c core.longpaths=true clone` each app into the scratchpad
+  (its routes are too deep for Windows' path limit otherwise) and link `node_modules` from the working copy with a
+  junction. `explore` keeps its data in `<tmp>/flow-checker/<name>-<hash>`; remove it first for a cold timing. The
+  0.2.2 numbers come from `npm install @integr8-media/flow-checker@0.2.2` in a scratch folder (its `cli.js` needs its
+  dependencies), counted with today's `buildIndex()` (loaded through the repo's jiti) so both use one yardstick.
+- The test app is `work/jobseekk_frontend` (54 pages), the second app `work/ur-dr-temp/ur-dr-frontend` (29 pages).
+- `summary` text columns are padded to the longest label, so scripts must match with `/Label +value/`, not fixed
+  spaces. The matrix's summary check failed twice on its own regex before it passed.
+- Query-library sites also carry their transport (`fetch`), so per-transport counts include them. Say so instead of
+  splitting the count: a count must match the filtered list its link opens.
+- Found, not fixed (next patch): links from config data or through the project's own link components aren't
+  navigations ("nothing links here" on most pages of a data-driven menu), and `router.push()` in listeners an effect
+  registers, or in handlers chosen with a ternary, is read as a guard / `page-load`.

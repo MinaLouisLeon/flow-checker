@@ -34,7 +34,7 @@
         {
           "label": "Data",
           "value": "tRPC",
-          "detail": "7 requests",
+          "detail": "7 requests, 6 through React Query",
           "link": {
             "to": "requests",
             "transport": "trpc"

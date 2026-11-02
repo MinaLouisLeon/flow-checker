@@ -43,7 +43,7 @@
         {
           "label": "Data",
           "value": "fetch",
-          "detail": "13 requests",
+          "detail": "13 requests, 9 through React Query, 1 through SWR",
           "link": {
             "to": "requests",
             "transport": "fetch"
