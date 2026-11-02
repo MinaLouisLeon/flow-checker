@@ -47,8 +47,10 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 
 ## Gotchas
 
-- Slow CLI tests (`watch.test.ts`, `export.test.ts`, `config-options.test.ts` doctor case) and the bff HTML golden can
-  time out when the whole suite runs in parallel; re-run them alone before assuming a regression.
+- Tests that scan fixture apps take 4-6 s when the whole suite runs in parallel, so `vitest.config.ts` sets
+  `testTimeout: 30_000` (the 5 s default failed the bff / next-intl HTML goldens and the Postman GraphQL test at
+  random). Tests that copy a fixture must skip `.test-copy-*`: `incremental.test.ts` and `watch.test.ts` make and
+  remove those inside `fixtures/basic` while other files copy it (`EBUSY` / `ENOENT`).
 - `next dev` writes `AGENTS.md` into each fixture; it is gitignored there (`fixtures/*/AGENTS.md`).
 - Next middleware matchers use path-to-regexp v6 semantics (anchored both ends, optional trailing slash,
   case-insensitive, `:param*` modifiers). Next adds optional `_next/data` / `.rsc` forms
@@ -443,3 +445,10 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   don't resolve (Windows CI, a whole `node_modules` junction in `explore.test.ts`), so `incremental.test.ts` now
   re-scans a copy with no `node_modules`. A failed re-scan in `dev` is only printed: tests that wait for one should
   show the captured stderr when they fail.
+- The Next 13.4 matrix job sometimes failed with `Missing: react-query` / `query=null` (also on other branches before
+  M36). A failed QueryClient lookup is reused for the rest of the browser task (`lookedUpThisTask`), and hydration can
+  commit the provider and run the query in that same task. Requests whose stack goes through `@tanstack/query-core`
+  (`sentByQueryLibrary()`) now get `fillQueryLater()`: one task later, look again and `guess()`. It only works in dev
+  builds (stacks with package paths), which is where capture runs.
+- Perf tests in `shared` must time only the function under test: `buildImpact()` without passed-in areas rebuilt
+  them on each call, and 26 ms locally became 104 ms on a loaded Windows runner.

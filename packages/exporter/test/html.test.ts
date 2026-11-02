@@ -34,8 +34,7 @@ function fakeDashboard(script: string): string {
   return dir
 }
 
-// Building a fixture's snapshot scans it; under full parallel load that can take over 5 s.
-describe.each(FIXTURES)('HTML export of %s', { timeout: 30_000 }, (fixture) => {
+describe.each(FIXTURES)('HTML export of %s', (fixture) => {
   it('embeds the same data as the golden copy', async () => {
     const data = fixtureSnapshot(fixture)
     await expect(`${JSON.stringify(data, null, 2)}\n`).toMatchFileSnapshot(

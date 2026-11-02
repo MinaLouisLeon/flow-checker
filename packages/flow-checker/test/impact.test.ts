@@ -19,8 +19,9 @@ import { type CliIO, runCli } from '../src/cli/run'
 
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 // The config imports `@integr8-media/flow-checker/config`, which only resolves after `pnpm build`.
+// `.test-copy-*`: other tests' copies inside the fixture, made and removed while this one copies it.
 const NOT_COPIED =
-  /^(\.flow-checker|\.next|node_modules|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
+  /^(\.flow-checker|\.next|node_modules|\.test-copy-.*|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
 
 function capture() {
   const out: string[] = []

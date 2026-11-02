@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   type AppModel,
   AppModelSchema,
+  buildAreas,
   buildImpact,
   buildIndex,
   type Component,
@@ -484,9 +485,12 @@ describe('a large app', () => {
       imports[`src/f${i}/b.tsx`] = ['lib/util.ts']
     }
     const index = buildIndex(model({ routes, components, requests, imports }))
-    buildImpact(index, [{ file: 'lib/util.ts' }]) // warm up
+    // Areas are built once per model and passed in, as the dashboard does (`areasOf()`); their own
+    // cost is M30's. Timing them here made the test flaky on slow CI runners.
+    const areas = buildAreas(index)
+    buildImpact(index, [{ file: 'lib/util.ts' }], areas) // warm up
     const start = performance.now()
-    const impact = buildImpact(index, [{ file: 'lib/util.ts' }])
+    const impact = buildImpact(index, [{ file: 'lib/util.ts' }], areas)
     const took = performance.now() - start
     expect(impact.pages).toHaveLength(200)
     expect(impact.requests).toHaveLength(1000)

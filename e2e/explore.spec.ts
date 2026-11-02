@@ -17,8 +17,9 @@ import { basename, join, resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 
 const repo = resolve(import.meta.dirname, '..')
+// `.test-copy-*`: other tests' copies inside the fixture, made and removed while this one copies it.
 const NOT_IN_CLONE =
-  /^(\.flow-checker|\.next|node_modules|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
+  /^(\.flow-checker|\.next|node_modules|\.test-copy-.*|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
 
 /**
  * Links each installed package by its real path, not the whole `node_modules` folder. pnpm links

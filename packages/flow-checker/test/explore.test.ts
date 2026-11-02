@@ -29,8 +29,9 @@ const FIXTURES = readdirSync(fixturesDir, { withFileTypes: true })
   .map((d) => d.name)
 
 // What a fresh clone doesn't have: flow-checker's own files and build output.
+// `.test-copy-*`: other tests' copies inside the fixture, made and removed while this one copies it.
 const NOT_IN_CLONE =
-  /^(\.flow-checker|\.next|node_modules|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
+  /^(\.flow-checker|\.next|node_modules|\.test-copy-.*|AGENTS\.md|flow-checker\.config\.\w+|instrumentation(-client)?\.\w+)$/
 
 function capture() {
   const out: string[] = []
