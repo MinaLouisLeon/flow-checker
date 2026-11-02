@@ -4,7 +4,7 @@ Stack
   Next.js    <next-version>  (App Router in src/app/, 4 pages, 0 route handlers)
   Rendering  5 server, 9 client, 0 shared  (14 components)
   Data       React Query  (11 requests)
-  Data       fetch  (12 requests)
+  Data       fetch  (12 requests, 11 through React Query)
 
 Areas (4 areas by URL)
   home      /  (1 page, 2 flows, 3 endpoints)

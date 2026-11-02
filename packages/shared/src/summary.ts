@@ -130,6 +130,16 @@ const DATA_LIBRARIES: {
   },
 ]
 
+/** "303 through React Query" for each query library that sends some of these sites. */
+function queryLibraries(sites: RequestSite[]): string[] {
+  const out: string[] = []
+  for (const lib of DATA_LIBRARIES.slice(0, 2)) {
+    const n = sites.filter(lib.match).length
+    if (n > 0) out.push(`${n} through ${lib.name}`)
+  }
+  return out
+}
+
 function transport(t: RequestSite['transport']): SummaryLink {
   return { to: 'requests', transport: t }
 }
@@ -163,7 +173,11 @@ function stackSection(index: ModelIndex): SummarySection {
       const libraries = [...new Set((model.graphql?.clients ?? []).map((c) => c.library))]
       if (libraries.length > 0) value = `GraphQL (${libraries.join(', ')})`
     }
-    items.push({ label: 'Data', value, detail: plural(sites.length, 'request'), link: lib.link(sites) })
+    // A React Query or SWR site also has the transport its query function uses, so a transport's
+    // count says how many of its requests a library above already listed.
+    const viaLibrary = lib.name === 'React Query' || lib.name === 'SWR' ? [] : queryLibraries(sites)
+    const detail = [plural(sites.length, 'request'), ...viaLibrary].join(', ')
+    items.push({ label: 'Data', value, detail, link: lib.link(sites) })
   }
   // API clients from the config, one per module.
   const clients = new Map<string, RequestSite[]>()

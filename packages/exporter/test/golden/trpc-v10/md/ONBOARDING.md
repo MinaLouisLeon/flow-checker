@@ -7,7 +7,7 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 - Next.js: [16.4.3](README.md) (App Router in src/app/, 3 pages, 1 route handler)
 - Rendering: [4 server, 7 client, 0 shared](README.md) (11 components)
 - Data: React Query (6 requests)
-- Data: tRPC (7 requests)
+- Data: tRPC (7 requests, 6 through React Query)
 - Data: fetch (6 requests)
 
 ## Areas

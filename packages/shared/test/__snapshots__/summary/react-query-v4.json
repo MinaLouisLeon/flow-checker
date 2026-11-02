@@ -34,7 +34,7 @@
         {
           "label": "Data",
           "value": "fetch",
-          "detail": "12 requests",
+          "detail": "12 requests, 11 through React Query",
           "link": {
             "to": "requests",
             "transport": "fetch"

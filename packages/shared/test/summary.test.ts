@@ -288,6 +288,26 @@ describe('stack', () => {
     ])
   })
 
+  it("says how many of a transport's requests a query library sends", () => {
+    const m = app(['/'])
+    m.requests = [
+      site('r1', 'cmp_rt_0', { hook: { name: 'useQuery', module: '@tanstack/react-query' } }),
+      site('r2', 'cmp_rt_0', { hook: { name: 'useQuery', module: '@tanstack/react-query' } }),
+      site('r3', 'cmp_rt_0', { hook: { name: 'useSWR', module: 'swr' } }),
+      site('r4', 'cmp_rt_0'),
+      site('r5', 'cmp_rt_0', { transport: 'axios' }),
+    ]
+    const details = section(summaryOf(m), 'stack')
+      .items.filter((i) => i.label === 'Data')
+      .map((i) => `${i.value}: ${i.detail}`)
+    expect(details).toEqual([
+      'React Query: 2 requests',
+      'SWR: 1 request',
+      'axios: 1 request',
+      'fetch: 4 requests, 2 through React Query, 1 through SWR',
+    ])
+  })
+
   it('says when the Next.js version is not known', () => {
     const m = app(['/'])
     m.project = { appDir: 'app' }

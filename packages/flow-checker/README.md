@@ -2,13 +2,32 @@
 
 Maps a Next.js **App Router** project (its pages, components, requests, types and user flows), checks that map against real traffic while you use the app, and exports it as documentation.
 
+## Just cloned a Next.js project? Start here
+
+Run this in the project folder. Nothing to install or set up, and no file in the project is created or changed:
+
+```bash
+npx @integr8-media/flow-checker explore
+```
+
+It scans the code and opens the dashboard on **Start here**, a short tour of the app:
+
+1. **Start here:** what the app is built with, its areas (features), the pages to start from, the main flows (_login → verify OTP → dashboard_), the backends it calls and where things live. Every item opens its screen.
+2. **Look around:** **Areas** groups everything by feature, **Endpoints** lists every backend call with the pages that make it, and the **Map** shows each page with its components, requests and whether it needs a login (`guarded`). Press Ctrl+K (⌘K) to find anything by name, file or URL. Hover any badge to read what it means.
+3. **Walk the app:** to see it run, turn capture on (below) and follow **Walk the app**, a checklist of flows to try, each step ticking as you use the app.
+4. **Before you change a file:** `npx @integr8-media/flow-checker impact src/lib/api.ts` lists the pages, flows and requests the change affects.
+
+`npx @integr8-media/flow-checker summary` prints Start here in the terminal instead.
+
+## Capture real traffic
+
 ```bash
 npm install -D @integr8-media/flow-checker
 npx flow-checker init     # adds two capture hooks and a config file
 npx flow-checker          # scans, opens the dashboard and starts your app with capture on
 ```
 
-Then use your app as usual. Each request the app sends shows up in the dashboard, linked to the line of code that sent it.
+Then use your app as usual. Each request the app sends shows up in the dashboard, linked to the line of code that sent it, and the flows you walk are confirmed.
 
 ## What it does
 
@@ -17,7 +36,9 @@ Then use your app as usual. Each request the app sends shows up in the dashboard
 - **Verifies the map.** Each capture is matched to the request site that sent it, which marks that site `✓ verified`. The captured data is compared with the declared types (missing fields, extra fields, wrong types, unexpected `null`), and flows are confirmed when you walk them.
 - **Checks the code against your Postman collection** (optional): requests the collection doesn't have, endpoints nothing calls, and types from saved examples.
 - **Keeps up with your edits.** Files are watched and re-scanned incrementally. Requests whose code changed since they were captured are marked `↻ needs re-check`.
-- **Exports documentation:** Markdown (with Mermaid route maps and sequence diagrams) and a static, read-only copy of the dashboard you can host anywhere.
+- **Explains the app to newcomers:** areas by feature, backend endpoints, which pages are guarded (and by what), a Start here tour and a walk-through of the flows. See [Dashboard](#dashboard).
+- **Says what a change affects** before you make it, and in CI: `impact <file>`, `scan --diff <ref> --fail-on <kinds>`. See [Impact check](#impact-check).
+- **Exports documentation:** Markdown (`ONBOARDING.md`, areas, endpoints, pages, flows, a glossary, with Mermaid route maps and sequence diagrams) and a static, read-only copy of the dashboard you can host anywhere.
 
 ## Requirements
 
@@ -104,12 +125,14 @@ In CI, when output is piped, or with `NO_COLOR` / `TERM=dumb`, only the `✓` li
 
 ### Dashboard
 
-`flow-checker dev` serves the dashboard on port 4400. The same screens are in the static HTML export, read-only.
+`flow-checker dev` and `flow-checker explore` serve the dashboard on port 4400. The same screens are in the static HTML export, read-only.
 
 - **Start here** (the first screen): a short tour of the app for someone new to it. What it is built with (Next.js version, server / client components, data libraries such as React Query, SWR, tRPC, GraphQL or axios, next-intl, middleware, a Postman contract), its largest areas, the start page, the most-linked pages and the pages nothing links to, the longest flows, the backends it calls, where things live (the root layout, the files that send the most requests, route handlers, the most-used types) and the first things to check. Every item opens its screen. `flow-checker summary` prints the same in the terminal, and the Markdown export writes it to `ONBOARDING.md`.
 - **Walk the app** (`#/walk`): the flows not confirmed yet as a checklist, the ones that start on an entry page first. Each step says what to do ("Submit the form in `LoginForm` on `/[locale]/login`") or what should happen next ("It sends `POST /auth/login`", "It goes to `/[locale]/verify`"). **Open in app** opens the start page in your running app, with dynamic segments (`[locale]`, `[id]`) filled in from values you type once (the next-intl default locale is suggested). Steps tick as the captures and page changes arrive, and a walked flow moves to Walked. Start here and the overview show the coverage: confirmed flows and captured requests, in percent. Without capture (`explore`) it is a reading guide and says how to turn capture on.
 - **Overview** (`#/overview`): counts for pages, route handlers, components, requests, types and flows, each a link to its list, and the things to check (unresolved URLs, unknown triggers, type mismatches...), one note per request.
-- **Map:** the route map (graph or tree). A page shows its component tree, the requests it sends on load and on events (apart from those its layouts send on every page), where it leads and the flows that start on it.
+- **Areas:** pages grouped by feature (the first part of their URL, else the feature folder that holds their components), one card per area with its pages, flows, endpoints, shared components and things to check. Rename or merge areas with the [`areas`](https://github.com/MinaLouisLeon/flow-checker/blob/main/docs/config.md#areas) config option. The Markdown export writes `areas.md`.
+- **Endpoints:** every backend endpoint the app calls, one row per method and URL pattern, grouped by host (this app's route handlers and server actions, each base URL, URLs the scan couldn't read), with the pages and components that call it, its types and its captures. The Markdown export writes `endpoints.md`.
+- **Map:** the route map (graph or tree), with an optional frame around each area. A page shows its component tree, the requests it sends on load and on events (apart from those its layouts send on every page), where it leads, the flows that start on it, and its access: `guarded` with what can stop it ("redirects to `/login` when `!session` (middleware)"), `open`, or `access unknown` when the scan can't tell. Filter the map by access. Guards are read from middleware redirects and `redirect()` / `notFound()` / `forbidden()` / `unauthorized()` in the page, its layouts and the helpers they call; with capture on, a redirect you hit marks its guard as seen.
 - **Components:** every component, searchable by name or file, filtered by kind (server / client / shared), by what it has (sends requests, things to check, not on any page) and sorted by name, requests or pages.
 - **Requests:** every request site, searchable by URL, component or file, filtered by when it is sent (on load, on events, server-side, unknown trigger), status (verified, mismatch, needs re-check, not captured yet), transport and flags. The same request sent from several places is one row. A request opens on its own page with its body and response types, server hops, query-cache links, captures and the call path from the component.
 - **Flows**, **Types**, **Live** (captures as they arrive, with their match and type check) and **Export**.
@@ -253,6 +276,8 @@ export default defineConfig({
   postman: { collection: 'postman/collections/My API', environment: 'postman/environments/dev.yaml' },
   // GraphQL types when the code has none: a schema file, or live introspection (env:NAME headers).
   graphql: { schema: 'schema.graphql' },
+  // Areas (features) on the Areas screen: fold some into one, give others a display name.
+  areas: { merge: { account: ['profile', 'settings'] }, rename: { account: 'Account' } },
 })
 ```
 
@@ -290,7 +315,7 @@ Masked values keep their shape (`"[REDACTED:string]"`, `0`, `false`), so type ch
 - Middleware `config.matcher` must be written out in the file (as Next.js requires); routes are matched with sample values for dynamic segments, and redirects or rewrites to URLs built at runtime are shown as written.
 - tRPC: procedures called through `createCaller` or a server-side `createTRPCOptionsProxy({ router })` run without an HTTP request and are not request sites. Subscriptions are found in the code, but their streams are captured as plain requests. The router must be reachable from `fetchRequestHandler({ router })` or the client's `AppRouter` type.
 - Next.js before 15.3: browser capture needs webpack (no Turbopack) and `withFlowChecker()`.
-- Large repositories: the first scan of a ~1,800-file app takes about 12 s and a re-scan after an edit about 4 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
+- Large repositories: the first scan of a ~1,800-file app takes about 10 s and a re-scan after an edit about 3 s. Re-scans run in a worker thread, so the dashboard and capture stay responsive meanwhile.
 
 ## License
 
