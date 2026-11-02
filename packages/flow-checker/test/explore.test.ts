@@ -121,9 +121,17 @@ describe('explore without a setup', () => {
   it('watches and re-scans without writing into the project', { timeout: 60_000 }, async () => {
     const root = freshCopy('basic', dirs)
     const { io } = capture()
+    // Route paths of each re-scan. On Windows the new folder and the page inside it can arrive in
+    // separate batches, so the first re-scan may not have the page yet: wait for the one that does.
     const rescans: string[][] = []
     const session = await startDev(
-      { root, port: 0, open: false, explore: true, onRescan: (_, files) => rescans.push(files) },
+      {
+        root,
+        port: 0,
+        open: false,
+        explore: true,
+        onRescan: (model) => rescans.push(model.routes.map((r) => r.path)),
+      },
       io,
     )
     if (typeof session === 'number') throw new Error(`explore failed with ${session}`)
@@ -135,7 +143,8 @@ describe('explore without a setup', () => {
         'export default function Added() { return null }',
       )
       const deadline = Date.now() + 30_000
-      while (rescans.length === 0 && Date.now() < deadline) await new Promise((r) => setTimeout(r, 100))
+      const added = () => rescans.some((paths) => paths.includes('/explore-added'))
+      while (!added() && Date.now() < deadline) await new Promise((r) => setTimeout(r, 100))
       const model = await getJson<AppModel>(`${session.url}/api/model`)
       expect(model.routes.map((r) => r.path)).toContain('/explore-added')
       const saved = JSON.parse(readFileSync(join(session.dataDir ?? '', 'model.json'), 'utf8')) as AppModel

@@ -437,3 +437,6 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `import` / `export` statement in the bundle. UI text like `; imported by` matched the old regex, the export fell back
   to `type="module"`, which Chrome blocks on `file://`, and every export e2e spec failed on CI (PR #46). Unit tests
   use a stand-in bundle, so run `pnpm test:e2e` (or check the real bundle) after adding dashboard text.
+- On Windows, chokidar can report a new folder and the file written into it in separate batches, so a test that waits
+  for the first re-scan after `mkdir` + `writeFile` may see a model without the file. Wait for the re-scan whose model
+  has what you added (`explore.test.ts`, failed once on Windows CI on PR #46).
