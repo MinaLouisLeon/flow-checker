@@ -433,3 +433,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - `renderToStaticMarkup` escapes apostrophes (`&#x27;`): dashboard tests must not match text that has one.
 - `pnpm check > log; echo EXIT $?` in a background task reports success either way; read the log for `ERR_PNPM` /
   `Failed`. Run `pnpm typecheck` first: test files are only typechecked there, not by vitest.
+- The static export loads the dashboard as a classic script only when `isClassicScript()` (exporter `html.ts`) finds no
+  `import` / `export` statement in the bundle. UI text like `; imported by` matched the old regex, the export fell back
+  to `type="module"`, which Chrome blocks on `file://`, and every export e2e spec failed on CI (PR #46). Unit tests
+  use a stand-in bundle, so run `pnpm test:e2e` (or check the real bundle) after adding dashboard text.

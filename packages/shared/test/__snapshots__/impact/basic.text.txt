@@ -43,7 +43,7 @@ Area users
 ---
 
 Changed file
-  lib/config.ts  nothing of its own; imported by lib/api.ts
+  lib/config.ts  nothing of its own, used through lib/api.ts
 
 Affects 2 pages, 1 flow and 4 requests.
 

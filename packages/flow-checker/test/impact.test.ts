@@ -195,7 +195,7 @@ describe('cli impact', { timeout: 60_000 }, () => {
     const { io, out } = capture()
     expect(await runCli(['impact', '--root', root, join(root, 'lib/config.ts')], io)).toBe(0)
     const text = out.join('\n')
-    expect(text).toContain('lib/config.ts  nothing of its own; imported by lib/api.ts')
+    expect(text).toContain('lib/config.ts  nothing of its own, used through lib/api.ts')
     expect(text).toContain('Affects 2 pages, 1 flow and 4 requests.')
     expect(text).toMatch(/^Area users$/m)
     expect(text).toMatch(/^ {2}flow {11}DeleteUserButton click/m)

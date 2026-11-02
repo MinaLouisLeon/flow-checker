@@ -57,7 +57,7 @@ describe('basic fixture', () => {
       scan(['lib/config.ts'], { requests: { added: 0, removed: 0, changed: 4 } }),
     )
     expect(html).toContain('data-testid="impact-panel"')
-    expect(html).toContain('nothing of its own; imported by lib/api.ts')
+    expect(html).toContain('nothing of its own, used through lib/api.ts')
     expect(html).toContain('The scan found 4 requests changed.')
     expect(html).toContain('<strong>2 pages, 1 flow and 4 requests</strong>')
     // Area headings link to the area; items link to their screens.

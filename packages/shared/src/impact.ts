@@ -611,7 +611,7 @@ export function impactCounts(impact: Impact): string {
 export function fileFacts(file: ImpactFile): string {
   if (file.found === 'code')
     return `${file.facts.join(', ')}${file.wholeFile ? ' (whole file: nothing starts on that line)' : ''}`
-  if (file.found === 'imported') return `nothing of its own; imported by ${file.via.join(', ')}`
+  if (file.found === 'imported') return `nothing of its own, used through ${file.via.join(', ')}`
   return 'not in the scan (not imported from the app, excluded, or not a source file)'
 }
 
