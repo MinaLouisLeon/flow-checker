@@ -7,7 +7,27 @@
 | File | `app/users/[id]/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | open |
+| Rendering | dynamic |
+| Title | `basic fixture` |
 | Status | ✓ 3 verified |
+
+## Rendering
+
+- dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `app/users/[id]/page.tsx:5`
+- dynamic: fetches with `cache: 'no-store'` (page), `lib/api.ts:20`
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `lib/api.ts:20`
+- ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `lib/api.ts:20`
+
+## Metadata
+
+- layout `metadata`: title, `app/layout.tsx:4`
 
 ## Component tree
 

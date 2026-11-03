@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 15,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -37,6 +37,83 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "segment-config",
+            "in": "page",
+            "detail": "dynamic = 'force-dynamic'",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 5,
+              "column": 14
+            },
+            "effect": "dynamic"
+          },
+          {
+            "in": "page",
+            "componentId": "cmp_0ku4o3jpe9o",
+            "loc": {
+              "file": "lib/api.ts",
+              "line": 5,
+              "column": 21
+            },
+            "siteId": "req_13cmzl2vi57",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_0ku4o3jpe9o",
+            "siteId": "req_13cmzl2vi57",
+            "detail": "fetch",
+            "loc": {
+              "file": "lib/api.ts",
+              "line": 5,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_0ku4o3jpe9o",
+            "siteId": "req_13cmzl2vi57",
+            "detail": "fetch",
+            "loc": {
+              "file": "lib/api.ts",
+              "line": 5,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "mismatch fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "mismatch fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     }
   ],

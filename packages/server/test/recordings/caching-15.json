@@ -1,0 +1,608 @@
+{
+  "fixture": "caching-15",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mw03m78mau9svqnn5",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T02:58:50.585Z",
+      "durationMs": 17,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/featured",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 404,
+        "statusText": "Not Found",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 02:58:50 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "error": "No route for GET /products/featured"
+          },
+          "size": 47
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at dedupeFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/dedupe-fetch.js:137:25)",
+        "at doOriginalFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:606:24)",
+        "at eval (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:861:24)",
+        "at async ProductsPage (webpack-internal:///(rsc)/./app/products/page.tsx:27:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductsPage",
+          "file": "app/products/page.tsx",
+          "line": 27,
+          "column": 22
+        }
+      ]
+    },
+    {
+      "id": "cap_mw03m78mau9svqnn8",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T02:58:53.349Z",
+      "durationMs": 8,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/featured",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 404,
+        "statusText": "Not Found",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 02:58:53 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "error": "No route for GET /products/featured"
+          },
+          "size": 47
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at dedupeFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/dedupe-fetch.js:137:25)",
+        "at doOriginalFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:606:24)",
+        "at eval (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:861:24)",
+        "at async ProductsPage (webpack-internal:///(rsc)/./app/products/page.tsx:27:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "ProductsPage",
+          "file": "app/products/page.tsx",
+          "line": 27,
+          "column": 22
+        }
+      ]
+    },
+    {
+      "id": "cap_mw03m78mau9svqnnc",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T02:59:03.508Z",
+      "durationMs": 144,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 02:59:03 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": [
+        "at dedupeFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/dedupe-fetch.js:137:25)",
+        "at doOriginalFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:606:24)",
+        "at eval (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:861:24)",
+        "at async getTodo (webpack-internal:///(rsc)/./lib/todos.js:19:17)",
+        "at async TodoPage (webpack-internal:///(rsc)/./app/todos/[id]/page.tsx:14:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodo",
+          "file": "lib/todos.js",
+          "line": 19,
+          "column": 17
+        },
+        {
+          "fn": "TodoPage",
+          "file": "app/todos/[id]/page.tsx",
+          "line": 14,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21ftrjtuxeu",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw03m78mau9svqnne",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T02:59:06.175Z",
+      "durationMs": 55,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 02:59:06 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": [
+        "at dedupeFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/dedupe-fetch.js:137:25)",
+        "at doOriginalFetch (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:606:24)",
+        "at eval (webpack-internal:///(rsc)/../../node_modules/.pnpm/next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889/node_modules/next/dist/server/lib/patch-fetch.js:861:24)",
+        "at async getTodo (webpack-internal:///(rsc)/./lib/todos.js:19:17)",
+        "at async TodoPage (webpack-internal:///(rsc)/./app/todos/[id]/page.tsx:14:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodo",
+          "file": "lib/todos.js",
+          "line": 19,
+          "column": 17
+        },
+        {
+          "fn": "TodoPage",
+          "file": "app/todos/[id]/page.tsx",
+          "line": 14,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21ftrjtuxeu",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "cache": [
+    {
+      "id": "ce_mw03m78mau9svqnn0",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:42.511Z",
+      "kind": "fetch",
+      "status": "hit",
+      "reason": "revalidate: 4294967294",
+      "key": "1pjv2uxk9dii4",
+      "method": "GET",
+      "url": "http://localhost:4010/todos",
+      "tags": [
+        "todos"
+      ],
+      "stack": [
+        "at listTodos (webpack-internal:///(rsc)/./lib/todos.js:8:23)",
+        "at Home (webpack-internal:///(rsc)/./app/page.tsx:16:78)",
+        "at Object.react_stack_bottom_frame (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:195995)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:92185)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:109385)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:111005)",
+        "at retryTask (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:146653)",
+        "at outlineTask (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:97258)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:91184)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:109385)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:111005)",
+        "at <repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:102349"
+      ],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.js",
+          "line": 8,
+          "column": 23
+        },
+        {
+          "fn": "Home",
+          "file": "app/page.tsx",
+          "line": 16,
+          "column": 78
+        }
+      ]
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn1",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:43.485Z",
+      "kind": "fetch",
+      "status": "hit",
+      "reason": "revalidate: 4294967294",
+      "key": "1pjv2uxk9dii4",
+      "method": "GET",
+      "url": "http://localhost:4010/todos",
+      "tags": [
+        "todos"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at listTodos (webpack-internal:///(rsc)/./lib/todos.js:8:23)",
+        "at Home (webpack-internal:///(rsc)/./app/page.tsx:16:78)",
+        "at Object.react_stack_bottom_frame (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:195995)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:92185)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:109385)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:111005)",
+        "at retryTask (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:146653)",
+        "at outlineTask (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:97258)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:91184)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:109385)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:111005)",
+        "at <repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:102349"
+      ],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.js",
+          "line": 8,
+          "column": 23
+        },
+        {
+          "fn": "Home",
+          "file": "app/page.tsx",
+          "line": 16,
+          "column": 78
+        }
+      ]
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn2",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:46.560Z",
+      "kind": "fetch",
+      "status": "hit",
+      "reason": "revalidate: 4294967294",
+      "key": "1pjv2uxk9dii4",
+      "method": "GET",
+      "url": "http://localhost:4010/todos",
+      "tags": [
+        "todos"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": [
+        "at listTodos (webpack-internal:///(rsc)/./lib/todos.js:8:23)",
+        "at Home (webpack-internal:///(rsc)/./app/page.tsx:16:78)",
+        "at Object.react_stack_bottom_frame (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:195995)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:92185)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:109385)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:111005)",
+        "at retryTask (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:146653)",
+        "at outlineTask (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:97258)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:91184)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:109385)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:111005)",
+        "at <repo>\\node_modules\\.pnpm\\next@15.5.28_@babel+core@7._9de563aee2b14895f1dc358f374ff889\\node_modules\\next\\dist\\compiled\\next-server\\app-page.runtime.dev.js:23:102349"
+      ],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "lib/todos.js",
+          "line": 8,
+          "column": 23
+        },
+        {
+          "fn": "Home",
+          "file": "app/page.tsx",
+          "line": 16,
+          "column": 78
+        }
+      ]
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn3",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:50.308Z",
+      "kind": "unstable-cache",
+      "status": "hit",
+      "key": "a976ko1av9qq9",
+      "name": "",
+      "tags": [
+        "products"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn4",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:50.581Z",
+      "kind": "fetch",
+      "status": "miss",
+      "key": "1rk0prz9a6w64",
+      "method": "GET",
+      "url": "http://localhost:4010/products/featured",
+      "captureId": "cap_mw03m78mau9svqnn5",
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at ProductsPage (webpack-internal:///(rsc)/./app/products/page.tsx:27:28)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "ProductsPage",
+          "file": "app/products/page.tsx",
+          "line": 27,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn6",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:53.313Z",
+      "kind": "unstable-cache",
+      "status": "hit",
+      "key": "a976ko1av9qq9",
+      "name": "",
+      "tags": [
+        "products"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn7",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:53.315Z",
+      "kind": "fetch",
+      "status": "miss",
+      "key": "1rk0prz9a6w64",
+      "method": "GET",
+      "url": "http://localhost:4010/products/featured",
+      "captureId": "cap_mw03m78mau9svqnn8",
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at ProductsPage (webpack-internal:///(rsc)/./app/products/page.tsx:27:28)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "ProductsPage",
+          "file": "app/products/page.tsx",
+          "line": 27,
+          "column": 28
+        }
+      ]
+    },
+    {
+      "id": "ce_mw03m78mau9svqnn9",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:56.617Z",
+      "kind": "unstable-cache",
+      "status": "hit",
+      "key": "1gd4rbbi3e76s",
+      "name": "",
+      "tags": [
+        "viewer"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/profile"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw03m78mau9svqnna",
+      "sessionId": "server",
+      "at": "2026-11-03T02:58:59.207Z",
+      "kind": "unstable-cache",
+      "status": "hit",
+      "key": "1gd4rbbi3e76s",
+      "name": "",
+      "tags": [
+        "viewer"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/profile"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw03m78mau9svqnnb",
+      "sessionId": "server",
+      "at": "2026-11-03T02:59:03.504Z",
+      "kind": "fetch",
+      "status": "skip",
+      "reason": "auto no cache",
+      "key": "13kqhrdpz1krq",
+      "method": "GET",
+      "url": "http://localhost:4010/todos/1",
+      "tags": [
+        "todos",
+        "todo-1"
+      ],
+      "captureId": "cap_mw03m78mau9svqnnc",
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": [
+        "at getTodo (webpack-internal:///(rsc)/./lib/todos.js:19:23)",
+        "at TodoPage (webpack-internal:///(rsc)/./app/todos/[id]/page.tsx:14:75)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getTodo",
+          "file": "lib/todos.js",
+          "line": 19,
+          "column": 23
+        },
+        {
+          "fn": "TodoPage",
+          "file": "app/todos/[id]/page.tsx",
+          "line": 14,
+          "column": 75
+        }
+      ]
+    },
+    {
+      "id": "ce_mw03m78mau9svqnnd",
+      "sessionId": "server",
+      "at": "2026-11-03T02:59:06.171Z",
+      "kind": "fetch",
+      "status": "skip",
+      "reason": "auto no cache",
+      "key": "13kqhrdpz1krq",
+      "method": "GET",
+      "url": "http://localhost:4010/todos/1",
+      "tags": [
+        "todos",
+        "todo-1"
+      ],
+      "captureId": "cap_mw03m78mau9svqnne",
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": [
+        "at getTodo (webpack-internal:///(rsc)/./lib/todos.js:19:23)",
+        "at TodoPage (webpack-internal:///(rsc)/./app/todos/[id]/page.tsx:14:75)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "getTodo",
+          "file": "lib/todos.js",
+          "line": 19,
+          "column": 23
+        },
+        {
+          "fn": "TodoPage",
+          "file": "app/todos/[id]/page.tsx",
+          "line": 14,
+          "column": 75
+        }
+      ]
+    }
+  ]
+}

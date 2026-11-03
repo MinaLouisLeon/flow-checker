@@ -29,7 +29,11 @@ M28 `flow-checker explore` (branch `feat/m28-explore`) · M29 Endpoints (branch 
 M30 Areas (branch `feat/m30-areas`) · M31 Guarded pages (branch `feat/m31-guarded-pages`) · M32 Start here (branch `feat/m32-start-here`) ·
 M33 Global search (branch `feat/m33-global-search`) · M34 Plain wording (branch `feat/m34-plain-wording`) · M35 Guided walk-through (branch `feat/m35-guided-walk-through`) ·
 M36 Impact check (branch `feat/m36-impact-check`) · M37 Release v0.3.0 (branch `feat/m37-release-v0.3.0`; publish = push the
-`v0.3.0` tag after merging to `main`).
+`v0.3.0` tag after merging to `main`) · M38 Render mode per page (v0.4.0, branch `feat/m38-render-mode`) · M39 Server cache map (branch
+`feat/server-cache-map-m39`) · M40 Cache check at runtime (branch `feat/cache-check-at-runtime-m40`) ·
+M41 Special files and boundaries (branch `feat/special-files-and-boundaries-m41`) ·
+M42 Release v0.4.0 (branch `feat/release-040`; publish = push the `v0.4.0` tag after merging to `main`).
 
-Next: M38 `export --llm` (v0.4.0 coding-agent context, M38–M40; see `docs/PLAN.md`).
+Next: v0.5.0 (boundaries, safety and performance, M43–M48), then v0.6.0 (M49–M54) and
+v1.0.0 (`export --llm` + MCP server covering every feature, M55–M57); see `docs/PLAN.md`.
 Fixes must target code patterns, not the app they were found on.

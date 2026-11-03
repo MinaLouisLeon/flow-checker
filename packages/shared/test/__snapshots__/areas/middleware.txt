@@ -11,7 +11,7 @@ dashboard from /dashboard
   pages: /dashboard, /dashboard/settings
   components: DashboardPage, SettingsPage
   shared components: RootLayout
-  requests: 2, endpoints: 2, notes: 0
+  requests: 2, endpoints: 2, notes: 4
   flows: -
 
 login from /login
@@ -25,7 +25,7 @@ products from /products
   pages: /products
   components: ProductsPage
   shared components: RootLayout
-  requests: 1, endpoints: 1, notes: 0
+  requests: 1, endpoints: 1, notes: 2
   flows: -
 
 shared components: RootLayout

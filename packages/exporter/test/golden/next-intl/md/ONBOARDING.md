@@ -44,4 +44,6 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 
 ## To check
 
-The scan resolved every page, component, type and request.
+1 open note.
+
+- Boundary: [/\[locale\]: no not-found page: calls \`notFound()\` with no \`not-found\` file above it, so Next shows its default page (on 4 pages)](pages/%5Blocale%5D.md) (src/app/\[locale\]/layout.tsx:19)

@@ -191,13 +191,18 @@ describe('registerServerRuntime', () => {
     expect(last?.response?.body).toEqual({ kind: 'none' })
   })
 
-  it('leaves a Next-style patched fetch on top of ours as is', async () => {
+  it('keeps a Next-style patched fetch on top of ours, observed from the outside (M40)', async () => {
     const ours = globalThis.fetch
     const nextPatched = Object.assign((input: RequestInfo | URL, init?: RequestInit) => ours(input, init), {
       __nextPatched: true,
     })
     globalThis.fetch = nextPatched as typeof fetch
-    expect(globalThis.fetch).toBe(nextPatched)
+    // Wrapped once to read cache results, not wrapped again for capture.
+    expect(globalThis.fetch).not.toBe(nextPatched)
+    expect((globalThis.fetch as typeof fetch & { __nextPatched?: boolean }).__nextPatched).toBe(true)
+    const observed = globalThis.fetch
+    globalThis.fetch = observed
+    expect(globalThis.fetch).toBe(observed)
 
     received.length = 0
     await (await fetch(`${backendUrl}/through-next`)).text()

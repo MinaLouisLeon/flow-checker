@@ -111,11 +111,13 @@ describe('project helpers', () => {
       '.flow-checker/sessions/',
       '.flow-checker/cache/',
       '.flow-checker/postman/',
+      '.flow-checker/cache-events.jsonl',
     ])
     expect(ensureGitignore(root)).toEqual([
       '.flow-checker/sessions/',
       '.flow-checker/cache/',
       '.flow-checker/postman/',
+      '.flow-checker/cache-events.jsonl',
     ])
     expect(missingGitignoreEntries(root)).toEqual([])
 

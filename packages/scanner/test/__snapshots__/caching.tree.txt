@@ -1,0 +1,145 @@
+# Route tree
+
+src/app [layout, page]
+├─ api
+│  ├─ featured [route]
+│  ├─ revalidate [route]
+│  ├─ stats [route]
+│  └─ todos [route]
+├─ products [page]
+├─ settings [page]
+├─ todos
+│  └─ [id] (dynamic) [page]
+└─ users [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/api/featured  route GET  src/app/api/featured/route.ts
+/api/revalidate  route POST  src/app/api/revalidate/route.ts
+/api/stats  route GET  src/app/api/stats/route.ts
+/api/todos  route POST  src/app/api/todos/route.ts
+/products  page  src/app/products/page.tsx
+/settings  page  src/app/settings/page.tsx
+/todos/[id]  page  src/app/todos/[id]/page.tsx
+/users  page  src/app/users/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:6
+└─ SiteHeader  server  src/components/site-header.tsx:5
+   └─ Link  external next/link
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+Home  server  src/app/page.tsx:5
+└─ Link  external next/link
+access: open
+render: ISR 15m
+  ISR 1h: caches with `use cache` and `cacheLife('hours')` (page)  src/lib/todos.ts:8
+  ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+boundaries: (none)
+title: caching fixture  (layout metadata)
+
+## /products  src/app/products/page.tsx
+layouts: src/app/layout.tsx
+ProductsPage  server  src/app/products/page.tsx:17
+├─ Suspense  external react
+└─ ProductList  server  src/app/products/page.tsx:4  [suspense]
+access: open
+render: ISR 5m
+  ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+  ISR 5m: fetches with `next: { revalidate: 300 }` (component)  src/lib/products.ts:6
+boundaries:
+  suspense in page around ProductList src/app/products/page.tsx:21
+title: caching fixture  (layout metadata)
+
+## /settings  src/app/settings/page.tsx
+layouts: src/app/layout.tsx
+SettingsPage  server  src/app/settings/page.tsx:3
+access: open
+render: ISR 15m
+  ISR 15m: caches with `use cache` (page)  src/lib/settings.ts:8
+  ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+boundaries: (none)
+title: caching fixture  (layout metadata)
+
+## /todos/[id]  src/app/todos/[id]/page.tsx
+layouts: src/app/layout.tsx
+TodoPage  server  src/app/todos/[id]/page.tsx:18
+├─ Suspense  external react
+└─ TodoDetail  server  src/app/todos/[id]/page.tsx:5  [suspense]
+access: open
+render: partial
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+  ISR 15m: caches with `use cache` (component)  src/lib/todos.ts:14
+boundaries:
+  suspense in page around TodoDetail src/app/todos/[id]/page.tsx:20
+title: caching fixture  (layout metadata)
+
+## /users  src/app/users/page.tsx
+layouts: src/app/layout.tsx
+UsersPage  server  src/app/users/page.tsx:16
+├─ Suspense  external react
+└─ UserList  server  src/app/users/page.tsx:5  [suspense]
+access: open
+render: ISR 1m
+  ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+  ISR 1m: caches with `unstable_cache` (component)  src/lib/users.js:10
+boundaries:
+  suspense in page around UserList src/app/users/page.tsx:20
+title: caching fixture  (layout metadata)
+
+# Server cache
+
+fetch  {API_URL ?? http://localhost:4010}/products/featured  5m  src/app/api/featured/route.ts:8
+  used by: /api/featured
+fetch  {API_URL ?? http://localhost:4010}/todos  [stats]  until revalidated  src/app/api/stats/route.ts:6
+  used by: /api/stats
+  ! tag-never-revalidated: Nothing revalidates the tag `stats`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes on the next build.
+use cache  SiteHeader  [nav]  15m (default)  src/components/site-header.tsx:5
+  used by: /, /products, /settings, /todos/[id], /users
+fetch  {API_URL ?? http://localhost:4010}/products  [products]  5m  src/lib/products.ts:6
+  used by: /products
+use cache  getSettings  [settings]  15m (default)  src/lib/settings.ts:8
+  used by: /settings
+  ! tag-never-revalidated: Nothing revalidates the tag `settings`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes when its time runs out.
+use cache  listTodos  [todos]  1h  src/lib/todos.ts:6
+  used by: /
+use cache  getTodo  [todo-{id}]  15m (default)  src/lib/todos.ts:14
+  used by: /todos/[id]
+unstable_cache  getUsers  [users]  1m  src/lib/users.js:10
+  used by: /users
+
+updateTag('todos')  in server action `createTodo`  src/app/actions.ts:12
+  refreshes: use cache listTodos
+  pages: /
+revalidatePath('/')  in server action `createTodo`  src/app/actions.ts:13
+  pages: /
+updateTag(`todo-${id}`)  in server action `toggleTodo`  src/app/actions.ts:23
+  refreshes: use cache getTodo
+  pages: /todos/[id]
+revalidatePath('/todos/[id]', 'page')  in server action `toggleTodo`  src/app/actions.ts:24
+  pages: /todos/[id]
+revalidateTag('users', 'max')  in server action `refreshUsers`  src/app/actions.ts:28
+  refreshes: unstable_cache getUsers
+  pages: /users
+revalidateTag('user', 'max')  in server action `refreshUsers`  src/app/actions.ts:30
+  ! tag-never-set: No cached data has the tag `user`, so this call refreshes nothing. Tags are set with `next.tags` on a `fetch`, `cacheTag()` or `unstable_cache`'s `tags`.
+revalidatePath('/user')  in server action `refreshUsers`  src/app/actions.ts:31
+  ! path-no-route: No page or route handler is at `/user`, so this call refreshes nothing. `revalidatePath` takes the route's path (for a rewrite, its destination).
+revalidateTag('products', 'max')  in route handler `POST /api/revalidate`  src/app/api/revalidate/route.ts:5
+  refreshes: fetch {API_URL ?? http://localhost:4010}/products
+  pages: /products
+revalidateTag('nav', { expire: 0 })  in route handler `POST /api/revalidate`  src/app/api/revalidate/route.ts:6
+  refreshes: use cache SiteHeader
+  pages: /, /products, /settings, /todos/[id], /users
+revalidatePath('/products')  in route handler `POST /api/revalidate`  src/app/api/revalidate/route.ts:7
+  pages: /products
+updateTag('todos')  in route handler `POST /api/todos`  src/app/api/todos/route.ts:11
+  refreshes: use cache listTodos
+  pages: /
+  ! update-tag-outside-action: `updateTag` only works in a server action; Next throws here. Use `revalidateTag(tag, { expire: 0 })` in a route handler.

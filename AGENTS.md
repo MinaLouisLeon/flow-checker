@@ -40,6 +40,7 @@ pnpm test:e2e              # playwright (after pnpm build)
 pnpm check                 # everything CI runs
 node scripts/record-captures.mjs <fixture>  # re-record real captures (after pnpm build)
 node scripts/next-matrix.mjs 15.5 16        # Next version matrix (network)
+node scripts/render-check.mjs [fixture]     # scanned render modes vs. `next build` (after pnpm build)
 ```
 
 Under full parallel load a couple of slow tests (`flow-checker/test/watch.test.ts`, `export.test.ts`) can time out;
@@ -108,3 +109,8 @@ re-run them on their own before assuming a regression.
 | M35 | Guided walk-through                               | Done   |
 | M36 | Impact check                                      | Done   |
 | M37 | Release v0.3.0                                    | Done   |
+| M38 | Render mode per page                              | Done   |
+| M39 | Server cache map                                  | Done   |
+| M40 | Cache check at runtime                            | Done   |
+| M41 | Special files and boundaries                      | Done   |
+| M42 | Release v0.4.0                                    | Done   |

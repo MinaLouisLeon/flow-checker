@@ -94,6 +94,57 @@ Whether a page can stop a visitor (redirect to a login, show not found), as read
 | <a id="access-open"></a>**open** | Nothing in the code redirects or stops a visitor on this page. |  |
 | <a id="access-unknown"></a>**access ?** (`unknown`) | The scan could not tell: a check is in code it could not follow (a package, an excluded file). | Open the page to see what could not be read. |
 
+## Render mode
+
+How Next renders a page in a production build, as read from the code. `next dev` renders every page per request.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="render-static"></a>**static** | Prerendered once at build time; every visitor gets the same HTML until the next build. |  |
+| <a id="render-isr"></a>**ISR** (`isr`) | Prerendered at build time and rebuilt in the background after the time shown (`revalidate`, `next.revalidate` or `cacheLife`). |  |
+| <a id="render-dynamic"></a>**dynamic** | Rendered for each request, because the page reads the request (`cookies()`, `headers()`, `searchParams`), opts out of caching or has params it cannot list ahead. | Open the page to see each reason and where it is; remove the ones you did not mean. |
+| <a id="render-partial"></a>**partial** | Cache Components: a static shell is prerendered and the parts that read the request or uncached data stream in per request. | Each reason must sit inside `<Suspense>` (or `use cache`), or the build fails. |
+| <a id="render-unknown"></a>**render ?** (`unknown`) | The scan could not tell: a config value or a call it could not read. | Open the page to see what could not be read. |
+
+## Boundaries
+
+What Next shows while a page loads, when it throws or when it calls `notFound()`, read from the special files in its folders and the `<Suspense>` and error boundaries it renders.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="boundary-loading"></a>**loading** | A `loading` file: shown while the page in its folder (and the layouts in folders below) load. It does not cover the layout in its own folder. |  |
+| <a id="boundary-error"></a>**error** | An `error` file: shown when the page in its folder (or a layout in a folder below) throws. It does not catch the layout in its own folder. |  |
+| <a id="boundary-not-found"></a>**not-found** | A `not-found` file: shown when `notFound()` is called below its folder. The one in the app folder also answers URLs no page has. |  |
+| <a id="boundary-forbidden"></a>**forbidden** | A `forbidden` file: shown when `forbidden()` is called below its folder (`authInterrupts`). |  |
+| <a id="boundary-unauthorized"></a>**unauthorized** | An `unauthorized` file: shown when `unauthorized()` is called below its folder (`authInterrupts`). |  |
+| <a id="boundary-global-error"></a>**global-error** | The `global-error` file in the app folder: replaces the whole page, root layout included, when nothing nearer catches an error. |  |
+| <a id="boundary-suspense"></a>**\<Suspense\>** (`suspense`) | A `<Suspense>` a layout, the page or a component renders: its `fallback` shows while what is inside loads. |  |
+| <a id="boundary-error-boundary"></a>**error boundary** (`error-boundary`) | A component that catches what its children throw (`react-error-boundary`, or a class with `componentDidCatch` / `getDerivedStateFromError`). |  |
+| <a id="boundary-blocking-route"></a>**blocks the build** (`blocking-route`) | Cache Components: the page reads request data (`cookies()`, an uncached `fetch`, awaited `params` or `searchParams`) outside `<Suspense>`, so `next build` fails. | Wrap the part that reads it in `<Suspense>` (or add a `loading` file beside the page), cache it with `use cache`, or set `export const instant = false`. |
+| <a id="boundary-no-fallback"></a>**no loading state** (`no-fallback`) | The page is rendered per request and waits for a server request with nothing to show meanwhile: navigating to it seems stuck until the data arrives. | Add a `loading` file beside the page, or wrap the part that fetches in `<Suspense>`. |
+| <a id="boundary-no-error-boundary"></a>**no error boundary** (`no-error-boundary`) | The page fetches fresh data on the server, and no `error` file, error boundary or `global-error` catches a failure, so visitors get Next's default error page. | Add an `error` file in a folder above the page (or `global-error` in the app folder). |
+| <a id="boundary-no-not-found"></a>**no not-found page** (`no-not-found`) | `notFound()`, `forbidden()` or `unauthorized()` is called with no file of that name above it, so Next shows its plain default page. | Add the file in a folder above the call (for a layout, above its own folder). |
+| <a id="boundary-slot-no-match"></a>**slot without default** (`slot-no-match`) | A parallel slot (`@name`) of a layout around the page has no page for its URL and no `default` file. Next 16 fails the build; earlier versions show 404 on a full page load. | Add a `default` file to the slot (returning `null` or calling `notFound()`). |
+| <a id="boundary-no-canonical"></a>**no page to intercept** (`no-canonical`) | An intercepting route (`(.)`) has no plain page at the URL it intercepts, so a refresh or shared link has nothing to show. Next 16 fails the build. | Add the page at that URL, outside the slot. |
+
+## Server cache
+
+What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="cache-fetch"></a>**fetch** | A server `fetch` that asks to be cached: `cache: 'force-cache'`, `next.revalidate` or `next.tags`. |  |
+| <a id="cache-use-cache"></a>**use cache** (`use-cache`) | A function, component or file with the `use cache` directive. `cacheLife` sets how long it is kept, `cacheTag` its tags. |  |
+| <a id="cache-unstable-cache"></a>**unstable_cache** (`unstable-cache`) | A function wrapped in `unstable_cache()`, with its `tags` and `revalidate` options. |  |
+| <a id="cache-tag-never-set"></a>**tag never set** (`tag-never-set`) | The tag is revalidated, but no cached data has it, so the call refreshes nothing. | Check the tag for a typo, or add it where the data is cached. |
+| <a id="cache-tag-never-revalidated"></a>**never revalidated** (`tag-never-revalidated`) | The tag is set, but no `revalidateTag` or `updateTag` call has it: the data only refreshes when its time runs out. | Revalidate the tag where the data changes, or drop the tag if nothing needs it. |
+| <a id="cache-path-no-route"></a>**no such path** (`path-no-route`) | `revalidatePath` names a path that no page or route handler has, so it refreshes nothing. | Use the route path from the `app` folder (for a rewrite, its destination). |
+| <a id="cache-update-tag-outside-action"></a>**updateTag outside an action** (`update-tag-outside-action`) | `updateTag` only works in a server action; Next throws anywhere else. | Use `revalidateTag(tag, { expire: 0 })` in route handlers. |
+| <a id="cache-cached"></a>**cached at runtime** (`cached`) | Live capture: Next served it from its server cache at least once. |  |
+| <a id="cache-not-reused"></a>**not reused yet** (`not-reused`) | Live capture saw it run, but nothing asked for the same data again yet, so it could not be served from the cache. | Load the page again to check that the second time is a hit. |
+| <a id="cache-always-missed"></a>**always missed** (`always-missed`) | Live capture: the same data was asked for again, and Next missed its cache every time. It was never served from the cache. | For a `fetch`, check that it answers 200 (Next keeps nothing else). For a function, check that it doesn't throw and that what it reads doesn't change each time. |
+| <a id="cache-never-cached"></a>**never cached** (`never-cached`) | Live capture: Next skipped its cache every time, for the reason shown. `auto no cache` is a `fetch` without a `cache` option in a page rendered per request. | Give the `fetch` `cache: 'force-cache'` or `next.revalidate`, or check the segment config (`dynamic`, `fetchCache`). |
+
 ## Flow status
 
 Whether a flow found in the code has been walked in the running app.

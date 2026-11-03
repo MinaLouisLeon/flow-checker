@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 15,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -96,6 +96,48 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/page.tsx",
+            "in": "page",
+            "componentId": "cmp_2flvqsq9ypc",
+            "wraps": [
+              "TodoList"
+            ],
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 11,
+              "column": 9
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Relay fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Relay fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -149,6 +191,55 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/components/TodoPage.tsx",
+            "in": "component",
+            "componentId": "cmp_1l6j7vj8arn",
+            "wraps": [
+              "TodoDetail"
+            ],
+            "loc": {
+              "file": "src/components/TodoPage.tsx",
+              "line": 15,
+              "column": 5
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Relay fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Relay fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -174,6 +265,33 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Relay fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Relay fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     }
   ],
@@ -258,6 +376,7 @@
           "resolution": "project",
           "componentId": "cmp_0l3kw3n479w",
           "module": "@/components/TodoList",
+          "suspense": true,
           "loc": {
             "file": "src/app/page.tsx",
             "line": 12,
@@ -276,7 +395,22 @@
           }
         }
       ],
-      "usedTypes": []
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "TodoList"
+          ],
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 11,
+            "column": 9
+          }
+        }
+      ]
     },
     {
       "id": "cmp_27t3g1lua9i",
@@ -769,6 +903,7 @@
           "componentId": "cmp_1gqfw2iamk9",
           "module": "./TodoDetail",
           "conditional": true,
+          "suspense": true,
           "loc": {
             "file": "src/components/TodoPage.tsx",
             "line": 16,
@@ -778,6 +913,21 @@
       ],
       "usedTypes": [
         "typ_21jc4oi1jmb"
+      ],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "TodoDetail"
+          ],
+          "loc": {
+            "file": "src/components/TodoPage.tsx",
+            "line": 15,
+            "column": 5
+          }
+        }
       ],
       "propsType": {
         "text": "{ id: string }",

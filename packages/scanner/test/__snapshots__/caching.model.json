@@ -1,0 +1,2745 @@
+{
+  "version": 15,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>",
+    "cacheComponents": true
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        "dir": "src/app/api",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "featured",
+              "kind": "static",
+              "name": "featured"
+            },
+            "dir": "src/app/api/featured",
+            "files": {
+              "route": "src/app/api/featured/route.ts"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "revalidate",
+              "kind": "static",
+              "name": "revalidate"
+            },
+            "dir": "src/app/api/revalidate",
+            "files": {
+              "route": "src/app/api/revalidate/route.ts"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "stats",
+              "kind": "static",
+              "name": "stats"
+            },
+            "dir": "src/app/api/stats",
+            "files": {
+              "route": "src/app/api/stats/route.ts"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "todos",
+              "kind": "static",
+              "name": "todos"
+            },
+            "dir": "src/app/api/todos",
+            "files": {
+              "route": "src/app/api/todos/route.ts"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        "dir": "src/app/products",
+        "files": {
+          "page": "src/app/products/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        },
+        "dir": "src/app/settings",
+        "files": {
+          "page": "src/app/settings/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        "dir": "src/app/todos",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/todos/[id]",
+            "files": {
+              "page": "src/app/todos/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        },
+        "dir": "src/app/users",
+        "files": {
+          "page": "src/app/users/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bvhjg8zu96",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "isr",
+        "revalidate": 900,
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_1bvhjg8zu96",
+            "loc": {
+              "file": "src/lib/todos.ts",
+              "line": 8,
+              "column": 3
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "detail": "cacheLife('hours')",
+            "revalidate": 3600
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_1jq9zmbuonm",
+            "loc": {
+              "file": "src/components/site-header.tsx",
+              "line": 5,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_2gcm52zh4tz",
+      "path": "/api/featured",
+      "kind": "route-handler",
+      "file": "src/app/api/featured/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "featured",
+          "kind": "static",
+          "name": "featured"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "rt_1lssl7y11mj",
+      "path": "/api/revalidate",
+      "kind": "route-handler",
+      "file": "src/app/api/revalidate/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "revalidate",
+          "kind": "static",
+          "name": "revalidate"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "id": "rt_2du82l2seay",
+      "path": "/api/stats",
+      "kind": "route-handler",
+      "file": "src/app/api/stats/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "stats",
+          "kind": "static",
+          "name": "stats"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET"
+      ]
+    },
+    {
+      "id": "rt_1636zr3h4p1",
+      "path": "/api/todos",
+      "kind": "route-handler",
+      "file": "src/app/api/todos/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "id": "rt_0te2vdgan2u",
+      "path": "/products",
+      "kind": "page",
+      "file": "src/app/products/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_115a9noj763",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "isr",
+        "revalidate": 300,
+        "reasons": [
+          {
+            "in": "component",
+            "componentId": "cmp_1jq9zmbuonm",
+            "loc": {
+              "file": "src/components/site-header.tsx",
+              "line": 5,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_2dtufprs15e",
+            "loc": {
+              "file": "src/lib/products.ts",
+              "line": 6,
+              "column": 21
+            },
+            "siteId": "req_1v51o4o87ag",
+            "kind": "fetch",
+            "effect": "isr",
+            "detail": "next: { revalidate: 300 }",
+            "revalidate": 300
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/products/page.tsx",
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "wraps": [
+              "ProductList"
+            ],
+            "loc": {
+              "file": "src/app/products/page.tsx",
+              "line": 21,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_14nb5m1ywic",
+      "path": "/settings",
+      "kind": "page",
+      "file": "src/app/settings/page.tsx",
+      "segments": [
+        {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_12h7lqgksec",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "isr",
+        "revalidate": 900,
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_12h7lqgksec",
+            "loc": {
+              "file": "src/lib/settings.ts",
+              "line": 8,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_1jq9zmbuonm",
+            "loc": {
+              "file": "src/components/site-header.tsx",
+              "line": 5,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_0rsc27vk284",
+      "path": "/todos/[id]",
+      "kind": "page",
+      "file": "src/app/todos/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1an2304y5ca",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "partial",
+        "revalidate": 900,
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_1jq9zmbuonm",
+            "loc": {
+              "file": "src/components/site-header.tsx",
+              "line": 5,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_0dvf5dfxxis",
+            "loc": {
+              "file": "src/lib/todos.ts",
+              "line": 14,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/todos/[id]/page.tsx",
+            "in": "page",
+            "componentId": "cmp_1an2304y5ca",
+            "wraps": [
+              "TodoDetail"
+            ],
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 20,
+              "column": 5
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1xs1qhs4r3f",
+      "path": "/users",
+      "kind": "page",
+      "file": "src/app/users/page.tsx",
+      "segments": [
+        {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0zsf7mc3ftx",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "isr",
+        "revalidate": 60,
+        "reasons": [
+          {
+            "in": "component",
+            "componentId": "cmp_1jq9zmbuonm",
+            "loc": {
+              "file": "src/components/site-header.tsx",
+              "line": 5,
+              "column": 1
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "revalidate": 900
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_0edmy5fjwi9",
+            "loc": {
+              "file": "src/lib/users.js",
+              "line": 10,
+              "column": 25
+            },
+            "siteId": "req_05c71xnszbd",
+            "kind": "cached",
+            "effect": "isr",
+            "detail": "unstable_cache",
+            "revalidate": 60
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/users/page.tsx",
+            "in": "page",
+            "componentId": "cmp_0zsf7mc3ftx",
+            "wraps": [
+              "UserList"
+            ],
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 20,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 6,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "SiteHeader",
+          "resolution": "project",
+          "componentId": "cmp_1jq9zmbuonm",
+          "module": "@/components/site-header",
+          "loc": {
+            "file": "src/app/layout.tsx",
+            "line": 10,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1bvhjg8zu96",
+      "name": "Home",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 5,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 13,
+            "column": 13
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_2dtufprs15e",
+      "name": "ProductList",
+      "file": "src/app/products/page.tsx",
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 4,
+        "column": 16
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_115a9noj763",
+      "name": "ProductsPage",
+      "file": "src/app/products/page.tsx",
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 17,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Suspense",
+          "resolution": "external",
+          "module": "react",
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 21,
+            "column": 7
+          }
+        },
+        {
+          "name": "ProductList",
+          "resolution": "project",
+          "componentId": "cmp_2dtufprs15e",
+          "suspense": true,
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 22,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "ProductList"
+          ],
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 21,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_12h7lqgksec",
+      "name": "SettingsPage",
+      "file": "src/app/settings/page.tsx",
+      "loc": {
+        "file": "src/app/settings/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0dvf5dfxxis",
+      "name": "TodoDetail",
+      "file": "src/app/todos/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/todos/[id]/page.tsx",
+        "line": 5,
+        "column": 16
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1an2304y5ca",
+      "name": "TodoPage",
+      "file": "src/app/todos/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/todos/[id]/page.tsx",
+        "line": 18,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Suspense",
+          "resolution": "external",
+          "module": "react",
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 20,
+            "column": 5
+          }
+        },
+        {
+          "name": "TodoDetail",
+          "resolution": "project",
+          "componentId": "cmp_0dvf5dfxxis",
+          "suspense": true,
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 21,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "TodoDetail"
+          ],
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 20,
+            "column": 5
+          }
+        }
+      ],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0edmy5fjwi9",
+      "name": "UserList",
+      "file": "src/app/users/page.tsx",
+      "loc": {
+        "file": "src/app/users/page.tsx",
+        "line": 5,
+        "column": 16
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0zsf7mc3ftx",
+      "name": "UsersPage",
+      "file": "src/app/users/page.tsx",
+      "loc": {
+        "file": "src/app/users/page.tsx",
+        "line": 16,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Suspense",
+          "resolution": "external",
+          "module": "react",
+          "loc": {
+            "file": "src/app/users/page.tsx",
+            "line": 20,
+            "column": 7
+          }
+        },
+        {
+          "name": "UserList",
+          "resolution": "project",
+          "componentId": "cmp_0edmy5fjwi9",
+          "suspense": true,
+          "loc": {
+            "file": "src/app/users/page.tsx",
+            "line": 21,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "UserList"
+          ],
+          "loc": {
+            "file": "src/app/users/page.tsx",
+            "line": 20,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1jq9zmbuonm",
+      "name": "SiteHeader",
+      "file": "src/components/site-header.tsx",
+      "loc": {
+        "file": "src/components/site-header.tsx",
+        "line": 5,
+        "column": 23
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/components/site-header.tsx",
+            "line": 10,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1s1917ih72u",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_13cc5ekstvg",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_2awuae7bdft",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 15,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1zioj79pkch",
+      "name": "Settings",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 21,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "theme",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1h4u2f7klbp",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "createTodo",
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 6,
+          "column": 23
+        }
+      },
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "bodyType": {
+        "text": "{ title: string; }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/actions.ts",
+          "line": 7,
+          "column": 9,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "1wz64afxgah"
+    },
+    {
+      "id": "req_0jw9fcs5sqw",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "toggleTodo",
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 16,
+          "column": 23
+        }
+      },
+      "transport": "fetch",
+      "method": "PATCH",
+      "url": {
+        "text": "`${API_URL}/todos/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "bodyType": {
+        "text": "{ done: boolean; }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/actions.ts",
+          "line": 18,
+          "column": 9,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "26e9nviq424"
+    },
+    {
+      "id": "req_1wyk9ydgs6j",
+      "origin": "route-handler",
+      "routeId": "rt_2gcm52zh4tz",
+      "handlerMethod": "GET",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products/featured`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products/featured"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_13cc5ekstvg",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0ir4r244xxm"
+    },
+    {
+      "id": "req_1x1icafh3ot",
+      "origin": "route-handler",
+      "routeId": "rt_2du82l2seay",
+      "handlerMethod": "GET",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1s1917ih72u",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/stats/route.ts",
+          "line": 6,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "2bd9gfervmg"
+    },
+    {
+      "id": "req_13j6nb1xfcz",
+      "origin": "route-handler",
+      "routeId": "rt_1636zr3h4p1",
+      "handlerMethod": "POST",
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "bodyType": {
+        "text": "string",
+        "shape": {
+          "kind": "primitive",
+          "name": "string"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/todos/route.ts",
+          "line": 6,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "1nmyvqg06yw"
+    },
+    {
+      "id": "req_1gfwxpb9du1",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1s1917ih72u",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 23,
+          "callee": "listTodos"
+        },
+        {
+          "file": "src/lib/todos.ts",
+          "line": 10,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1f78iewgpt3"
+    },
+    {
+      "id": "req_25uyneltd07",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "serverAction": {
+        "name": "createTodo",
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 6,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 17,
+          "column": 13
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 17,
+          "column": 13,
+          "callee": "createTodo"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "04xh8tsrugq",
+      "chain": [
+        "req_1h4u2f7klbp"
+      ]
+    },
+    {
+      "id": "req_1v51o4o87ag",
+      "origin": "component",
+      "componentId": "cmp_2dtufprs15e",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_13cc5ekstvg",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/page.tsx",
+          "line": 5,
+          "column": 26,
+          "callee": "listProducts"
+        },
+        {
+          "file": "src/lib/products.ts",
+          "line": 6,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "14asxl5pfy3"
+    },
+    {
+      "id": "req_0jt7837kwt3",
+      "origin": "component",
+      "componentId": "cmp_12h7lqgksec",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/settings`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1zioj79pkch",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/page.tsx",
+          "line": 4,
+          "column": 26,
+          "callee": "getSettings"
+        },
+        {
+          "file": "src/lib/settings.ts",
+          "line": 10,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1zfmuk2rcj3"
+    },
+    {
+      "id": "req_27zkvcxi1o8",
+      "origin": "component",
+      "componentId": "cmp_0dvf5dfxxis",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/todos/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1s1917ih72u",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/todos/[id]/page.tsx",
+          "line": 7,
+          "column": 22,
+          "callee": "getTodo"
+        },
+        {
+          "file": "src/lib/todos.ts",
+          "line": 17,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "097169uhh6l"
+    },
+    {
+      "id": "req_03tkx1244vu",
+      "origin": "component",
+      "componentId": "cmp_0dvf5dfxxis",
+      "serverAction": {
+        "name": "toggleTodo",
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 16,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/app/todos/[id]/page.tsx",
+          "line": 9,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/todos/[id]/page.tsx",
+          "line": 9,
+          "column": 11,
+          "callee": "toggleTodo"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1h0vmijgzlt",
+      "chain": [
+        "req_0jw9fcs5sqw"
+      ]
+    },
+    {
+      "id": "req_05c71xnszbd",
+      "origin": "component",
+      "componentId": "cmp_0edmy5fjwi9",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/users`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_2awuae7bdft",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/users/page.tsx",
+          "line": 6,
+          "column": 23,
+          "callee": "getUsers"
+        },
+        {
+          "file": "src/lib/users.js",
+          "line": 6,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1sssa50aaaq"
+    },
+    {
+      "id": "req_1rnq3uqo47a",
+      "origin": "component",
+      "componentId": "cmp_0zsf7mc3ftx",
+      "serverAction": {
+        "name": "refreshUsers",
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 27,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/app/users/page.tsx",
+          "line": 23,
+          "column": 13
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/users/page.tsx",
+          "line": 23,
+          "column": 13,
+          "callee": "refreshUsers"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0x9m5uow132"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_23xwcvl87r5",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 13,
+          "column": 13
+        }
+      },
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 13,
+        "column": 13
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 13,
+          "column": 13,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0rsc27vk284"
+    },
+    {
+      "id": "nav_17ku4gdne66",
+      "origin": "component",
+      "componentId": "cmp_1jq9zmbuonm",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/site-header.tsx",
+          "line": 10,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/components/site-header.tsx",
+        "line": 10,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/site-header.tsx",
+          "line": 10,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_0hm2qayxy9l",
+      "origin": "component",
+      "componentId": "cmp_1jq9zmbuonm",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/products\"",
+        "confidence": "exact",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/site-header.tsx",
+          "line": 10,
+          "column": 35
+        }
+      },
+      "loc": {
+        "file": "src/components/site-header.tsx",
+        "line": 10,
+        "column": 35
+      },
+      "callStack": [
+        {
+          "file": "src/components/site-header.tsx",
+          "line": 10,
+          "column": 35,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0te2vdgan2u"
+    },
+    {
+      "id": "nav_1z4dmqysr49",
+      "origin": "component",
+      "componentId": "cmp_1jq9zmbuonm",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/users\"",
+        "confidence": "exact",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/site-header.tsx",
+          "line": 10,
+          "column": 74
+        }
+      },
+      "loc": {
+        "file": "src/components/site-header.tsx",
+        "line": 10,
+        "column": 74
+      },
+      "callStack": [
+        {
+          "file": "src/components/site-header.tsx",
+          "line": 10,
+          "column": 74,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1xs1qhs4r3f"
+    },
+    {
+      "id": "nav_1g6qh8z4by8",
+      "origin": "component",
+      "componentId": "cmp_1jq9zmbuonm",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/settings\"",
+        "confidence": "exact",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/site-header.tsx",
+          "line": 11,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/components/site-header.tsx",
+        "line": 11,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/components/site-header.tsx",
+          "line": 11,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_14nb5m1ywic"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_0v632q97ea7",
+      "name": "Home submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_1bvhjg8zu96",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_1bvhjg8zu96",
+          "event": "action",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 17,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_25uyneltd07"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ]
+    },
+    {
+      "id": "flw_1ujugafgcix",
+      "name": "TodoDetail submit",
+      "routeId": "rt_0rsc27vk284",
+      "componentId": "cmp_0dvf5dfxxis",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0rsc27vk284",
+          "componentId": "cmp_0dvf5dfxxis",
+          "event": "action",
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 9,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_03tkx1244vu"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0rsc27vk284"
+      ]
+    },
+    {
+      "id": "flw_1wngmv9jbce",
+      "name": "UsersPage submit",
+      "routeId": "rt_1xs1qhs4r3f",
+      "componentId": "cmp_0zsf7mc3ftx",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1xs1qhs4r3f",
+          "componentId": "cmp_0zsf7mc3ftx",
+          "event": "action",
+          "loc": {
+            "file": "src/app/users/page.tsx",
+            "line": 23,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1rnq3uqo47a"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1xs1qhs4r3f"
+      ]
+    }
+  ],
+  "queryLinks": [],
+  "imports": {
+    "src/app/actions.ts": [
+      "src/lib/api-url.ts"
+    ],
+    "src/app/api/featured/route.ts": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ],
+    "src/app/api/stats/route.ts": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ],
+    "src/app/api/todos/route.ts": [
+      "src/lib/api-url.ts"
+    ],
+    "src/app/layout.tsx": [
+      "src/components/site-header.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/app/actions.ts",
+      "src/lib/todos.ts"
+    ],
+    "src/app/products/page.tsx": [
+      "src/lib/products.ts"
+    ],
+    "src/app/settings/page.tsx": [
+      "src/lib/settings.ts"
+    ],
+    "src/app/todos/[id]/page.tsx": [
+      "src/app/actions.ts",
+      "src/lib/todos.ts"
+    ],
+    "src/app/users/page.tsx": [
+      "src/app/actions.ts",
+      "src/lib/users.js"
+    ],
+    "src/lib/products.ts": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ],
+    "src/lib/settings.ts": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ],
+    "src/lib/todos.ts": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ],
+    "src/lib/users.js": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ]
+  },
+  "cache": {
+    "entries": [
+      {
+        "id": "ce_2f6hvjnxtt2",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/products/featured",
+        "revalidate": 300,
+        "tags": [],
+        "loc": {
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 21
+        },
+        "siteIds": [
+          "req_1wyk9ydgs6j"
+        ],
+        "pageIds": [],
+        "handlerIds": [
+          "rt_2gcm52zh4tz"
+        ],
+        "flags": []
+      },
+      {
+        "id": "ce_2bzzsf1ekmk",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/todos",
+        "cache": "force-cache",
+        "tags": [
+          {
+            "text": "'stats'",
+            "value": "stats",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "src/app/api/stats/route.ts",
+          "line": 6,
+          "column": 21
+        },
+        "siteIds": [
+          "req_1x1icafh3ot"
+        ],
+        "pageIds": [],
+        "handlerIds": [
+          "rt_2du82l2seay"
+        ],
+        "flags": [
+          {
+            "kind": "tag-never-revalidated",
+            "message": "Nothing revalidates the tag `stats`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes on the next build."
+          }
+        ]
+      },
+      {
+        "id": "ce_12kinw9012e",
+        "kind": "use-cache",
+        "name": "SiteHeader",
+        "directive": "use cache",
+        "revalidate": 900,
+        "tags": [
+          {
+            "text": "'nav'",
+            "value": "nav",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "src/components/site-header.tsx",
+          "line": 5,
+          "column": 23
+        },
+        "siteIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf",
+          "rt_0te2vdgan2u",
+          "rt_14nb5m1ywic",
+          "rt_0rsc27vk284",
+          "rt_1xs1qhs4r3f"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_1cde1382hel",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/products",
+        "revalidate": 300,
+        "tags": [
+          {
+            "text": "'products'",
+            "value": "products",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "src/lib/products.ts",
+          "line": 6,
+          "column": 21
+        },
+        "siteIds": [
+          "req_1v51o4o87ag"
+        ],
+        "pageIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_2dgpgqa1ozz",
+        "kind": "use-cache",
+        "name": "getSettings",
+        "directive": "use cache",
+        "inFile": true,
+        "revalidate": 900,
+        "tags": [
+          {
+            "text": "'settings'",
+            "value": "settings",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "src/lib/settings.ts",
+          "line": 8,
+          "column": 23
+        },
+        "siteIds": [
+          "req_0jt7837kwt3"
+        ],
+        "pageIds": [
+          "rt_14nb5m1ywic"
+        ],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "tag-never-revalidated",
+            "message": "Nothing revalidates the tag `settings`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes when its time runs out."
+          }
+        ]
+      },
+      {
+        "id": "ce_01a180wtuq9",
+        "kind": "use-cache",
+        "name": "listTodos",
+        "directive": "use cache",
+        "revalidate": 3600,
+        "life": "cacheLife('hours')",
+        "tags": [
+          {
+            "text": "'todos'",
+            "value": "todos",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "src/lib/todos.ts",
+          "line": 6,
+          "column": 23
+        },
+        "siteIds": [
+          "req_1gfwxpb9du1"
+        ],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_18fcvcosjrz",
+        "kind": "use-cache",
+        "name": "getTodo",
+        "directive": "use cache",
+        "revalidate": 900,
+        "tags": [
+          {
+            "text": "`todo-${id}`",
+            "value": "todo-{id}",
+            "confidence": "pattern"
+          }
+        ],
+        "loc": {
+          "file": "src/lib/todos.ts",
+          "line": 14,
+          "column": 23
+        },
+        "siteIds": [
+          "req_27zkvcxi1o8"
+        ],
+        "pageIds": [
+          "rt_0rsc27vk284"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_2bpnutq8zcz",
+        "kind": "unstable-cache",
+        "name": "getUsers",
+        "fn": "loadUsers",
+        "revalidate": 60,
+        "tags": [
+          {
+            "text": "'users'",
+            "value": "users",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "src/lib/users.js",
+          "line": 10,
+          "column": 25
+        },
+        "siteIds": [
+          "req_05c71xnszbd"
+        ],
+        "pageIds": [
+          "rt_1xs1qhs4r3f"
+        ],
+        "handlerIds": [],
+        "flags": []
+      }
+    ],
+    "invalidations": [
+      {
+        "id": "ci_1dmhzczpdt8",
+        "api": "updateTag",
+        "tag": {
+          "text": "'todos'",
+          "value": "todos",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "createTodo",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 6,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 12,
+            "column": 3,
+            "callee": "updateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 12,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_01a180wtuq9"
+        ],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1qa93uzukrr",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "createTodo",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 6,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 13,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 13,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1rg9uhbvq2u",
+        "api": "updateTag",
+        "tag": {
+          "text": "`todo-${id}`",
+          "value": "todo-{id}",
+          "confidence": "pattern"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "toggleTodo",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 16,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 23,
+            "column": 3,
+            "callee": "updateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 23,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_18fcvcosjrz"
+        ],
+        "pageIds": [
+          "rt_0rsc27vk284"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1m1dr4rbojs",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/todos/[id]'",
+          "value": "/todos/[id]",
+          "confidence": "exact",
+          "type": "page"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "toggleTodo",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 16,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 24,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 24,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0rsc27vk284"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_104p81f84oj",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'users'",
+          "value": "users",
+          "confidence": "exact"
+        },
+        "profile": "'max'",
+        "origin": "server-action",
+        "serverAction": {
+          "name": "refreshUsers",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 27,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 28,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 28,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_2bpnutq8zcz"
+        ],
+        "pageIds": [
+          "rt_1xs1qhs4r3f"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_196bcj4y9g6",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'user'",
+          "value": "user",
+          "confidence": "exact"
+        },
+        "profile": "'max'",
+        "origin": "server-action",
+        "serverAction": {
+          "name": "refreshUsers",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 27,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 30,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 30,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "tag-never-set",
+            "message": "No cached data has the tag `user`, so this call refreshes nothing. Tags are set with `next.tags` on a `fetch`, `cacheTag()` or `unstable_cache`'s `tags`."
+          }
+        ]
+      },
+      {
+        "id": "ci_0ft9xicp0ei",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/user'",
+          "value": "/user",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "refreshUsers",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 27,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/actions.ts",
+            "line": 31,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/app/actions.ts",
+          "line": 31,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "path-no-route",
+            "message": "No page or route handler is at `/user`, so this call refreshes nothing. `revalidatePath` takes the route's path (for a rewrite, its destination)."
+          }
+        ]
+      },
+      {
+        "id": "ci_1dtxdcqldah",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'products'",
+          "value": "products",
+          "confidence": "exact"
+        },
+        "profile": "'max'",
+        "origin": "route-handler",
+        "routeId": "rt_1lssl7y11mj",
+        "handlerMethod": "POST",
+        "callStack": [
+          {
+            "file": "src/app/api/revalidate/route.ts",
+            "line": 5,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/api/revalidate/route.ts",
+          "line": 5,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_1cde1382hel"
+        ],
+        "pageIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_0g0806nqpnf",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'nav'",
+          "value": "nav",
+          "confidence": "exact"
+        },
+        "profile": "{ expire: 0 }",
+        "origin": "route-handler",
+        "routeId": "rt_1lssl7y11mj",
+        "handlerMethod": "POST",
+        "callStack": [
+          {
+            "file": "src/app/api/revalidate/route.ts",
+            "line": 6,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/api/revalidate/route.ts",
+          "line": 6,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_12kinw9012e"
+        ],
+        "pageIds": [
+          "rt_0h4e5x5madf",
+          "rt_0te2vdgan2u",
+          "rt_14nb5m1ywic",
+          "rt_0rsc27vk284",
+          "rt_1xs1qhs4r3f"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_28f8q621lgu",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/products'",
+          "value": "/products",
+          "confidence": "exact"
+        },
+        "origin": "route-handler",
+        "routeId": "rt_1lssl7y11mj",
+        "handlerMethod": "POST",
+        "callStack": [
+          {
+            "file": "src/app/api/revalidate/route.ts",
+            "line": 7,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/app/api/revalidate/route.ts",
+          "line": 7,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1t5yqroopfs",
+        "api": "updateTag",
+        "tag": {
+          "text": "'todos'",
+          "value": "todos",
+          "confidence": "exact"
+        },
+        "origin": "route-handler",
+        "routeId": "rt_1636zr3h4p1",
+        "handlerMethod": "POST",
+        "callStack": [
+          {
+            "file": "src/app/api/todos/route.ts",
+            "line": 11,
+            "column": 3,
+            "callee": "updateTag"
+          }
+        ],
+        "loc": {
+          "file": "src/app/api/todos/route.ts",
+          "line": 11,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_01a180wtuq9"
+        ],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "update-tag-outside-action",
+            "message": "`updateTag` only works in a server action; Next throws here. Use `revalidateTag(tag, { expire: 0 })` in a route handler."
+          }
+        ]
+      }
+    ]
+  }
+}

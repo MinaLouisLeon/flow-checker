@@ -1,5 +1,8 @@
 export * from './access'
 export * from './areas'
+export * from './boundaries'
+export * from './cache'
+export * from './cache-check'
 export * from './capture'
 export type {
   ApiClientConfig,
@@ -30,6 +33,7 @@ export * from './middleware'
 export * from './model'
 export * from './model-index'
 export * from './query-keys'
+export * from './render'
 export * from './search'
 export { interceptLevels, isPrivateFolder, isUrlSegment, parseSegment, urlPart } from './segments'
 export * from './summary'

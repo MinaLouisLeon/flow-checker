@@ -1,4 +1,5 @@
 // Lookup tables and derived facts the dashboard screens and the exporter need, built once per model.
+import { GAP_LABELS, gapText } from './boundaries'
 import { isInfoFlag, urlText } from './format-requests'
 import type {
   AppModel,
@@ -41,6 +42,7 @@ export type NoteKind =
   | 'missing-page-component'
   | 'request'
   | 'middleware'
+  | 'boundary'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -410,6 +412,31 @@ function scanNotes(model: AppModel): ScanNote[] {
         requestId: site.id,
       })
     }
+  }
+  // Boundary gaps (M41): a gap in a layout shows on every page under it, so it is one note.
+  const gapNotes = new Map<string, { note: ScanNote; pages: number }>()
+  for (const route of model.routes) {
+    for (const gap of route.boundaries?.gaps ?? []) {
+      const key = `${gap.kind}|${gap.detail}|${gap.loc?.file}:${gap.loc?.line}:${gap.loc?.column}`
+      const known = gapNotes.get(key)
+      if (known) {
+        known.pages++
+        continue
+      }
+      gapNotes.set(key, {
+        pages: 1,
+        note: {
+          kind: 'boundary',
+          message: `${route.path}${route.slot ? ` @${route.slot}` : ''}: ${GAP_LABELS[gap.kind]}: ${gapText(gap)}`,
+          file: gap.loc?.file ?? route.file,
+          ...(gap.loc ? { line: gap.loc.line, column: gap.loc.column } : {}),
+          routeId: route.id,
+        },
+      })
+    }
+  }
+  for (const { note, pages } of gapNotes.values()) {
+    notes.push(pages > 1 ? { ...note, message: `${note.message} (on ${pages} pages)` } : note)
   }
   const mw = model.middleware
   if (mw?.matcherText !== undefined) {

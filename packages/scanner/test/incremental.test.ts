@@ -94,6 +94,27 @@ describe('scan session', () => {
     expectFresh(model)
   })
 
+  it('relabels a page that starts reading cookies (M38)', () => {
+    const page = 'app/(marketing)/about/page.tsx'
+    const about = () => session.model.routes.find((r) => r.path === '/about')
+    expect(about()?.render?.mode).toBe('static')
+    const original = read(page)
+    write(
+      page,
+      `import { cookies } from 'next/headers'\n${original.replace(
+        'export default function AboutPage() {',
+        "export default async function AboutPage() {\n  const theme = (await cookies()).get('theme')",
+      )}`,
+    )
+    const model = session.update({ changed: [page] })
+    expect(about()?.render?.mode).toBe('dynamic')
+    expectFresh(model)
+    write(page, original)
+    expect(session.update({ changed: [page] }).routes.find((r) => r.path === '/about')?.render?.mode).toBe(
+      'static',
+    )
+  })
+
   it('keeps the hash of an event handler when only the JSX around it changes', () => {
     const path = 'deleteUser > api.delete'
     const before = site(session.model, path)

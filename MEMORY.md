@@ -45,6 +45,11 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
 | M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
 | M37 | Release v0.3.0        | Matrix also runs `explore` (project files hashed before/after), `summary` and `impact`. Publish = tag.                   |
+| M38 | Render mode           | Model version 13, `Route.render`. Walk records `RenderUse`s; `scanner/src/render.ts` adds segment config and the mode.   |
+| M39 | Server cache map      | Model version 14, `AppModel.cache`. Walk records `CacheFound` / `InvalidationFound`; `scanner/src/cache.ts` links them.  |
+| M40 | Cache check (runtime) | Runtime reads Next's own records (fetch metrics, cache handlers, `IncrementalCache.get`); served model gets `runtime`.   |
+| M41 | Boundaries            | Model version 15, `Route.boundaries` / `metadata`. Refs carry `suspense` / `errorBoundary`; `scanner/src/boundaries.ts`. |
+| M42 | Release v0.4.0        | Matrix runs `next build` per version (async: it fetches from the script). Publish = tag.                                 |
 
 ## Gotchas
 
@@ -381,7 +386,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 
 ## M33 — Global search (branch `feat/m33-global-search`)
 
-- The ranking is pure (`shared/src/search.ts`) so a v0.4.0 agent tool can reuse it; the dashboard only adds the box
+- The ranking is pure (`shared/src/search.ts`) so the v1.0.0 MCP tool (M56) can reuse it; the dashboard only adds the box
   and `searchScreen()`. Add a new kind there, in `SEARCH_KINDS`, `searchScreen()` and the link test.
 - Word matching keeps each field on its own line in `allWords`: without that, `src/user` matched a component named
   `User` in `src/b.tsx` (pieces from two fields).
@@ -469,3 +474,87 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Found, not fixed (next patch): links from config data or through the project's own link components aren't
   navigations ("nothing links here" on most pages of a data-driven menu), and `router.push()` in listeners an effect
   registers, or in handlers chosen with a ternary, is read as a guard / `page-load`.
+
+## M38 — Render mode per page (branch `feat/m38-render-mode`)
+
+- Check rendering rules with a real `next build` before coding them: `scripts/render-check.mjs` builds every Next
+  fixture and compares the route table. A scratch app outside the repo needs `next build --webpack`: Turbopack won't
+  resolve a `node_modules` junction that points outside the project root.
+- A dynamic segment without `generateStaticParams` is ƒ even when the page never reads `params`; a plain server
+  `fetch` is static (it runs once at build). Most fixture "dynamic" pages are `[id]` pages for that reason.
+- With Cache Components, request data outside `<Suspense>` fails the build ("blocking route"), so `partial` pages
+  are only valid when every reason is inside a boundary. That check is M41.
+- Render uses are recorded in `#emit` for every server-render site (not only fetch), so M39 can read the cache
+  options from `RenderUse.fetch` / `cached` without another walk.
+- Never add `next.config.*` (or any file that imports Next's types) to the ts-morph project: it made every warm
+  re-scan of the basic fixture 3x slower (66 → 205 ms, first one 130 ms → 1 s) and failed `incremental.test.ts`'s
+  1 s budget under load. It is parsed on its own with `ts.createSourceFile`. The perf app has no Next config, so
+  `bench.mjs` didn't show it: time `session.update()` on a fixture too.
+- New page-view text must keep M34's badge budget (`badges.test.ts`: details off hides a third of the badges):
+  secondary badges go behind `useShowDetails()`.
+- Heredoc patch scripts again turned `'\n'` into a line break (exporter `renderSection`); use the Edit tool for
+  lines with escapes.
+
+## M39 — Server cache map (branch `feat/server-cache-map-m39`)
+
+- Build the fixtures with `next build` before trusting a caching rule: with Cache Components a `fetch` with
+  `force-cache` / `next.revalidate` and `unstable_cache` are prerendered (○), but `next.tags` alone is dynamic (◐);
+  on Next 15 `unstable_cache`'s `revalidate` sets the page's ISR time. M38 had all three wrong and `render-check`
+  couldn't see it until a fixture used them.
+- Stable Next 15 has no `use cache` (it needs a canary), so `caching-15` covers tagged fetches and `unstable_cache`
+  only; Next 15 names (`unstable_cacheTag`, `unstable_cacheLife`) are covered by unit tests.
+- `render-check` parsing: Next 15's table has size columns (`3.46 kB` read as a time before), and with Cache
+  Components a page with params prints a symbol-less row with its `◐` row below.
+- Cached functions are entered by the walk even with no request inside (`#reachesNetwork` returns true for them),
+  so database-only `use cache` functions are entries. Fetch entries are keyed by the `fetch` call, not the site.
+- A tag the scan can't read on one side (`revalidateTag(tag)` from a webhook, `cacheTag(...tags)`) turns off the
+  flags for the other side; otherwise every tag would be flagged.
+- Don't `git add -N` new files to see them in `git diff`: it changes the index (`git reset -q -- <paths>` undoes it).
+
+## M40 — Cache check at runtime (branch `feat/cache-check-at-runtime-m40`)
+
+- Read Next's own records instead of guessing: `workStore.fetchMetrics` (dev only) for `fetch`, the handlers on
+  `globalThis[Symbol.for('@next/cache-handlers-map')]` for `use cache`, `IncrementalCache.get` for `unstable_cache`.
+  Next 16 keeps its async storages on `globalThis` (`@next/work-async-storage@<version>`); on Next 15 load
+  `next/dist/server/app-render/work-async-storage.external.js` from the app's `next` (`createRequire(cwd)`): same instance.
+- With Cache Components, `Date.now()`, `new Date()` and `Math.random()` in server code that runs during a dev
+  prerender abort the render. Server runtime code takes times and ids from `runtime/src/clock.ts`;
+  `runtime/test/cache.test.ts` traps calls from `runtime/src` while a fake page renders.
+- In dev, Next labels every empty fetch-cache lookup `cache-control: no-cache (hard refresh)` (a skip). It is a hard
+  reload only when the incoming request has exactly `cache-control: no-cache` (Next's own test in `IncrementalCache`).
+- A page with a cached `fetch` that answers 404 turns `partial` in `next build` with Cache Components, so `render-check`
+  disagreed: keep planted runtime cases out of pages whose render mode is checked (the Next 16 one is a route handler).
+- Webpack dev (Next 15) server frames are `webpack-internal:///(rsc)/./lib/x.js:<bundled line>`; the mapper keeps the
+  bundled line. Matching by URL is the fallback, as for request sites.
+- The recordings that `matching.test.ts` uses must exercise every request site; the caching recordings don't (cache
+  hits send nothing), so they are only used by the cache tests.
+
+## M41 — Special files and boundaries (branch `feat/special-files-and-boundaries-m41`)
+
+- Next 16.4's `next build` stops at the first prerender error, so check one case per build: `cases.sh`-style, move all
+  case folders out of `app/` and copy one back per build. Strict route matching (16.4) fails the build for a slot with
+  no page or `default` for a URL a sibling slot or `children` matches, and for an intercepting route with no plain page.
+  So a planted slot gap can't live in a fixture that `render-check` builds: it is in `boundaries.test.ts` instead.
+- A folder's `loading` / `error` never cover the layout in the same folder (Next renders them inside it). The page and
+  deeper layouts are covered; `global-error` covers everything. `boundaries.ts` compares folder indexes for this.
+- `params` / `searchParams` only block with Cache Components when awaited (`await`, `use()`, `.then`): a page that hands
+  `params` to a child inside `<Suspense>` builds. The `caching` fixture's `/todos/[id]` is that case and caught it.
+- Titles: Next skips the template of the layout in the page's own folder (`i < metadataItems.length - 2` in
+  `resolve-metadata.js`) and a plain string title resets the template for what is below. Checked against built HTML.
+- A boundary's `wraps` must look inside components too (`<Catch>{children}</Catch>`), or a layout's `<Suspense>`
+  around a wrapper doesn't count for `children`.
+- Note messages are escaped in `issues.md` (`text()`); boundary notes are the tool's own wording, so they go out raw and
+  the dashboard renders them with `CodeText`. A table cell with `|` (a title template) must be escaped.
+- The Python-in-heredoc escape trap struck again (`'\n'` in `lines.join`): use the Edit tool for those lines.
+
+## M42 — Release v0.4.0 (branch `feat/release-040`)
+
+- The test app now lives at `work/csrf-jobseekk/jobseekk_frontend` (37 pages at its HEAD); the second app is still
+  `work/ur-dr-temp/ur-dr-frontend`. A fresh clone shows a few files modified (line endings): compare `git status`
+  before and after `explore` instead of expecting it clean.
+- `next build --webpack` works on both real-app clones (junctioned `node_modules`), and `compareRenderModes()` from
+  `scripts/next-build-table.mjs` checks a model against its output: the best check of render modes on a real app.
+- A script that runs its own HTTP server must not `spawnSync` a command that calls it (`next build` prerendering a
+  page that fetches from it): the event loop is blocked and the build retries the page for minutes.
+- New files under `.flow-checker/` need an entry in `GITIGNORE_ENTRIES` (`cli/project.ts`) unless safe to commit;
+  M40's `cache-events.jsonl` was missed until here.

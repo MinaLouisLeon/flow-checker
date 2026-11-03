@@ -12,14 +12,22 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { accessOf, isVerified as isSiteVerified } from '@flow-checker/shared'
+import { accessOf, isVerified as isSiteVerified, RENDER_LABELS, renderOf } from '@flow-checker/shared'
 import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
 import { areasOf } from '../lists'
 import type { ModelIndex } from '../model-index'
-import { ACCESS_FILTERS, type AccessFilter, href, type MapView, replaceScreen } from '../router'
-import { AccessBadge, Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
+import {
+  ACCESS_FILTERS,
+  type AccessFilter,
+  href,
+  type MapView,
+  RENDER_FILTERS,
+  type RenderFilter,
+  replaceScreen,
+} from '../router'
+import { AccessBadge, Badge, Empty, matches, RenderBadge, SearchBox, SourceLink } from '../ui'
 
 interface RouteNodeData extends Record<string, unknown> {
   route: Route
@@ -47,19 +55,28 @@ export function MapScreen({
   q,
   areas,
   access,
+  render,
 }: {
   view: MapView
   q: string
   areas?: boolean
   access?: AccessFilter
+  render?: RenderFilter
 }) {
   const { index } = useData()
-  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas, access })
-  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas, access })
+  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas, access, render })
+  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas, access, render })
   const setAreas = (next: boolean) =>
-    replaceScreen({ name: 'map', view, q, areas: next || undefined, access })
+    replaceScreen({ name: 'map', view, q, areas: next || undefined, access, render })
   const setAccess = (next: AccessFilter | undefined) =>
-    replaceScreen({ name: 'map', view, q, areas, access: next })
+    replaceScreen({ name: 'map', view, q, areas, access: next, render })
+  const setRender = (next: RenderFilter | undefined) =>
+    replaceScreen({ name: 'map', view, q, areas, access, render: next })
+  const renderCounts = useMemo(() => {
+    const counts: Record<RenderFilter, number> = { static: 0, isr: 0, dynamic: 0, partial: 0, unknown: 0 }
+    for (const route of index.model.routes) if (route.kind === 'page') counts[renderOf(route).mode]++
+    return counts
+  }, [index])
   const accessCounts = useMemo(() => {
     const counts: Record<AccessFilter, number> = { guarded: 0, open: 0, unknown: 0 }
     for (const route of index.model.routes) if (route.kind === 'page') counts[accessOf(route).status]++
@@ -105,9 +122,27 @@ export function MapScreen({
             ))}
           </fieldset>
         )}
+        {view === 'graph' && (
+          <fieldset className="segmented" aria-label="Render mode">
+            <button type="button" aria-pressed={!render} onClick={() => setRender(undefined)}>
+              Any rendering
+            </button>
+            {RENDER_FILTERS.filter((m) => renderCounts[m] > 0 || render === m).map((m) => (
+              <button
+                key={m}
+                type="button"
+                aria-pressed={render === m}
+                onClick={() => setRender(render === m ? undefined : m)}
+                title={RENDER_HINTS[m]}
+              >
+                {RENDER_LABELS[m]} {renderCounts[m]}
+              </button>
+            ))}
+          </fieldset>
+        )}
       </div>
       {view === 'graph' ? (
-        <RouteGraphView q={q} showAreas={Boolean(areas)} access={access} />
+        <RouteGraphView q={q} showAreas={Boolean(areas)} access={access} render={render} />
       ) : view === 'tree' ? (
         <RouteTreeView q={q} />
       ) : (
@@ -117,16 +152,36 @@ export function MapScreen({
   )
 }
 
+const RENDER_HINTS: Record<RenderFilter, string> = {
+  static: 'Pages prerendered at build time',
+  isr: 'Pages prerendered and refreshed after a set time',
+  dynamic: 'Pages rendered for each request',
+  partial: 'Pages with a static shell and parts streamed per request (Cache Components)',
+  unknown: "Pages whose rendering the scan can't tell",
+}
+
 const ACCESS_HINTS: Record<AccessFilter, string> = {
   guarded: 'Pages that redirect or stop under a condition the scan read',
   open: 'Pages where nothing redirects or stops them',
   unknown: "Pages that may redirect or stop, under a condition the scan can't read",
 }
 
-function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolean; access?: AccessFilter }) {
+function RouteGraphView({
+  q,
+  showAreas,
+  access,
+  render,
+}: {
+  q: string
+  showAreas: boolean
+  access?: AccessFilter
+  render?: RenderFilter
+}) {
   const { index } = useData()
   const [showShared, setShowShared] = useState(false)
   const hasSharedEdges = index.navEdges.some((e) => e.shared)
+  const hasSlots = index.model.routes.some((r) => r.slot && !r.intercepting)
+  const hasIntercepts = index.model.routes.some((r) => r.intercepting)
   const { nodes, edges } = useMemo(() => {
     const graph = layoutRoutes(index.model.routes)
     // Counts are the page's own tree: the layouts' components and notes are the same on every
@@ -173,14 +228,26 @@ function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolea
       // Pages in later grid columns sit next to their parent already; edges to them crossed the grid.
       ...graph.edges
         .filter((e) => !e.grid)
-        .map((e) => ({
-          id: e.id,
-          source: e.source,
-          target: e.target,
-          sourceHandle: 'out',
-          targetHandle: 'in',
-          className: 'edge-hierarchy',
-        })),
+        .map((e) =>
+          e.kind === 'intercepts'
+            ? {
+                id: e.id,
+                source: e.source,
+                target: e.target,
+                type: 'smoothstep',
+                ...navHandles(positions.get(e.source), positions.get(e.target)),
+                className: 'edge-intercepts',
+                markerEnd: { type: MarkerType.ArrowClosed },
+              }
+            : {
+                id: e.id,
+                source: e.source,
+                target: e.target,
+                sourceHandle: 'out',
+                targetHandle: 'in',
+                className: e.kind === 'hierarchy' ? 'edge-hierarchy' : `edge-hierarchy edge-${e.kind}`,
+              },
+        ),
       // Links, router calls and redirects between pages (M7). The line style tells them apart
       // (see the legend): text labels piled up on busy maps.
       ...index.navEdges
@@ -208,11 +275,12 @@ function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolea
           ...n.data,
           dimmed:
             !matches(q, n.data.route.path, n.data.route.file) ||
-            (!!access && (n.data.route.kind !== 'page' || accessOf(n.data.route).status !== access)),
+            (!!access && (n.data.route.kind !== 'page' || accessOf(n.data.route).status !== access)) ||
+            (!!render && (n.data.route.kind !== 'page' || renderOf(n.data.route).mode !== render)),
         },
       })),
     ],
-    [frames, nodes, q, access],
+    [frames, nodes, q, access, render],
   )
 
   if (nodes.length === 0) return <p className="empty">No routes found.</p>
@@ -257,6 +325,19 @@ function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolea
         <span className="legend-item">
           <i className="line line-hierarchy" /> nested route
         </span>
+        {hasSlots && (
+          <span className="legend-item" title="A parallel slot page, rendered beside the page at its URL">
+            <i className="line line-slot" /> slot
+          </span>
+        )}
+        {hasIntercepts && (
+          <span
+            className="legend-item"
+            title="An intercepting page: shown instead of the page it points to when you navigate from its parent"
+          >
+            <i className="line line-intercepts" /> intercepts
+          </span>
+        )}
         <span className="legend-item">
           <i className="line line-nav" /> link
         </span>
@@ -363,10 +444,15 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
             {componentCount} component{componentCount === 1 ? '' : 's'}
           </span>
         )}
-        {route.slot && <span>@{route.slot}</span>}
-        {route.intercepting && <span>intercepts</span>}
+        {route.slot && <span title="Parallel slot">@{route.slot}</span>}
+        {route.intercepting && (
+          <span title={`Shown instead of ${route.path} when you navigate from ${route.intercepting.from}`}>
+            intercepts {route.intercepting.marker}
+          </span>
+        )}
         {noteCount > 0 && <span className="warn">⚠ {noteCount}</span>}
         {!handler && <AccessBadge route={route} compact />}
+        {!handler && <RenderBadge route={route} compact />}
       </div>
       <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>
@@ -418,13 +504,30 @@ const SEGMENT_LABEL: Record<string, string | undefined> = {
 function RouteTreeView({ q }: { q: string }) {
   const { index } = useData()
   const routeByFile = useMemo(() => new Map(index.model.routes.map((r) => [r.file, r])), [index])
+  // Slot folders some page needs a `default` file in (M41).
+  const noDefault = useMemo(
+    () =>
+      new Set(
+        index.model.routes.flatMap((r) =>
+          (r.boundaries?.gaps ?? []).flatMap((g) => (g.kind === 'slot-no-match' && g.dir ? [g.dir] : [])),
+        ),
+      ),
+    [index],
+  )
   return (
     <div className="tree-view">
       <ul className="tree">
-        <TreeNode node={index.model.routeTree} q={q} routeByFile={routeByFile} root />
+        <TreeNode node={index.model.routeTree} q={q} routeByFile={routeByFile} noDefault={noDefault} root />
       </ul>
     </div>
   )
+}
+
+/** Where an intercepting folder's navigation starts, in words. */
+const INTERCEPT_HINT: Record<string, string> = {
+  '(.)': 'Intercepts a route at the same level, on client navigation',
+  '(..)': 'Intercepts a route one level up, on client navigation',
+  '(...)': 'Intercepts a route from the app root, on client navigation',
 }
 
 function subtreeMatches(node: RouteTreeNode, q: string): boolean {
@@ -440,11 +543,13 @@ function TreeNode({
   node,
   q,
   routeByFile,
+  noDefault,
   root,
 }: {
   node: RouteTreeNode
   q: string
   routeByFile: Map<string, Route>
+  noDefault: Set<string>
   root?: boolean
 }) {
   if (!subtreeMatches(node, q) || (!root && !hasRouteFiles(node))) return null
@@ -456,7 +561,19 @@ function TreeNode({
       <div className="tree-row">
         <span className={`seg seg-${segment.kind}`}>{root ? node.dir : segment.raw}</span>
         {kind && <Badge tone="muted">{kind}</Badge>}
-        {segment.intercept && <Badge tone="muted">intercepts {segment.intercept}</Badge>}
+        {segment.intercept && (
+          <Badge
+            tone="muted"
+            title={INTERCEPT_HINT[segment.intercept] ?? 'Intercepts a route levels up, on client navigation'}
+          >
+            intercepts {segment.intercept}
+          </Badge>
+        )}
+        {noDefault.has(node.dir) && (
+          <Badge tone="warn" term={['boundary', 'slot-no-match']}>
+            no default
+          </Badge>
+        )}
         <span className="files">
           {files.map(([kind, file]) => {
             const route = routeByFile.get(file)
@@ -484,7 +601,7 @@ function TreeNode({
       {node.children.length > 0 && (
         <ul>
           {node.children.map((child) => (
-            <TreeNode key={child.dir} node={child} q={q} routeByFile={routeByFile} />
+            <TreeNode key={child.dir} node={child} q={q} routeByFile={routeByFile} noDefault={noDefault} />
           ))}
         </ul>
       )}

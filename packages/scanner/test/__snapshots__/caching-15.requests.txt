@@ -1,0 +1,49 @@
+# Requests
+
+## server action createTodo  app/actions.ts:7
+POST {API_URL ?? http://localhost:4010}/todos  fetch  server-action
+  body: { title: string; }
+  via: fetch app/actions.ts:8
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## server action toggleTodo  app/actions.ts:17
+PATCH {API_URL ?? http://localhost:4010}/todos/:id  fetch  server-action
+  body: { done: boolean; }
+  via: fetch app/actions.ts:19
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## Home  app/page.tsx:5
+GET {API_URL ?? http://localhost:4010}/todos  fetch  server-render
+  response: Todo[]
+  via: listTodos app/page.tsx:6 > fetch lib/todos.js:6
+POST server action createTodo  server-action  event action
+  body: FormData
+  response: void
+  then: POST {API_URL ?? http://localhost:4010}/todos
+  via: createTodo app/page.tsx:17
+
+## ProductsPage  app/products/page.tsx:7
+GET {API_URL ?? http://localhost:4010}/products  fetch  server-render
+  via: fetch app/products/page.tsx:10
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+GET {API_URL ?? http://localhost:4010}/products/featured  fetch  server-render
+  via: fetch app/products/page.tsx:17
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+POST server action refreshProducts  server-action  event action
+  response: void
+  via: refreshProducts app/products/page.tsx:27
+
+## TodoPage  app/todos/[id]/page.tsx:4
+GET {API_URL ?? http://localhost:4010}/todos/:id  fetch  server-render
+  response: Todo
+  via: getTodo app/todos/[id]/page.tsx:6 > fetch lib/todos.js:12
+POST server action toggleTodo  server-action  event action
+  body: FormData
+  response: void
+  then: PATCH {API_URL ?? http://localhost:4010}/todos/:id
+  via: toggleTodo app/todos/[id]/page.tsx:8
+
+## AccountBar  components/account-bar.tsx:3
+GET {API_URL ?? http://localhost:4010}/users/1  fetch  server-render
+  response: User
+  via: getViewer components/account-bar.tsx:4 > fetch lib/viewer.ts:9

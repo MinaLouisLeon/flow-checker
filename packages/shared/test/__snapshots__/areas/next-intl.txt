@@ -4,7 +4,7 @@ home from /
   pages: /[locale]
   components: HomePage
   shared components: LocaleLayout
-  requests: 0, endpoints: 0, notes: 0
+  requests: 0, endpoints: 0, notes: 1
   flows: -
 
 dashboard from /[locale]/dashboard

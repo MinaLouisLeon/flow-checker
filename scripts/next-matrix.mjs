@@ -12,7 +12,10 @@
 //             (`middleware.ts` before 16, `proxy.ts` from 16): its matcher, redirect and fetch;
 //             and the v0.2.0 sites: a React Query query with its key, two tRPC procedures, a
 //             urql GraphQL operation, an EventSource, a native WebSocket, and the Postman
-//             collection matched to the code; and v0.3.0: the account page is `guarded`
+//             collection matched to the code; and v0.3.0: the account page is `guarded`;
+//             and v0.4.0: each page's render mode, the cached fetch with its tag and the route
+//             handler that revalidates it, a missing loading state and a templated title
+//   build   → `next build` prints the same render mode for every page as the scan (M38)
 //   summary → Start here names the Next.js version, the middleware and the start page (M32)
 //   impact  → the route handler file affects the page that calls it (M36)
 //   dev     →a page-load server fetch, a click-triggered browser fetch and the route handler's
@@ -20,7 +23,8 @@
 //             middleware's fetch is captured and matched (edge runtime before 16, Node.js on 16);
 //             the query is matched by key, the tRPC batch is split per procedure, the GraphQL
 //             capture is matched and type-checked, and the event stream's and socket's messages
-//             are captured and matched
+//             are captured and matched; the cached fetch is a hit on the second visit (M40,
+//             Next 15 and later)
 //
 // Run after `pnpm build` (needs network for npm and Playwright's Chromium):
 //   node scripts/next-matrix.mjs                 # every version below
@@ -34,6 +38,7 @@ import { createServer as createNetServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { chromium } from '@playwright/test'
+import { compareRenderModes, readBuildTable } from './next-build-table.mjs'
 
 const repo = resolve(import.meta.dirname, '..')
 const pkgDir = join(repo, 'packages', 'flow-checker')
@@ -203,9 +208,18 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     // v0.3.0 (M31): the account page redirects when there is no session cookie.
     'access: guarded',
     'redirects to `/` when `!session` (page)',
+    // v0.4.0: render modes (M38), the server cache map (M39), boundaries and titles (M41).
+    /## \/ {2}app\/page\.tsx\n[^#]*render: dynamic\n {2}dynamic: /,
+    /## \/account {2}[^#]*render: dynamic\n {2}dynamic: /,
+    /## \/cached {2}[^#]*render: ISR 1m\n/,
+    /## \/cached {2}[^#]*title: Cached \| Matrix/,
+    /## \/ {2}app\/page\.tsx\n[^#]*! no loading state:/,
+    /fetch {2}\{UPSTREAM_URL\}\/quote {2}\[quote\] {2}1m {2}app\/cached\/page\.tsx:\d+\n {2}used by: \/cached\n/,
+    /revalidateTag\('quote'[^)]*\) {2}in route handler `POST \/api\/refresh`[^\n]*\n {2}refreshes: fetch \{UPSTREAM_URL\}\/quote\n {2}pages: \/cached\n/,
   ]
   for (const expected of expectations) {
-    if (!scan.includes(expected)) throw new Error(`scan is missing "${expected}":\n${scan}`)
+    const found = typeof expected === 'string' ? scan.includes(expected) : expected.test(scan)
+    if (!found) throw new Error(`scan is missing ${expected}:\n${scan}`)
   }
   console.log('  scan ok')
 
@@ -223,6 +237,28 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     throw new Error(`impact of app/api/hello/route.ts is missing the page or the handler:\n${impact}`)
   }
   console.log('  summary and impact ok')
+
+  // M38: `next build` prints the render mode the scan gives each page.
+  const model = JSON.parse(readFileSync(join(app, '.flow-checker', 'model.json'), 'utf8'))
+  // Not spawnSync: the build fetches from the upstream server, which runs in this process.
+  const build = await runAsync(
+    process.execPath,
+    [join(app, 'node_modules', 'next', 'dist', 'bin', 'next'), 'build'],
+    app,
+    { ...process.env, UPSTREAM_URL: upstream, NEXT_TELEMETRY_DISABLED: '1', FLOW_CHECKER: '' },
+  )
+  const buildOut = build.output
+  if (build.status !== 0) throw new Error(`next build failed:\n${buildOut}`)
+  const built = readBuildTable(buildOut)
+  const modes = compareRenderModes(model, built)
+  if (built.size < 3 || modes.length > 0) {
+    throw new Error(
+      `next build and the scan disagree (${built.size} routes read):\n${modes.join('\n')}\n${buildOut}`,
+    )
+  }
+  // dev must not start from the production build.
+  removeDir(join(app, '.next'))
+  console.log(`  build ok (${built.size} routes, same render modes)`)
 
   // dev: dashboard + the app with capture on.
   const env = {
@@ -273,8 +309,17 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
       await page.goto(`${appUrl}/old`)
       await page.waitForURL(`${appUrl}/`)
       const flags = await waitForMiddleware(dashboard)
+      // M40: the cached fetch misses on the first visit and is a hit on the second.
+      let cache = 'cache check skipped before Next 15'
+      if (atLeast(next, 15, 0)) {
+        for (let i = 0; i < 2; i++) {
+          await page.goto(`${appUrl}/cached`)
+          await page.getByText('Quote: Matrix quote').waitFor({ timeout: 60_000 })
+        }
+        cache = `cached fetch ${await waitForCacheHit(dashboard)}`
+      }
       console.log(
-        `  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches, ${transports})`,
+        `  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches, ${transports}, ${cache})`,
       )
     } finally {
       await page.close()
@@ -449,6 +494,25 @@ function waitForMiddleware(dashboard) {
   })
 }
 
+/** The cached fetch's runtime result on the served model: Next reused it. */
+function waitForCacheHit(dashboard) {
+  const entry = async () => {
+    const model = await (await fetch(`${dashboard}/api/model`)).json()
+    return model.cache?.entries?.find((e) => e.kind === 'fetch' && e.name.endsWith('/quote'))
+  }
+  return waitFor(
+    async () => {
+      const runtime = (await entry())?.runtime
+      return runtime?.verdict === 'cached' ? `${runtime.hits} hit, ${runtime.misses} miss` : undefined
+    },
+    'the cached fetch to be a hit at runtime',
+    30_000,
+  ).catch(async (error) => {
+    error.message += `\nEntry: ${JSON.stringify(await entry().catch(() => null))}`
+    throw error
+  })
+}
+
 // --- The app ----------------------------------------------------------------------------------
 
 function writeApp(dir, proxy) {
@@ -494,7 +558,10 @@ function writeApp(dir, proxy) {
   }
 }
 `,
-    'app/layout.tsx': `export default function RootLayout({ children }: { children: React.ReactNode }) {
+    // v0.4.0 (M41): the title template the cached page's title goes through.
+    'app/layout.tsx': `export const metadata = { title: { default: 'Matrix', template: '%s | Matrix' } }
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>
@@ -544,6 +611,32 @@ export default async function Home() {
       <EchoSocket />
     </main>
   )
+}
+`,
+    // v0.4.0 (M38–M40): an ISR page through a tagged, timed fetch, and a route handler that
+    // revalidates it. Next 16 wants a cache profile with revalidateTag().
+    'app/cached/page.tsx': `export const metadata = { title: 'Cached' }
+
+interface Quote {
+  text: string
+}
+
+async function getQuote(): Promise<Quote> {
+  const res = await fetch(\`\${process.env.UPSTREAM_URL}/quote\`, { next: { revalidate: 60, tags: ['quote'] } })
+  return res.json()
+}
+
+export default async function Cached() {
+  const quote = await getQuote()
+  return <p>Quote: {quote.text}</p>
+}
+`,
+    'app/api/refresh/route.ts': `import { revalidatePath, revalidateTag } from 'next/cache'
+
+export async function POST() {
+  revalidateTag('quote'${proxy ? ", 'max'" : ''})
+  revalidatePath('/cached')
+  return Response.json({ ok: true })
 }
 `,
     'components/Hello.tsx': `'use client'
@@ -818,6 +911,7 @@ function startUpstream() {
       if (req.url === '/greeting') res.end(JSON.stringify({ message: 'Hello from upstream' }))
       else if (req.url === '/flags') res.end(JSON.stringify({ beta: true }))
       else if (req.url === '/page') res.end(JSON.stringify({ title: 'Matrix app' }))
+      else if (req.url === '/quote') res.end(JSON.stringify({ text: 'Matrix quote' }))
       else {
         res.statusCode = 404
         res.end('{}')
@@ -870,6 +964,21 @@ function echoSocket(req, socket) {
         socket.write(frame(1, Buffer.from(JSON.stringify({ text: `echo: ${text}` }))))
       }
     }
+  })
+}
+
+/** Runs a command without blocking this process's servers. Resolves with its exit code and output. */
+function runAsync(cmd, args, cwd, env) {
+  return new Promise((done) => {
+    const child = spawn(cmd, args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] })
+    let output = ''
+    for (const stream of [child.stdout, child.stderr]) {
+      stream.setEncoding('utf8')
+      stream.on('data', (chunk) => {
+        output += chunk
+      })
+    }
+    child.on('close', (status) => done({ status, output }))
   })
 }
 

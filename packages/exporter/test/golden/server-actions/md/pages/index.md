@@ -7,10 +7,22 @@
 | File | `src/app/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | guarded |
+| Rendering | static |
+| Title | `server-actions fixture` |
 
 ## Access
 
 - redirects to `/products` always (page), `src/app/page.tsx:4`
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+
+## Metadata
+
+- layout `metadata`: title, `src/app/layout.tsx:3`
 
 ## Component tree
 

@@ -1,0 +1,1706 @@
+{
+  "version": 15,
+  "project": {
+    "appDir": "app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "app",
+    "files": {
+      "layout": "app/layout.tsx",
+      "page": "app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "(account)",
+          "kind": "group",
+          "name": "account"
+        },
+        "dir": "app/(account)",
+        "files": {
+          "layout": "app/(account)/layout.tsx"
+        },
+        "children": [
+          {
+            "segment": {
+              "raw": "profile",
+              "kind": "static",
+              "name": "profile"
+            },
+            "dir": "app/(account)/profile",
+            "files": {
+              "page": "app/(account)/profile/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        "dir": "app/api",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "revalidate",
+              "kind": "static",
+              "name": "revalidate"
+            },
+            "dir": "app/api/revalidate",
+            "files": {
+              "route": "app/api/revalidate/route.ts"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        "dir": "app/products",
+        "files": {
+          "page": "app/products/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        "dir": "app/todos",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "app/todos/[id]",
+            "files": {
+              "page": "app/todos/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_12v7saiyoj2",
+      "path": "/",
+      "kind": "page",
+      "file": "app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_0egxkrv4t8n",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1w5u5pjpz72",
+      "path": "/api/revalidate",
+      "kind": "route-handler",
+      "file": "app/api/revalidate/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "revalidate",
+          "kind": "static",
+          "name": "revalidate"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "POST"
+      ]
+    },
+    {
+      "id": "rt_0pkd6801g1s",
+      "path": "/products",
+      "kind": "page",
+      "file": "app/products/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_23k37s13z1d",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "isr",
+        "revalidate": 300,
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_23k37s13z1d",
+            "loc": {
+              "file": "app/products/page.tsx",
+              "line": 9,
+              "column": 24
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "detail": "unstable_cache",
+            "revalidate": 300
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_0aitfxaf7jb",
+      "path": "/profile",
+      "kind": "page",
+      "file": "app/(account)/profile/page.tsx",
+      "segments": [
+        {
+          "raw": "(account)",
+          "kind": "group",
+          "name": "account"
+        },
+        {
+          "raw": "profile",
+          "kind": "static",
+          "name": "profile"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        },
+        {
+          "kind": "layout",
+          "file": "app/(account)/layout.tsx",
+          "componentId": "cmp_0ed1ue7bhe9"
+        }
+      ],
+      "componentId": "cmp_0ega4ra2kms",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "isr",
+        "revalidate": 86400,
+        "reasons": [
+          {
+            "in": "component",
+            "componentId": "cmp_1cqxz9m62fc",
+            "loc": {
+              "file": "lib/viewer.ts",
+              "line": 7,
+              "column": 26
+            },
+            "kind": "cached",
+            "effect": "isr",
+            "detail": "unstable_cache",
+            "revalidate": 86400
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1o3mhu1qw49",
+      "path": "/todos/[id]",
+      "kind": "page",
+      "file": "app/todos/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "app/layout.tsx",
+          "componentId": "cmp_2dznycb4aq7"
+        }
+      ],
+      "componentId": "cmp_1rad9auprew",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_1rad9auprew",
+            "siteId": "req_21ftrjtuxeu",
+            "detail": "fetch",
+            "loc": {
+              "file": "lib/todos.js",
+              "line": 12,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_1rad9auprew",
+            "siteId": "req_21ftrjtuxeu",
+            "detail": "fetch",
+            "loc": {
+              "file": "lib/todos.js",
+              "line": 12,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_0ed1ue7bhe9",
+      "name": "AccountLayout",
+      "file": "app/(account)/layout.tsx",
+      "loc": {
+        "file": "app/(account)/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "AccountBar",
+          "resolution": "project",
+          "componentId": "cmp_1cqxz9m62fc",
+          "module": "@/components/account-bar",
+          "loc": {
+            "file": "app/(account)/layout.tsx",
+            "line": 8,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0ega4ra2kms",
+      "name": "ProfilePage",
+      "file": "app/(account)/profile/page.tsx",
+      "loc": {
+        "file": "app/(account)/profile/page.tsx",
+        "line": 1,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_2dznycb4aq7",
+      "name": "RootLayout",
+      "file": "app/layout.tsx",
+      "loc": {
+        "file": "app/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0egxkrv4t8n",
+      "name": "Home",
+      "file": "app/page.tsx",
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 5,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 13,
+            "column": 13
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_23k37s13z1d",
+      "name": "ProductsPage",
+      "file": "app/products/page.tsx",
+      "loc": {
+        "file": "app/products/page.tsx",
+        "line": 7,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [
+        "typ_0ghl92kmf2v"
+      ]
+    },
+    {
+      "id": "cmp_1rad9auprew",
+      "name": "TodoPage",
+      "file": "app/todos/[id]/page.tsx",
+      "loc": {
+        "file": "app/todos/[id]/page.tsx",
+        "line": 4,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1cqxz9m62fc",
+      "name": "AccountBar",
+      "file": "components/account-bar.tsx",
+      "loc": {
+        "file": "components/account-bar.tsx",
+        "line": 3,
+        "column": 23
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_0e8bmtj552i",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0ghl92kmf2v",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_20i3s96fxph",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "lib/types.ts",
+        "line": 14,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_0p4n47rxz7x",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "createTodo",
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 7,
+          "column": 23
+        }
+      },
+      "transport": "fetch",
+      "method": "POST",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "bodyType": {
+        "text": "{ title: string; }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/actions.ts",
+          "line": 8,
+          "column": 9,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "2g4umj560wf"
+    },
+    {
+      "id": "req_1mdxzo98tr6",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "toggleTodo",
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 17,
+          "column": 23
+        }
+      },
+      "transport": "fetch",
+      "method": "PATCH",
+      "url": {
+        "text": "`${API_URL}/todos/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "bodyType": {
+        "text": "{ done: boolean; }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "done",
+              "type": {
+                "kind": "primitive",
+                "name": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/actions.ts",
+          "line": 19,
+          "column": 9,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "258495gdv5l"
+    },
+    {
+      "id": "req_049zb4jpbkc",
+      "origin": "component",
+      "componentId": "cmp_0egxkrv4t8n",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/todos`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0e8bmtj552i",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 6,
+          "column": 23,
+          "callee": "listTodos"
+        },
+        {
+          "file": "lib/todos.js",
+          "line": 6,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0kr6jzl4g78"
+    },
+    {
+      "id": "req_2erpzcgyjsg",
+      "origin": "component",
+      "componentId": "cmp_0egxkrv4t8n",
+      "serverAction": {
+        "name": "createTodo",
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 7,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 17,
+          "column": 13
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 17,
+          "column": 13,
+          "callee": "createTodo"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0szn476x1n6",
+      "chain": [
+        "req_0p4n47rxz7x"
+      ]
+    },
+    {
+      "id": "req_24s7slb1j7n",
+      "origin": "component",
+      "componentId": "cmp_23k37s13z1d",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "callStack": [
+        {
+          "file": "app/products/page.tsx",
+          "line": 10,
+          "column": 44,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "0zcm6lfo7rm"
+    },
+    {
+      "id": "req_0emcfr2h86v",
+      "origin": "component",
+      "componentId": "cmp_23k37s13z1d",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products/featured`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products/featured"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "callStack": [
+        {
+          "file": "app/products/page.tsx",
+          "line": 17,
+          "column": 26,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "0uozbbfol8m"
+    },
+    {
+      "id": "req_28s3rmjndbc",
+      "origin": "component",
+      "componentId": "cmp_23k37s13z1d",
+      "serverAction": {
+        "name": "refreshProducts",
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 27,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "app/products/page.tsx",
+          "line": 27,
+          "column": 13
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/products/page.tsx",
+          "line": 27,
+          "column": 13,
+          "callee": "refreshProducts"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "2e0i78l795j"
+    },
+    {
+      "id": "req_21ftrjtuxeu",
+      "origin": "component",
+      "componentId": "cmp_1rad9auprew",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/todos/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0e8bmtj552i",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/todos/[id]/page.tsx",
+          "line": 6,
+          "column": 22,
+          "callee": "getTodo"
+        },
+        {
+          "file": "lib/todos.js",
+          "line": 12,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0nu88p6ohjz"
+    },
+    {
+      "id": "req_1uqq0aa2nmq",
+      "origin": "component",
+      "componentId": "cmp_1rad9auprew",
+      "serverAction": {
+        "name": "toggleTodo",
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 17,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "app/todos/[id]/page.tsx",
+          "line": 8,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "app/todos/[id]/page.tsx",
+          "line": 8,
+          "column": 11,
+          "callee": "toggleTodo"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0vvc8ebqnjs",
+      "chain": [
+        "req_1mdxzo98tr6"
+      ]
+    },
+    {
+      "id": "req_1yxcysii37b",
+      "origin": "component",
+      "componentId": "cmp_1cqxz9m62fc",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/users/1`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/users/1"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_20i3s96fxph",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "components/account-bar.tsx",
+          "line": 4,
+          "column": 24,
+          "callee": "getViewer"
+        },
+        {
+          "file": "lib/viewer.ts",
+          "line": 9,
+          "column": 23,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1ct45s155pf"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_175j9ais6mj",
+      "origin": "component",
+      "componentId": "cmp_0egxkrv4t8n",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/todos/${todo.id}`",
+        "confidence": "pattern",
+        "path": "/todos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "app/page.tsx",
+          "line": 13,
+          "column": 13
+        }
+      },
+      "loc": {
+        "file": "app/page.tsx",
+        "line": 13,
+        "column": 13
+      },
+      "callStack": [
+        {
+          "file": "app/page.tsx",
+          "line": 13,
+          "column": 13,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1o3mhu1qw49"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_0ss6cupou11",
+      "name": "Home submit",
+      "routeId": "rt_12v7saiyoj2",
+      "componentId": "cmp_0egxkrv4t8n",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_12v7saiyoj2",
+          "componentId": "cmp_0egxkrv4t8n",
+          "event": "action",
+          "loc": {
+            "file": "app/page.tsx",
+            "line": 17,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2erpzcgyjsg"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_12v7saiyoj2"
+      ]
+    },
+    {
+      "id": "flw_00zvbfxa2kz",
+      "name": "ProductsPage submit",
+      "routeId": "rt_0pkd6801g1s",
+      "componentId": "cmp_23k37s13z1d",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0pkd6801g1s",
+          "componentId": "cmp_23k37s13z1d",
+          "event": "action",
+          "loc": {
+            "file": "app/products/page.tsx",
+            "line": 27,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_28s3rmjndbc"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0pkd6801g1s"
+      ]
+    },
+    {
+      "id": "flw_0jjve805eqd",
+      "name": "TodoPage submit",
+      "routeId": "rt_1o3mhu1qw49",
+      "componentId": "cmp_1rad9auprew",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1o3mhu1qw49",
+          "componentId": "cmp_1rad9auprew",
+          "event": "action",
+          "loc": {
+            "file": "app/todos/[id]/page.tsx",
+            "line": 8,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1uqq0aa2nmq"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1o3mhu1qw49"
+      ]
+    }
+  ],
+  "queryLinks": [],
+  "imports": {
+    "app/(account)/layout.tsx": [
+      "components/account-bar.tsx"
+    ],
+    "app/page.tsx": [
+      "app/actions.ts",
+      "lib/todos.js"
+    ],
+    "app/products/page.tsx": [
+      "app/actions.ts",
+      "lib/types.ts"
+    ],
+    "app/todos/[id]/page.tsx": [
+      "app/actions.ts",
+      "lib/todos.js"
+    ],
+    "components/account-bar.tsx": [
+      "lib/viewer.ts"
+    ],
+    "lib/todos.js": [
+      "lib/types.ts"
+    ],
+    "lib/viewer.ts": [
+      "lib/types.ts"
+    ]
+  },
+  "cache": {
+    "entries": [
+      {
+        "id": "ce_1qdivio4imf",
+        "kind": "unstable-cache",
+        "name": "listProducts",
+        "revalidate": 300,
+        "tags": [
+          {
+            "text": "'products'",
+            "value": "products",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "app/products/page.tsx",
+          "line": 9,
+          "column": 24
+        },
+        "siteIds": [
+          "req_24s7slb1j7n"
+        ],
+        "pageIds": [
+          "rt_0pkd6801g1s"
+        ],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "tag-never-revalidated",
+            "message": "Nothing revalidates the tag `products`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes when its time runs out."
+          }
+        ]
+      },
+      {
+        "id": "ce_1l7bl7snwhf",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/products/featured",
+        "cache": "force-cache",
+        "tags": [],
+        "loc": {
+          "file": "app/products/page.tsx",
+          "line": 17,
+          "column": 26
+        },
+        "siteIds": [
+          "req_0emcfr2h86v"
+        ],
+        "pageIds": [
+          "rt_0pkd6801g1s"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_03segcll0hh",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/todos",
+        "cache": "force-cache",
+        "tags": [
+          {
+            "text": "'todos'",
+            "value": "todos",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "lib/todos.js",
+          "line": 6,
+          "column": 21
+        },
+        "siteIds": [
+          "req_049zb4jpbkc"
+        ],
+        "pageIds": [
+          "rt_12v7saiyoj2"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_05y8gex9128",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/todos/:id",
+        "tags": [
+          {
+            "text": "'todos'",
+            "value": "todos",
+            "confidence": "exact"
+          },
+          {
+            "text": "`todo-${id}`",
+            "value": "todo-{id}",
+            "confidence": "pattern"
+          }
+        ],
+        "loc": {
+          "file": "lib/todos.js",
+          "line": 12,
+          "column": 21
+        },
+        "siteIds": [
+          "req_21ftrjtuxeu"
+        ],
+        "pageIds": [
+          "rt_1o3mhu1qw49"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ce_1e89lydrfva",
+        "kind": "unstable-cache",
+        "name": "getViewer",
+        "revalidate": 86400,
+        "tags": [
+          {
+            "text": "'viewer'",
+            "value": "viewer",
+            "confidence": "exact"
+          }
+        ],
+        "loc": {
+          "file": "lib/viewer.ts",
+          "line": 7,
+          "column": 26
+        },
+        "siteIds": [
+          "req_1yxcysii37b"
+        ],
+        "pageIds": [
+          "rt_0aitfxaf7jb"
+        ],
+        "handlerIds": [],
+        "flags": []
+      }
+    ],
+    "invalidations": [
+      {
+        "id": "ci_1b075riwk4n",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'todos'",
+          "value": "todos",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "createTodo",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 7,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/actions.ts",
+            "line": 13,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 13,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_03segcll0hh",
+          "ce_05y8gex9128"
+        ],
+        "pageIds": [
+          "rt_12v7saiyoj2",
+          "rt_1o3mhu1qw49"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1vjh73na6lf",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "createTodo",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 7,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/actions.ts",
+            "line": 14,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 14,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_12v7saiyoj2"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_0j60muqbexe",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "`todo-${id}`",
+          "value": "todo-{id}",
+          "confidence": "pattern"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "toggleTodo",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 17,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/actions.ts",
+            "line": 24,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 24,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_05y8gex9128"
+        ],
+        "pageIds": [
+          "rt_1o3mhu1qw49"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_0oxtx659ppp",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'product'",
+          "value": "product",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "refreshProducts",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 27,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/actions.ts",
+            "line": 29,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 29,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "tag-never-set",
+            "message": "No cached data has the tag `product`, so this call refreshes nothing. Tags are set with `next.tags` on a `fetch`, `cacheTag()` or `unstable_cache`'s `tags`."
+          }
+        ]
+      },
+      {
+        "id": "ci_01wxnrg7yla",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/products'",
+          "value": "/products",
+          "confidence": "exact",
+          "type": "layout"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "refreshProducts",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 27,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "app/actions.ts",
+            "line": 30,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "app/actions.ts",
+          "line": 30,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0pkd6801g1s"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_0n663xkxnq4",
+        "api": "revalidateTag",
+        "tag": {
+          "text": "'viewer'",
+          "value": "viewer",
+          "confidence": "exact"
+        },
+        "origin": "route-handler",
+        "routeId": "rt_1w5u5pjpz72",
+        "handlerMethod": "POST",
+        "callStack": [
+          {
+            "file": "app/api/revalidate/route.ts",
+            "line": 5,
+            "column": 3,
+            "callee": "revalidateTag"
+          }
+        ],
+        "loc": {
+          "file": "app/api/revalidate/route.ts",
+          "line": 5,
+          "column": 3
+        },
+        "entryIds": [
+          "ce_1e89lydrfva"
+        ],
+        "pageIds": [
+          "rt_0aitfxaf7jb"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_17mfc5d36t4",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/profil'",
+          "value": "/profil",
+          "confidence": "exact"
+        },
+        "origin": "route-handler",
+        "routeId": "rt_1w5u5pjpz72",
+        "handlerMethod": "POST",
+        "callStack": [
+          {
+            "file": "app/api/revalidate/route.ts",
+            "line": 7,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "app/api/revalidate/route.ts",
+          "line": 7,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [],
+        "handlerIds": [],
+        "flags": [
+          {
+            "kind": "path-no-route",
+            "message": "No page or route handler is at `/profil`, so this call refreshes nothing. `revalidatePath` takes the route's path (for a rewrite, its destination)."
+          }
+        ]
+      }
+    ]
+  }
+}

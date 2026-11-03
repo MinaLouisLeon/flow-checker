@@ -4,7 +4,14 @@
 // The request scanner finds them on its walk, so they get the same origin, trigger and
 // string resolution as requests. These are the AST helpers it uses.
 import type { Navigation } from '@flow-checker/shared'
-import { type CallExpression, type JsxTagNameExpression, Node as N, type Node, ts } from 'ts-morph'
+import {
+  type CallExpression,
+  type JsxTagNameExpression,
+  Node as N,
+  type Node,
+  type SourceFile,
+  ts,
+} from 'ts-morph'
 import { importModuleOf, packageFactoryOf, unalias } from './components'
 
 export type NavApi = Navigation['api']
@@ -174,4 +181,70 @@ function isNegated(condition: Node): boolean {
   // A plain `error` / `err` / `failed` value is truthy on failure.
   if (/\b(err|error|errors|failed|failure)\b/i.test(inner.getText())) negated = !negated
   return negated
+}
+
+const REQUEST_APIS: Record<string, string> = {
+  cookies: 'next/headers',
+  headers: 'next/headers',
+  draftMode: 'next/headers',
+  connection: 'next/server',
+  unstable_noStore: 'next/cache',
+}
+
+/**
+ * `cookies()`, `headers()`, `draftMode()` (next/headers), `connection()` (next/server) or
+ * `unstable_noStore()` (next/cache): reading the request makes the page render per request (M38).
+ * Returns the function's own name, also when imported under another one.
+ */
+export function requestApiCall(call: CallExpression): string | undefined {
+  const expr = call.getExpression()
+  if (!N.isIdentifier(expr) || !importsRequestApis(call.getSourceFile())) return undefined
+  const name = unaliasedName(expr)
+  const module = REQUEST_APIS[name]
+  return module && importModuleOf(expr) === module ? name : undefined
+}
+
+const REQUEST_API_MODULES = new Set(Object.values(REQUEST_APIS))
+// Keyed by the compiler node: a re-scan replaces it when the file changes, the wrapper stays.
+const importsApis = new WeakMap<ts.SourceFile, boolean>()
+
+/** Whether the file imports one of those modules: most files don't, which skips the symbol lookups. */
+function importsRequestApis(file: SourceFile): boolean {
+  let found = importsApis.get(file.compilerNode)
+  if (found === undefined) {
+    found = file.getImportDeclarations().some((d) => REQUEST_API_MODULES.has(d.getModuleSpecifierValue()))
+    importsApis.set(file.compilerNode, found)
+  }
+  return found
+}
+
+/** `cacheLife('hours')` or `cacheLife({ revalidate })` from next/cache (M38). */
+export function isCacheLifeCall(call: CallExpression): boolean {
+  const expr = call.getExpression()
+  if (!N.isIdentifier(expr)) return false
+  const name = unaliasedName(expr)
+  return (name === 'cacheLife' || name === 'unstable_cacheLife') && importModuleOf(expr) === 'next/cache'
+}
+
+export type CacheApi = 'revalidateTag' | 'updateTag' | 'revalidatePath' | 'cacheTag' | 'unstable_cache'
+
+const CACHE_APIS: Record<string, CacheApi> = {
+  revalidateTag: 'revalidateTag',
+  updateTag: 'updateTag',
+  revalidatePath: 'revalidatePath',
+  cacheTag: 'cacheTag',
+  // Next 15 names.
+  unstable_cacheTag: 'cacheTag',
+  unstable_cache: 'unstable_cache',
+}
+
+/**
+ * A server cache call from next/cache (M39): `revalidateTag()`, `updateTag()`, `revalidatePath()`,
+ * `cacheTag()` or `unstable_cache()`, also under another import name.
+ */
+export function cacheApiCall(call: CallExpression): CacheApi | undefined {
+  const expr = call.getExpression()
+  if (!N.isIdentifier(expr) || !importsRequestApis(call.getSourceFile())) return undefined
+  const api = CACHE_APIS[unaliasedName(expr)]
+  return api && importModuleOf(expr) === 'next/cache' ? api : undefined
 }

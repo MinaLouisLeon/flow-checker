@@ -11,6 +11,9 @@
 // `.mutate()` call, or plain render.
 import {
   type ApiClientConfig,
+  type CacheEntry,
+  type CacheInvalidation,
+  type CacheKey,
   type CallFrame,
   type Component,
   type Flag,
@@ -45,6 +48,7 @@ import {
   type TrpcProcedure,
   type TrpcProcedureType,
   type TypeRef,
+  urlText,
 } from '@flow-checker/shared'
 import {
   type ArrowFunction,
@@ -82,13 +86,17 @@ import {
 import { type GraphQLSchema, operationShapes, usedFragments } from './graphql-schema'
 import { unmask } from './graphql-types'
 import {
+  type CacheApi,
+  cacheApiCall,
   type ExitKind,
+  isCacheLifeCall,
   linkApi,
   type NavApi,
   type NavKind,
   navigationCall,
   outcomeOf,
   renderExitCall,
+  requestApiCall,
 } from './navigation'
 import { compare, relativeTo } from './paths'
 import {
@@ -358,8 +366,72 @@ export interface Unfollowed {
   callee: string
   /** `excluded`: the function is in a file the config leaves out. `missing`: the import doesn't resolve. */
   why: 'excluded' | 'missing'
+  /** Runs while the server renders (a server component), not in the browser (M38). */
+  server: boolean
   loc: SourceLoc
 }
+
+/** A `fetch` call's cache options (M38). */
+export interface FetchCache {
+  /** `cache` as written: `no-store`, `force-cache`, ... */
+  cache?: string
+  /** `next.revalidate`: seconds, or `false`. */
+  revalidate?: number | false
+  /** Set when an option is there but its value can't be read. */
+  unread?: boolean
+  /** `next.tags` (M39). */
+  tags?: CacheKey[]
+}
+
+/** A `use cache` scope a server request runs in (M38). */
+export interface UseCache {
+  /** `unstable_cache`: the scope is an `unstable_cache()` call, not `use cache` (M39). */
+  api?: 'unstable_cache'
+  /** The `cacheLife()` argument as written, when there is one. */
+  life?: string
+  /** Seconds from the `cacheLife` profile or object (or `unstable_cache`'s `revalidate`); absent when it can't be read. */
+  revalidate?: number
+  loc: SourceLoc
+}
+
+/**
+ * What decides how a page renders, found while a server component renders (M38): a request-time
+ * API call, or a request with its cache options.
+ */
+export type RenderUse =
+  | { kind: 'request-api'; id: string; componentId: string; api: string; loc: SourceLoc }
+  | {
+      kind: 'data'
+      id: string
+      componentId: string
+      siteId: string
+      transport: RequestSite['transport']
+      fetch?: FetchCache
+      cached?: UseCache
+      loc: SourceLoc
+    }
+  /** A cached function or component that sends no request the scan sees (a database read) (M39). */
+  | { kind: 'cached'; id: string; componentId: string; cached: UseCache; loc: SourceLoc }
+
+/** A cached scope: a `use cache` function (or a function in a `use cache` file), or an `unstable_cache()` call. */
+interface CacheScope {
+  node: Node
+  kind: 'use-cache' | 'unstable-cache'
+  directive?: string
+  inFile?: boolean
+}
+
+/** Cached data the walk went through (M39), before it is linked to pages. */
+export interface CacheFound extends Omit<CacheEntry, 'siteIds' | 'pageIds' | 'handlerIds' | 'flags'> {
+  siteIds: Set<string>
+  /** Server components that render with it. */
+  componentIds: Set<string>
+  /** Route handlers that use it. */
+  handlerIds: Set<string>
+}
+
+/** A `revalidateTag()` / `updateTag()` / `revalidatePath()` call (M39), before it is linked. */
+export type InvalidationFound = Omit<CacheInvalidation, 'entryIds' | 'pageIds' | 'handlerIds' | 'flags'>
 
 /** Middleware answering itself with a response (M31). */
 export interface MiddlewareResponse {
@@ -398,6 +470,8 @@ interface Found {
   socket?: SiteSocket
   /** The method is a default (none given, or `?? 'POST'`), not one the code chose. */
   methodDefault?: boolean
+  /** `fetch`: its cache options (M38). */
+  fetchCache?: FetchCache
 }
 
 /** What `#mergeTwins` needs to know about a site. */
@@ -452,6 +526,11 @@ export class RequestScanner {
   readonly #exits = new Map<string, RenderExit>()
   readonly #unfollowed = new Map<string, Unfollowed>()
   readonly #mwResponses = new Map<string, MiddlewareResponse>()
+  /** Request-time API calls and server requests while a server component renders (M38). */
+  readonly #renderUses = new Map<string, RenderUse>()
+  /** Server cache entries and the calls that revalidate them (M39). */
+  readonly #cache = new Map<string, CacheFound>()
+  readonly #invalidations = new Map<string, InvalidationFound>()
   /** Hook call (or `useQueries` entry) -> ids of the sites it runs. */
   readonly #hookSites = new Map<Node, string[]>()
   /** Site id -> what its hook does, for React Query sites. */
@@ -496,6 +575,12 @@ export class RequestScanner {
       key: component.id,
       client: component.kind !== 'server',
       componentId: component.id,
+    }
+    // A server component that is itself cached (`'use cache'` in it or its file).
+    const cached = component.kind === 'server' ? this.#calleeCacheScope(undefined, body) : undefined
+    if (cached) {
+      this.#cacheEntry(cached).componentIds.add(component.id)
+      this.#cachedRender(component.id, cached)
     }
     this.#walk(body, body, EMPTY_ENV, { origin, frames: [], active: new Set([body]) })
   }
@@ -877,6 +962,21 @@ export class RequestScanner {
   /** Redirects and `notFound()`-like calls reached while a component renders (M31). */
   renderExits(): RenderExit[] {
     return [...this.#exits.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** Request-time API calls and server requests while server components render (M38). */
+  renderUses(): RenderUse[] {
+    return [...this.#renderUses.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** Server cache entries the walk went through (M39). */
+  cacheEntries(): CacheFound[] {
+    return [...this.#cache.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** `revalidateTag()` / `updateTag()` / `revalidatePath()` calls in server actions and route handlers (M39). */
+  invalidations(): InvalidationFound[] {
+    return [...this.#invalidations.values()].sort((a, b) => compareLoc(a.loc, b.loc))
   }
 
   /** Calls made while a component renders that the walk couldn't follow (excluded or missing files). */
@@ -1376,6 +1476,21 @@ export class RequestScanner {
       this.#emitExit(w, this.#frame(call, scope), exit, call)
       return true
     }
+    const api = requestApiCall(call)
+    if (api) {
+      this.#emitRequestApi(w, this.#frame(call, scope), api, call)
+      return true
+    }
+    const cacheApi = cacheApiCall(call)
+    if (cacheApi === 'revalidateTag' || cacheApi === 'updateTag' || cacheApi === 'revalidatePath') {
+      this.#emitInvalidation(w, this.#frame(call, scope), cacheApi, call, env)
+      return true
+    }
+    // Tags are read from the cached scope they are in.
+    if (cacheApi === 'cacheTag') return true
+    // `unstable_cache(fn, keys, options)` written where it runs: the walk goes on into `fn`.
+    if (cacheApi === 'unstable_cache')
+      this.#cacheUse(w, this.#frame(call, scope), { node: call, kind: 'unstable-cache' })
     if (w.origin.kind === 'middleware' && this.#middlewareAnswer(call, scope, w)) return true
     const trpc = procedureCall(call)
     if (trpc && trpc.proxy !== 'server') {
@@ -1441,6 +1556,8 @@ export class RequestScanner {
     if (isProject(fn) && !this.#isScanned(fn) && w.origin.kind === 'component')
       this.#unfollow(w, call, scope, 'excluded')
     if (!isProject(fn) || w.active.has(fn) || !this.#isScanned(fn)) return false
+    const cached = this.#calleeCacheScope(call, fn)
+    if (cached) this.#cacheUse(w, this.#frame(call, scope), cached)
     if (this.#isServerAction(fn) && w.origin.client) {
       this.#emit(w, this.#frame(call, scope), this.#actionSite(fn, false))
       return false
@@ -2528,7 +2645,39 @@ export class RequestScanner {
       url: this.#requestUrl(input, env),
       ...(body ? { bodyType: body } : {}),
       ...(methodDefault ? { methodDefault } : {}),
+      fetchCache: this.#fetchCache(init, env),
     }
+  }
+
+  /** `{ cache: 'no-store' }` and `{ next: { revalidate: 60 } }` on a `fetch` (M38). */
+  #fetchCache(init: Node | undefined, env: Env): FetchCache {
+    const out: FetchCache = {}
+    const cache = this.#prop(init, env, 'cache')
+    if (cache === 'unknown') out.unread = true
+    else if (cache !== 'absent') {
+      const value = this.#str(cache.node, cache.env)
+      const text = value?.parts.every((p) => 'text' in p) ? strText(value) : undefined
+      if (text) out.cache = text
+      else out.unread = true
+    }
+    const next = this.#prop(init, env, 'next')
+    if (next === 'unknown') out.unread = true
+    else if (next !== 'absent') {
+      const revalidate = this.#prop(next.node, next.env, 'revalidate')
+      if (revalidate === 'unknown') out.unread = true
+      else if (revalidate !== 'absent') {
+        const value = this.#evaluate(revalidate.node, revalidate.env).node
+        const literal = value ? skipWrappers(value) : undefined
+        if (literal && N.isNumericLiteral(literal)) out.revalidate = literal.getLiteralValue()
+        else if (literal && literal.getKind() === ts.SyntaxKind.FalseKeyword) out.revalidate = false
+        else out.unread = true
+      }
+      const tags = this.#prop(next.node, next.env, 'tags')
+      if (tags === 'unknown')
+        out.tags = [{ text: oneLine(next.node?.getText() ?? ''), confidence: 'unknown' }]
+      else if (tags !== 'absent') out.tags = this.#cacheKeys(tags.node, tags.env)
+    }
+    return out
   }
 
   /** `axios.get(url)`, `api.post(url, data)`, `axios(config)`, `api.request(config)`. */
@@ -2785,6 +2934,11 @@ export class RequestScanner {
   #reachesNetwork(fn: Node): boolean {
     const known = this.#reaches.get(fn)
     if (known !== undefined) return known
+    // Cached functions are entered even when they only read a database: they are cache entries (M39).
+    if (this.#calleeCacheScope(undefined, fn)) {
+      this.#reaches.set(fn, true)
+      return true
+    }
     this.#reaches.set(fn, false)
     let found = false
     fn.forEachDescendant((d, traversal) => {
@@ -2806,6 +2960,9 @@ export class RequestScanner {
         isActionStateHook(d) ||
         navigationCall(d) ||
         renderExitCall(d) ||
+        requestApiCall(d) ||
+        cacheApiCall(d) ||
+        cacheWrapperOf(d) ||
         middlewareResponse(d) ||
         (procedureCall(d)?.proxy ?? 'server') !== 'server' ||
         isGraphqlRequest(d) ||
@@ -2912,6 +3069,373 @@ export class RequestScanner {
     if (hookFrame?.hook?.def.rq) {
       this.#siteKinds.set(id, { kind: hookFrame.hook.def.kind, client: !!hookFrame.hook.def.client })
     }
+    if (w.origin.kind === 'component' && w.origin.componentId && trigger.kind === 'server-render') {
+      const cached = this.#useCache(frames)
+      this.#renderUses.set(id, {
+        kind: 'data',
+        id,
+        componentId: w.origin.componentId,
+        siteId: id,
+        transport: found.transport,
+        ...(found.fetchCache ? { fetch: found.fetchCache } : {}),
+        ...(cached ? { cached } : {}),
+        loc: this.#loc(last.node),
+      })
+    }
+    this.#cacheSite(w, frames, trigger, found, id, last.node)
+  }
+
+  /** `cookies()`, `headers()`, ... while a server component renders (M38). */
+  #emitRequestApi(w: Walk, last: Frame, api: string, node: Node) {
+    if (w.origin.kind !== 'component' || !w.origin.componentId) return
+    const frames = [...w.frames, last]
+    if (this.#trigger(frames, w.origin).kind !== 'server-render') return
+    const callStack = frames.map((f) => this.#loc(f.node))
+    const id = makeId('rn', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#renderUses.has(id)) return
+    this.#renderUses.set(id, {
+      kind: 'request-api',
+      id,
+      componentId: w.origin.componentId,
+      api,
+      loc: this.#loc(node),
+    })
+  }
+
+  /** The innermost cached scope the frames run in, with its `cacheLife` or `revalidate` (M38, M39). */
+  #useCache(frames: Frame[]): UseCache | undefined {
+    const scope = this.#cacheScopeOf(frames)
+    return scope ? this.#useCacheOf(scope) : undefined
+  }
+
+  #useCacheOf(scope: CacheScope): UseCache {
+    if (scope.kind === 'use-cache') return this.#cacheLife(scope.node)
+    const options = (scope.node as CallExpression).getArguments()[2]
+    const revalidate = this.#prop(options, EMPTY_ENV, 'revalidate')
+    const seconds =
+      revalidate === 'absent' || revalidate === 'unknown' ? undefined : this.#seconds(revalidate)
+    return {
+      api: 'unstable_cache',
+      ...(typeof seconds === 'number' ? { revalidate: seconds } : {}),
+      loc: this.#loc(scope.node),
+    }
+  }
+
+  /** A server component renders with a cached scope: its time counts for the page (M39). */
+  #cachedRender(componentId: string, scope: CacheScope) {
+    const cached = this.#useCacheOf(scope)
+    const id = makeId(
+      'rn',
+      'cached',
+      componentId,
+      `${cached.loc.file}:${cached.loc.line}:${cached.loc.column}`,
+    )
+    if (!this.#renderUses.has(id)) {
+      this.#renderUses.set(id, { kind: 'cached', id, componentId, cached, loc: cached.loc })
+    }
+  }
+
+  #cacheLife(scope: Node): UseCache {
+    const call = scope.getDescendantsOfKind(ts.SyntaxKind.CallExpression).find(isCacheLifeCall)
+    const loc = this.#loc(call ?? scope)
+    if (!call) return { revalidate: CACHE_LIFE.default as number, loc }
+    const arg = call.getArguments()[0]
+    const value = arg ? this.#evaluate(arg, EMPTY_ENV).node : undefined
+    const literal = value ? skipWrappers(value) : undefined
+    const life = oneLine(call.getText())
+    if (literal && (N.isStringLiteral(literal) || N.isNoSubstitutionTemplateLiteral(literal))) {
+      const seconds = CACHE_LIFE[literal.getLiteralValue()]
+      return { life, ...(seconds !== undefined ? { revalidate: seconds } : {}), loc }
+    }
+    if (literal && N.isObjectLiteralExpression(literal)) {
+      const prop = literal.getProperty('revalidate')
+      const init = prop && N.isPropertyAssignment(prop) ? prop.getInitializer() : undefined
+      if (!prop) return { life, revalidate: CACHE_LIFE.default as number, loc }
+      if (init && N.isNumericLiteral(init)) return { life, revalidate: init.getLiteralValue(), loc }
+    }
+    return { life, loc }
+  }
+
+  // --- Server cache (M39) --------------------------------------------------------------------
+
+  /**
+   * Where a cache use counts: a server component while it renders, a route handler or a server
+   * action. Client code can't read the server cache.
+   */
+  #cacheContext(w: Walk, trigger: () => Trigger): { componentId?: string; routeId?: string } | undefined {
+    if (w.origin.kind === 'route-handler') return w.origin.routeId ? { routeId: w.origin.routeId } : {}
+    if (w.origin.kind === 'server-action') return {}
+    if (w.origin.kind !== 'component' || !w.origin.componentId) return undefined
+    return trigger().kind === 'server-render' ? { componentId: w.origin.componentId } : undefined
+  }
+
+  #addUse(entry: CacheFound, context: { componentId?: string; routeId?: string }) {
+    if (context.componentId) entry.componentIds.add(context.componentId)
+    if (context.routeId) entry.handlerIds.add(context.routeId)
+  }
+
+  /** A call into a cached function, or `unstable_cache()` written inline. */
+  #cacheUse(w: Walk, frame: Frame, scope: CacheScope) {
+    const context = this.#cacheContext(w, () => this.#trigger([...w.frames, frame], w.origin))
+    if (!context) return
+    this.#addUse(this.#cacheEntry(scope), context)
+    if (context.componentId) this.#cachedRender(context.componentId, scope)
+  }
+
+  /** A server request: inside a cached scope, and a cache entry itself when it is a `fetch` with cache options. */
+  #cacheSite(w: Walk, frames: Frame[], trigger: Trigger, found: Found, siteId: string, node: Node) {
+    if (found.transport === 'server-action') return
+    const context = this.#cacheContext(w, () => trigger)
+    if (!context) return
+    const scope = this.#cacheScopeOf(frames)
+    if (scope) {
+      const entry = this.#cacheEntry(scope)
+      entry.siteIds.add(siteId)
+      this.#addUse(entry, context)
+    }
+    const options = found.fetchCache
+    if (found.transport !== 'fetch' || !options) return
+    const caches =
+      !!options.tags?.length ||
+      options.cache === 'force-cache' ||
+      options.revalidate === false ||
+      (typeof options.revalidate === 'number' && options.revalidate > 0)
+    if (!caches) return
+    const loc = this.#loc(node)
+    const id = makeId('ce', `${loc.file}:${loc.line}:${loc.column}`)
+    // As written at the fetch, so a helper's entry reads the same for every caller.
+    const [input, init] = N.isCallExpression(node) ? node.getArguments() : []
+    const written = this.#fetchCache(init, EMPTY_ENV).tags
+    let entry = this.#cache.get(id)
+    if (!entry) {
+      entry = {
+        id,
+        kind: 'fetch',
+        name: urlText(this.#requestUrl(input, EMPTY_ENV)),
+        ...(options.cache ? { cache: options.cache } : {}),
+        ...(options.revalidate !== undefined ? { revalidate: options.revalidate } : {}),
+        tags: [],
+        siteIds: new Set(),
+        componentIds: new Set(),
+        handlerIds: new Set(),
+        loc,
+      }
+      this.#cache.set(id, entry)
+    }
+    // Tags passed in by callers can only be read per caller: keep each one once.
+    const readable = written?.every((t) => t.confidence !== 'unknown')
+    for (const tag of (readable ? written : options.tags) ?? []) {
+      if (!entry.tags.some((t) => sameKey(t, tag))) entry.tags.push(tag)
+    }
+    entry.siteIds.add(siteId)
+    this.#addUse(entry, context)
+  }
+
+  /** The innermost cached scope the frames run in. */
+  #cacheScopeOf(frames: Frame[]): CacheScope | undefined {
+    for (let i = frames.length - 1; i >= 0; i--) {
+      const frame = frames[i] as Frame
+      const found = this.#scopeIn(frame.node, frame.scope)
+      if (found) return found
+      // `getUser()` where `const getUser = unstable_cache(load, ...)`: `load` runs in it.
+      const before = frames[i - 1]
+      const wrapper = before && N.isCallExpression(before.node) ? cacheWrapperOf(before.node) : undefined
+      if (wrapper) return { node: wrapper, kind: 'unstable-cache' }
+    }
+    return undefined
+  }
+
+  /** A cached function around `node` up to `scope`, or the `use cache` file it is in. */
+  #scopeIn(node: Node, scope: Node): CacheScope | undefined {
+    for (let at: Node | undefined = node; at && !N.isSourceFile(at); at = at.getParent()) {
+      const own = isFunctionLike(at) ? ownCacheScope(at) : undefined
+      if (own) return own
+      if (at === scope) break
+    }
+    return this.#fileCacheScope(scope)
+  }
+
+  /** In a `'use cache'` file, the top-level function `node` is in. */
+  #fileCacheScope(node: Node): CacheScope | undefined {
+    const directive = this.#directivesOf(node.getSourceFile()).find((d) => d.startsWith('use cache'))
+    if (!directive) return undefined
+    let top: Node | undefined = isFunctionLike(node) ? node : undefined
+    for (const a of node.getAncestors()) if (isFunctionLike(a)) top = a
+    return top ? { node: top, kind: 'use-cache', directive, inFile: true } : undefined
+  }
+
+  /** The cached scope a call enters: an `unstable_cache()` wrapper, or a cached function. */
+  #calleeCacheScope(call: CallExpression | undefined, fn: Node): CacheScope | undefined {
+    const wrapper = call ? cacheWrapperOf(call) : undefined
+    if (wrapper) return { node: wrapper, kind: 'unstable-cache' }
+    if (!isFunctionLike(fn)) return undefined
+    const own = ownCacheScope(fn)
+    if (own) return own
+    return fn.getFirstAncestor((a) => isFunctionLike(a)) ? undefined : this.#fileCacheScope(fn)
+  }
+
+  #directivesOf(file: SourceFile): string[] {
+    let found = this.#fileDirectives.get(file)
+    if (!found) {
+      found = directives(file)
+      this.#fileDirectives.set(file, found)
+    }
+    return found
+  }
+
+  #cacheEntry(scope: CacheScope): CacheFound {
+    const anchor = scope.kind === 'unstable-cache' ? scope.node : functionAnchor(scope.node)
+    const loc = this.#loc(anchor)
+    const id = makeId('ce', `${loc.file}:${loc.line}:${loc.column}`)
+    const known = this.#cache.get(id)
+    if (known) return known
+    const uses = {
+      siteIds: new Set<string>(),
+      componentIds: new Set<string>(),
+      handlerIds: new Set<string>(),
+    }
+    let entry: CacheFound
+    if (scope.kind === 'use-cache') {
+      const life = this.#cacheLife(scope.node)
+      entry = {
+        id,
+        kind: 'use-cache',
+        name: functionName(scope.node),
+        ...(scope.directive ? { directive: scope.directive } : {}),
+        ...(scope.inFile ? { inFile: true } : {}),
+        ...(life.revalidate !== undefined ? { revalidate: life.revalidate } : {}),
+        ...(life.life ? { life: life.life } : {}),
+        tags: this.#cacheTagsIn(scope.node),
+        ...uses,
+        loc,
+      }
+    } else {
+      const call = scope.node as CallExpression
+      const [fn, , options] = call.getArguments()
+      const holder = outerParens(call).getParent()
+      const name =
+        holder && N.isVariableDeclaration(holder)
+          ? holder.getName()
+          : fn && N.isIdentifier(skipWrappers(fn))
+            ? skipWrappers(fn).getText()
+            : 'anonymous'
+      // The name Next reports at runtime (M40): the wrapped function's, not the variable's.
+      const wrapped = fn ? skipWrappers(fn) : undefined
+      const fnName =
+        wrapped && N.isIdentifier(wrapped)
+          ? wrapped.getText()
+          : wrapped && N.isFunctionExpression(wrapped)
+            ? wrapped.getName()
+            : undefined
+      const tags = this.#prop(options, EMPTY_ENV, 'tags')
+      const revalidate = this.#prop(options, EMPTY_ENV, 'revalidate')
+      const seconds =
+        revalidate === 'absent' || revalidate === 'unknown' ? undefined : this.#seconds(revalidate)
+      entry = {
+        id,
+        kind: 'unstable-cache',
+        name,
+        ...(fnName && fnName !== name ? { fn: fnName } : {}),
+        ...(seconds !== undefined ? { revalidate: seconds } : {}),
+        tags:
+          tags === 'absent'
+            ? []
+            : tags === 'unknown'
+              ? [{ text: oneLine(options?.getText() ?? ''), confidence: 'unknown' }]
+              : this.#cacheKeys(tags.node, tags.env),
+        ...uses,
+        loc,
+      }
+    }
+    this.#cache.set(id, entry)
+    return entry
+  }
+
+  /** A `revalidate` value: seconds, or `false`. */
+  #seconds(value: Resolved): number | false | undefined {
+    const node = this.#evaluate(value.node, value.env).node
+    const literal = node ? skipWrappers(node) : undefined
+    if (literal && N.isNumericLiteral(literal)) return literal.getLiteralValue()
+    if (literal && literal.getKind() === ts.SyntaxKind.FalseKeyword) return false
+    return undefined
+  }
+
+  /** The `cacheTag()` calls of a cached function (not those of cached functions inside it). */
+  #cacheTagsIn(fn: Node): CacheKey[] {
+    const tags: CacheKey[] = []
+    for (const call of fn.getDescendantsOfKind(ts.SyntaxKind.CallExpression)) {
+      if (cacheApiCall(call) !== 'cacheTag') continue
+      const owner = call.getFirstAncestor((a) => isFunctionLike(a) && ownCacheScope(a) !== undefined)
+      if (owner && owner !== fn) continue
+      for (const arg of call.getArguments()) {
+        const keys = N.isSpreadElement(arg)
+          ? this.#cacheKeys(arg.getExpression(), EMPTY_ENV)
+          : [this.#cacheKey(arg, EMPTY_ENV)]
+        for (const key of keys) if (!tags.some((t) => sameKey(t, key))) tags.push(key)
+      }
+    }
+    return tags
+  }
+
+  /** The tags in an array literal (through constants and spreads), or one unknown tag. */
+  #cacheKeys(node: Node | undefined, env: Env): CacheKey[] {
+    const value = this.#evaluate(node, env)
+    const list = value.node ? skipWrappers(value.node) : undefined
+    if (!list || !N.isArrayLiteralExpression(list)) {
+      return [{ text: oneLine(node?.getText() ?? ''), confidence: 'unknown' }]
+    }
+    return list
+      .getElements()
+      .flatMap((element) =>
+        N.isSpreadElement(element)
+          ? this.#cacheKeys(element.getExpression(), value.env)
+          : [this.#cacheKey(element, value.env)],
+      )
+  }
+
+  /** A tag or path: `'posts'` is exact, `` `post-${id}` `` the pattern `post-{id}`. */
+  #cacheKey(node: Node, env: Env): CacheKey {
+    const text = oneLine(node.getText())
+    const value = this.#str(node, env)
+    // Only runtime parts (`${tag}`) say nothing about the value.
+    if (!value || value.parts.every((p) => 'hole' in p || p.text === ''))
+      return { text, confidence: 'unknown' }
+    const holes = value.parts.some((p) => 'hole' in p)
+    const written = value.parts.map((p) => ('text' in p ? p.text : `{${p.hole}}`)).join('')
+    return { text, value: written, confidence: holes ? 'pattern' : 'exact' }
+  }
+
+  /** `revalidateTag()`, `updateTag()` or `revalidatePath()` in a server action or route handler. */
+  #emitInvalidation(
+    w: Walk,
+    last: Frame,
+    api: Exclude<CacheApi, 'cacheTag' | 'unstable_cache'>,
+    call: CallExpression,
+    env: Env,
+  ) {
+    const origin = w.origin
+    if (origin.kind !== 'server-action' && origin.kind !== 'route-handler') return
+    const frames = [...w.frames, last]
+    const callStack: CallFrame[] = frames.map((f) => ({ ...this.#loc(f.node), callee: f.callee }))
+    const id = makeId('ci', origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#invalidations.has(id)) return
+    const [first, second] = call.getArguments()
+    const key: CacheKey = first ? this.#cacheKey(first, env) : { text: '', confidence: 'unknown' }
+    const type = api === 'revalidatePath' && second ? literalOf(this.#str(second, env)) : undefined
+    this.#invalidations.set(id, {
+      id,
+      api,
+      ...(api === 'revalidatePath'
+        ? { path: { ...key, ...(type === 'page' || type === 'layout' ? { type } : {}) } }
+        : { tag: key }),
+      ...(api === 'revalidateTag' && second ? { profile: oneLine(second.getText()) } : {}),
+      origin: origin.kind,
+      ...(origin.serverAction ? { serverAction: origin.serverAction } : {}),
+      ...(origin.routeId ? { routeId: origin.routeId } : {}),
+      ...(origin.handlerMethod ? { handlerMethod: origin.handlerMethod } : {}),
+      callStack,
+      loc: this.#loc(call),
+    })
   }
 
   #emitNav(w: Walk, last: Frame, found: NavFound, node: Node, conditional = false): string | undefined {
@@ -2978,7 +3502,8 @@ export class RequestScanner {
     const loc = this.#loc(call)
     const key = `${w.origin.key}|${loc.file}:${loc.line}:${loc.column}`
     if (this.#unfollowed.has(key)) return
-    this.#unfollowed.set(key, { componentId: w.origin.componentId, callee: frame.callee, why, loc })
+    const server = trigger === 'server-render'
+    this.#unfollowed.set(key, { componentId: w.origin.componentId, callee: frame.callee, why, server, loc })
   }
 
   /**
@@ -4943,6 +5468,16 @@ function functionOf(decl: Node | undefined): Node | undefined {
     if (init && N.isCallExpression(init) && CALLBACK_HOOKS.has(calleeName(init) ?? '')) {
       init = init.getArguments()[0]
     }
+    // `unstable_cache(fn, keys)` and React's `cache(fn)` call `fn` (M39).
+    if (init && N.isCallExpression(init) && isCacheWrapper(init)) {
+      const fn = init.getArguments()[0]
+      const inner = fn ? skipWrappers(fn) : undefined
+      if (inner && N.isIdentifier(inner)) {
+        const symbol = inner.getSymbol()
+        return symbol ? functionOf(unalias(symbol).getDeclarations()[0]) : undefined
+      }
+      init = inner
+    }
     return isFunctionLike(init) ? init : undefined
   }
   return undefined
@@ -5230,6 +5765,63 @@ function climb(node: Node): Node {
 }
 
 /** The function body starts with `'use server'`. */
+/** `unstable_cache(fn, ...)` from next/cache, or `cache(fn)` from react. */
+function isCacheWrapper(call: CallExpression): boolean {
+  const name = calleeName(call)
+  if (name === 'cache') return importedName(call.getExpression())?.module === 'react'
+  return cacheApiCall(call) === 'unstable_cache'
+}
+
+/** `getUser()` where `const getUser = unstable_cache(load, ...)`: that `unstable_cache()` call. */
+function cacheWrapperOf(call: CallExpression): CallExpression | undefined {
+  const expr = call.getExpression()
+  if (!N.isIdentifier(expr)) return undefined
+  const symbol = expr.getSymbol()
+  const decl = symbol ? unalias(symbol).getDeclarations()[0] : undefined
+  if (!decl || !N.isVariableDeclaration(decl)) return undefined
+  const init = decl.getInitializer()
+  const value = init ? skipWrappers(init) : undefined
+  return value && N.isCallExpression(value) && cacheApiCall(value) === 'unstable_cache' ? value : undefined
+}
+
+/** A function with its own `'use cache'`, or the function passed to `unstable_cache()`. */
+function ownCacheScope(fn: FunctionLike): CacheScope | undefined {
+  const directive = ownDirective(fn)
+  if (directive?.startsWith('use cache')) return { node: fn, kind: 'use-cache', directive }
+  const parent = outerParens(fn).getParent()
+  if (parent && N.isCallExpression(parent) && cacheApiCall(parent) === 'unstable_cache') {
+    const first = parent.getArguments()[0]
+    if (first && skipWrappers(first) === fn) return { node: parent, kind: 'unstable-cache' }
+  }
+  return undefined
+}
+
+function sameKey(a: CacheKey, b: CacheKey): boolean {
+  return a.confidence === b.confidence && a.value === b.value && a.text === b.text
+}
+
+/** The `revalidate` seconds of Next's preset `cacheLife` profiles. */
+const CACHE_LIFE: Record<string, number> = {
+  default: 900,
+  seconds: 1,
+  minutes: 60,
+  hours: 3_600,
+  days: 86_400,
+  weeks: 604_800,
+  max: 2_592_000,
+}
+
+/** The function's first directive (`'use cache'`, `'use server'`), if any. */
+function ownDirective(fn: FunctionLike): string | undefined {
+  const body = fn.getBody()
+  const first = body && N.isBlock(body) ? body.getStatements()[0] : undefined
+  if (!first || !N.isExpressionStatement(first)) return undefined
+  const expr = first.getExpression()
+  return N.isStringLiteral(expr) || N.isNoSubstitutionTemplateLiteral(expr)
+    ? expr.getLiteralValue()
+    : undefined
+}
+
 function hasOwnUseServer(fn: FunctionLike): boolean {
   const body = fn.getBody()
   const first = body && N.isBlock(body) ? body.getStatements()[0] : undefined

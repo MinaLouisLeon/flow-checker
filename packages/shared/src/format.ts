@@ -1,5 +1,7 @@
 // Plain-text rendering of a model: used by `flow-checker scan --tree` and snapshot tests.
 import { accessOf, guardText } from './access'
+import { gapLine, titleText } from './boundaries'
+import { formatCache } from './cache'
 import { urlText } from './format-requests'
 import type {
   AppModel,
@@ -11,6 +13,7 @@ import type {
   Route,
   RouteTreeNode,
 } from './model'
+import { renderLabel, renderOf, renderReasonLine } from './render'
 
 export function formatModel(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -44,7 +47,12 @@ export function formatModel(model: AppModel): string {
     }
     out.push(...(route.componentId ? formatComponentTree(route.componentId, components) : ['(no component)']))
     out.push(...formatAccess(route))
+    out.push(...formatRender(route))
+    out.push(...formatBoundaries(route))
   }
+
+  const cache = formatCache(model)
+  if (cache.length > 0) out.push('', ...cache)
 
   return `${out.join('\n')}\n`
 }
@@ -54,6 +62,38 @@ function formatAccess(route: Route): string[] {
   const out = [`access: ${access.status}`]
   for (const guard of access.guards) out.push(`  ${guardText(guard)}  ${guard.loc.file}:${guard.loc.line}`)
   for (const reason of access.reasons ?? []) out.push(`  ? ${reason.text}`)
+  return out
+}
+
+function formatRender(route: Route): string[] {
+  const render = renderOf(route)
+  const out = [`render: ${renderLabel(render)}`]
+  for (const reason of render.reasons) {
+    const at = reason.loc ? `  ${reason.loc.file}:${reason.loc.line}` : ''
+    out.push(`  ${renderReasonLine(reason)}${at}`)
+  }
+  return out
+}
+
+function formatBoundaries(route: Route): string[] {
+  const boundaries = route.boundaries
+  if (!boundaries) return []
+  const files = boundaries.items.map((b) =>
+    b.in === 'segment'
+      ? `${b.kind}${b.nearest ? '*' : ''} ${b.file}`
+      : `${b.kind} in ${b.in}${b.wraps?.length ? ` around ${b.wraps.join(', ')}` : ''} ${b.loc?.file}:${b.loc?.line}`,
+  )
+  const out = [`boundaries: ${files.length > 0 ? '' : '(none)'}`.trimEnd()]
+  for (const file of files) out.push(`  ${file}`)
+  for (const gap of boundaries.gaps) {
+    const at = gap.loc ? `  ${gap.loc.file}:${gap.loc.line}` : ''
+    out.push(`  ! ${gapLine(gap)}${at}`)
+  }
+  const meta = route.metadata
+  if (meta) {
+    const from = meta.sources.map((m) => `${m.in} ${m.kind}`).join(', ')
+    out.push(`title: ${titleText(meta)}${from ? `  (${from})` : ''}`)
+  }
   return out
 }
 
@@ -156,7 +196,12 @@ function componentLabel(c: Component): string {
 }
 
 function refLabel(ref: ComponentRef, target: Component | undefined): string {
-  const flags = [ref.conditional && 'conditional', ref.dynamic && 'dynamic'].filter(Boolean)
+  const flags = [
+    ref.conditional && 'conditional',
+    ref.dynamic && 'dynamic',
+    ref.suspense && 'suspense',
+    ref.errorBoundary && 'error boundary',
+  ].filter(Boolean)
   const suffix = flags.length > 0 ? `  [${flags.join(', ')}]` : ''
   if (target) {
     const name = ref.name === target.name ? target.name : `${ref.name} = ${target.name}`

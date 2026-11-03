@@ -18,6 +18,8 @@ import {
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { addRouteAccess } from './access'
+import { addRouteBoundaries } from './boundaries'
+import { buildCacheMap } from './cache'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
@@ -31,6 +33,7 @@ import {
 } from './middleware'
 import { compare, relativeTo, resolveFrom, toPosix } from './paths'
 import { createProject } from './project'
+import { addRouteRender, cacheComponentsOn } from './render'
 import { RequestScanner } from './requests'
 import { walkRoutes } from './routes'
 import { findHandler, findLinkPath, findRouterFromClients, type ProcedureDef, readRouter } from './trpc'
@@ -420,6 +423,36 @@ function analyze(
     unfollowed: requests.unfollowed(),
     responses: requests.middlewareResponses(),
   })
+  const cacheComponents = cacheComponentsOn(
+    discovery.nextConfig && fs.fileExistsSync(discovery.nextConfig)
+      ? fs.readFileSync(discovery.nextConfig)
+      : undefined,
+  )
+  addRouteRender({
+    root,
+    routes,
+    components,
+    uses: requests.renderUses(),
+    unfollowed: requests.unfollowed(),
+    fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
+    cacheComponents,
+  })
+  addRouteBoundaries({
+    root,
+    appDir: relativeTo(root, discovery.appDir),
+    tree,
+    routes,
+    components,
+    uses: requests.renderUses(),
+    fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
+    cacheComponents,
+  })
+  const cache = buildCacheMap({
+    routes,
+    components,
+    entries: requests.cacheEntries(),
+    invalidations: requests.invalidations(),
+  })
   const modelTypes = types.types()
   report({
     phase: 'flows',
@@ -436,6 +469,7 @@ function analyze(
       ...(discovery.tsconfig ? { tsconfig: relativeTo(root, discovery.tsconfig) } : {}),
       ...(discovery.nextConfig ? { nextConfig: relativeTo(root, discovery.nextConfig) } : {}),
       ...(discovery.nextVersion ? { nextVersion: discovery.nextVersion } : {}),
+      ...(cacheComponents ? { cacheComponents: true as const } : {}),
     },
     routeTree: tree,
     routes,
@@ -451,6 +485,7 @@ function analyze(
     ...(streams.length > 0 ? { streams } : {}),
     ...(settings.areas ? { areas: settings.areas } : {}),
     imports: importGraph(project, root, discovery, settings),
+    ...(cache ? { cache } : {}),
   }
 }
 

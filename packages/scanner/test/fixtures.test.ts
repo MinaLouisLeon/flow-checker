@@ -2,6 +2,8 @@ import { resolve } from 'node:path'
 import {
   type AppModel,
   AppModelSchema,
+  cacheKeyText,
+  cacheOf,
   formatFlows,
   formatModel,
   formatRequests,
@@ -28,6 +30,9 @@ const FIXTURES = [
   'graphql-relay',
   'sse',
   'websocket',
+  'caching',
+  'caching-15',
+  'boundaries',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -80,6 +85,23 @@ describe.each(FIXTURES)('fixture %s', (fixture) => {
     }
   })
 
+  it('gives every page a render mode, with a reason unless it is static (M38)', () => {
+    for (const route of scan(fixture).routes) {
+      if (route.kind !== 'page') {
+        expect(route.render).toBeUndefined()
+        continue
+      }
+      const render = route.render
+      expect(render, route.path).toBeDefined()
+      if (!render || render.mode === 'static') continue
+      const effect = render.mode === 'partial' ? 'dynamic' : render.mode
+      expect(
+        render.reasons.some((r) => r.effect === effect),
+        route.path,
+      ).toBe(true)
+    }
+  })
+
   it('has no duplicate sites', () => {
     // A twin is the same network call from the same origin, reached once through a path and
     // once through the tail of it (a local function walked in place and through its hook).
@@ -105,5 +127,174 @@ describe.each(FIXTURES)('fixture %s', (fixture) => {
     await expect(`${JSON.stringify(stable, null, 2)}\n`).toMatchFileSnapshot(
       `__snapshots__/${fixture}.model.json`,
     )
+  })
+})
+
+// Server cache map (M39): every revalidate call in the caching fixtures links to the expected
+// entries and pages, and each flag fires on its planted case only.
+describe('server cache map (M39)', () => {
+  function links(fixture: string): { entries: string[]; invalidations: string[] } {
+    const model = scan(fixture)
+    const map = cacheOf(model)
+    const path = (id: string) => model.routes.find((r) => r.id === id)?.path ?? id
+    const name = new Map(map.entries.map((e) => [e.id, e.name]))
+    const flags = (list: { kind: string }[]) => (list.length ? ` !${list.map((f) => f.kind).join(' !')}` : '')
+    return {
+      entries: map.entries.map(
+        (e) =>
+          `${e.kind} ${e.name} [${e.tags.map(cacheKeyText).join(', ')}] -> ${[...e.pageIds, ...e.handlerIds]
+            .map(path)
+            .join(' ')}${flags(e.flags)}`,
+      ),
+      invalidations: map.invalidations.map(
+        (i) =>
+          `${i.origin} ${i.api}(${cacheKeyText(i.tag ?? i.path ?? { text: '', confidence: 'unknown' })}) -> ${i.entryIds
+            .map((id) => name.get(id))
+            .join(', ')} | ${[...i.pageIds, ...i.handlerIds].map(path).join(' ')}${flags(i.flags)}`,
+      ),
+    }
+  }
+
+  it('links the Next 16 fixture (Cache Components)', () => {
+    const api = '{API_URL ?? http://localhost:4010}'
+    expect(links('caching')).toEqual({
+      entries: [
+        // Answers 404, so it is never cached at runtime (M40).
+        `fetch ${api}/products/featured [] -> /api/featured`,
+        `fetch ${api}/todos [stats] -> /api/stats !tag-never-revalidated`,
+        'use-cache SiteHeader [nav] -> / /products /settings /todos/[id] /users',
+        `fetch ${api}/products [products] -> /products`,
+        'use-cache getSettings [settings] -> /settings !tag-never-revalidated',
+        'use-cache listTodos [todos] -> /',
+        'use-cache getTodo [todo-{id}] -> /todos/[id]',
+        'unstable-cache getUsers [users] -> /users',
+      ],
+      invalidations: [
+        'server-action updateTag(todos) -> listTodos | /',
+        'server-action revalidatePath(/) ->  | /',
+        'server-action updateTag(todo-{id}) -> getTodo | /todos/[id]',
+        'server-action revalidatePath(/todos/[id]) ->  | /todos/[id]',
+        'server-action revalidateTag(users) -> getUsers | /users',
+        'server-action revalidateTag(user) ->  |  !tag-never-set',
+        'server-action revalidatePath(/user) ->  |  !path-no-route',
+        `route-handler revalidateTag(products) -> ${api}/products | /products`,
+        'route-handler revalidateTag(nav) -> SiteHeader | / /products /settings /todos/[id] /users',
+        'route-handler revalidatePath(/products) ->  | /products',
+        'route-handler updateTag(todos) -> listTodos | / !update-tag-outside-action',
+      ],
+    })
+  })
+
+  it('links the Next 15 fixture (no Cache Components)', () => {
+    const api = '{API_URL ?? http://localhost:4010}'
+    expect(links('caching-15')).toEqual({
+      entries: [
+        'unstable-cache listProducts [products] -> /products !tag-never-revalidated',
+        `fetch ${api}/products/featured [] -> /products`,
+        `fetch ${api}/todos [todos] -> /`,
+        `fetch ${api}/todos/:id [todos, todo-{id}] -> /todos/[id]`,
+        'unstable-cache getViewer [viewer] -> /profile',
+      ],
+      invalidations: [
+        `server-action revalidateTag(todos) -> ${api}/todos, ${api}/todos/:id | / /todos/[id]`,
+        'server-action revalidatePath(/) ->  | /',
+        `server-action revalidateTag(todo-{id}) -> ${api}/todos/:id | /todos/[id]`,
+        'server-action revalidateTag(product) ->  |  !tag-never-set',
+        'server-action revalidatePath(/products) ->  | /products',
+        'route-handler revalidateTag(viewer) -> getViewer | /profile',
+        'route-handler revalidatePath(/profil) ->  |  !path-no-route',
+      ],
+    })
+  })
+
+  it('labels the caching pages like `next build` does', () => {
+    const modes = (fixture: string) =>
+      Object.fromEntries(
+        scan(fixture)
+          .routes.filter((r) => r.kind === 'page')
+          .map((r) => [r.path, `${r.render?.mode}${r.render?.revalidate ? ` ${r.render.revalidate}` : ''}`]),
+      )
+    // Next 16.4 (○ 15m, ○ 5m, ○ 15m, ◐, ○ 1m): the cached header in the root layout is 15 minutes.
+    expect(modes('caching')).toEqual({
+      '/': 'isr 900',
+      '/products': 'isr 300',
+      '/settings': 'isr 900',
+      '/todos/[id]': 'partial 900',
+      '/users': 'isr 60',
+    })
+    // Next 15.5 (○, ○ 5m, ○ 1d, ƒ).
+    expect(modes('caching-15')).toEqual({
+      '/': 'static',
+      '/products': 'isr 300',
+      '/profile': 'isr 86400',
+      '/todos/[id]': 'dynamic',
+    })
+  })
+})
+
+describe('special files and boundaries (M41)', () => {
+  beforeAll(() => {
+    scan('boundaries')
+    scan('caching')
+  }, 60_000)
+
+  const key = (r: { path: string; slot?: string; intercepting?: unknown }) =>
+    `${r.path}${r.slot ? ` @${r.slot}` : ''}${r.intercepting ? ' (intercepting)' : ''}`
+
+  it('flags only the planted gap in the boundaries fixture, which `next build` accepts', () => {
+    const gaps = scan('boundaries').routes.flatMap((r) =>
+      (r.boundaries?.gaps ?? []).map((g) => `${key(r)}: ${g.kind} ${g.detail} ${g.loc?.file}`),
+    )
+    expect(gaps).toEqual(['/photos/[id]: no-fallback fetch src/lib/api.ts'])
+  })
+
+  it('finds the slots, the intercepting route and their parts', () => {
+    const pages = scan('boundaries').routes.filter((r) => r.kind === 'page')
+    expect(pages.filter((r) => r.slot || r.intercepting).map(key)).toEqual([
+      '/dashboard @stats',
+      '/dashboard @team',
+      '/dashboard/members @team',
+      '/photos/[id] @modal (intercepting)',
+    ])
+    const dashboard = pages.find((r) => key(r) === '/dashboard')
+    expect(dashboard?.boundaries?.items.filter((i) => i.nearest).map((i) => i.kind)).toEqual([
+      'not-found',
+      'forbidden',
+      'unauthorized',
+      'loading',
+      'error',
+    ])
+    const reports = pages.find((r) => r.path === '/reports')
+    expect(reports?.boundaries?.items.filter((i) => i.in !== 'segment').map((i) => i.kind)).toEqual([
+      'suspense',
+      'suspense',
+      'error-boundary',
+    ])
+  })
+
+  it('resolves titles like the built pages show them', () => {
+    // `<title>` of each page in `next build` / `next start` (16.4.3).
+    const titles = Object.fromEntries(
+      scan('boundaries')
+        .routes.filter((r) => r.kind === 'page' && !r.slot && !r.intercepting)
+        .map((r) => [r.path, r.metadata?.title]),
+    )
+    expect(titles).toEqual({
+      '/': 'Boundaries',
+      '/account': 'Boundaries',
+      '/blog/[slug]': 'Post {slug} | Boundaries',
+      '/dashboard': 'Dashboard | Boundaries',
+      '/dashboard/settings': 'Settings',
+      '/photos': 'Photos | Boundaries',
+      '/photos/[id]': 'Photo {id} | Boundaries',
+      '/reports': 'Reports',
+    })
+  })
+
+  it('flags nothing that blocks the caching fixture, which builds with Cache Components', () => {
+    const blocking = scan('caching').routes.flatMap((r) =>
+      (r.boundaries?.gaps ?? []).filter((g) => g.kind === 'blocking-route').map(() => r.path),
+    )
+    expect(blocking).toEqual([])
   })
 })

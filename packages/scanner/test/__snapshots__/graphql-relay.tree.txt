@@ -27,22 +27,34 @@ layouts: src/app/layout.tsx
 HomePage  server  src/app/page.tsx:6
 ├─ ClientOnly  client (use client)  src/components/ClientOnly.tsx:8
 ├─ Suspense  external react
-├─ TodoList  client (use client)  src/components/TodoList.tsx:7
+├─ TodoList  client (use client)  src/components/TodoList.tsx:7  [suspense]
 │  └─ TodoItem  client (use client)  src/components/TodoItem.tsx:7
 │     └─ Link  external next/link
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:8
 access: open
+render: static
+boundaries:
+  suspense in page around TodoList src/app/page.tsx:11
+title: Relay fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
 Page  server  src/app/todos/[id]/page.tsx:3
 └─ TodoPage  client (use client)  src/components/TodoPage.tsx:8
    ├─ Suspense  external react  [conditional]
-   └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:27  [conditional]
+   └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:27  [conditional, suspense]
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries:
+  suspense in component around TodoDetail src/components/TodoPage.tsx:15
+title: Relay fixture  (layout metadata)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:3
 └─ UserList  client (use client)  src/components/UserList.tsx:7
 access: open
+render: static
+boundaries: (none)
+title: Relay fixture  (layout metadata)

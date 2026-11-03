@@ -2,7 +2,7 @@
 // Masking keeps the shape: strings become "[REDACTED:string]", numbers 0 and booleans false,
 // so comparing captured data with the declared types still works on redacted data.
 // Running it twice gives the same result, so the tool server can apply it again as a safety net.
-import type { Capture, CapturedBody } from '@flow-checker/shared'
+import type { CacheEvent, Capture, CapturedBody } from '@flow-checker/shared'
 import type { RuntimeCaptureOptions } from './options'
 
 export const REDACTED_STRING = '[REDACTED:string]'
@@ -215,5 +215,18 @@ export function redactCapture(capture: Capture, rules: RedactRules, storeRaw = f
   if (out.query === undefined) delete out.query
   out.redacted = true
   out.redactedPaths = [...new Set([...capture.redactedPaths, ...r.paths])]
+  return out
+}
+
+/**
+ * Returns a cache event (M40) with its URLs redacted like a capture's. Tags and the key hash stay:
+ * the key is already a hash, and tags are names written in the code.
+ */
+export function redactCacheEvent(event: CacheEvent, rules: RedactRules, storeRaw = false): CacheEvent {
+  if (storeRaw) return event
+  const r = createRedactor(rules)
+  const out: CacheEvent = { ...event }
+  if (event.url !== undefined) out.url = r.url(event.url, 'url')
+  if (event.parent) out.parent = { ...event.parent, url: r.url(event.parent.url, 'parent.url') }
   return out
 }

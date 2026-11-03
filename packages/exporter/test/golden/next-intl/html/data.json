@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "next-intl",
   "model": {
-    "version": 12,
+    "version": 15,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -109,6 +109,41 @@
               }
             }
           ]
+        },
+        "render": {
+          "mode": "static",
+          "reasons": [
+            {
+              "kind": "static-params",
+              "effect": "info",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 7,
+                "column": 1
+              }
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-not-found",
+              "in": "layout",
+              "componentId": "cmp_0jf6im1pjt6",
+              "detail": "notFound",
+              "file": "not-found",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 19,
+                "column": 44
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "sources": []
         }
       },
       {
@@ -152,6 +187,41 @@
               }
             }
           ]
+        },
+        "render": {
+          "mode": "static",
+          "reasons": [
+            {
+              "kind": "static-params",
+              "effect": "info",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 7,
+                "column": 1
+              }
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-not-found",
+              "in": "layout",
+              "componentId": "cmp_0jf6im1pjt6",
+              "detail": "notFound",
+              "file": "not-found",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 19,
+                "column": 44
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "sources": []
         }
       },
       {
@@ -195,6 +265,41 @@
               }
             }
           ]
+        },
+        "render": {
+          "mode": "static",
+          "reasons": [
+            {
+              "kind": "static-params",
+              "effect": "info",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 7,
+                "column": 1
+              }
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-not-found",
+              "in": "layout",
+              "componentId": "cmp_0jf6im1pjt6",
+              "detail": "notFound",
+              "file": "not-found",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 19,
+                "column": 44
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "sources": []
         }
       },
       {
@@ -238,6 +343,51 @@
               }
             }
           ]
+        },
+        "render": {
+          "mode": "dynamic",
+          "reasons": [
+            {
+              "kind": "search-params",
+              "effect": "dynamic",
+              "in": "page",
+              "loc": {
+                "file": "src/app/[locale]/verify/page.tsx",
+                "line": 4,
+                "column": 3
+              }
+            },
+            {
+              "kind": "static-params",
+              "effect": "info",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 7,
+                "column": 1
+              }
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-not-found",
+              "in": "layout",
+              "componentId": "cmp_0jf6im1pjt6",
+              "detail": "notFound",
+              "file": "not-found",
+              "loc": {
+                "file": "src/app/[locale]/layout.tsx",
+                "line": 19,
+                "column": 44
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "sources": []
         }
       }
     ],

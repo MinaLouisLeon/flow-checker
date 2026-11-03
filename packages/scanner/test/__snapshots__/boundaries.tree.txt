@@ -1,0 +1,231 @@
+# Route tree
+
+src/app [layout, page, global-error, not-found, forbidden, unauthorized]
+├─ account [page]
+├─ blog
+│  └─ [slug] (dynamic) [page]
+├─ dashboard [layout, page, loading, error, default]
+│  ├─ @stats (slot) [page, default]
+│  ├─ @team (slot) [page, default]
+│  │  └─ members [page]
+│  └─ settings [page]
+├─ photos [layout, page, not-found]
+│  ├─ @modal (slot) [default]
+│  │  └─ (.)[id] (dynamic) (intercepts (.)) [page]
+│  └─ [id] (dynamic) [page]
+└─ reports [template, page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/account  page  src/app/account/page.tsx
+/blog/[slug]  page  src/app/blog/[slug]/page.tsx
+/dashboard  page  src/app/dashboard/@stats/page.tsx  (slot @stats)
+/dashboard  page  src/app/dashboard/@team/page.tsx  (slot @team)
+/dashboard  page  src/app/dashboard/page.tsx
+/dashboard/members  page  src/app/dashboard/@team/members/page.tsx  (slot @team)
+/dashboard/settings  page  src/app/dashboard/settings/page.tsx
+/photos  page  src/app/photos/page.tsx
+/photos/[id]  page  src/app/photos/@modal/(.)[id]/page.tsx  (slot @modal, intercepts from /photos (.))
+/photos/[id]  page  src/app/photos/[id]/page.tsx
+/reports  page  src/app/reports/page.tsx
+
+# Layouts
+
+DashboardLayout  server  src/app/dashboard/layout.tsx:5
+└─ Suspense  external react
+
+RootLayout  server  src/app/layout.tsx:10
+└─ Link  external next/link
+
+PhotosLayout  server  src/app/photos/layout.tsx:3
+
+ReportsTemplate  server  src/app/reports/template.tsx:3
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+Home  server  src/app/page.tsx:1
+access: open
+render: static
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+title: Boundaries  (layout metadata)
+
+## /account  src/app/account/page.tsx
+layouts: src/app/layout.tsx
+AccountPage  server  src/app/account/page.tsx:4
+access: guarded
+  shows the unauthorized page (401) when `!session` (page)  src/app/account/page.tsx:7
+  shows the forbidden page (403) when `session && store.get('role')?.value !== 'admin'` (page)  src/app/account/page.tsx:8
+render: dynamic
+  dynamic: calls `cookies()`, which reads the request (page)  src/app/account/page.tsx:5
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+title: Boundaries  (layout metadata)
+
+## /blog/[slug]  src/app/blog/[slug]/page.tsx
+layouts: src/app/layout.tsx
+PostPage  server  src/app/blog/[slug]/page.tsx:13
+access: guarded
+  shows the not-found page (404) when `!post` (page)  src/app/blog/[slug]/page.tsx:16
+render: static
+  info: `generateStaticParams` lists the params to prerender (page)  src/app/blog/[slug]/page.tsx:4
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+title: Post {slug} | Boundaries  (layout metadata, page generateMetadata)
+
+## /dashboard @stats  src/app/dashboard/@stats/page.tsx
+layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
+Stats  server  src/app/dashboard/@stats/page.tsx:3
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:7
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error src/app/global-error.tsx
+  loading* src/app/dashboard/loading.tsx
+  error* src/app/dashboard/error.tsx
+  suspense in layout around stats src/app/dashboard/layout.tsx:18
+title: Dashboard | Boundaries  (layout metadata, layout metadata)
+
+## /dashboard @team  src/app/dashboard/@team/page.tsx
+layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
+Team  server  src/app/dashboard/@team/page.tsx:1
+access: open
+render: static
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error src/app/global-error.tsx
+  loading* src/app/dashboard/loading.tsx
+  error* src/app/dashboard/error.tsx
+  suspense in layout around stats src/app/dashboard/layout.tsx:18
+title: Dashboard | Boundaries  (layout metadata, layout metadata)
+
+## /dashboard  src/app/dashboard/page.tsx
+layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
+DashboardPage  server  src/app/dashboard/page.tsx:3
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:7
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error src/app/global-error.tsx
+  loading* src/app/dashboard/loading.tsx
+  error* src/app/dashboard/error.tsx
+  suspense in layout around stats src/app/dashboard/layout.tsx:18
+title: Dashboard | Boundaries  (layout metadata, layout metadata)
+
+## /dashboard/members @team  src/app/dashboard/@team/members/page.tsx
+layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
+Members  server  src/app/dashboard/@team/members/page.tsx:3
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:7
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error src/app/global-error.tsx
+  loading* src/app/dashboard/loading.tsx
+  error* src/app/dashboard/error.tsx
+  suspense in layout around stats src/app/dashboard/layout.tsx:18
+title: Dashboard | Boundaries  (layout metadata, layout metadata)
+
+## /dashboard/settings  src/app/dashboard/settings/page.tsx
+layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
+DashboardSettings  server  src/app/dashboard/settings/page.tsx:3
+access: open
+render: static
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error src/app/global-error.tsx
+  loading* src/app/dashboard/loading.tsx
+  error* src/app/dashboard/error.tsx
+  suspense in layout around stats src/app/dashboard/layout.tsx:18
+title: Settings  (layout metadata, layout metadata, page metadata)
+
+## /photos  src/app/photos/page.tsx
+layouts: src/app/layout.tsx > src/app/photos/layout.tsx
+Photos  server  src/app/photos/page.tsx:5
+└─ Link  external next/link
+access: open
+render: static
+boundaries:
+  not-found src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+  not-found* src/app/photos/not-found.tsx
+title: Photos | Boundaries  (layout metadata, page metadata)
+
+## /photos/[id] @modal  src/app/photos/@modal/(.)[id]/page.tsx
+layouts: src/app/layout.tsx > src/app/photos/layout.tsx
+PhotoModal  server  src/app/photos/@modal/(.)[id]/page.tsx:3
+└─ Modal  client (use client)  src/components/modal.tsx:6
+access: open
+render: dynamic
+  dynamic: has the dynamic segment `(.)[id]` and no `generateStaticParams` (page)
+boundaries:
+  not-found src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+  not-found* src/app/photos/not-found.tsx
+title: Boundaries  (layout metadata)
+
+## /photos/[id]  src/app/photos/[id]/page.tsx
+layouts: src/app/layout.tsx > src/app/photos/layout.tsx
+PhotoPage  server  src/app/photos/[id]/page.tsx:9
+access: guarded
+  shows the not-found page (404) when `!product` (page)  src/app/photos/[id]/page.tsx:12
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:17
+boundaries:
+  not-found src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+  not-found* src/app/photos/not-found.tsx
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:17
+title: Photo {id} | Boundaries  (layout metadata, page generateMetadata)
+
+## /reports  src/app/reports/page.tsx
+layouts: src/app/layout.tsx > src/app/reports/template.tsx
+ReportsPage  server  src/app/reports/page.tsx:18
+├─ Suspense  external react
+├─ ReportTable  server  src/app/reports/page.tsx:6  [suspense]
+├─ ErrorBoundary  client (use client)  src/components/error-boundary.tsx:6  [suspense]
+└─ SettingsPanel  server  src/app/reports/page.tsx:11  [suspense, error boundary]
+access: open
+render: dynamic
+  dynamic: calls `cookies()`, which reads the request (page)  src/app/reports/page.tsx:19
+  dynamic: fetches with `cache: 'no-store'` (component)  src/lib/api.ts:7
+boundaries:
+  not-found* src/app/not-found.tsx
+  forbidden* src/app/forbidden.tsx
+  unauthorized* src/app/unauthorized.tsx
+  global-error* src/app/global-error.tsx
+  suspense in page around ReportTable src/app/reports/page.tsx:22
+  suspense in page around ErrorBoundary, SettingsPanel src/app/reports/page.tsx:25
+  error-boundary in page around SettingsPanel src/app/reports/page.tsx:26
+title: Reports  (layout metadata, page metadata)

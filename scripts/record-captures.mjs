@@ -1,7 +1,8 @@
 // Records real captures from every fixture app, for the matcher (M6) and type comparison (M8) tests.
 // For each fixture: starts the mock API and `flow-checker dev` (built CLI), drives the app in
 // Chromium, then saves the captures the tool server stored to
-// packages/server/test/recordings/<fixture>.json. Local paths are replaced with `<repo>`.
+// packages/server/test/recordings/<fixture>.json, with the server cache events (M40) when there
+// are any. Local paths are replaced with `<repo>`.
 //
 // Run after `pnpm build`:  node scripts/record-captures.mjs [fixture...]
 import { spawn, spawnSync } from 'node:child_process'
@@ -277,6 +278,23 @@ const scripts = {
     await settle(page)
   },
   // WebSockets (M19): each socket is closed by the page before moving on, so every capture ends
+  // M40: each page twice, so the second visit can be served from Next's server cache.
+  caching: async (page) => {
+    for (const path of ['/', '/products', '/settings', '/users', '/todos/1', '/api/stats', '/api/featured']) {
+      await page.goto(`${app}${path}`)
+      await settle(page)
+      await page.goto(`${app}${path}`)
+      await settle(page)
+    }
+  },
+  'caching-15': async (page) => {
+    for (const path of ['/', '/products', '/profile', '/todos/1']) {
+      await page.goto(`${app}${path}`)
+      await settle(page)
+      await page.goto(`${app}${path}`)
+      await settle(page)
+    }
+  },
   // with its close code.
   websocket: async (page) => {
     await page.goto(`${app}/`)
@@ -355,8 +373,14 @@ async function untilStable(read, quietMs = 4000, maxMs = 30_000) {
   }
 }
 
-function serverActions(fixture, captures) {
-  const ids = new Set(captures.flatMap((c) => [c.serverAction?.id, c.parent?.serverActionId]).filter(Boolean))
+function serverActions(fixture, captures, cache) {
+  const ids = new Set(
+    [
+      ...captures.flatMap((c) => [c.serverAction?.id, c.parent?.serverActionId]),
+      // `use cache` functions are in the same manifest (M40).
+      ...cache.map((e) => e.functionId),
+    ].filter(Boolean),
+  )
   const out = {}
   for (const dir of ['.next/dev/server', '.next/server']) {
     let manifest
@@ -374,6 +398,18 @@ function serverActions(fixture, captures) {
     }
   }
   return out
+}
+
+/** Server cache events the tool server stored for the fixture (M40), oldest first. */
+function cacheEvents(fixture) {
+  try {
+    return readFileSync(join(repo, 'fixtures', fixture, '.flow-checker', 'cache-events.jsonl'), 'utf8')
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line))
+  } catch {
+    return []
+  }
 }
 
 function scrub(value) {
@@ -428,11 +464,16 @@ async function record(fixture, browser) {
     const counts = { matched: 0, ambiguous: 0, unmatched: 0 }
     for (const c of captures) counts[c.match?.status ?? 'unmatched']++
     console.log(`${fixture}: ${captures.length} captures`, counts)
+    const cache = cacheEvents(fixture)
+    if (cache.length > 0) console.log(`${fixture}: ${cache.length} cache events`)
     const saved = {
       fixture,
       // Server action ids from Next's manifest, so tests can resolve them without a build.
-      actions: serverActions(fixture, captures),
+      actions: serverActions(fixture, captures, cache),
       captures: captures.map(({ match: _, ...rest }) => ({ ...rest, stack: rest.stack.slice(0, 12) })),
+      ...(cache.length > 0
+        ? { cache: cache.map((event) => ({ ...event, stack: event.stack.slice(0, 12) })) }
+        : {}),
     }
     mkdirSync(outDir, { recursive: true })
     writeFileSync(join(outDir, `${fixture}.json`), `${JSON.stringify(scrub(saved), null, 2)}\n`)

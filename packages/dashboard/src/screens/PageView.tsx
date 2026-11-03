@@ -1,21 +1,28 @@
 import {
   accessOf,
   type ComponentRef,
+  durationText,
   guardAction,
   guardWhen,
   type Navigation,
+  pageCache,
   type QueryLink,
+  type RenderReason,
   type RequestSite,
   type Route,
+  renderOf,
+  renderReasonText,
   urlText,
 } from '@flow-checker/shared'
 import { useState } from 'react'
+import { BoundariesSection, MetadataSection } from '../BoundariesView'
+import { CacheEntryRow, InvalidationRow } from '../CacheView'
 import { useData } from '../context'
 import { useShowDetails } from '../details'
 import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
 import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
-import { ownerHref, QueryLinkList, RequestList, RequestSummary, triggerLabel } from '../RequestView'
+import { ownerHref, QueryLinkList, RequestList, RequestSummary, siteHref, triggerLabel } from '../RequestView'
 import { href } from '../router'
 import {
   AccessBadge,
@@ -25,6 +32,7 @@ import {
   Empty,
   KindBadge,
   RefBadges,
+  RenderBadge,
   SearchBox,
   Section,
   SourceLink,
@@ -70,6 +78,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
           </h1>
           {details && <Badge>page</Badge>}
           <AccessBadge route={route} />
+          <RenderBadge route={route} />
           {route.slot && <Badge tone="muted">slot @{route.slot}</Badge>}
           {route.intercepting && (
             <Badge tone="muted" title={`From ${route.intercepting.from}`}>
@@ -108,6 +117,10 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         )}
 
         <AccessSection route={route} index={index} routeId={routeId} />
+        <RenderSection route={route} index={index} />
+        <BoundariesSection route={route} />
+        <CacheSection route={route} index={index} />
+        <MetadataSection route={route} />
 
         <Section title="Layout chain">
           {route.layoutChain.length === 0 ? (
@@ -537,6 +550,114 @@ const GUARD_PLACE: Record<string, string> = {
   layout: 'layout',
   page: 'page',
   component: 'component',
+}
+
+const RENDER_SUMMARY: Record<string, string> = {
+  static: 'Prerendered once at build time: every visitor gets the same page until the next build.',
+  isr: 'Prerendered at build time and rebuilt in the background after the time below.',
+  dynamic: 'Rendered on the server for each request, for the reasons below.',
+  partial: 'A static shell is prerendered; the parts below stream in for each request.',
+  unknown: "The scan can't tell how this page renders, for the reasons below.",
+}
+
+const EFFECT_BADGES: Record<
+  RenderReason['effect'],
+  { text: string; tone: 'ok' | 'shared' | 'server' | 'muted' }
+> = {
+  dynamic: { text: 'dynamic', tone: 'server' },
+  isr: { text: 'ISR', tone: 'shared' },
+  static: { text: 'static', tone: 'ok' },
+  unknown: { text: '?', tone: 'muted' },
+  info: { text: 'info', tone: 'muted' },
+}
+
+/** How Next renders the page in a build, and why (M38). Reasons link to their component and request. */
+function RenderSection({ route, index }: { route: Route; index: ModelIndex }) {
+  const render = renderOf(route)
+  const cacheComponents = index.model.project.cacheComponents
+  const details = useShowDetails()
+  return (
+    <Section title="Rendering" aside={details ? <RenderBadge route={route} /> : undefined}>
+      <p className="muted">
+        {RENDER_SUMMARY[render.mode]}
+        {cacheComponents ? ' Cache Components is on.' : ''} In <code>next dev</code> every page renders per
+        request.
+      </p>
+      {render.reasons.length > 0 && (
+        <ul className="list render-list">
+          {render.reasons.map((reason, i) => {
+            const component = reason.componentId ? index.components.get(reason.componentId) : undefined
+            const site = reason.siteId ? index.requests.get(reason.siteId) : undefined
+            const badge = EFFECT_BADGES[reason.effect]
+            return (
+              <li key={`${reason.kind}-${i}`} data-render={reason.kind}>
+                <Badge tone={badge.tone}>
+                  {reason.effect === 'isr' && reason.revalidate !== undefined
+                    ? `ISR ${durationText(reason.revalidate)}`
+                    : badge.text}
+                </Badge>
+                {details && <Badge tone="muted">{GUARD_PLACE[reason.in]}</Badge>}
+                <span>
+                  <CodeText text={renderReasonText(reason)} />
+                  {component && reason.in === 'component' && (
+                    <span className="muted"> · {component.name}</span>
+                  )}
+                  {site && (
+                    <>
+                      {' · '}
+                      <a href={siteHref(site)}>request</a>
+                    </>
+                  )}
+                </span>
+                <span className="spacer" />
+                {reason.loc && (
+                  <SourceLink file={reason.loc.file} line={reason.loc.line} column={reason.loc.column} />
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </Section>
+  )
+}
+
+/** Server cache (M39): what the page renders with from the cache, and the calls that refresh it. */
+function CacheSection({ route, index }: { route: Route; index: ModelIndex }) {
+  if (!index.model.cache) return null
+  const { entries, invalidations } = pageCache(index.model.cache, route.id)
+  if (entries.length === 0 && invalidations.length === 0) return null
+  return (
+    <Section
+      title="Server cache"
+      aside={
+        <a className="muted" href={href({ name: 'cache' })}>
+          all cached data
+        </a>
+      }
+    >
+      {entries.length > 0 && (
+        <>
+          <p className="muted">Cached data the page and its layouts render with:</p>
+          <CappedList
+            items={entries}
+            className="list cache-list"
+            render={(entry) => <CacheEntryRow key={entry.id} entry={entry} index={index} pages={false} />}
+          />
+        </>
+      )}
+      {invalidations.length > 0 && (
+        <>
+          <p className="muted">Refreshed by:</p>
+          <CappedList
+            items={invalidations}
+            className="list cache-list"
+            render={(inv) => <InvalidationRow key={inv.id} inv={inv} index={index} />}
+          />
+        </>
+      )}
+    </Section>
+  )
 }
 
 /** What can stop the page from rendering (M31): middleware, layouts, the page and its components. */

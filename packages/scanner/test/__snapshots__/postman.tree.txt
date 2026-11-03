@@ -22,9 +22,24 @@ HomePage  server  app/page.tsx:9
 ├─ ProductPanel  client (use client)  components/ProductPanel.tsx:7
 └─ TodoPanel  client (use client)  components/TodoPanel.tsx:8
 access: open
+render: dynamic
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  app/page.tsx:6
+  dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:5
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:5
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:5
+title: postman fixture  (layout metadata)
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
 UserPage  server  app/users/[id]/page.tsx:7
 └─ DeleteUserButton  client (use client)  components/DeleteUserButton.tsx:7
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  app/users/[id]/page.tsx:4
+  dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:12
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:12
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:12
+title: postman fixture  (layout metadata)

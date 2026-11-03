@@ -127,6 +127,166 @@ export const RouteAccessSchema = z.object({
 })
 export type RouteAccess = z.infer<typeof RouteAccessSchema>
 
+// Render mode (M38): how Next renders each page, and why. Read from the page, its layouts and the
+// components they render: request-time APIs, segment config, `fetch` cache options and
+// `generateStaticParams`. The modes are the ones `next build` prints.
+
+export const RenderReasonSchema = z.object({
+  /**
+   * `request-api`: `cookies()`, `headers()`, `draftMode()`, `connection()` or `unstable_noStore()`.
+   * `search-params`: the page reads its `searchParams` prop. `dynamic-params`: a dynamic segment with
+   * no `generateStaticParams`. `static-params`: `generateStaticParams` lists the params to prerender.
+   * `segment-config`: `export const dynamic` / `revalidate` / `fetchCache`. `fetch`: a server
+   * `fetch` with a `cache` or `next.revalidate` option. `uncached-data`: Cache Components only, a
+   * server request outside `use cache`. `cached`: a `use cache` scope (with its `cacheLife`).
+   * `unread`: something the scan can't read (a config value, a call it can't follow).
+   */
+  kind: z.enum([
+    'request-api',
+    'search-params',
+    'dynamic-params',
+    'static-params',
+    'segment-config',
+    'fetch',
+    'uncached-data',
+    'cached',
+    'unread',
+  ]),
+  /**
+   * What it does to the page: `dynamic` (rendered per request; with Cache Components, a part
+   * streamed per request), `isr` (prerendered, refreshed after `revalidate` seconds), `static`
+   * (`force-static` / `error`: prerendered whatever else the page does), `unknown`, or `info`
+   * (no change, shown for context).
+   */
+  effect: z.enum(['dynamic', 'isr', 'static', 'unknown', 'info']),
+  /** Where it is: a layout around the page, the page, or a component they render. */
+  in: z.enum(['layout', 'page', 'component']),
+  /** The call, option or config as written (`cookies`, `cache: 'no-store'`), or why it can't be read. */
+  detail: z.string().optional(),
+  /** Seconds, for `isr`. */
+  revalidate: z.number().optional(),
+  componentId: z.string().optional(),
+  siteId: z.string().optional(),
+  loc: SourceLocSchema.optional(),
+})
+export type RenderReason = z.infer<typeof RenderReasonSchema>
+
+export const RouteRenderSchema = z.object({
+  /**
+   * `static`: prerendered at build time. `isr`: prerendered and refreshed after `revalidate`
+   * seconds. `dynamic`: rendered for each request. `partial`: Cache Components, a static shell with
+   * parts streamed per request. `unknown`: the scan can't tell (`reasons` say why).
+   */
+  mode: z.enum(['static', 'isr', 'dynamic', 'partial', 'unknown']),
+  /** Seconds, for `isr` (and `partial`: its static shell): the lowest time the page and its data ask for. */
+  revalidate: z.number().optional(),
+  reasons: z.array(RenderReasonSchema),
+})
+export type RouteRender = z.infer<typeof RouteRenderSchema>
+
+// Special files and boundaries (M41): what Next shows while a page loads, when it throws or calls
+// `notFound()`, and the gaps where nothing catches it. Checked against `next build` (16.4): a
+// folder's `loading` and `error` wrap its page and the layouts below it, never its own layout.
+
+/** Special files that act as a boundary for the pages below their folder. */
+export const BOUNDARY_FILES = [
+  'loading',
+  'error',
+  'not-found',
+  'forbidden',
+  'unauthorized',
+  'global-error',
+] as const
+
+export const PageBoundarySchema = z.object({
+  /**
+   * A special file in one of the page's folders (`global-error` in the app folder), or `suspense`:
+   * a `<Suspense>` that a layout, the page or a component renders, or `error-boundary`: a component
+   * that catches errors (`react-error-boundary`, or a class with `componentDidCatch`).
+   */
+  kind: z.enum([...BOUNDARY_FILES, 'suspense', 'error-boundary']),
+  /** The special file, or the file of the component that renders the boundary. */
+  file: z.string(),
+  /** `segment`: a special file. Otherwise where the boundary is rendered. */
+  in: z.enum(['segment', 'layout', 'page', 'component']),
+  componentId: z.string().optional(),
+  /** Special files: the one Next shows when the page itself suspends, throws or calls the function. */
+  nearest: z.literal(true).optional(),
+  /** `<Suspense>` and error boundaries: what they wrap, as written (`children`, `TodoList`). */
+  wraps: z.array(z.string()).optional(),
+  loc: SourceLocSchema.optional(),
+})
+export type PageBoundary = z.infer<typeof PageBoundarySchema>
+
+export const BoundaryGapSchema = z.object({
+  /**
+   * `blocking-route`: Cache Components, request data (`cookies()`, an uncached `fetch`, `params`,
+   * `searchParams`) read outside `<Suspense>`; `next build` fails. `no-fallback`: a page rendered per
+   * request waits for a server request with no `loading` file or `<Suspense>` to show meanwhile.
+   * `no-error-boundary`: a page rendered per request fetches on the server and no `error` file,
+   * error boundary or `global-error` catches a failure. `no-not-found`: `notFound()`, `forbidden()`
+   * or `unauthorized()` with no file of that name above it. `slot-no-match`: a parallel slot of a
+   * layout around the page has no page for its URL and no `default` file. `no-canonical`: an
+   * intercepting route with no plain page at the URL it intercepts.
+   */
+  kind: z.enum([
+    'blocking-route',
+    'no-fallback',
+    'no-error-boundary',
+    'no-not-found',
+    'slot-no-match',
+    'no-canonical',
+  ]),
+  /** Where it is: a layout around the page, the page, or a component they render. */
+  in: z.enum(['layout', 'page', 'component']).optional(),
+  componentId: z.string().optional(),
+  siteId: z.string().optional(),
+  /** What it is about, as written: `cookies`, `fetch`, `searchParams`, `notFound`, `@modal`, a path. */
+  detail: z.string().optional(),
+  /** `no-not-found`: the file Next looks for. */
+  file: z.enum(['not-found', 'forbidden', 'unauthorized']).optional(),
+  /** `slot-no-match`: the slot's folder. */
+  dir: z.string().optional(),
+  /** Other places on the page with the same gap, besides this one. */
+  more: z.number().int().positive().optional(),
+  loc: SourceLocSchema.optional(),
+})
+export type BoundaryGap = z.infer<typeof BoundaryGapSchema>
+
+export const RouteBoundariesSchema = z.object({
+  /** Outermost first: special files by folder, then the `<Suspense>` and error boundaries in the page's components. */
+  items: z.array(PageBoundarySchema),
+  gaps: z.array(BoundaryGapSchema),
+})
+export type RouteBoundaries = z.infer<typeof RouteBoundariesSchema>
+
+export const MetadataSourceSchema = z.object({
+  /** `export const metadata` or `export function generateMetadata`. */
+  kind: z.enum(['metadata', 'generateMetadata']),
+  in: z.enum(['layout', 'page']),
+  file: z.string(),
+  /** Fields it sets (`title`, `description`, `openGraph`). Absent when the scan can't read them. */
+  fields: z.array(z.string()).optional(),
+  /** `title`, or `title.default` / `title.absolute`, as written; `{name}` for values only known at runtime. */
+  title: z.string().optional(),
+  /** `title.template` (`%s | Shop`), which titles below this layout go into. */
+  template: z.string().optional(),
+  /** `title.absolute`: templates above don't apply. */
+  absolute: z.literal(true).optional(),
+  loc: SourceLocSchema,
+})
+export type MetadataSource = z.infer<typeof MetadataSourceSchema>
+
+export const RouteMetadataSchema = z.object({
+  /** The `<title>` Next renders for the page, with layout templates applied. */
+  title: z.string().optional(),
+  /** The nearest title comes from a `generateMetadata` (or a value) the scan can't read. */
+  titleUnread: z.literal(true).optional(),
+  /** Outermost layout first, the page last. */
+  sources: z.array(MetadataSourceSchema),
+})
+export type RouteMetadata = z.infer<typeof RouteMetadataSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -148,6 +308,12 @@ export const RouteSchema = z.object({
   intercepting: z.object({ marker: z.string(), from: z.string() }).optional(),
   /** Pages: what can stop the page from rendering (M31). Absent in older models: read it as `unknown`. */
   access: RouteAccessSchema.optional(),
+  /** Pages: how Next renders it and why (M38). Absent in older models: read it as `unknown`. */
+  render: RouteRenderSchema.optional(),
+  /** Pages: the boundaries that cover it and the gaps (M41). Absent in older models. */
+  boundaries: RouteBoundariesSchema.optional(),
+  /** Pages: `metadata` / `generateMetadata` from the page and its layouts (M41). Absent in older models. */
+  metadata: RouteMetadataSchema.optional(),
 })
 export type Route = z.infer<typeof RouteSchema>
 
@@ -339,10 +505,27 @@ export const ComponentRefSchema = z.object({
   conditional: z.boolean().optional(),
   /** Loaded with `next/dynamic` or `React.lazy`. */
   dynamic: z.boolean().optional(),
+  /** Every place it is rendered is inside a `<Suspense>` in this component (M41). */
+  suspense: z.literal(true).optional(),
+  /** Every place it is rendered is inside an error boundary in this component (M41). */
+  errorBoundary: z.literal(true).optional(),
   /** First place it is rendered. */
   loc: SourceLocSchema,
 })
 export type ComponentRef = z.infer<typeof ComponentRefSchema>
+
+/** A `<Suspense>` or an error boundary that a component renders (M41). */
+export const ComponentBoundarySchema = z.object({
+  kind: z.enum(['suspense', 'error-boundary']),
+  /** The tag as written (`Suspense`, `React.Suspense`, `ErrorBoundary`). */
+  name: z.string(),
+  /** `<Suspense>` with a `fallback`. */
+  fallback: z.literal(true).optional(),
+  /** Components and props rendered inside, as written (`TodoList`, `children`, `modal`). */
+  wraps: z.array(z.string()),
+  loc: SourceLocSchema,
+})
+export type ComponentBoundary = z.infer<typeof ComponentBoundarySchema>
 
 export const ComponentSchema = z.object({
   id: z.string(),
@@ -359,6 +542,8 @@ export const ComponentSchema = z.object({
   clientBoundary: z.boolean(),
   /** Components rendered by this one, in source order, one entry per distinct target. */
   children: z.array(ComponentRefSchema),
+  /** `<Suspense>` and error boundaries it renders, in source order (M41). */
+  boundaries: z.array(ComponentBoundarySchema).optional(),
   /** Type of the props parameter. Absent when the component takes no props. */
   propsType: TypeRefSchema.optional(),
   /** Ids of named project types referenced in the component's body (not counting `propsType`), in source order. */
@@ -1107,12 +1292,151 @@ export const GraphqlInfoSchema = z.object({
 })
 export type GraphqlInfo = z.infer<typeof GraphqlInfoSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Server cache map (M39): what Next caches on the server (`fetch` cache options, `use cache`,
+// `unstable_cache`), the tags on it, and the `revalidateTag` / `updateTag` / `revalidatePath`
+// calls that refresh it, linked to the pages they refresh.
+
+/** A cache tag or a `revalidatePath` path, as written and as far as the scan can read it. */
+export const CacheKeySchema = z.object({
+  /** The expression as written, e.g. `'posts'` or `` `post-${id}` ``. */
+  text: z.string(),
+  /** The value with `{name}` for parts only known at runtime (`post-{id}`). Absent when unread. */
+  value: z.string().optional(),
+  /** `exact`: a fixed value. `pattern`: has parts only known at runtime. `unknown`: can't be read. */
+  confidence: z.enum(['exact', 'pattern', 'unknown']),
+})
+export type CacheKey = z.infer<typeof CacheKeySchema>
+
+export const CacheFlagSchema = z.object({
+  /**
+   * `tag-never-set`: a tag is revalidated but no cached data has it, so the call refreshes
+   * nothing (a typo, or the data lost its tag). `tag-never-revalidated`: a tag is set but nothing
+   * revalidates it. `path-no-route`: `revalidatePath` names a path no page or route handler has.
+   * `update-tag-outside-action`: `updateTag` outside a server action, which Next rejects.
+   * From live capture (M40), only in the served model: `always-missed`: the same data was asked
+   * for again and Next missed its cache each time, never a hit. `never-cached`: Next skipped
+   * the cache every time it was used (the reason it gave is in the message).
+   */
+  kind: z.enum([
+    'tag-never-set',
+    'tag-never-revalidated',
+    'path-no-route',
+    'update-tag-outside-action',
+    'always-missed',
+    'never-cached',
+  ]),
+  message: z.string(),
+})
+export type CacheFlag = z.infer<typeof CacheFlagSchema>
+
+/**
+ * What Next did with a cache entry while the app ran (M40), from the cache events live capture
+ * matched to it. Only in the served model.
+ */
+export const CacheRuntimeSchema = z.object({
+  /** Served from Next's cache (stale ones included). */
+  hits: z.number().int().nonnegative(),
+  /** Not in the cache (or expired): the data was fetched or computed again. */
+  misses: z.number().int().nonnegative(),
+  /** Next didn't use its cache for the call (see `reasons`). */
+  skips: z.number().int().nonnegative(),
+  /** Different values asked for: URLs for a `fetch`, arguments for a function. */
+  keys: z.number().int().nonnegative(),
+  /** Why Next skipped the cache, or why it missed, in Next's words (`auto no cache`). */
+  reasons: z.array(z.string()).optional(),
+  /** ISO time of the last event. */
+  lastAt: z.string(),
+  /**
+   * `cached`: at least one hit. `not-reused`: no hit yet, but nothing was asked for twice.
+   * `always-missed` / `never-cached`: see `CacheFlagSchema`.
+   */
+  verdict: z.enum(['cached', 'not-reused', 'always-missed', 'never-cached']),
+})
+export type CacheRuntime = z.infer<typeof CacheRuntimeSchema>
+
+export const CacheEntrySchema = z.object({
+  id: z.string(),
+  /**
+   * `fetch`: a server `fetch` with `cache: 'force-cache'`, `next.revalidate` or `next.tags`.
+   * `use-cache`: a function, component or file with `'use cache'`. `unstable-cache`: a function
+   * wrapped in `unstable_cache()`.
+   */
+  kind: z.enum(['fetch', 'use-cache', 'unstable-cache']),
+  /** The function's name; for `fetch`, the URL as written. */
+  name: z.string(),
+  /**
+   * `unstable-cache`: the name of the function it wraps, when that function has one. Next reports
+   * that name at runtime (M40), not the variable holding the cached function.
+   */
+  fn: z.string().optional(),
+  /** `use-cache`: the directive as written (`use cache`, `use cache: remote`), and whether it is on the file. */
+  directive: z.string().optional(),
+  inFile: z.boolean().optional(),
+  /** `fetch`: the `cache` option as written. */
+  cache: z.string().optional(),
+  /**
+   * Seconds until it is refreshed (`next.revalidate`, `unstable_cache`'s `revalidate`, the
+   * `cacheLife` profile). `false`: kept until revalidated. Absent: Next's default.
+   */
+  revalidate: z.union([z.number(), z.literal(false)]).optional(),
+  /** `use-cache`: the `cacheLife()` call as written. */
+  life: z.string().optional(),
+  tags: z.array(CacheKeySchema),
+  /** `fetch`: its request sites. Others: the server requests sent inside it. */
+  siteIds: z.array(z.string()),
+  /** Pages that render with it (through their layouts and the components they render). */
+  pageIds: z.array(z.string()),
+  /** Route handlers that use it. */
+  handlerIds: z.array(z.string()),
+  flags: z.array(CacheFlagSchema),
+  /** What Next did with it at runtime (M40). Only in the served model, when capture saw it. */
+  runtime: CacheRuntimeSchema.optional(),
+  loc: SourceLocSchema,
+})
+export type CacheEntry = z.infer<typeof CacheEntrySchema>
+
+export const CacheInvalidationSchema = z.object({
+  id: z.string(),
+  api: z.enum(['revalidateTag', 'updateTag', 'revalidatePath']),
+  /** `revalidateTag` / `updateTag`: the tag. */
+  tag: CacheKeySchema.optional(),
+  /** `revalidatePath`: the path, and its `type` argument. */
+  path: CacheKeySchema.extend({ type: z.enum(['page', 'layout']).optional() }).optional(),
+  /** `revalidateTag`'s second argument as written (`'max'`, `{ expire: 0 }`). */
+  profile: z.string().optional(),
+  /** Where it runs: a server action, or a route handler (see `routeId`). */
+  origin: z.enum(['server-action', 'route-handler']),
+  serverAction: ServerActionRefSchema.optional(),
+  routeId: z.string().optional(),
+  handlerMethod: HttpMethodSchema.optional(),
+  /** Cached data it refreshes: entries with the tag. Empty for `revalidatePath`. */
+  entryIds: z.array(z.string()),
+  /** Pages it refreshes: the path's pages, or the pages that render with the entries. */
+  pageIds: z.array(z.string()),
+  /** `revalidatePath`: route handlers at the path. */
+  handlerIds: z.array(z.string()),
+  flags: z.array(CacheFlagSchema),
+  /** From the action or handler down to the call. */
+  callStack: z.array(CallFrameSchema),
+  loc: SourceLocSchema,
+})
+export type CacheInvalidation = z.infer<typeof CacheInvalidationSchema>
+
+export const CacheMapSchema = z.object({
+  entries: z.array(CacheEntrySchema),
+  invalidations: z.array(CacheInvalidationSchema),
+})
+export type CacheMap = z.infer<typeof CacheMapSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
   tsconfig: z.string().optional(),
   nextConfig: z.string().optional(),
   nextVersion: z.string().optional(),
+  /** `cacheComponents: true` in the Next config (M38): pages get a static shell with streamed parts. */
+  cacheComponents: z.literal(true).optional(),
 })
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 
@@ -1130,7 +1454,9 @@ export const AppModelSchema = z.object({
    * version 7 (before M19) no WebSockets, version 8 no `prop` component references, version 9
    * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`),
    * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags,
-   * version 11 (before M31) no page `access` (read as `unknown`).
+   * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
+   * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
+   * `boundaries` or `metadata`.
    */
   version: z
     .union([
@@ -1145,6 +1471,9 @@ export const AppModelSchema = z.object({
       z.literal(9),
       z.literal(10),
       z.literal(11),
+      z.literal(12),
+      z.literal(13),
+      z.literal(14),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1181,5 +1510,7 @@ export const AppModelSchema = z.object({
    * the scan has no other facts about (constants, utils). Absent in older models.
    */
   imports: z.record(z.string(), z.array(z.string())).optional(),
+  /** Server caching and what refreshes it (M39). Absent when the app caches nothing and revalidates nothing. */
+  cache: CacheMapSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

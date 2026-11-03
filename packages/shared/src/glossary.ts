@@ -4,7 +4,20 @@
 import type { EndpointStatus } from './endpoints'
 import type { FlowStatus } from './flow-runs'
 import type { CaptureMatch } from './match'
-import type { Component, Flag, RequestSite, RequestUrl, RouteAccess, Trigger } from './model'
+import type {
+  BoundaryGap,
+  CacheEntry,
+  CacheFlag,
+  CacheRuntime,
+  Component,
+  Flag,
+  PageBoundary,
+  RequestSite,
+  RequestUrl,
+  RouteAccess,
+  RouteRender,
+  Trigger,
+} from './model'
 import type { TypeCheckStatus } from './type-check'
 
 export interface GlossaryEntry {
@@ -32,6 +45,9 @@ export type GlossaryGroupId =
   | 'request'
   | 'url'
   | 'access'
+  | 'render'
+  | 'boundary'
+  | 'cache'
   | 'flow-status'
   | 'endpoint-status'
   | 'endpoint-side'
@@ -258,6 +274,191 @@ const ACCESS: GlossaryGroup<RouteAccess['status']> = {
   },
 }
 
+const RENDER: GlossaryGroup<RouteRender['mode']> = {
+  id: 'render',
+  title: 'Render mode',
+  intro:
+    'How Next renders a page in a production build, as read from the code. `next dev` renders every page per request.',
+  entries: {
+    static: {
+      label: 'static',
+      means: 'Prerendered once at build time; every visitor gets the same HTML until the next build.',
+    },
+    isr: {
+      label: 'ISR',
+      means:
+        'Prerendered at build time and rebuilt in the background after the time shown (`revalidate`, `next.revalidate` or `cacheLife`).',
+    },
+    dynamic: {
+      label: 'dynamic',
+      means:
+        'Rendered for each request, because the page reads the request (`cookies()`, `headers()`, `searchParams`), opts out of caching or has params it cannot list ahead.',
+      todo: 'Open the page to see each reason and where it is; remove the ones you did not mean.',
+    },
+    partial: {
+      label: 'partial',
+      means:
+        'Cache Components: a static shell is prerendered and the parts that read the request or uncached data stream in per request.',
+      todo: 'Each reason must sit inside `<Suspense>` (or `use cache`), or the build fails.',
+    },
+    unknown: {
+      label: 'render ?',
+      means: 'The scan could not tell: a config value or a call it could not read.',
+      todo: 'Open the page to see what could not be read.',
+    },
+  },
+}
+
+const BOUNDARY: GlossaryGroup<PageBoundary['kind'] | BoundaryGap['kind']> = {
+  id: 'boundary',
+  title: 'Boundaries',
+  intro:
+    'What Next shows while a page loads, when it throws or when it calls `notFound()`, read from the special files in its folders and the `<Suspense>` and error boundaries it renders.',
+  entries: {
+    loading: {
+      label: 'loading',
+      means:
+        'A `loading` file: shown while the page in its folder (and the layouts in folders below) load. It does not cover the layout in its own folder.',
+    },
+    error: {
+      label: 'error',
+      means:
+        'An `error` file: shown when the page in its folder (or a layout in a folder below) throws. It does not catch the layout in its own folder.',
+    },
+    'not-found': {
+      label: 'not-found',
+      means:
+        'A `not-found` file: shown when `notFound()` is called below its folder. The one in the app folder also answers URLs no page has.',
+    },
+    forbidden: {
+      label: 'forbidden',
+      means: 'A `forbidden` file: shown when `forbidden()` is called below its folder (`authInterrupts`).',
+    },
+    unauthorized: {
+      label: 'unauthorized',
+      means:
+        'An `unauthorized` file: shown when `unauthorized()` is called below its folder (`authInterrupts`).',
+    },
+    'global-error': {
+      label: 'global-error',
+      means:
+        'The `global-error` file in the app folder: replaces the whole page, root layout included, when nothing nearer catches an error.',
+    },
+    suspense: {
+      label: '<Suspense>',
+      means:
+        'A `<Suspense>` a layout, the page or a component renders: its `fallback` shows while what is inside loads.',
+    },
+    'error-boundary': {
+      label: 'error boundary',
+      means:
+        'A component that catches what its children throw (`react-error-boundary`, or a class with `componentDidCatch` / `getDerivedStateFromError`).',
+    },
+    'blocking-route': {
+      label: 'blocks the build',
+      means:
+        'Cache Components: the page reads request data (`cookies()`, an uncached `fetch`, awaited `params` or `searchParams`) outside `<Suspense>`, so `next build` fails.',
+      todo: 'Wrap the part that reads it in `<Suspense>` (or add a `loading` file beside the page), cache it with `use cache`, or set `export const instant = false`.',
+    },
+    'no-fallback': {
+      label: 'no loading state',
+      means:
+        'The page is rendered per request and waits for a server request with nothing to show meanwhile: navigating to it seems stuck until the data arrives.',
+      todo: 'Add a `loading` file beside the page, or wrap the part that fetches in `<Suspense>`.',
+    },
+    'no-error-boundary': {
+      label: 'no error boundary',
+      means:
+        "The page fetches fresh data on the server, and no `error` file, error boundary or `global-error` catches a failure, so visitors get Next's default error page.",
+      todo: 'Add an `error` file in a folder above the page (or `global-error` in the app folder).',
+    },
+    'no-not-found': {
+      label: 'no not-found page',
+      means:
+        '`notFound()`, `forbidden()` or `unauthorized()` is called with no file of that name above it, so Next shows its plain default page.',
+      todo: 'Add the file in a folder above the call (for a layout, above its own folder).',
+    },
+    'slot-no-match': {
+      label: 'slot without default',
+      means:
+        'A parallel slot (`@name`) of a layout around the page has no page for its URL and no `default` file. Next 16 fails the build; earlier versions show 404 on a full page load.',
+      todo: 'Add a `default` file to the slot (returning `null` or calling `notFound()`).',
+    },
+    'no-canonical': {
+      label: 'no page to intercept',
+      means:
+        'An intercepting route (`(.)`) has no plain page at the URL it intercepts, so a refresh or shared link has nothing to show. Next 16 fails the build.',
+      todo: 'Add the page at that URL, outside the slot.',
+    },
+  },
+}
+
+const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
+  id: 'cache',
+  title: 'Server cache',
+  intro:
+    'What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).',
+  entries: {
+    fetch: {
+      label: 'fetch',
+      means:
+        "A server `fetch` that asks to be cached: `cache: 'force-cache'`, `next.revalidate` or `next.tags`.",
+    },
+    'use-cache': {
+      label: 'use cache',
+      means:
+        'A function, component or file with the `use cache` directive. `cacheLife` sets how long it is kept, `cacheTag` its tags.',
+    },
+    'unstable-cache': {
+      label: 'unstable_cache',
+      means: 'A function wrapped in `unstable_cache()`, with its `tags` and `revalidate` options.',
+    },
+    'tag-never-set': {
+      label: 'tag never set',
+      means: 'The tag is revalidated, but no cached data has it, so the call refreshes nothing.',
+      todo: 'Check the tag for a typo, or add it where the data is cached.',
+    },
+    'tag-never-revalidated': {
+      label: 'never revalidated',
+      means:
+        'The tag is set, but no `revalidateTag` or `updateTag` call has it: the data only refreshes when its time runs out.',
+      todo: 'Revalidate the tag where the data changes, or drop the tag if nothing needs it.',
+    },
+    'path-no-route': {
+      label: 'no such path',
+      means: '`revalidatePath` names a path that no page or route handler has, so it refreshes nothing.',
+      todo: 'Use the route path from the `app` folder (for a rewrite, its destination).',
+    },
+    'update-tag-outside-action': {
+      label: 'updateTag outside an action',
+      means: '`updateTag` only works in a server action; Next throws anywhere else.',
+      todo: 'Use `revalidateTag(tag, { expire: 0 })` in route handlers.',
+    },
+    cached: {
+      label: 'cached at runtime',
+      means: 'Live capture: Next served it from its server cache at least once.',
+    },
+    'not-reused': {
+      label: 'not reused yet',
+      means:
+        'Live capture saw it run, but nothing asked for the same data again yet, so it could not be served from the cache.',
+      todo: 'Load the page again to check that the second time is a hit.',
+    },
+    'always-missed': {
+      label: 'always missed',
+      means:
+        'Live capture: the same data was asked for again, and Next missed its cache every time. It was never served from the cache.',
+      todo: "For a `fetch`, check that it answers 200 (Next keeps nothing else). For a function, check that it doesn't throw and that what it reads doesn't change each time.",
+    },
+    'never-cached': {
+      label: 'never cached',
+      means:
+        'Live capture: Next skipped its cache every time, for the reason shown. `auto no cache` is a `fetch` without a `cache` option in a page rendered per request.',
+      todo: "Give the `fetch` `cache: 'force-cache'` or `next.revalidate`, or check the segment config (`dynamic`, `fetchCache`).",
+    },
+  },
+}
+
 const FLOW_STATUS: GlossaryGroup<FlowStatus['status']> = {
   id: 'flow-status',
   title: 'Flow status',
@@ -416,6 +617,9 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   REQUEST,
   URL,
   ACCESS,
+  RENDER,
+  BOUNDARY,
+  CACHE,
   FLOW_STATUS,
   ENDPOINT_STATUS,
   ENDPOINT_SIDE,

@@ -23,6 +23,9 @@ layouts: src/app/layout.tsx
 Home  server  src/app/page.tsx:3
 access: guarded
   redirects to `/products` always (page)  src/app/page.tsx:4
+render: static
+boundaries: (none)
+title: server-actions fixture  (layout metadata)
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -30,6 +33,13 @@ ProductsPage  server  src/app/products/page.tsx:7
 ├─ Link  external next/link
 └─ DeleteProductButton  client (use client)  src/components/DeleteProductButton.tsx:7
 access: open
+render: dynamic
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  src/app/products/page.tsx:5
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/backend.ts:7
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/backend.ts:7
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/backend.ts:7
+title: server-actions fixture  (layout metadata)
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -37,9 +47,29 @@ ProductPage  server  src/app/products/[id]/page.tsx:7
 └─ Link  external next/link
 access: guarded
   shows the not-found page (404) when `!product` (page)  src/app/products/[id]/page.tsx:10
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  src/app/products/[id]/page.tsx:5
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/backend.ts:12
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/backend.ts:12
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/backend.ts:12
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page)  src/app/products/[id]/page.tsx:10
+title: server-actions fixture  (layout metadata)
 
 ## /products/new  src/app/products/new/page.tsx
 layouts: src/app/layout.tsx
 NewProductPage  server  src/app/products/new/page.tsx:3
 └─ CreateProductForm  client (use client)  src/components/CreateProductForm.tsx:10
 access: open
+render: static
+boundaries: (none)
+title: server-actions fixture  (layout metadata)
+
+# Server cache
+
+
+revalidatePath('/products')  in server action `createProduct`  src/actions/products.ts:25
+  pages: /products
+revalidatePath('/products')  in server action `deleteProduct`  src/actions/products.ts:32
+  pages: /products

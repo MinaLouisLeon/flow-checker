@@ -7,7 +7,23 @@
 | File | `src/app/todos/[id]/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
+| Rendering | dynamic |
+| Title | `Apollo Client 3 fixture` |
 | Status | ✓ 2 verified |
+
+## Rendering
+
+- dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+
+## Metadata
+
+- layout `metadata`: title, `src/app/layout.tsx:4`
 
 ## Component tree
 

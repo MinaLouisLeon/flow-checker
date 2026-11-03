@@ -225,7 +225,18 @@
     {
       "id": "check",
       "title": "To check",
-      "items": [],
+      "note": "1 open note",
+      "items": [
+        {
+          "label": "Boundary",
+          "value": "/[locale]: no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (on 4 pages)",
+          "detail": "src/app/[locale]/layout.tsx:19",
+          "link": {
+            "to": "page",
+            "routeId": "rt_27sgeyuy9pv"
+          }
+        }
+      ],
       "more": 0,
       "link": {
         "to": "overview"

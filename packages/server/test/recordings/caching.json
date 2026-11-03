@@ -1,0 +1,1252 @@
+{
+  "fixture": "caching",
+  "actions": {
+    "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c": {
+      "filename": "fixtures/caching/src/components/site-header.tsx",
+      "exportedName": "$$RSC_SERVER_CACHE_0"
+    },
+    "80d3eabacfeda5f5c684c612f5d5980e3ad6f7b9a8": {
+      "filename": "fixtures/caching/src/lib/todos.ts",
+      "exportedName": "$$RSC_SERVER_CACHE_0"
+    },
+    "c00f5426756ccc50c6af7ac30977168c4ca089a435": {
+      "filename": "fixtures/caching/src/lib/todos.ts",
+      "exportedName": "$$RSC_SERVER_CACHE_1"
+    },
+    "80d2d1a75e41d4c209898edab47264224e228a1769": {
+      "filename": "fixtures/caching/src/lib/settings.ts",
+      "exportedName": "$$RSC_SERVER_CACHE_0"
+    }
+  },
+  "captures": [
+    {
+      "id": "cap_mw048l4g9rcvjbak0",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:05.531Z",
+      "durationMs": 37,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:05 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at async listTodos (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\_1uy6r2a55_7r7._.js:134:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listTodos",
+          "file": "src/lib/todos.ts",
+          "line": 10,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1gfwxpb9du1",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbak7",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:11.319Z",
+      "durationMs": 142,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:11 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7656:63",
+        "at async fetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7827:24)",
+        "at async listProducts (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0swr9t4ha-h0s._.js:91:17)",
+        "at async ProductList (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0swr9t4ha-h0s._.js:17:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/products.ts",
+          "line": 6,
+          "column": 15
+        },
+        {
+          "fn": "ProductList",
+          "file": "src/app/products/page.tsx",
+          "line": 5,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1v51o4o87ag",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbakd",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:16.579Z",
+      "durationMs": 11,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:16 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at async getSettings (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\fixtures_caching_0o6xcbpeowece._.js:54:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getSettings",
+          "file": "src/lib/settings.ts",
+          "line": 10,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0jt7837kwt3",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Settings",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "extra-field",
+                "path": "response.body.digest",
+                "expected": "not declared",
+                "actual": "null"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbaki",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:21.783Z",
+      "durationMs": 23,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:21 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Ada Lovelace",
+              "email": "ada@example.com",
+              "role": "admin"
+            },
+            {
+              "id": 2,
+              "name": "Alan Turing",
+              "email": "alan@example.com",
+              "role": "member"
+            }
+          ],
+          "size": 146
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at NextTracerImpl.trace (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:9005:72)",
+        "at fetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7126:323)",
+        "at loadUsers (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1ndqs5bzy5fsm._.js:112:23)",
+        "at cachedCb (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\node_modules__pnpm_1gz-hji-ueeke._.js:16265:116)",
+        "at async UserList (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1ndqs5bzy5fsm._.js:30:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "loadUsers",
+          "file": "src/lib/users.js",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "UserList",
+          "file": "src/app/users/page.tsx",
+          "line": 6,
+          "column": 17
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_05c71xnszbd",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User[]",
+            "status": "mismatch",
+            "mismatches": [
+              {
+                "kind": "extra-field",
+                "path": "response.body[].role",
+                "expected": "not declared",
+                "actual": "string \"admin\"",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbako",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:27.748Z",
+      "durationMs": 14,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:27 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at async getTodo (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\_1uy6r2a55_7r7._.js:147:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "getTodo",
+          "file": "src/lib/todos.ts",
+          "line": 17,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_27zkvcxi1o8",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbaks",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:33.268Z",
+      "durationMs": 10,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:33 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/stats"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at async GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-eb6c2sxesz_._.js:72:17)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_1is2vs55ha4l0._.js:705:50)",
+        "at async AppRouteRouteModule.handleResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:1:262295)",
+        "at async handleResponse (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_1is2vs55ha4l0._.js:777:32)",
+        "at async handleRequest (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_1is2vs55ha4l0._.js:916:5)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/stats/route.ts",
+          "line": 6,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1x1icafh3ot",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbakv",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:37.557Z",
+      "durationMs": 10,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/featured",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 404,
+        "statusText": "Not Found",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:37 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "error": "No route for GET /products/featured"
+          },
+          "size": 47
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/featured"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at async GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ulijzg65fxor._.js:72:17)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_0_367pqa0c1bw._.js:705:50)",
+        "at async AppRouteRouteModule.handleResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:1:262295)",
+        "at async handleResponse (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_0_367pqa0c1bw._.js:777:32)",
+        "at async handleRequest (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_0_367pqa0c1bw._.js:916:5)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1wyk9ydgs6j",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "skipped",
+            "reason": "Error response (404) is not checked against the success type.",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw048l4g9rcvjbakx",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-03T03:16:39.627Z",
+      "durationMs": 8,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/featured",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 404,
+        "statusText": "Not Found",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Tue, 03 Nov 2026 03:16:39 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "error": "No route for GET /products/featured"
+          },
+          "size": 47
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/api/featured"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:6438:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7535:24)",
+        "at <repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_1fpju5l46bmh7._.js:7822:24",
+        "at async GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ulijzg65fxor._.js:72:17)",
+        "at async AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:25953)",
+        "at async AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30505)",
+        "at async responseGenerator (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_0_367pqa0c1bw._.js:705:50)",
+        "at async AppRouteRouteModule.handleResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:1:262295)",
+        "at async handleResponse (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_0_367pqa0c1bw._.js:777:32)",
+        "at async handleRequest (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\1v1x_next_dist_0_367pqa0c1bw._.js:916:5)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 15
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1wyk9ydgs6j",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "skipped",
+            "reason": "Error response (404) is not checked against the success type.",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ],
+  "cache": [
+    {
+      "id": "ce_mw048l4g9rcvjbak1",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:06.007Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbak2",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:06.008Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1k4mmmh1dd2st0",
+      "functionId": "80d3eabacfeda5f5c684c612f5d5980e3ad6f7b9a8",
+      "handler": "default",
+      "tags": [
+        "todos"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbak3",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:08.672Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbak4",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:08.673Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1k4mmmh1dd2st0",
+      "functionId": "80d3eabacfeda5f5c684c612f5d5980e3ad6f7b9a8",
+      "handler": "default",
+      "tags": [
+        "todos"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbak6",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:11.270Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbak5",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:11.258Z",
+      "kind": "fetch",
+      "status": "hit",
+      "reason": "revalidate: 300",
+      "key": "c6wbv014eyr2f",
+      "method": "GET",
+      "url": "http://localhost:4010/products",
+      "tags": [
+        "products"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at Object.stack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1720:197)",
+        "at startFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1359:26)",
+        "at listProducts (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0swr9t4ha-h0s._.js:91:23)",
+        "at ProductList (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0swr9t4ha-h0s._.js:17:190)",
+        "at Object.react_stack_bottom_frame (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:198381)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:79453)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:96801)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:100624)",
+        "at retryTask (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:146672)",
+        "at outlineTask (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:84690)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:78452)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/products.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "ProductList",
+          "file": "src/app/products/page.tsx",
+          "line": 5,
+          "column": 38
+        }
+      ]
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbaka",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:13.961Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbak9",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:13.948Z",
+      "kind": "fetch",
+      "status": "hit",
+      "reason": "revalidate: 300",
+      "key": "c6wbv014eyr2f",
+      "method": "GET",
+      "url": "http://localhost:4010/products",
+      "tags": [
+        "products"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/products"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at Object.stack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1720:197)",
+        "at startFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1359:26)",
+        "at listProducts (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0swr9t4ha-h0s._.js:91:23)",
+        "at ProductList (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0swr9t4ha-h0s._.js:17:190)",
+        "at Object.react_stack_bottom_frame (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:198381)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:79453)",
+        "at renderElement (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:96801)",
+        "at renderModelDestructive (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:100624)",
+        "at retryTask (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:146672)",
+        "at outlineTask (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:84690)",
+        "at renderFunctionComponent (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-page-turbo.runtime.dev.js:99:78452)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "listProducts",
+          "file": "src/lib/products.ts",
+          "line": 6,
+          "column": 21
+        },
+        {
+          "fn": "ProductList",
+          "file": "src/app/products/page.tsx",
+          "line": 5,
+          "column": 38
+        }
+      ]
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakb",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:16.548Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/settings"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakc",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:16.549Z",
+      "kind": "use-cache",
+      "status": "miss",
+      "key": "1fxt8obhdrpkg",
+      "functionId": "80d2d1a75e41d4c209898edab47264224e228a1769",
+      "handler": "default",
+      "tags": [
+        "settings"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/settings"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbake",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:19.141Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/settings"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakf",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:19.141Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1fxt8obhdrpkg",
+      "functionId": "80d2d1a75e41d4c209898edab47264224e228a1769",
+      "handler": "default",
+      "tags": [
+        "settings"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/settings"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakh",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:21.754Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/users"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakg",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:21.752Z",
+      "kind": "unstable-cache",
+      "status": "hit",
+      "stale": true,
+      "key": "1xit6yk3ljx1b",
+      "name": "loadUsers",
+      "tags": [
+        "users"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/users"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakk",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:24.377Z",
+      "kind": "unstable-cache",
+      "status": "hit",
+      "key": "1xit6yk3ljx1b",
+      "name": "loadUsers",
+      "tags": [
+        "users"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/users"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakl",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:24.380Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/users"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakm",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:27.709Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakn",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:27.735Z",
+      "kind": "use-cache",
+      "status": "miss",
+      "key": "izioy819ku6vv",
+      "functionId": "c00f5426756ccc50c6af7ac30977168c4ca089a435",
+      "handler": "default",
+      "tags": [
+        "todo-1"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakp",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:30.400Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "1hmjwd11j1fzfu",
+      "functionId": "801f735c1a89b057d5e009b55cbfbc3d5f1413a43c",
+      "handler": "default",
+      "tags": [
+        "nav"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakq",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:30.435Z",
+      "kind": "use-cache",
+      "status": "hit",
+      "key": "izioy819ku6vv",
+      "functionId": "c00f5426756ccc50c6af7ac30977168c4ca089a435",
+      "handler": "default",
+      "tags": [
+        "todo-1"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/todos/1"
+      },
+      "stack": []
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakr",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:33.262Z",
+      "kind": "fetch",
+      "status": "miss",
+      "key": "1pjv2uxk9dii4",
+      "method": "GET",
+      "url": "http://localhost:4010/todos",
+      "tags": [
+        "stats"
+      ],
+      "captureId": "cap_mw048l4g9rcvjbaks",
+      "parent": {
+        "method": "GET",
+        "url": "/api/stats"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at Object.stack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1720:197)",
+        "at startFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1359:26)",
+        "at GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-eb6c2sxesz_._.js:72:23)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31107",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30624",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30581",
+        "at AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30535)",
+        "at AppRouteRouteModule.handle (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:33229)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/stats/route.ts",
+          "line": 6,
+          "column": 21
+        }
+      ]
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakt",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:35.337Z",
+      "kind": "fetch",
+      "status": "hit",
+      "reason": "revalidate: 4294967294",
+      "key": "1pjv2uxk9dii4",
+      "method": "GET",
+      "url": "http://localhost:4010/todos",
+      "tags": [
+        "stats"
+      ],
+      "parent": {
+        "method": "GET",
+        "url": "/api/stats"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at Object.stack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1720:197)",
+        "at startFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1359:26)",
+        "at GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-eb6c2sxesz_._.js:72:23)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31107",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30624",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30581",
+        "at AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30535)",
+        "at AppRouteRouteModule.handle (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:33229)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/stats/route.ts",
+          "line": 6,
+          "column": 21
+        }
+      ]
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbaku",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:37.552Z",
+      "kind": "fetch",
+      "status": "miss",
+      "key": "1rk0prz9a6w64",
+      "method": "GET",
+      "url": "http://localhost:4010/products/featured",
+      "captureId": "cap_mw048l4g9rcvjbakv",
+      "parent": {
+        "method": "GET",
+        "url": "/api/featured"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at Object.stack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1720:197)",
+        "at startFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1359:26)",
+        "at GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ulijzg65fxor._.js:72:23)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31107",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30624",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30581",
+        "at AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30535)",
+        "at AppRouteRouteModule.handle (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:33229)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 21
+        }
+      ]
+    },
+    {
+      "id": "ce_mw048l4g9rcvjbakw",
+      "sessionId": "server",
+      "at": "2026-11-03T03:16:39.625Z",
+      "kind": "fetch",
+      "status": "miss",
+      "key": "1rk0prz9a6w64",
+      "method": "GET",
+      "url": "http://localhost:4010/products/featured",
+      "captureId": "cap_mw048l4g9rcvjbakx",
+      "parent": {
+        "method": "GET",
+        "url": "/api/featured"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at Object.stack (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1720:197)",
+        "at startFetch (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1359:26)",
+        "at GET (<repo>\\fixtures\\caching\\.next\\dev\\server\\chunks\\[root-of-the-server]__1ulijzg65fxor._.js:72:23)",
+        "at AppRouteRouteModule.renderToResponse (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:26017)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31261",
+        "at NextTracerImpl.trace (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\server\\lib\\trace\\tracer.js:196:72)",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:31107",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30624",
+        "at <repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30581",
+        "at AppRouteRouteModule.executeRequest (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:30535)",
+        "at AppRouteRouteModule.handle (<repo>\\node_modules\\.pnpm\\next@16.4.3_@babel+core@7.2_48fad41ff7398357a5bd096d36d76e28\\node_modules\\next\\dist\\compiled\\next-server\\app-route-turbo.runtime.dev.js:5:33229)"
+      ],
+      "sourceStack": [
+        {
+          "fn": "GET",
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 21
+        }
+      ]
+    }
+  ]
+}

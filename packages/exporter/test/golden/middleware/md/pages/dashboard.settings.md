@@ -7,12 +7,31 @@
 | File | `app/dashboard/settings/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | guarded |
+| Rendering | dynamic |
+| Title | `middleware fixture` |
 | Status | ✓ 1 verified |
 
 ## Access
 
 - redirects to `/login` when `!token` (middleware), `proxy.ts:23`
 - redirects to `/login?expired=1` when `token && !user` (middleware), `proxy.ts:27`
+
+## Rendering
+
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `app/dashboard/settings/page.tsx:3`
+- dynamic: fetches with `cache: 'no-store'` (page), `lib/api.ts:10`
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `lib/api.ts:10`
+- ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `lib/api.ts:10`
+
+## Metadata
+
+- layout `metadata`: title, `app/layout.tsx:4`
 
 ## Component tree
 

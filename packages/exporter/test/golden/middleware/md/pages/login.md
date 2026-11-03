@@ -7,10 +7,22 @@
 | File | `app/login/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | guarded |
+| Rendering | static |
+| Title | `middleware fixture` |
 
 ## Access
 
 - redirects to `/dashboard` when `cookie session is set` (middleware), `proxy.ts:20`
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+
+## Metadata
+
+- layout `metadata`: title, `app/layout.tsx:4`
 
 ## Component tree
 

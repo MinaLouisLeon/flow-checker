@@ -573,6 +573,7 @@ const NOTE_ORDER: NoteKind[] = [
   'type-mismatch',
   'needs-recheck',
   'missing-page-component',
+  'boundary',
   'request',
   'middleware',
   'unresolved-component',
@@ -585,6 +586,7 @@ const NOTE_LABEL: Record<NoteKind, string> = {
   'missing-page-component': 'Page',
   request: 'Request',
   middleware: 'Middleware',
+  boundary: 'Boundary',
   'unresolved-component': 'Component',
   'unresolved-type': 'Type',
 }

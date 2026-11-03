@@ -37,6 +37,11 @@ HomePage  server  src/app/[locale]/page.tsx:4
 └─ Link  external @/i18n/navigation (from next-intl/navigation)
 access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
+render: static
+  info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
 
 ## /[locale]/dashboard  src/app/[locale]/dashboard/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -45,6 +50,11 @@ DashboardPage  server  src/app/[locale]/dashboard/page.tsx:3
    └─ Link  external @/i18n/navigation (from next-intl/navigation)  [conditional]
 access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
+render: static
+  info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
 
 ## /[locale]/login  src/app/[locale]/login/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -52,6 +62,11 @@ LoginPage  server  src/app/[locale]/login/page.tsx:3
 └─ LoginForm  client (use client)  src/components/LoginForm.tsx:9
 access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
+render: static
+  info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
 
 ## /[locale]/verify  src/app/[locale]/verify/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -60,3 +75,9 @@ VerifyPage  server  src/app/[locale]/verify/page.tsx:3
    └─ Link  external @/i18n/navigation (from next-intl/navigation)  [conditional]
 access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
+render: dynamic
+  dynamic: reads `searchParams`, which come with each request (page)  src/app/[locale]/verify/page.tsx:4
+  info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
