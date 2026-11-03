@@ -59,6 +59,8 @@ render: dynamic
 unstable_cache  listProducts  [products]  5m  app/products/page.tsx:9
   used by: /products
   ! tag-never-revalidated: Nothing revalidates the tag `products`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes when its time runs out.
+fetch  {API_URL ?? http://localhost:4010}/products/featured  until revalidated  app/products/page.tsx:17
+  used by: /products
 fetch  {API_URL ?? http://localhost:4010}/todos  [todos]  until revalidated  lib/todos.js:6
   used by: /
 fetch  {API_URL ?? http://localhost:4010}/todos/:id  [todos, todo-{id}]  until revalidated  lib/todos.js:12

@@ -119,6 +119,10 @@ What Next keeps on the server between requests, the tags on it, and the calls th
 | <a id="cache-tag-never-revalidated"></a>**never revalidated** (`tag-never-revalidated`) | The tag is set, but no `revalidateTag` or `updateTag` call has it: the data only refreshes when its time runs out. | Revalidate the tag where the data changes, or drop the tag if nothing needs it. |
 | <a id="cache-path-no-route"></a>**no such path** (`path-no-route`) | `revalidatePath` names a path that no page or route handler has, so it refreshes nothing. | Use the route path from the `app` folder (for a rewrite, its destination). |
 | <a id="cache-update-tag-outside-action"></a>**updateTag outside an action** (`update-tag-outside-action`) | `updateTag` only works in a server action; Next throws anywhere else. | Use `revalidateTag(tag, { expire: 0 })` in route handlers. |
+| <a id="cache-cached"></a>**cached at runtime** (`cached`) | Live capture: Next served it from its server cache at least once. |  |
+| <a id="cache-not-reused"></a>**not reused yet** (`not-reused`) | Live capture saw it run, but nothing asked for the same data again yet, so it could not be served from the cache. | Load the page again to check that the second time is a hit. |
+| <a id="cache-always-missed"></a>**always missed** (`always-missed`) | Live capture: the same data was asked for again, and Next missed its cache every time. It was never served from the cache. | For a `fetch`, check that it answers 200 (Next keeps nothing else). For a function, check that it doesn't throw and that what it reads doesn't change each time. |
+| <a id="cache-never-cached"></a>**never cached** (`never-cached`) | Live capture: Next skipped its cache every time, for the reason shown. `auto no cache` is a `fetch` without a `cache` option in a page rendered per request. | Give the `fetch` `cache: 'force-cache'` or `next.revalidate`, or check the segment config (`dynamic`, `fetchCache`). |
 
 ## Flow status
 

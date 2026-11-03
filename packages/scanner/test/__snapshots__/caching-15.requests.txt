@@ -26,9 +26,12 @@ POST server action createTodo  server-action  event action
 GET {API_URL ?? http://localhost:4010}/products  fetch  server-render
   via: fetch app/products/page.tsx:10
   ⚠ unknown-response: No response type was found (annotation, generic or cast).
+GET {API_URL ?? http://localhost:4010}/products/featured  fetch  server-render
+  via: fetch app/products/page.tsx:17
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
 POST server action refreshProducts  server-action  event action
   response: void
-  via: refreshProducts app/products/page.tsx:23
+  via: refreshProducts app/products/page.tsx:27
 
 ## TodoPage  app/todos/[id]/page.tsx:4
 GET {API_URL ?? http://localhost:4010}/todos/:id  fetch  server-render

@@ -2,11 +2,14 @@
 // decisions in `.flow-checker/overrides.json`, compares matched captures with the site's
 // declared types (M8), and derives each request site's status. Captures taken before a site's
 // code last changed are stale, and a site with only stale captures needs a re-check (M9).
+// Server cache events (M40) are matched to the scan's cache entries and summed up per entry.
 
 import { splitTrpcCapture } from '@flow-checker/runtime/trpc'
 import {
   type AppModel,
   applyVerification,
+  type CacheEvent,
+  type CacheRuntime,
   type Capture,
   type CaptureMatch,
   type CaptureSummary,
@@ -23,6 +26,7 @@ import {
   type VerificationSummary,
 } from '@flow-checker/shared'
 import { type ServerActionInfo, ServerActionResolver } from './actions'
+import { checkCache } from './cache-check'
 import { BEGINNING, CodeHistory } from './history'
 import { fingerprint, Matcher } from './matcher'
 import { OverridesFile } from './overrides'
@@ -55,6 +59,7 @@ export class Verifier {
   /** During a re-scan: old site id -> new id, for sites whose lines moved. */
   private renamed: Record<string, string> = {}
   private served: AppModel | undefined
+  private cacheChecks: Record<string, CacheRuntime> | undefined
   private readonly listeners = new Set<() => void>()
 
   constructor(options: VerifierOptions) {
@@ -95,6 +100,7 @@ export class Verifier {
     this.sites = new Map(model.requests.map((s) => [s.id, s]))
     this.types = typeTable(model.types)
     this.renamed = renamed
+    this.cacheChecks = undefined
     try {
       this.rematch(this.store.all(), true)
     } finally {
@@ -141,6 +147,29 @@ export class Verifier {
     this.changed()
   }
 
+  /** Stores server cache events (M40) with their stack frames resolved to project files. */
+  ingestCache(events: readonly CacheEvent[]): void {
+    if (events.length === 0) return
+    this.store.addCacheEvents(
+      events.map((incoming) => {
+        // The runtime must not decide this.
+        const { sourceStack: _, ...event } = incoming
+        const frames = event.stack.length > 0 ? this.mapper.resolve(event.stack) : []
+        return frames.length > 0 ? { ...event, sourceStack: frames } : event
+      }),
+    )
+    this.changed()
+  }
+
+  /** What Next's cache did per cache entry id (M40). */
+  cacheResults(): Record<string, CacheRuntime> {
+    this.cacheChecks ??= checkCache(this.model, this.store.cacheEvents(), {
+      resolveAction: this.resolveAction,
+      capture: (id) => this.store.get(id),
+    })
+    return this.cacheChecks
+  }
+
   /**
    * An update of an open event stream (M18) only carries its new messages, from index
    * `stream.from`: they are added to the ones already stored.
@@ -183,9 +212,15 @@ export class Verifier {
     this.changed()
   }
 
-  /** The model with each site's status (and type-mismatch flag) from its matched captures. */
+  /**
+   * The model with each site's status (and type-mismatch flag) from its matched captures, and
+   * each cache entry's runtime results (M40).
+   */
   servedModel(): AppModel {
-    this.served ??= applyVerification(this.model, { sites: this.siteVerification() })
+    this.served ??= applyVerification(this.model, {
+      sites: this.siteVerification(),
+      cache: this.cacheResults(),
+    })
     return this.served
   }
 
@@ -198,7 +233,12 @@ export class Verifier {
       else counts[match.status]++
       if (match.by === 'manual') counts.manual++
     }
-    return { sites: this.siteVerification(), counts }
+    const cache = this.cacheResults()
+    return {
+      sites: this.siteVerification(),
+      counts,
+      ...(Object.keys(cache).length > 0 ? { cache } : {}),
+    }
   }
 
   /** Called after matches change (debounce on the receiving side). */
@@ -349,6 +389,7 @@ export class Verifier {
 
   private changed() {
     this.served = undefined
+    this.cacheChecks = undefined
     for (const listener of this.listeners) {
       try {
         listener()

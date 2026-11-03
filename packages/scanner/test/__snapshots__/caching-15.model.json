@@ -827,7 +827,40 @@
       "hash": "0zcm6lfo7rm"
     },
     {
-      "id": "req_1cxpytqbdby",
+      "id": "req_0emcfr2h86v",
+      "origin": "component",
+      "componentId": "cmp_23k37s13z1d",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products/featured`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products/featured"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "callStack": [
+        {
+          "file": "app/products/page.tsx",
+          "line": 17,
+          "column": 26,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "0uozbbfol8m"
+    },
+    {
+      "id": "req_28s3rmjndbc",
       "origin": "component",
       "componentId": "cmp_23k37s13z1d",
       "serverAction": {
@@ -845,7 +878,7 @@
         "event": "action",
         "loc": {
           "file": "app/products/page.tsx",
-          "line": 23,
+          "line": 27,
           "column": 13
         }
       },
@@ -859,7 +892,7 @@
       "callStack": [
         {
           "file": "app/products/page.tsx",
-          "line": 23,
+          "line": 27,
           "column": 13,
           "callee": "refreshProducts"
         }
@@ -1071,7 +1104,7 @@
       ]
     },
     {
-      "id": "flw_0dbwtc4cq4u",
+      "id": "flw_00zvbfxa2kz",
       "name": "ProductsPage submit",
       "routeId": "rt_0pkd6801g1s",
       "componentId": "cmp_23k37s13z1d",
@@ -1083,13 +1116,13 @@
           "event": "action",
           "loc": {
             "file": "app/products/page.tsx",
-            "line": 23,
+            "line": 27,
             "column": 13
           }
         },
         {
           "kind": "request",
-          "siteId": "req_1cxpytqbdby"
+          "siteId": "req_28s3rmjndbc"
         }
       ],
       "branches": [],
@@ -1184,6 +1217,26 @@
             "message": "Nothing revalidates the tag `products`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes when its time runs out."
           }
         ]
+      },
+      {
+        "id": "ce_1l7bl7snwhf",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/products/featured",
+        "cache": "force-cache",
+        "tags": [],
+        "loc": {
+          "file": "app/products/page.tsx",
+          "line": 17,
+          "column": 26
+        },
+        "siteIds": [
+          "req_0emcfr2h86v"
+        ],
+        "pageIds": [
+          "rt_0pkd6801g1s"
+        ],
+        "handlerIds": [],
+        "flags": []
       },
       {
         "id": "ce_03segcll0hh",

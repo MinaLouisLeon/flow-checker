@@ -12,6 +12,11 @@ PATCH {API_URL ?? http://localhost:4010}/todos/:id  fetch  server-action
   via: fetch src/app/actions.ts:18
   ⚠ unknown-response: No response type was found (annotation, generic or cast).
 
+## route handler GET /api/featured  src/app/api/featured/route.ts
+GET {API_URL ?? http://localhost:4010}/products/featured  fetch  route-handler
+  response: Product[]
+  via: fetch src/app/api/featured/route.ts:8
+
 ## route handler GET /api/stats  src/app/api/stats/route.ts
 GET {API_URL ?? http://localhost:4010}/todos  fetch  route-handler
   response: Todo[]

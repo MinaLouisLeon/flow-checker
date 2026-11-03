@@ -1188,11 +1188,46 @@ export const CacheFlagSchema = z.object({
    * nothing (a typo, or the data lost its tag). `tag-never-revalidated`: a tag is set but nothing
    * revalidates it. `path-no-route`: `revalidatePath` names a path no page or route handler has.
    * `update-tag-outside-action`: `updateTag` outside a server action, which Next rejects.
+   * From live capture (M40), only in the served model: `always-missed`: the same data was asked
+   * for again and Next missed its cache each time, never a hit. `never-cached`: Next skipped
+   * the cache every time it was used (the reason it gave is in the message).
    */
-  kind: z.enum(['tag-never-set', 'tag-never-revalidated', 'path-no-route', 'update-tag-outside-action']),
+  kind: z.enum([
+    'tag-never-set',
+    'tag-never-revalidated',
+    'path-no-route',
+    'update-tag-outside-action',
+    'always-missed',
+    'never-cached',
+  ]),
   message: z.string(),
 })
 export type CacheFlag = z.infer<typeof CacheFlagSchema>
+
+/**
+ * What Next did with a cache entry while the app ran (M40), from the cache events live capture
+ * matched to it. Only in the served model.
+ */
+export const CacheRuntimeSchema = z.object({
+  /** Served from Next's cache (stale ones included). */
+  hits: z.number().int().nonnegative(),
+  /** Not in the cache (or expired): the data was fetched or computed again. */
+  misses: z.number().int().nonnegative(),
+  /** Next didn't use its cache for the call (see `reasons`). */
+  skips: z.number().int().nonnegative(),
+  /** Different values asked for: URLs for a `fetch`, arguments for a function. */
+  keys: z.number().int().nonnegative(),
+  /** Why Next skipped the cache, or why it missed, in Next's words (`auto no cache`). */
+  reasons: z.array(z.string()).optional(),
+  /** ISO time of the last event. */
+  lastAt: z.string(),
+  /**
+   * `cached`: at least one hit. `not-reused`: no hit yet, but nothing was asked for twice.
+   * `always-missed` / `never-cached`: see `CacheFlagSchema`.
+   */
+  verdict: z.enum(['cached', 'not-reused', 'always-missed', 'never-cached']),
+})
+export type CacheRuntime = z.infer<typeof CacheRuntimeSchema>
 
 export const CacheEntrySchema = z.object({
   id: z.string(),
@@ -1204,6 +1239,11 @@ export const CacheEntrySchema = z.object({
   kind: z.enum(['fetch', 'use-cache', 'unstable-cache']),
   /** The function's name; for `fetch`, the URL as written. */
   name: z.string(),
+  /**
+   * `unstable-cache`: the name of the function it wraps, when that function has one. Next reports
+   * that name at runtime (M40), not the variable holding the cached function.
+   */
+  fn: z.string().optional(),
   /** `use-cache`: the directive as written (`use cache`, `use cache: remote`), and whether it is on the file. */
   directive: z.string().optional(),
   inFile: z.boolean().optional(),
@@ -1224,6 +1264,8 @@ export const CacheEntrySchema = z.object({
   /** Route handlers that use it. */
   handlerIds: z.array(z.string()),
   flags: z.array(CacheFlagSchema),
+  /** What Next did with it at runtime (M40). Only in the served model, when capture saw it. */
+  runtime: CacheRuntimeSchema.optional(),
   loc: SourceLocSchema,
 })
 export type CacheEntry = z.infer<typeof CacheEntrySchema>

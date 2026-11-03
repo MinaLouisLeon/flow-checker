@@ -47,6 +47,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M37 | Release v0.3.0        | Matrix also runs `explore` (project files hashed before/after), `summary` and `impact`. Publish = tag.                   |
 | M38 | Render mode           | Model version 13, `Route.render`. Walk records `RenderUse`s; `scanner/src/render.ts` adds segment config and the mode.   |
 | M39 | Server cache map      | Model version 14, `AppModel.cache`. Walk records `CacheFound` / `InvalidationFound`; `scanner/src/cache.ts` links them.  |
+| M40 | Cache check (runtime) | Runtime reads Next's own records (fetch metrics, cache handlers, `IncrementalCache.get`); served model gets `runtime`.   |
 
 ## Gotchas
 
@@ -507,3 +508,21 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - A tag the scan can't read on one side (`revalidateTag(tag)` from a webhook, `cacheTag(...tags)`) turns off the
   flags for the other side; otherwise every tag would be flagged.
 - Don't `git add -N` new files to see them in `git diff`: it changes the index (`git reset -q -- <paths>` undoes it).
+
+## M40 — Cache check at runtime (branch `feat/cache-check-at-runtime-m40`)
+
+- Read Next's own records instead of guessing: `workStore.fetchMetrics` (dev only) for `fetch`, the handlers on
+  `globalThis[Symbol.for('@next/cache-handlers-map')]` for `use cache`, `IncrementalCache.get` for `unstable_cache`.
+  Next 16 keeps its async storages on `globalThis` (`@next/work-async-storage@<version>`); on Next 15 load
+  `next/dist/server/app-render/work-async-storage.external.js` from the app's `next` (`createRequire(cwd)`): same instance.
+- With Cache Components, `Date.now()`, `new Date()` and `Math.random()` in server code that runs during a dev
+  prerender abort the render. Server runtime code takes times and ids from `runtime/src/clock.ts`;
+  `runtime/test/cache.test.ts` traps calls from `runtime/src` while a fake page renders.
+- In dev, Next labels every empty fetch-cache lookup `cache-control: no-cache (hard refresh)` (a skip). It is a hard
+  reload only when the incoming request has exactly `cache-control: no-cache` (Next's own test in `IncrementalCache`).
+- A page with a cached `fetch` that answers 404 turns `partial` in `next build` with Cache Components, so `render-check`
+  disagreed: keep planted runtime cases out of pages whose render mode is checked (the Next 16 one is a route handler).
+- Webpack dev (Next 15) server frames are `webpack-internal:///(rsc)/./lib/x.js:<bundled line>`; the mapper keeps the
+  bundled line. Matching by URL is the fallback, as for request sites.
+- The recordings that `matching.test.ts` uses must exercise every request site; the caching recordings don't (cache
+  hits send nothing), so they are only used by the cache tests.

@@ -1,12 +1,14 @@
 // Server cache map (M39): rows for cached data and revalidation calls, shared by the Cache screen
-// and the page view.
+// and the page view. With live capture, each entry also shows what Next's cache did (M40).
 import {
   CACHE_KIND_LABELS,
   type CacheEntry,
   type CacheFlag,
   type CacheInvalidation,
+  type CacheRuntime,
   cacheKeyText,
   cacheLifeText,
+  cacheRuntimeText,
   explain,
   invalidationText,
   invalidationWhere,
@@ -48,6 +50,26 @@ export function CacheFlags({ flags }: { flags: readonly CacheFlag[] }) {
         </li>
       ))}
     </ul>
+  )
+}
+
+/**
+ * What Next's cache did with an entry while the app ran. Flagged verdicts only get the counts: the
+ * flag below the row says the rest.
+ */
+function CacheRuntimeLine({ runtime }: { runtime: CacheRuntime }) {
+  const flagged = runtime.verdict === 'always-missed' || runtime.verdict === 'never-cached'
+  return (
+    <div className="muted" data-cache-runtime={runtime.verdict}>
+      at runtime:{' '}
+      {!flagged && (
+        <Badge tone={runtime.verdict === 'cached' ? 'ok' : 'muted'} term={['cache', runtime.verdict]}>
+          {explain('cache', runtime.verdict)?.label ?? runtime.verdict}
+        </Badge>
+      )}{' '}
+      {cacheRuntimeText(runtime)}
+      {runtime.keys > 1 ? ` · ${runtime.keys} different values` : ''}
+    </div>
   )
 }
 
@@ -97,6 +119,7 @@ export function CacheEntryRow({
           used by <RouteLinks ids={used} index={index} />
         </div>
       )}
+      {entry.runtime && <CacheRuntimeLine runtime={entry.runtime} />}
       <CacheFlags flags={entry.flags} />
     </li>
   )

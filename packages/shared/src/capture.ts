@@ -223,6 +223,51 @@ export const CaptureSchema = z.object({
 })
 export type Capture = z.infer<typeof CaptureSchema>
 
+/**
+ * What Next's server cache did for one call (M40): a cached `fetch`, a `use cache` function or an
+ * `unstable_cache` function. Hits send no request, so they are recorded here, not as captures.
+ */
+export const CacheEventSchema = z.object({
+  id: z.string(),
+  /** Inherited from the browser request the server was answering, like server captures. */
+  sessionId: z.string(),
+  /** ISO time of the call. */
+  at: z.string(),
+  kind: z.enum(['fetch', 'use-cache', 'unstable-cache']),
+  /**
+   * `hit`: served from the cache. `miss`: not there (or expired), so it ran. `skip`: Next didn't
+   * use its cache for this call (see `reason`). `hmr`: dev only, served from the copy Next keeps
+   * across hot reloads.
+   */
+  status: z.enum(['hit', 'miss', 'skip', 'hmr']),
+  /** A hit whose time had run out: served, and refreshed in the background. */
+  stale: z.boolean().optional(),
+  /** Next's reason (`fetch`), e.g. `revalidate: 300`, `auto no cache`, `fetchCache = force-no-store`. */
+  reason: z.string().optional(),
+  /** Short hash of what was asked for (URL and method, or the cache key): same data, same key. */
+  key: z.string(),
+  /** `fetch`: the request. The URL is redacted like a capture's. */
+  method: z.string().optional(),
+  url: z.string().optional(),
+  /** `use-cache`: the function's id in Next's server reference manifest. */
+  functionId: z.string().optional(),
+  /** `use-cache`: the cache handler kind (`default`, `remote`, `private` or a custom one). */
+  handler: z.string().optional(),
+  /** `unstable-cache`: the name of the function it wraps; empty when it has none. */
+  name: z.string().optional(),
+  /** Tags Next stored with the data (or the `next.tags` / `unstable_cache` tags asked for). */
+  tags: z.array(z.string()).optional(),
+  /** `fetch`: the request that was sent on a miss or skip. */
+  captureId: z.string().optional(),
+  /** The incoming request the server was answering. */
+  parent: CaptureParentSchema.optional(),
+  /** `fetch`: stack frames where it was called, innermost first. Empty for cached functions. */
+  stack: z.array(z.string()),
+  /** Project frames of `stack`, resolved by the tool server. */
+  sourceStack: z.array(SourceLocSchema.extend({ fn: z.string().optional() })).optional(),
+})
+export type CacheEvent = z.infer<typeof CacheEventSchema>
+
 export const SessionEventSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('navigation'),
@@ -270,6 +315,8 @@ export const IngestBatchSchema = z.object({
   sessionId: z.string().optional(),
   captures: z.array(CaptureSchema).default([]),
   events: z.array(SessionEventSchema).default([]),
+  /** Server cache hits, misses and skips (M40). */
+  cache: z.array(CacheEventSchema).default([]),
 })
 export type IngestBatch = z.infer<typeof IngestBatchSchema>
 

@@ -1,10 +1,22 @@
 // Captures and sessions on disk (docs/PLAN.md 13):
 //   .flow-checker/captures/<siteId>/<captureId>.json   (`_unmatched` until matched to a site)
 //   .flow-checker/sessions/<sessionId>.json
+//   .flow-checker/cache-events.jsonl                     (server cache hits and misses, M40)
 // Everything is also kept in memory (newest `limit` captures) for the API.
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
+import {
+  appendFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { join } from 'node:path'
 import {
+  type CacheEvent,
+  CacheEventSchema,
   type Capture,
   CaptureSchema,
   type CaptureSummary,
@@ -16,6 +28,7 @@ import {
 
 export const UNMATCHED_DIR = '_unmatched'
 const SESSION_WRITE_MS = 500
+const CACHE_EVENTS_FILE = 'cache-events.jsonl'
 
 export type StoreListener = (capture: Capture) => void
 
@@ -24,6 +37,8 @@ export interface CaptureStoreOptions {
   root: string
   /** Captures kept in memory. Default: 2000. */
   limit?: number
+  /** Cache events kept (M40). Default: 5000. */
+  cacheLimit?: number
   /** Never write to disk. Export reads the store without changing it. */
   readOnly?: boolean
 }
@@ -31,8 +46,10 @@ export interface CaptureStoreOptions {
 export class CaptureStore {
   readonly dir: string
   private readonly limit: number
+  private readonly cacheLimit: number
   private readonly readOnly: boolean
   private captures: Capture[] = []
+  private cache: CacheEvent[] = []
   private readonly byId = new Map<string, Capture>()
   /** Capture id → folder its file is in. */
   private readonly folders = new Map<string, string>()
@@ -45,6 +62,7 @@ export class CaptureStore {
   constructor(options: CaptureStoreOptions) {
     this.dir = join(options.root, '.flow-checker')
     this.limit = options.limit ?? 2000
+    this.cacheLimit = options.cacheLimit ?? 5000
     this.readOnly = options.readOnly ?? false
   }
 
@@ -75,7 +93,44 @@ export class CaptureStore {
         if (parsed.success) this.sessions.set(parsed.data.id, parsed.data)
       }
     }
+
+    const cacheFile = join(this.dir, CACHE_EVENTS_FILE)
+    if (existsSync(cacheFile)) {
+      const lines = readFileSync(cacheFile, 'utf8').split('\n')
+      const events: CacheEvent[] = []
+      for (const line of lines) {
+        if (!line.trim()) continue
+        let json: unknown
+        try {
+          json = JSON.parse(line)
+        } catch {
+          continue
+        }
+        const parsed = CacheEventSchema.safeParse(json)
+        if (parsed.success) events.push(parsed.data)
+      }
+      this.cache = events.slice(-this.cacheLimit)
+      // Keep the file from growing without end over many runs.
+      if (!this.readOnly && events.length > this.cacheLimit * 2) {
+        writeFileSync(cacheFile, this.cache.map((e) => `${JSON.stringify(e)}\n`).join(''))
+      }
+    }
     return this
+  }
+
+  /** Server cache hits, misses and skips from the runtime (M40). */
+  addCacheEvents(events: readonly CacheEvent[]): void {
+    if (events.length === 0) return
+    this.cache.push(...events)
+    if (this.cache.length > this.cacheLimit) this.cache = this.cache.slice(-this.cacheLimit)
+    if (this.readOnly) return
+    mkdirSync(this.dir, { recursive: true })
+    appendFileSync(join(this.dir, CACHE_EVENTS_FILE), events.map((e) => `${JSON.stringify(e)}\n`).join(''))
+  }
+
+  /** Cache events kept in memory, oldest first. */
+  cacheEvents(): readonly CacheEvent[] {
+    return this.cache
   }
 
   /**
@@ -180,15 +235,17 @@ export class CaptureStore {
     return () => this.listeners.delete(listener)
   }
 
-  /** Deletes every capture and session, in memory and on disk. */
+  /** Deletes every capture, session and cache event, in memory and on disk. */
   clear(): void {
     this.captures = []
+    this.cache = []
     this.byId.clear()
     this.folders.clear()
     this.sessions.clear()
     this.dirtySessions.clear()
     rmSync(join(this.dir, 'captures'), { recursive: true, force: true })
     rmSync(join(this.dir, 'sessions'), { recursive: true, force: true })
+    rmSync(join(this.dir, CACHE_EVENTS_FILE), { force: true })
   }
 
   /** Writes pending session changes. Call before exit. */
