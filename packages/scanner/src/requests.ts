@@ -3319,6 +3319,14 @@ export class RequestScanner {
           : fn && N.isIdentifier(skipWrappers(fn))
             ? skipWrappers(fn).getText()
             : 'anonymous'
+      // The name Next reports at runtime (M40): the wrapped function's, not the variable's.
+      const wrapped = fn ? skipWrappers(fn) : undefined
+      const fnName =
+        wrapped && N.isIdentifier(wrapped)
+          ? wrapped.getText()
+          : wrapped && N.isFunctionExpression(wrapped)
+            ? wrapped.getName()
+            : undefined
       const tags = this.#prop(options, EMPTY_ENV, 'tags')
       const revalidate = this.#prop(options, EMPTY_ENV, 'revalidate')
       const seconds =
@@ -3327,6 +3335,7 @@ export class RequestScanner {
         id,
         kind: 'unstable-cache',
         name,
+        ...(fnName && fnName !== name ? { fn: fnName } : {}),
         ...(seconds !== undefined ? { revalidate: seconds } : {}),
         tags:
           tags === 'absent'

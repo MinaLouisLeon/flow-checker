@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { splitGraphqlCapture } from '@flow-checker/runtime/graphql'
 import type { RuntimeCaptureOptions } from '@flow-checker/runtime/options'
-import { compileRules, redactCapture } from '@flow-checker/runtime/redact'
+import { compileRules, redactCacheEvent, redactCapture } from '@flow-checker/runtime/redact'
 import {
   type AppModel,
   diffCounts,
@@ -361,6 +361,8 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
         .flatMap((item) => splitGraphqlCapture(item))
         .map((item) => redactCapture(item, rules, capture.options.storeRaw)),
     )
+    // Server cache hits and misses (M40), also redacted again.
+    verifier.ingestCache(batch.cache.map((item) => redactCacheEvent(item, rules, capture.options.storeRaw)))
     if (batch.sessionId) store.addEvents(batch.sessionId, batch.events)
     return c.body(null, 204)
   })

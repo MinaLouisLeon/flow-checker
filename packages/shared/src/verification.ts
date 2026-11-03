@@ -1,5 +1,6 @@
 // Request site status from live captures (M6 matching + M8 type comparison). The tool server
 // applies it to `/api/model`, and the dashboard applies it again on live updates.
+import { applyCacheRuntime } from './cache-check'
 import type { SiteVerification, VerificationSummary } from './match'
 import type { AppModel, Flag, RequestSite } from './model'
 import type { TypeCheck, TypeCheckPart, TypeMismatch } from './type-check'
@@ -150,10 +151,18 @@ function staleFlag(verification: SiteVerification): Flag {
 
 /**
  * Applies verification to the scanned sites: status, and a `type-mismatch` flag listing what
- * didn't fit. Safe to call again on a model it already updated. Returns the same model when
- * nothing changed.
+ * didn't fit, and to cache entries what Next's cache did at runtime (M40). Safe to call again on a
+ * model it already updated. Returns the same model when nothing changed.
  */
-export function applyVerification(model: AppModel, summary: Pick<VerificationSummary, 'sites'>): AppModel {
+export function applyVerification(
+  model: AppModel,
+  summary: Pick<VerificationSummary, 'sites' | 'cache'>,
+): AppModel {
+  const withCache = applyCacheRuntime(model, summary.cache ?? {})
+  return applySites(withCache, summary)
+}
+
+function applySites(model: AppModel, summary: Pick<VerificationSummary, 'sites'>): AppModel {
   let changed = false
   const requests = model.requests.map((site) => {
     const verification = summary.sites[site.id]

@@ -158,6 +158,8 @@ describe('server cache map (M39)', () => {
     const api = '{API_URL ?? http://localhost:4010}'
     expect(links('caching')).toEqual({
       entries: [
+        // Answers 404, so it is never cached at runtime (M40).
+        `fetch ${api}/products/featured [] -> /api/featured`,
         `fetch ${api}/todos [stats] -> /api/stats !tag-never-revalidated`,
         'use-cache SiteHeader [nav] -> / /products /settings /todos/[id] /users',
         `fetch ${api}/products [products] -> /products`,
@@ -187,6 +189,7 @@ describe('server cache map (M39)', () => {
     expect(links('caching-15')).toEqual({
       entries: [
         'unstable-cache listProducts [products] -> /products !tag-never-revalidated',
+        `fetch ${api}/products/featured [] -> /products`,
         `fetch ${api}/todos [todos] -> /`,
         `fetch ${api}/todos/:id [todos, todo-{id}] -> /todos/[id]`,
         'unstable-cache getViewer [viewer] -> /profile',

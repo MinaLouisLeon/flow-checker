@@ -1,6 +1,7 @@
 export * from './access'
 export * from './areas'
 export * from './cache'
+export * from './cache-check'
 export * from './capture'
 export type {
   ApiClientConfig,

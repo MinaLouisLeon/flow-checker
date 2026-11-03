@@ -3,7 +3,7 @@
 // capture (`Capture.match`), and sites with at least one matched capture become `verified`.
 import { z } from 'zod'
 import { RecordedFlowSchema } from './flow-runs'
-import type { RequestUrl } from './model'
+import type { CacheRuntime, RequestUrl } from './model'
 import type { SiteTypeCheck } from './verification'
 
 /** Evidence that links a capture to a request site. */
@@ -137,6 +137,8 @@ export interface SiteVerification {
 /** `GET /api/verification`. */
 export interface VerificationSummary {
   sites: Record<string, SiteVerification>
+  /** What Next's server cache did per cache entry id (M40). Absent when no cache event came in. */
+  cache?: Record<string, CacheRuntime>
   /** `thirdParty`: unmatched requests other sites' scripts sent, not counted in `unmatched`. */
   counts: { matched: number; ambiguous: number; unmatched: number; manual: number; thirdParty?: number }
 }

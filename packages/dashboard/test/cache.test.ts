@@ -1,7 +1,8 @@
 // M39: the Cache screen lists tags, cached data and revalidation calls with their flags, and the
-// page view shows what the page renders with from the cache and what refreshes it.
+// page view shows what the page renders with from the cache and what refreshes it. M40: with live
+// capture, what Next's cache did with each entry, and the runtime flags under To check.
 import { readFileSync } from 'node:fs'
-import { AppModelSchema } from '@flow-checker/shared'
+import { AppModelSchema, applyVerification, type CacheRuntime } from '@flow-checker/shared'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createElement, type ReactElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -80,6 +81,50 @@ describe('page view', () => {
     const basic = indexOf('basic')
     const about = basic.model.routes.find((r) => r.path === '/about')?.id ?? ''
     expect(html(basic, createElement(PageView, { routeId: about }))).not.toContain('Server cache')
+  })
+})
+
+describe('with live capture (M40)', () => {
+  // Results as the tool server serves them for the recorded run (see server/test/cache-check.test.ts).
+  const byName = (name: string) => caching.model.cache?.entries.find((e) => e.name === name)?.id ?? ''
+  const result = (verdict: CacheRuntime['verdict'], hits: number, misses: number): CacheRuntime => ({
+    hits,
+    misses,
+    skips: 0,
+    keys: 1,
+    lastAt: '2026-11-03T10:00:00.000Z',
+    verdict,
+    ...(verdict === 'always-missed' ? { reasons: ['answered 404'] } : {}),
+  })
+  const live = buildIndex(
+    applyVerification(caching.model, {
+      sites: {},
+      cache: {
+        [byName('SiteHeader')]: result('cached', 2, 0),
+        [byName('{API_URL ?? http://localhost:4010}/products/featured')]: result('always-missed', 0, 2),
+      },
+    }),
+  )
+  const screen = html(live, createElement(CacheScreen))
+
+  it('shows what Next did with each entry it saw', () => {
+    expect(screen).toContain('data-cache-runtime="cached"')
+    expect(screen).toMatch(
+      /data-cache-runtime="cached">at runtime: <span class="badge badge-ok"[^>]*>cached at runtime<\/span> 2 hits/,
+    )
+    // Flagged entries get the counts; the flag says the rest.
+    expect(screen).toMatch(/data-cache-runtime="always-missed">at runtime: {2}2 misses/)
+  })
+
+  it('lists the runtime flag under To check, with the status the request got', () => {
+    const toCheck = screen.slice(screen.indexOf('data-section="to-check"'), screen.indexOf('<h2>Tags</h2>'))
+    expect(count(toCheck, 'data-cache-flag="always-missed"')).toBe(1)
+    expect(toCheck).toContain('The request answered 404')
+  })
+
+  it('shows nothing about runtime for entries live capture never saw', () => {
+    expect(count(screen, 'data-cache-runtime=')).toBe(2)
+    expect(html(caching, createElement(CacheScreen))).not.toContain('data-cache-runtime')
   })
 })
 

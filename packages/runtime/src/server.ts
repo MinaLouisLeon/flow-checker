@@ -6,21 +6,20 @@
 // - http/https (axios on Node): Node's `http.client.*` diagnostics channels.
 // - Incoming requests: `http.server.request.start` puts the request into an AsyncLocalStorage,
 //   so each outgoing call knows which page render, route handler or server action it belongs to.
+// - Server cache (M40): hits, misses and skips of cached fetches and functions (`cache.ts`).
+//
+// Code that runs inside a render takes its time and ids from `clock.ts`: with Cache Components,
+// Next aborts a dev prerender that calls `Date.now()`, `new Date()` or `Math.random()`.
 import { AsyncLocalStorage } from 'node:async_hooks'
 import diagnostics from 'node:diagnostics_channel'
 import { ClientRequest, type IncomingMessage } from 'node:http'
-import type { Capture, CapturedBody, CaptureParent } from '@flow-checker/shared'
+import type { CacheEvent, Capture, CapturedBody, CaptureParent } from '@flow-checker/shared'
 import { bytesBody, callerStack, headersToObject, readStream, requestBody } from './body'
+import { type CacheEventBase, createCacheObserver, fetchSlot } from './cache'
+import { createIds, isoNow, syncClock } from './clock'
 import { splitGraphqlCapture } from './graphql'
-import {
-  createIgnoreMatcher,
-  ENV,
-  LINK_HEADER,
-  parseRuntimeConfig,
-  type RuntimeConfig,
-  randomId,
-} from './options'
-import { compileRules, redactCapture } from './redact'
+import { createIgnoreMatcher, ENV, LINK_HEADER, parseRuntimeConfig, type RuntimeConfig } from './options'
+import { compileRules, redactCacheEvent, redactCapture } from './redact'
 import { isEventStream, readEventStream, recordStream } from './stream'
 import { splitTrpcCapture } from './trpc'
 
@@ -37,6 +36,10 @@ type Global = typeof globalThis & { [INSTALLED]?: ServerRuntime }
 interface IncomingContext {
   parent: CaptureParent
   sessionId: string
+  /** Cache results already sent for this request: dev renders a page more than once. */
+  seen: Set<string>
+  /** The request has `cache-control: no-cache` (a hard reload): Next's dev cache returns nothing. */
+  hardRefresh: boolean
 }
 
 export interface ServerRuntime {
@@ -69,6 +72,7 @@ function start(config: RuntimeConfig): ServerRuntime {
   const ignored = createIgnoreMatcher(options.ignore)
   const ingest = new URL(config.ingest)
   const incoming = new AsyncLocalStorage<IncomingContext>()
+  const nextId = createIds()
   // Depth of our own fetch wrappers on the current synchronous call, so a fetch wrapped twice
   // (another library re-wrapping ours) is recorded once.
   let depth = 0
@@ -77,16 +81,19 @@ function start(config: RuntimeConfig): ServerRuntime {
 
   const nativeFetch: Fetch = unwrap(globalThis.fetch)
   let queue: Capture[] = []
+  let cacheQueue: CacheEvent[] = []
   let timer: ReturnType<typeof setTimeout> | undefined
   let sending: Promise<void> = Promise.resolve()
 
   const flush = (): Promise<void> => {
     if (timer) clearTimeout(timer)
     timer = undefined
-    if (queue.length === 0) return sending
+    if (queue.length === 0 && cacheQueue.length === 0) return sending
     const captures = queue
+    const cache = cacheQueue
     queue = []
-    const body = JSON.stringify({ token: config.token, captures, events: [] })
+    cacheQueue = []
+    const body = JSON.stringify({ token: config.token, captures, events: [], cache })
     sending = sending
       .then(() =>
         nativeFetch(ingest.href, { method: 'POST', body, headers: { 'content-type': 'text/plain' } }).then(
@@ -119,6 +126,16 @@ function start(config: RuntimeConfig): ServerRuntime {
     } catch {}
   }
 
+  const pushCache = (event: CacheEvent) => {
+    try {
+      cacheQueue.push(redactCacheEvent(event, rules, options.storeRaw))
+      if (!timer) {
+        timer = setTimeout(() => void flush(), FLUSH_MS)
+        timer.unref?.()
+      }
+    } catch {}
+  }
+
   const shouldCapture = (url: URL) => {
     if (url.origin === ingest.origin && url.pathname === ingest.pathname) return false
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
@@ -136,11 +153,11 @@ function start(config: RuntimeConfig): ServerRuntime {
   ): Capture => {
     const context = incoming.getStore()
     const capture: Capture = {
-      id: randomId('cap'),
+      id: nextId('cap'),
       sessionId: context?.sessionId ?? 'server',
       origin: 'server',
       transport,
-      timestamp: new Date().toISOString(),
+      timestamp: isoNow(),
       durationMs: 0,
       request: { method, url: url.href, headers, body: { kind: 'none' } },
       stack: callerStack(OWN_FRAMES),
@@ -150,6 +167,36 @@ function start(config: RuntimeConfig): ServerRuntime {
     if (context) capture.parent = context.parent
     return capture
   }
+
+  // --- Server cache (M40) -------------------------------------------------------------------
+
+  const cacheContexts = new WeakMap<CacheEventBase, IncomingContext>()
+  const observer = createCacheObserver({
+    begin: () => {
+      const context = incoming.getStore()
+      const base: CacheEventBase = {
+        id: nextId('ce'),
+        sessionId: context?.sessionId ?? 'server',
+        at: isoNow(),
+        ...(context ? { parent: context.parent } : {}),
+      }
+      if (context) cacheContexts.set(base, context)
+      return base
+    },
+    emit: (base, body) => {
+      const context = cacheContexts.get(base)
+      const seen = `${body.kind} ${body.key} ${body.status}`
+      if (context) {
+        if (context.seen.has(seen)) return
+        context.seen.add(seen)
+      }
+      pushCache({ ...base, ...body })
+    },
+    stack: () => callerStack(OWN_FRAMES),
+    shouldCapture,
+    hardRefresh: (base) => cacheContexts.get(base)?.hardRefresh ?? false,
+  })
+  observer.refresh()
 
   // --- Incoming requests --------------------------------------------------------------------
 
@@ -171,8 +218,13 @@ function start(config: RuntimeConfig): ServerRuntime {
       }
       const action = header(headers['next-action'])
       if (action) parent.serverActionId = action
+      // No render runs here: read the wall clock, and wrap cache handlers Next set up since.
+      syncClock()
+      observer.refresh()
       // Everything the request handler runs from here on (sync and async) sees this context.
-      incoming.enterWith({ parent, sessionId })
+      // Next's own test for a hard reload in dev (`IncrementalCache.get`).
+      const hardRefresh = header(headers['cache-control']) === 'no-cache'
+      incoming.enterWith({ parent, sessionId, seen: new Set(), hardRefresh })
     } catch {}
   })
 
@@ -196,6 +248,9 @@ function start(config: RuntimeConfig): ServerRuntime {
             url,
             headers,
           )
+          // A cached fetch on the way down (M40): tell it which request it sent.
+          const slot = fetchSlot.getStore()
+          if (slot) slot.captureId = capture.id
           const contentType = headers['content-type']
           if (init?.body !== undefined && init.body !== null) {
             capture.request.body = requestBody(init.body, contentType, options.maxBodyBytes)
@@ -281,9 +336,9 @@ function start(config: RuntimeConfig): ServerRuntime {
     push(capture)
   }
 
-  // Next patches fetch on top of ours (its patched fetch calls ours for real network requests:
-  // stored as is). Anything else assigned, such as the native fetch put back by `resetFetch`, is
-  // wrapped again.
+  // Next patches fetch on top of ours (its patched fetch calls ours for real network requests),
+  // and its patched fetch is wrapped from the outside to read its cache results (M40). Anything
+  // else assigned, such as the native fetch put back by `resetFetch`, is wrapped again.
   let current = wrap(globalThis.fetch)
   try {
     Object.defineProperty(globalThis, 'fetch', {
@@ -291,7 +346,9 @@ function start(config: RuntimeConfig): ServerRuntime {
       enumerable: true,
       get: () => current,
       set: (value: Fetch) => {
-        current = typeof value !== 'function' || isOurs(value) || isNextPatched(value) ? value : wrap(value)
+        if (typeof value !== 'function' || isOurs(value) || observer.isObserved(value)) current = value
+        else if (isNextPatched(value)) current = observer.observeFetch(value)
+        else current = wrap(value)
       },
     })
   } catch {

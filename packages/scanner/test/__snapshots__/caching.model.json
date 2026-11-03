@@ -30,6 +30,18 @@
         "children": [
           {
             "segment": {
+              "raw": "featured",
+              "kind": "static",
+              "name": "featured"
+            },
+            "dir": "src/app/api/featured",
+            "files": {
+              "route": "src/app/api/featured/route.ts"
+            },
+            "children": []
+          },
+          {
+            "segment": {
               "raw": "revalidate",
               "kind": "static",
               "name": "revalidate"
@@ -177,6 +189,28 @@
           }
         ]
       }
+    },
+    {
+      "id": "rt_2gcm52zh4tz",
+      "path": "/api/featured",
+      "kind": "route-handler",
+      "file": "src/app/api/featured/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "featured",
+          "kind": "static",
+          "name": "featured"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "GET"
+      ]
     },
     {
       "id": "rt_1lssl7y11mj",
@@ -1058,6 +1092,46 @@
       "hash": "26e9nviq424"
     },
     {
+      "id": "req_1wyk9ydgs6j",
+      "origin": "route-handler",
+      "routeId": "rt_2gcm52zh4tz",
+      "handlerMethod": "GET",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API_URL}/products/featured`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "baseEnv": "API_URL",
+        "path": "/products/featured"
+      },
+      "trigger": {
+        "kind": "route-handler"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_13cc5ekstvg",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0ir4r244xxm"
+    },
+    {
       "id": "req_1x1icafh3ot",
       "origin": "route-handler",
       "routeId": "rt_2du82l2seay",
@@ -1769,6 +1843,10 @@
     "src/app/actions.ts": [
       "src/lib/api-url.ts"
     ],
+    "src/app/api/featured/route.ts": [
+      "src/lib/api-url.ts",
+      "src/types.ts"
+    ],
     "src/app/api/stats/route.ts": [
       "src/lib/api-url.ts",
       "src/types.ts"
@@ -1816,6 +1894,26 @@
   },
   "cache": {
     "entries": [
+      {
+        "id": "ce_2f6hvjnxtt2",
+        "kind": "fetch",
+        "name": "{API_URL ?? http://localhost:4010}/products/featured",
+        "revalidate": 300,
+        "tags": [],
+        "loc": {
+          "file": "src/app/api/featured/route.ts",
+          "line": 8,
+          "column": 21
+        },
+        "siteIds": [
+          "req_1wyk9ydgs6j"
+        ],
+        "pageIds": [],
+        "handlerIds": [
+          "rt_2gcm52zh4tz"
+        ],
+        "flags": []
+      },
       {
         "id": "ce_2bzzsf1ekmk",
         "kind": "fetch",
@@ -1994,6 +2092,7 @@
         "id": "ce_2bpnutq8zcz",
         "kind": "unstable-cache",
         "name": "getUsers",
+        "fn": "loadUsers",
         "revalidate": 60,
         "tags": [
           {

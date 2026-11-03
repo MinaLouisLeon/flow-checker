@@ -30,6 +30,7 @@ import {
   cacheFlags,
   cacheKeyText,
   cacheLifeText,
+  cacheRuntimeText,
   cacheTags,
   type Endpoint,
   type EndpointHost,
@@ -39,6 +40,7 @@ import {
   type ExportCapture,
   type ExportData,
   endpointLabel,
+  explain,
   type Flag,
   type Flow,
   type FlowStatus,
@@ -714,7 +716,14 @@ function cacheSection(ctx: Ctx, route: Route, from: string): string[] {
 
 function cacheEntryLine(e: CacheEntry): string {
   const tags = e.tags.length > 0 ? `, tags ${e.tags.map((t) => code(cacheKeyText(t))).join(', ')}` : ''
-  return `${CACHE_KIND_LABELS[e.kind]} ${code(e.name)}, kept ${cacheLifeText(e)}${tags}, ${code(`${e.loc.file}:${e.loc.line}`)}`
+  const runtime = e.runtime ? `, ${cacheRuntimeLabel(e)}` : ''
+  return `${CACHE_KIND_LABELS[e.kind]} ${code(e.name)}, kept ${cacheLifeText(e)}${tags}${runtime}, ${code(`${e.loc.file}:${e.loc.line}`)}`
+}
+
+/** "cached at runtime (3 hits · 1 miss)": what Next's cache did with the entry (M40). */
+function cacheRuntimeLabel(e: CacheEntry): string {
+  if (!e.runtime) return '—'
+  return `${explain('cache', e.runtime.verdict)?.label ?? e.runtime.verdict} (${cacheRuntimeText(e.runtime)})`
 }
 
 function invalidationLine(ctx: Ctx, i: CacheInvalidation): string {
@@ -737,6 +746,8 @@ function cacheDoc(ctx: Ctx): string {
   const byId = new Map(cache.entries.map((e) => [e.id, e]))
   const flagged = cacheFlags(cache)
   const tags = cacheTags(cache)
+  // Live capture saw Next's cache at work (M40).
+  const seen = cache.entries.some((e) => e.runtime)
   return doc([
     '# Server cache',
     link('← Overview', from, README),
@@ -766,12 +777,13 @@ function cacheDoc(ctx: Ctx): string {
     cache.entries.length === 0
       ? 'Nothing is cached.'
       : table(
-          ['Cached', 'Kept', 'Tags', 'Used by', 'Where'],
+          ['Cached', 'Kept', 'Tags', 'Used by', ...(seen ? ['At runtime'] : []), 'Where'],
           cache.entries.map((e) => [
             entryName(e),
             cacheLifeText(e),
             e.tags.map((t) => code(cacheKeyText(t))).join(', ') || '—',
             routes([...e.pageIds, ...e.handlerIds]),
+            ...(seen ? [cacheRuntimeLabel(e)] : []),
             code(`${e.loc.file}:${e.loc.line}`),
           ]),
         ),

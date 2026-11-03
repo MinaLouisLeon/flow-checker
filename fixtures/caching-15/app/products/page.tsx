@@ -12,9 +12,13 @@ export default async function ProductsPage() {
     { tags: ['products'], revalidate: 300 },
   )
   const products = await listProducts()
+  // The mock API answers 404 here, and Next only keeps a `fetch` that answers 200: every call
+  // misses the cache (flagged on purpose by the runtime check, M40).
+  const featured = await fetch(`${API_URL}/products/featured`, { cache: 'force-cache' })
   return (
     <main>
       <h1>Products</h1>
+      <p>{featured.ok ? 'Featured products' : 'No featured products'}</p>
       <ul>
         {products.map((p) => (
           <li key={p.id}>{p.name}</li>

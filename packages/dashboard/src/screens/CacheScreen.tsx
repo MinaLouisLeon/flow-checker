@@ -28,7 +28,8 @@ export function CacheScreen() {
         <code>revalidateTag</code> / <code>updateTag</code> / <code>revalidatePath</code> calls that refresh
         it.
         {cacheComponents ? ' Cache Components is on.' : ''} Read from the code; <code>next dev</code> doesn't
-        cache like a build does.
+        cache like a build does. With <code>flow-checker dev</code> running, each entry also shows what Next's
+        cache did while you used the app (hits, misses and skips).
       </p>
       {cache.entries.length === 0 && cache.invalidations.length === 0 ? (
         <Empty>The scan found no cached data and no revalidation calls.</Empty>

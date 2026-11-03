@@ -8,6 +8,7 @@ import { type RuntimeCaptureOptions, resolveCaptureOptions } from '@flow-checker
 import { compileRules, redactCapture } from '@flow-checker/runtime/redact'
 import {
   type AppModel,
+  type CacheEvent,
   type Capture,
   EXPORT_VERSION,
   type ExportCapture,
@@ -50,7 +51,8 @@ export function buildSnapshot(options: LiveSnapshotOptions): ExportData {
   const model = flows.withNames(verifier.servedModel())
   const all = store.all()
   const flowSummary = flows.summary()
-  const hasCaptures = all.length > 0
+  // Cache events (M40) count: a page whose cached data was all hits sent no request.
+  const hasCaptures = all.length > 0 || store.cacheEvents().length > 0
   const captures = pickCaptures(all, verifier)
   const capture = options.capture ?? resolveCaptureOptions(undefined)
   const rules = compileRules(capture.redact)
@@ -80,6 +82,8 @@ export interface OfflineSnapshotOptions extends SnapshotOptions {
   model: AppModel
   /** Captures to use instead of the ones saved in `.flow-checker/` (tests). */
   captures?: Capture[]
+  /** Server cache events to use with `captures` (tests, M40). */
+  cacheEvents?: CacheEvent[]
   /** Server action id → action. Default: Next's manifest in the project. */
   resolveAction?: (id: string) => ServerActionInfo | undefined
 }
@@ -91,8 +95,10 @@ export interface OfflineSnapshotOptions extends SnapshotOptions {
  */
 export function collectSnapshot(options: OfflineSnapshotOptions): ExportData {
   const store = new CaptureStore({ root: options.root, readOnly: true })
-  if (options.captures) for (const c of options.captures) store.add(c)
-  else store.load()
+  if (options.captures) {
+    for (const c of options.captures) store.add(c)
+    store.addCacheEvents(options.cacheEvents ?? [])
+  } else store.load()
   const overrides = new OverridesFile(options.root)
   const verifier = new Verifier({
     root: options.root,

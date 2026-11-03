@@ -2,6 +2,7 @@
 
 src/app [layout, page]
 ├─ api
+│  ├─ featured [route]
 │  ├─ revalidate [route]
 │  ├─ stats [route]
 │  └─ todos [route]
@@ -14,6 +15,7 @@ src/app [layout, page]
 # Routes
 
 /  page  src/app/page.tsx
+/api/featured  route GET  src/app/api/featured/route.ts
 /api/revalidate  route POST  src/app/api/revalidate/route.ts
 /api/stats  route GET  src/app/api/stats/route.ts
 /api/todos  route POST  src/app/api/todos/route.ts
@@ -80,6 +82,8 @@ render: ISR 1m
 
 # Server cache
 
+fetch  {API_URL ?? http://localhost:4010}/products/featured  5m  src/app/api/featured/route.ts:8
+  used by: /api/featured
 fetch  {API_URL ?? http://localhost:4010}/todos  [stats]  until revalidated  src/app/api/stats/route.ts:6
   used by: /api/stats
   ! tag-never-revalidated: Nothing revalidates the tag `stats`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes on the next build.

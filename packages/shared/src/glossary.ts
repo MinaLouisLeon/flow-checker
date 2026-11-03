@@ -7,6 +7,7 @@ import type { CaptureMatch } from './match'
 import type {
   CacheEntry,
   CacheFlag,
+  CacheRuntime,
   Component,
   Flag,
   RequestSite,
@@ -305,7 +306,7 @@ const RENDER: GlossaryGroup<RouteRender['mode']> = {
   },
 }
 
-const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind']> = {
+const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
   intro:
@@ -345,6 +346,28 @@ const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind']> = {
       label: 'updateTag outside an action',
       means: '`updateTag` only works in a server action; Next throws anywhere else.',
       todo: 'Use `revalidateTag(tag, { expire: 0 })` in route handlers.',
+    },
+    cached: {
+      label: 'cached at runtime',
+      means: 'Live capture: Next served it from its server cache at least once.',
+    },
+    'not-reused': {
+      label: 'not reused yet',
+      means:
+        'Live capture saw it run, but nothing asked for the same data again yet, so it could not be served from the cache.',
+      todo: 'Load the page again to check that the second time is a hit.',
+    },
+    'always-missed': {
+      label: 'always missed',
+      means:
+        'Live capture: the same data was asked for again, and Next missed its cache every time. It was never served from the cache.',
+      todo: "For a `fetch`, check that it answers 200 (Next keeps nothing else). For a function, check that it doesn't throw and that what it reads doesn't change each time.",
+    },
+    'never-cached': {
+      label: 'never cached',
+      means:
+        'Live capture: Next skipped its cache every time, for the reason shown. `auto no cache` is a `fetch` without a `cache` option in a page rendered per request.',
+      todo: "Give the `fetch` `cache: 'force-cache'` or `next.revalidate`, or check the segment config (`dynamic`, `fetchCache`).",
     },
   },
 }
