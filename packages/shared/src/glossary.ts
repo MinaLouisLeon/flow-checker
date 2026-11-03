@@ -4,7 +4,17 @@
 import type { EndpointStatus } from './endpoints'
 import type { FlowStatus } from './flow-runs'
 import type { CaptureMatch } from './match'
-import type { Component, Flag, RequestSite, RequestUrl, RouteAccess, RouteRender, Trigger } from './model'
+import type {
+  CacheEntry,
+  CacheFlag,
+  Component,
+  Flag,
+  RequestSite,
+  RequestUrl,
+  RouteAccess,
+  RouteRender,
+  Trigger,
+} from './model'
 import type { TypeCheckStatus } from './type-check'
 
 export interface GlossaryEntry {
@@ -33,6 +43,7 @@ export type GlossaryGroupId =
   | 'url'
   | 'access'
   | 'render'
+  | 'cache'
   | 'flow-status'
   | 'endpoint-status'
   | 'endpoint-side'
@@ -294,6 +305,50 @@ const RENDER: GlossaryGroup<RouteRender['mode']> = {
   },
 }
 
+const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind']> = {
+  id: 'cache',
+  title: 'Server cache',
+  intro:
+    'What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).',
+  entries: {
+    fetch: {
+      label: 'fetch',
+      means:
+        "A server `fetch` that asks to be cached: `cache: 'force-cache'`, `next.revalidate` or `next.tags`.",
+    },
+    'use-cache': {
+      label: 'use cache',
+      means:
+        'A function, component or file with the `use cache` directive. `cacheLife` sets how long it is kept, `cacheTag` its tags.',
+    },
+    'unstable-cache': {
+      label: 'unstable_cache',
+      means: 'A function wrapped in `unstable_cache()`, with its `tags` and `revalidate` options.',
+    },
+    'tag-never-set': {
+      label: 'tag never set',
+      means: 'The tag is revalidated, but no cached data has it, so the call refreshes nothing.',
+      todo: 'Check the tag for a typo, or add it where the data is cached.',
+    },
+    'tag-never-revalidated': {
+      label: 'never revalidated',
+      means:
+        'The tag is set, but no `revalidateTag` or `updateTag` call has it: the data only refreshes when its time runs out.',
+      todo: 'Revalidate the tag where the data changes, or drop the tag if nothing needs it.',
+    },
+    'path-no-route': {
+      label: 'no such path',
+      means: '`revalidatePath` names a path that no page or route handler has, so it refreshes nothing.',
+      todo: 'Use the route path from the `app` folder (for a rewrite, its destination).',
+    },
+    'update-tag-outside-action': {
+      label: 'updateTag outside an action',
+      means: '`updateTag` only works in a server action; Next throws anywhere else.',
+      todo: 'Use `revalidateTag(tag, { expire: 0 })` in route handlers.',
+    },
+  },
+}
+
 const FLOW_STATUS: GlossaryGroup<FlowStatus['status']> = {
   id: 'flow-status',
   title: 'Flow status',
@@ -453,6 +508,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   URL,
   ACCESS,
   RENDER,
+  CACHE,
   FLOW_STATUS,
   ENDPOINT_STATUS,
   ENDPOINT_SIDE,

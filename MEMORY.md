@@ -46,6 +46,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
 | M37 | Release v0.3.0        | Matrix also runs `explore` (project files hashed before/after), `summary` and `impact`. Publish = tag.                   |
 | M38 | Render mode           | Model version 13, `Route.render`. Walk records `RenderUse`s; `scanner/src/render.ts` adds segment config and the mode.   |
+| M39 | Server cache map      | Model version 14, `AppModel.cache`. Walk records `CacheFound` / `InvalidationFound`; `scanner/src/cache.ts` links them.  |
 
 ## Gotchas
 
@@ -490,3 +491,19 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   secondary badges go behind `useShowDetails()`.
 - Heredoc patch scripts again turned `'\n'` into a line break (exporter `renderSection`); use the Edit tool for
   lines with escapes.
+
+## M39 — Server cache map (branch `feat/server-cache-map-m39`)
+
+- Build the fixtures with `next build` before trusting a caching rule: with Cache Components a `fetch` with
+  `force-cache` / `next.revalidate` and `unstable_cache` are prerendered (○), but `next.tags` alone is dynamic (◐);
+  on Next 15 `unstable_cache`'s `revalidate` sets the page's ISR time. M38 had all three wrong and `render-check`
+  couldn't see it until a fixture used them.
+- Stable Next 15 has no `use cache` (it needs a canary), so `caching-15` covers tagged fetches and `unstable_cache`
+  only; Next 15 names (`unstable_cacheTag`, `unstable_cacheLife`) are covered by unit tests.
+- `render-check` parsing: Next 15's table has size columns (`3.46 kB` read as a time before), and with Cache
+  Components a page with params prints a symbol-less row with its `◐` row below.
+- Cached functions are entered by the walk even with no request inside (`#reachesNetwork` returns true for them),
+  so database-only `use cache` functions are entries. Fetch entries are keyed by the `fetch` call, not the site.
+- A tag the scan can't read on one side (`revalidateTag(tag)` from a webhook, `cacheTag(...tags)`) turns off the
+  flags for the other side; otherwise every tag would be flagged.
+- Don't `git add -N` new files to see them in `git diff`: it changes the index (`git reset -q -- <paths>` undoes it).

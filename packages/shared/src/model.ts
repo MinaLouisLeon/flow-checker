@@ -178,7 +178,7 @@ export const RouteRenderSchema = z.object({
    * parts streamed per request. `unknown`: the scan can't tell (`reasons` say why).
    */
   mode: z.enum(['static', 'isr', 'dynamic', 'partial', 'unknown']),
-  /** Seconds, for `isr`: the lowest time the page and its data ask for. */
+  /** Seconds, for `isr` (and `partial`: its static shell): the lowest time the page and its data ask for. */
   revalidate: z.number().optional(),
   reasons: z.array(RenderReasonSchema),
 })
@@ -1166,6 +1166,101 @@ export const GraphqlInfoSchema = z.object({
 })
 export type GraphqlInfo = z.infer<typeof GraphqlInfoSchema>
 
+// ---------------------------------------------------------------------------------------------
+// Server cache map (M39): what Next caches on the server (`fetch` cache options, `use cache`,
+// `unstable_cache`), the tags on it, and the `revalidateTag` / `updateTag` / `revalidatePath`
+// calls that refresh it, linked to the pages they refresh.
+
+/** A cache tag or a `revalidatePath` path, as written and as far as the scan can read it. */
+export const CacheKeySchema = z.object({
+  /** The expression as written, e.g. `'posts'` or `` `post-${id}` ``. */
+  text: z.string(),
+  /** The value with `{name}` for parts only known at runtime (`post-{id}`). Absent when unread. */
+  value: z.string().optional(),
+  /** `exact`: a fixed value. `pattern`: has parts only known at runtime. `unknown`: can't be read. */
+  confidence: z.enum(['exact', 'pattern', 'unknown']),
+})
+export type CacheKey = z.infer<typeof CacheKeySchema>
+
+export const CacheFlagSchema = z.object({
+  /**
+   * `tag-never-set`: a tag is revalidated but no cached data has it, so the call refreshes
+   * nothing (a typo, or the data lost its tag). `tag-never-revalidated`: a tag is set but nothing
+   * revalidates it. `path-no-route`: `revalidatePath` names a path no page or route handler has.
+   * `update-tag-outside-action`: `updateTag` outside a server action, which Next rejects.
+   */
+  kind: z.enum(['tag-never-set', 'tag-never-revalidated', 'path-no-route', 'update-tag-outside-action']),
+  message: z.string(),
+})
+export type CacheFlag = z.infer<typeof CacheFlagSchema>
+
+export const CacheEntrySchema = z.object({
+  id: z.string(),
+  /**
+   * `fetch`: a server `fetch` with `cache: 'force-cache'`, `next.revalidate` or `next.tags`.
+   * `use-cache`: a function, component or file with `'use cache'`. `unstable-cache`: a function
+   * wrapped in `unstable_cache()`.
+   */
+  kind: z.enum(['fetch', 'use-cache', 'unstable-cache']),
+  /** The function's name; for `fetch`, the URL as written. */
+  name: z.string(),
+  /** `use-cache`: the directive as written (`use cache`, `use cache: remote`), and whether it is on the file. */
+  directive: z.string().optional(),
+  inFile: z.boolean().optional(),
+  /** `fetch`: the `cache` option as written. */
+  cache: z.string().optional(),
+  /**
+   * Seconds until it is refreshed (`next.revalidate`, `unstable_cache`'s `revalidate`, the
+   * `cacheLife` profile). `false`: kept until revalidated. Absent: Next's default.
+   */
+  revalidate: z.union([z.number(), z.literal(false)]).optional(),
+  /** `use-cache`: the `cacheLife()` call as written. */
+  life: z.string().optional(),
+  tags: z.array(CacheKeySchema),
+  /** `fetch`: its request sites. Others: the server requests sent inside it. */
+  siteIds: z.array(z.string()),
+  /** Pages that render with it (through their layouts and the components they render). */
+  pageIds: z.array(z.string()),
+  /** Route handlers that use it. */
+  handlerIds: z.array(z.string()),
+  flags: z.array(CacheFlagSchema),
+  loc: SourceLocSchema,
+})
+export type CacheEntry = z.infer<typeof CacheEntrySchema>
+
+export const CacheInvalidationSchema = z.object({
+  id: z.string(),
+  api: z.enum(['revalidateTag', 'updateTag', 'revalidatePath']),
+  /** `revalidateTag` / `updateTag`: the tag. */
+  tag: CacheKeySchema.optional(),
+  /** `revalidatePath`: the path, and its `type` argument. */
+  path: CacheKeySchema.extend({ type: z.enum(['page', 'layout']).optional() }).optional(),
+  /** `revalidateTag`'s second argument as written (`'max'`, `{ expire: 0 }`). */
+  profile: z.string().optional(),
+  /** Where it runs: a server action, or a route handler (see `routeId`). */
+  origin: z.enum(['server-action', 'route-handler']),
+  serverAction: ServerActionRefSchema.optional(),
+  routeId: z.string().optional(),
+  handlerMethod: HttpMethodSchema.optional(),
+  /** Cached data it refreshes: entries with the tag. Empty for `revalidatePath`. */
+  entryIds: z.array(z.string()),
+  /** Pages it refreshes: the path's pages, or the pages that render with the entries. */
+  pageIds: z.array(z.string()),
+  /** `revalidatePath`: route handlers at the path. */
+  handlerIds: z.array(z.string()),
+  flags: z.array(CacheFlagSchema),
+  /** From the action or handler down to the call. */
+  callStack: z.array(CallFrameSchema),
+  loc: SourceLocSchema,
+})
+export type CacheInvalidation = z.infer<typeof CacheInvalidationSchema>
+
+export const CacheMapSchema = z.object({
+  entries: z.array(CacheEntrySchema),
+  invalidations: z.array(CacheInvalidationSchema),
+})
+export type CacheMap = z.infer<typeof CacheMapSchema>
+
 export const ProjectInfoSchema = z.object({
   /** `app` or `src/app`. */
   appDir: z.string(),
@@ -1192,7 +1287,7 @@ export const AppModelSchema = z.object({
    * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`),
    * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags,
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
-   * `render` (read as `unknown`).
+   * `render` (read as `unknown`), version 13 (before M39) no `cache`.
    */
   version: z
     .union([
@@ -1208,6 +1303,7 @@ export const AppModelSchema = z.object({
       z.literal(10),
       z.literal(11),
       z.literal(12),
+      z.literal(13),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1244,5 +1340,7 @@ export const AppModelSchema = z.object({
    * the scan has no other facts about (constants, utils). Absent in older models.
    */
   imports: z.record(z.string(), z.array(z.string())).optional(),
+  /** Server caching and what refreshes it (M39). Absent when the app caches nothing and revalidates nothing. */
+  cache: CacheMapSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

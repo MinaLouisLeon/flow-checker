@@ -1,6 +1,8 @@
 // M34: every status, flag kind, trigger kind and transport has a plain explanation.
 import { describe, expect, it } from 'vitest'
 import {
+  CacheEntrySchema,
+  CacheFlagSchema,
   CaptureMatchSchema,
   ComponentSchema,
   ENDPOINT_STATUSES,
@@ -32,6 +34,8 @@ const COVERED: [GlossaryGroupId, readonly string[]][] = [
   ['url', RequestUrlSchema.shape.confidence.options],
   ['access', RouteAccessSchema.shape.status.options],
   ['render', RouteRenderSchema.shape.mode.options],
+  ['cache', CacheEntrySchema.shape.kind.options],
+  ['cache', CacheFlagSchema.shape.kind.options],
   ['flow-status', ['confirmed', 'partial', 'unconfirmed']],
   ['endpoint-status', ENDPOINT_STATUSES],
   ['capture', CaptureMatchSchema.shape.status.options],

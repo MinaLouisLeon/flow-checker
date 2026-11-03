@@ -15,6 +15,13 @@
 - dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/products/page.tsx:5`
 - dynamic: fetches with `cache: 'no-store'` (page), `src/lib/backend.ts:7`
 
+## Server cache
+
+Refreshed by:
+
+- `revalidatePath('/products')` in server action `createProduct`, `src/actions/products.ts:25`
+- `revalidatePath('/products')` in server action `deleteProduct`, `src/actions/products.ts:32`
+
 ## Component tree
 
 - [`ProductsPage`](../components/ProductsPage.md) · server · ⇄ 1 request

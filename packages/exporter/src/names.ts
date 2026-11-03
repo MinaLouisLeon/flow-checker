@@ -20,6 +20,7 @@ export const ENDPOINTS = 'endpoints.md'
 export const AREAS = 'areas.md'
 export const ONBOARDING = 'ONBOARDING.md'
 export const GLOSSARY_DOC = 'GLOSSARY.md'
+export const CACHE = 'cache.md'
 
 export function docNames(model: AppModel): DocNames {
   const routes = unique(model.routes, (r) => `pages/${routeSlug(r)}`)

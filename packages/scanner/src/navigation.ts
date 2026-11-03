@@ -225,3 +225,26 @@ export function isCacheLifeCall(call: CallExpression): boolean {
   const name = unaliasedName(expr)
   return (name === 'cacheLife' || name === 'unstable_cacheLife') && importModuleOf(expr) === 'next/cache'
 }
+
+export type CacheApi = 'revalidateTag' | 'updateTag' | 'revalidatePath' | 'cacheTag' | 'unstable_cache'
+
+const CACHE_APIS: Record<string, CacheApi> = {
+  revalidateTag: 'revalidateTag',
+  updateTag: 'updateTag',
+  revalidatePath: 'revalidatePath',
+  cacheTag: 'cacheTag',
+  // Next 15 names.
+  unstable_cacheTag: 'cacheTag',
+  unstable_cache: 'unstable_cache',
+}
+
+/**
+ * A server cache call from next/cache (M39): `revalidateTag()`, `updateTag()`, `revalidatePath()`,
+ * `cacheTag()` or `unstable_cache()`, also under another import name.
+ */
+export function cacheApiCall(call: CallExpression): CacheApi | undefined {
+  const expr = call.getExpression()
+  if (!N.isIdentifier(expr) || !importsRequestApis(call.getSourceFile())) return undefined
+  const api = CACHE_APIS[unaliasedName(expr)]
+  return api && importModuleOf(expr) === 'next/cache' ? api : undefined
+}

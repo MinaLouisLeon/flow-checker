@@ -7,7 +7,7 @@ import type { Component, RenderReason, Route, RouteRender, SourceLoc } from '@fl
 import { Node as N, type Node, type SourceFile, ts } from 'ts-morph'
 import { componentsBelow, groupBy } from './access'
 import { relativeTo } from './paths'
-import type { RenderUse, Unfollowed } from './requests'
+import type { RenderUse, Unfollowed, UseCache } from './requests'
 
 export interface RenderInput {
   root: string
@@ -171,7 +171,11 @@ export function modeOf(
     times.length > 0 ? { mode: 'isr', revalidate: Math.min(...times) } : { mode: 'static' }
   // `force-static` / `error` prerender whatever the page reads.
   if (!cacheComponents && has('static')) return isr()
-  if (has('dynamic')) return { mode: cacheComponents ? 'partial' : 'dynamic' }
+  if (has('dynamic')) {
+    // With Cache Components the static shell around the dynamic parts has a time too.
+    if (!cacheComponents) return { mode: 'dynamic' }
+    return times.length > 0 ? { mode: 'partial', revalidate: Math.min(...times) } : { mode: 'partial' }
+  }
   if (has('unknown')) return { mode: 'unknown' }
   return isr()
 }
@@ -204,22 +208,29 @@ function useReason(
 ): RenderReason | undefined {
   const base = { in: place, componentId: use.componentId, loc: use.loc }
   if (use.kind === 'request-api') return { ...base, kind: 'request-api', effect: 'dynamic', detail: use.api }
+  // `unstable_cache` sets the page's time with or without Cache Components; `use cache` needs them.
+  if (use.kind === 'cached') {
+    return cacheComponents || use.cached.api ? cachedReason(base, use.cached) : undefined
+  }
   const site = { siteId: use.siteId }
+  if (use.cached?.api) return cachedReason({ ...base, ...site }, use.cached)
+  const options = use.fetch
   if (cacheComponents) {
-    if (use.cached) {
-      return {
-        ...base,
-        ...site,
-        kind: 'cached',
-        effect: use.cached.revalidate !== undefined ? 'isr' : 'unknown',
-        ...(use.cached.life ? { detail: use.cached.life } : {}),
-        ...(use.cached.revalidate !== undefined ? { revalidate: use.cached.revalidate } : {}),
-        loc: use.cached.loc,
+    if (use.cached) return cachedReason({ ...base, ...site }, use.cached)
+    // A fetch that asks to be cached is prerendered (checked with `next build`); `next.tags` alone isn't enough.
+    if (use.transport === 'fetch' && options && !options.unread) {
+      if (typeof options.revalidate === 'number' && options.revalidate > 0) {
+        const detail = `next: { revalidate: ${options.revalidate} }`
+        return { ...base, ...site, kind: 'fetch', effect: 'isr', detail, revalidate: options.revalidate }
+      }
+      if (options.cache === 'force-cache' || options.revalidate === false) {
+        const detail =
+          options.cache === 'force-cache' ? "cache: 'force-cache'" : 'next: { revalidate: false }'
+        return { ...base, ...site, kind: 'fetch', effect: 'info', detail }
       }
     }
     return { ...base, ...site, kind: 'uncached-data', effect: 'dynamic', detail: `\`${use.transport}\`` }
   }
-  const options = use.fetch
   if (!options) return undefined
   if (options.unread) {
     return {
@@ -259,6 +270,21 @@ function useReason(
     return { ...base, ...site, kind: 'fetch', effect: 'dynamic', detail: `fetchCache = '${value}'` }
   }
   return undefined
+}
+
+/** A `use cache` scope (with its `cacheLife`) or an `unstable_cache()` call. */
+function cachedReason(base: Omit<RenderReason, 'kind' | 'effect'>, cached: UseCache): RenderReason {
+  const timed = cached.revalidate !== undefined
+  const detail = cached.api ?? cached.life
+  return {
+    ...base,
+    kind: 'cached',
+    // `unstable_cache` without a time keeps its data until revalidated.
+    effect: timed ? 'isr' : cached.api ? 'info' : 'unknown',
+    ...(detail ? { detail } : {}),
+    ...(timed ? { revalidate: cached.revalidate } : {}),
+    loc: cached.loc,
+  }
 }
 
 // --- Reading page and layout files ---------------------------------------------------------------

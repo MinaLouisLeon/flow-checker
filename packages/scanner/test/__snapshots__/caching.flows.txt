@@ -1,0 +1,24 @@
+# Navigation
+
+## Home  src/app/page.tsx
+link /todos/:id -> /todos/[id]  event onClick
+
+## SiteHeader  src/components/site-header.tsx
+link / -> /  event onClick
+link /products -> /products  event onClick
+link /users -> /users  event onClick
+link /settings -> /settings  event onClick
+
+# Flows
+
+## Home submit  (/)
+1. Home action on /
+2. POST server action createTodo
+
+## TodoDetail submit  (/todos/[id])
+1. TodoDetail action on /todos/[id]
+2. POST server action toggleTodo
+
+## UsersPage submit  (/users)
+1. UsersPage action on /users
+2. POST server action refreshUsers

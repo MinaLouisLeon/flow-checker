@@ -1,0 +1,18 @@
+# Navigation
+
+## Home  app/page.tsx
+link /todos/:id -> /todos/[id]  event onClick
+
+# Flows
+
+## Home submit  (/)
+1. Home action on /
+2. POST server action createTodo
+
+## ProductsPage submit  (/products)
+1. ProductsPage action on /products
+2. POST server action refreshProducts
+
+## TodoPage submit  (/todos/[id])
+1. TodoPage action on /todos/[id]
+2. POST server action toggleTodo

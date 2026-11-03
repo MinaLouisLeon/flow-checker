@@ -1,0 +1,64 @@
+# Requests
+
+## server action createTodo  src/app/actions.ts:6
+POST {API_URL ?? http://localhost:4010}/todos  fetch  server-action
+  body: { title: string; }
+  via: fetch src/app/actions.ts:7
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## server action toggleTodo  src/app/actions.ts:16
+PATCH {API_URL ?? http://localhost:4010}/todos/:id  fetch  server-action
+  body: { done: boolean; }
+  via: fetch src/app/actions.ts:18
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## route handler GET /api/stats  src/app/api/stats/route.ts
+GET {API_URL ?? http://localhost:4010}/todos  fetch  route-handler
+  response: Todo[]
+  via: fetch src/app/api/stats/route.ts:6
+
+## route handler POST /api/todos  src/app/api/todos/route.ts
+POST {API_URL ?? http://localhost:4010}/todos  fetch  route-handler
+  body: string
+  via: fetch src/app/api/todos/route.ts:6
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## Home  src/app/page.tsx:5
+GET {API_URL ?? http://localhost:4010}/todos  fetch  server-render
+  response: Todo[]
+  via: listTodos src/app/page.tsx:6 > fetch src/lib/todos.ts:10
+POST server action createTodo  server-action  event action
+  body: FormData
+  response: void
+  then: POST {API_URL ?? http://localhost:4010}/todos
+  via: createTodo src/app/page.tsx:17
+
+## ProductList  src/app/products/page.tsx:4
+GET {API_URL ?? http://localhost:4010}/products  fetch  server-render
+  response: Product[]
+  via: listProducts src/app/products/page.tsx:5 > fetch src/lib/products.ts:6
+
+## SettingsPage  src/app/settings/page.tsx:3
+GET {API_URL ?? http://localhost:4010}/settings  fetch  server-render
+  response: Settings
+  via: getSettings src/app/settings/page.tsx:4 > fetch src/lib/settings.ts:10
+
+## TodoDetail  src/app/todos/[id]/page.tsx:5
+GET {API_URL ?? http://localhost:4010}/todos/:id  fetch  server-render
+  response: Todo
+  via: getTodo src/app/todos/[id]/page.tsx:7 > fetch src/lib/todos.ts:17
+POST server action toggleTodo  server-action  event action
+  body: FormData
+  response: void
+  then: PATCH {API_URL ?? http://localhost:4010}/todos/:id
+  via: toggleTodo src/app/todos/[id]/page.tsx:9
+
+## UserList  src/app/users/page.tsx:5
+GET {API_URL ?? http://localhost:4010}/users  fetch  server-render
+  response: User[]
+  via: getUsers src/app/users/page.tsx:6 > fetch src/lib/users.js:6
+
+## UsersPage  src/app/users/page.tsx:16
+POST server action refreshUsers  server-action  event action
+  response: void
+  via: refreshUsers src/app/users/page.tsx:23

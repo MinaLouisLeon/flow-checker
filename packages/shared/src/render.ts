@@ -62,6 +62,7 @@ export function renderReasonText(reason: RenderReason): string {
     case 'uncached-data':
       return `requests data outside \`use cache\` (${detail})`
     case 'cached':
+      if (detail === 'unstable_cache') return 'caches with `unstable_cache`'
       return `caches with \`use cache\`${detail ? ` and \`${detail}\`` : ''}`
     case 'unread':
       return detail

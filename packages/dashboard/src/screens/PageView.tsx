@@ -5,6 +5,7 @@ import {
   guardAction,
   guardWhen,
   type Navigation,
+  pageCache,
   type QueryLink,
   type RenderReason,
   type RequestSite,
@@ -14,6 +15,7 @@ import {
   urlText,
 } from '@flow-checker/shared'
 import { useState } from 'react'
+import { CacheEntryRow, InvalidationRow } from '../CacheView'
 import { useData } from '../context'
 import { useShowDetails } from '../details'
 import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
@@ -115,6 +117,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
 
         <AccessSection route={route} index={index} routeId={routeId} />
         <RenderSection route={route} index={index} />
+        <CacheSection route={route} index={index} />
 
         <Section title="Layout chain">
           {route.layoutChain.length === 0 ? (
@@ -611,6 +614,44 @@ function RenderSection({ route, index }: { route: Route; index: ModelIndex }) {
             )
           })}
         </ul>
+      )}
+    </Section>
+  )
+}
+
+/** Server cache (M39): what the page renders with from the cache, and the calls that refresh it. */
+function CacheSection({ route, index }: { route: Route; index: ModelIndex }) {
+  if (!index.model.cache) return null
+  const { entries, invalidations } = pageCache(index.model.cache, route.id)
+  if (entries.length === 0 && invalidations.length === 0) return null
+  return (
+    <Section
+      title="Server cache"
+      aside={
+        <a className="muted" href={href({ name: 'cache' })}>
+          all cached data
+        </a>
+      }
+    >
+      {entries.length > 0 && (
+        <>
+          <p className="muted">Cached data the page and its layouts render with:</p>
+          <CappedList
+            items={entries}
+            className="list cache-list"
+            render={(entry) => <CacheEntryRow key={entry.id} entry={entry} index={index} pages={false} />}
+          />
+        </>
+      )}
+      {invalidations.length > 0 && (
+        <>
+          <p className="muted">Refreshed by:</p>
+          <CappedList
+            items={invalidations}
+            className="list cache-list"
+            render={(inv) => <InvalidationRow key={inv.id} inv={inv} index={index} />}
+          />
+        </>
       )}
     </Section>
   )

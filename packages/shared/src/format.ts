@@ -1,5 +1,6 @@
 // Plain-text rendering of a model: used by `flow-checker scan --tree` and snapshot tests.
 import { accessOf, guardText } from './access'
+import { formatCache } from './cache'
 import { urlText } from './format-requests'
 import type {
   AppModel,
@@ -47,6 +48,9 @@ export function formatModel(model: AppModel): string {
     out.push(...formatAccess(route))
     out.push(...formatRender(route))
   }
+
+  const cache = formatCache(model)
+  if (cache.length > 0) out.push('', ...cache)
 
   return `${out.join('\n')}\n`
 }

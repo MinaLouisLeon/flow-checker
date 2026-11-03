@@ -106,6 +106,20 @@ How Next renders a page in a production build, as read from the code. `next dev`
 | <a id="render-partial"></a>**partial** | Cache Components: a static shell is prerendered and the parts that read the request or uncached data stream in per request. | Each reason must sit inside `<Suspense>` (or `use cache`), or the build fails. |
 | <a id="render-unknown"></a>**render ?** (`unknown`) | The scan could not tell: a config value or a call it could not read. | Open the page to see what could not be read. |
 
+## Server cache
+
+What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="cache-fetch"></a>**fetch** | A server `fetch` that asks to be cached: `cache: 'force-cache'`, `next.revalidate` or `next.tags`. |  |
+| <a id="cache-use-cache"></a>**use cache** (`use-cache`) | A function, component or file with the `use cache` directive. `cacheLife` sets how long it is kept, `cacheTag` its tags. |  |
+| <a id="cache-unstable-cache"></a>**unstable_cache** (`unstable-cache`) | A function wrapped in `unstable_cache()`, with its `tags` and `revalidate` options. |  |
+| <a id="cache-tag-never-set"></a>**tag never set** (`tag-never-set`) | The tag is revalidated, but no cached data has it, so the call refreshes nothing. | Check the tag for a typo, or add it where the data is cached. |
+| <a id="cache-tag-never-revalidated"></a>**never revalidated** (`tag-never-revalidated`) | The tag is set, but no `revalidateTag` or `updateTag` call has it: the data only refreshes when its time runs out. | Revalidate the tag where the data changes, or drop the tag if nothing needs it. |
+| <a id="cache-path-no-route"></a>**no such path** (`path-no-route`) | `revalidatePath` names a path that no page or route handler has, so it refreshes nothing. | Use the route path from the `app` folder (for a rewrite, its destination). |
+| <a id="cache-update-tag-outside-action"></a>**updateTag outside an action** (`update-tag-outside-action`) | `updateTag` only works in a server action; Next throws anywhere else. | Use `revalidateTag(tag, { expire: 0 })` in route handlers. |
+
 ## Flow status
 
 Whether a flow found in the code has been walked in the running app.
