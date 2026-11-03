@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { compareRenderModes, readBuildTable } from './next-build-table.mjs'
 
 const repo = resolve(fileURLToPath(import.meta.url), '../..')
 const fixtures = join(repo, 'fixtures')
@@ -15,9 +16,6 @@ const names =
         (n) =>
           statSync(join(fixtures, n)).isDirectory() && existsSync(join(fixtures, n, 'node_modules/next')),
       )
-
-// `next build` symbols: ○ static, ● SSG (generateStaticParams), ◐ partial, ƒ dynamic.
-const SYMBOLS = { '○': 'static', '●': 'static', '◐': 'partial', ƒ: 'dynamic' }
 
 let failed = 0
 for (const name of names) {
@@ -33,7 +31,7 @@ for (const name of names) {
     failed++
     continue
   }
-  const built = readTable(out)
+  const built = readBuildTable(out)
   const scan = spawnSync(
     process.execPath,
     [join(repo, 'packages/flow-checker/dist/cli.js'), 'scan', '--quiet', '--root', dir],
@@ -41,46 +39,10 @@ for (const name of names) {
   )
   if (scan.status !== 0) throw new Error(`scan failed on ${name}: ${scan.stderr}`)
   const model = JSON.parse(readFileSync(join(dir, '.flow-checker/model.json'), 'utf8'))
-  const problems = []
-  for (const route of model.routes) {
-    if (route.kind !== 'page' || route.slot || route.intercepting) continue
-    const next = built.get(route.path)
-    if (!next) continue
-    const ours = route.render?.mode === 'isr' ? 'static' : route.render?.mode
-    const time = route.render?.revalidate
-    if (ours !== next.mode) problems.push(`${route.path}: scan ${route.render?.mode}, next ${next.mode}`)
-    else if (next.revalidate && time === undefined)
-      problems.push(`${route.path}: next revalidates ${next.revalidate}`)
-  }
+  const problems = compareRenderModes(model, built)
   if (problems.length > 0) failed++
   console.log(
     `${problems.length > 0 ? '✗' : '✓'} ${name}: ${built.size} pages${problems.map((p) => `\n    ${p}`).join('')}`,
   )
 }
 process.exit(failed > 0 ? 1 : 0)
-
-/** Route path -> mode and revalidate column, from the `Route (app)` table. */
-function readTable(out) {
-  const rows = new Map()
-  const start = out.indexOf('Route (app)')
-  for (const line of out.slice(start).split('\n').slice(1)) {
-    // A page with `generateStaticParams` prints without a symbol, its prerendered params below it.
-    // With Cache Components a page with params prints the same way, its own mode on the row below.
-    const m = /^[┌├└│ ]+([○●◐ƒ])?\s*(\/\S*)(.*)$/.exec(line)
-    if (!m) {
-      if (/^\s*$/.test(line)) break
-      continue
-    }
-    const [, symbol, path, rest] = m
-    const known = rows.get(path)
-    if (path === '/_not-found' || (known && (known.symbol || !symbol))) continue
-    // Next 15 also prints size columns (`3.46 kB`): the revalidate column is the first duration.
-    const revalidate = rest.split(/\s+/).find((cell) => /^\d+(s|m|h|d|w|y)$/.test(cell))
-    rows.set(path, {
-      mode: symbol ? SYMBOLS[symbol] : 'static',
-      symbol: Boolean(symbol),
-      ...(revalidate ? { revalidate } : {}),
-    })
-  }
-  return rows
-}
