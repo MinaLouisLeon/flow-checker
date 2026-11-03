@@ -8,11 +8,23 @@
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
 | Rendering | dynamic |
+| Title | `tRPC v11 fixture` |
 | Status | ✓ 1 verified |
 
 ## Rendering
 
 - dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/users/page.tsx:6`
+
+## Boundaries
+
+- While it loads: only the `<Suspense>` parts below
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- `<Suspense>` around `UserList` (page), `src/app/users/page.tsx:10`
+
+## Metadata
+
+- layout `metadata`: title, `src/app/layout.tsx:4`
 
 ## Component tree
 

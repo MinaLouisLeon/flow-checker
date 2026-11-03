@@ -33,6 +33,8 @@ HomePage  server  src/app/page.tsx:5
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:8
 access: open
 render: static
+boundaries: (none)
+title: tRPC v11 fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -41,12 +43,17 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: tRPC v11 fixture  (layout metadata)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:8
 ├─ Suspense  external react
-└─ UserList  client (use client)  src/components/UserList.tsx:6
+└─ UserList  client (use client)  src/components/UserList.tsx:6  [suspense]
 access: open
 render: dynamic
   dynamic: `export const dynamic = 'force-dynamic'` (page)  src/app/users/page.tsx:6
+boundaries:
+  suspense in page around UserList src/app/users/page.tsx:10
+title: tRPC v11 fixture  (layout metadata)

@@ -2,13 +2,22 @@
 
 [← Overview](README.md)
 
-5 open items.
+9 open items.
 
 ## Type mismatches (1)
 
 Captured data does not fit the declared types.
 
 - [`GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products`](components/ProductPanel.md#req_08kv7zxxjyg): Response doesn't match Product\[\]: \[\].price is number 49.9 (expected string) (4 of 4 captures). (`components/ProductPanel.tsx:11`)
+
+## Boundary gaps (4)
+
+Pages with nothing to show while they load, nothing to catch an error or a missing page, and slots or intercepting routes `next build` rejects.
+
+- [`/`](pages/index.md): no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (`lib/api.ts:5`)
+- [`/`](pages/index.md): no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (`lib/api.ts:5`)
+- [`/users/[id]`](pages/users.%5Bid%5D.md): no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (`lib/api.ts:12`)
+- [`/users/[id]`](pages/users.%5Bid%5D.md): no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (`lib/api.ts:12`)
 
 ## Requests the scan could not fully resolve (2)
 

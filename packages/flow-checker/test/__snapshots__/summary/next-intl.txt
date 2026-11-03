@@ -28,5 +28,5 @@ Where things live
   Sends requests  src/lib/auth-api.ts  (3 requests)
   Type            User  (src/types/auth.ts, used 3 times)
 
-To check
-  The scan resolved every page, component, type and request.
+To check (1 open note)
+  Boundary  /[locale]: no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (on 4 pages)  (src/app/[locale]/layout.tsx:19)

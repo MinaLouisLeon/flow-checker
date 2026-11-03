@@ -1,0 +1,16 @@
+# Navigation
+
+## RootLayout  src/app/layout.tsx
+link / -> /  event onClick
+link /dashboard -> /dashboard  event onClick
+link /photos -> /photos  event onClick
+link /reports -> /reports  event onClick
+link /account -> /account  event onClick
+link /blog/hello -> /blog/[slug]  event onClick
+
+## Photos  src/app/photos/page.tsx
+link /photos/:id -> /photos/[id]  event onClick
+
+# Flows
+
+(none)

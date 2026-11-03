@@ -44,4 +44,10 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 
 ## To check
 
-The scan resolved every page, component, type and request.
+5 open notes.
+
+- Boundary: [/products: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/products.md) (src/lib/backend.ts:7)
+- Boundary: [/products: no error boundary: fetches on the server (\`fetch\`), and no \`error\` file, error boundary or \`global-error\` catches a failure](pages/products.md) (src/lib/backend.ts:7)
+- Boundary: [/products/\[id\]: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/products.%5Bid%5D.md) (src/lib/backend.ts:12)
+
+2 more: [all open issues](issues.md).

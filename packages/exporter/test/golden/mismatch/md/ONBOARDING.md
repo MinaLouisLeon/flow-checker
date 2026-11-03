@@ -39,8 +39,10 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 
 ## To check
 
-3 open notes.
+5 open notes.
 
 - Type mismatch: [GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users: Response doesn't match Account\[\]: \[\].id is number 1 (expected string); \[\].avatarUrl is missing (expected string); \[\].role is not in the type (2 of 2 captures).](components/HomePage.md#req_13cmzl2vi57) (app/page.tsx:9)
 - Type mismatch: [GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings: Response doesn't match Settings: digest is null (expected { frequency: "daily" \| "weekly" }) (2 of 2 captures).](components/SettingsPanel.md#req_23elzbn49tu) (components/SettingsPanel.tsx:12)
 - Type mismatch: [POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos: Response doesn't match Todo: userId is string "1" (expected number). Request body doesn't match NewTodo: userId is string "1" (expected number) (1 of 1 capture).](components/TodoPanel.md#req_1m9d40sdmxx) (components/TodoPanel.tsx:19)
+
+2 more: [all open issues](issues.md).

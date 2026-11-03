@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -188,6 +188,29 @@
             "revalidate": 900
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -333,6 +356,44 @@
             "revalidate": 300
           }
         ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/products/page.tsx",
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "wraps": [
+              "ProductList"
+            ],
+            "loc": {
+              "file": "src/app/products/page.tsx",
+              "line": 21,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -386,6 +447,29 @@
             "kind": "cached",
             "effect": "isr",
             "revalidate": 900
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
           }
         ]
       }
@@ -454,6 +538,44 @@
             "revalidate": 900
           }
         ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/todos/[id]/page.tsx",
+            "in": "page",
+            "componentId": "cmp_1an2304y5ca",
+            "wraps": [
+              "TodoDetail"
+            ],
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 20,
+              "column": 5
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -509,6 +631,44 @@
             "effect": "isr",
             "detail": "unstable_cache",
             "revalidate": 60
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/app/users/page.tsx",
+            "in": "page",
+            "componentId": "cmp_0zsf7mc3ftx",
+            "wraps": [
+              "UserList"
+            ],
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 20,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
           }
         ]
       }
@@ -622,6 +782,7 @@
           "name": "ProductList",
           "resolution": "project",
           "componentId": "cmp_2dtufprs15e",
+          "suspense": true,
           "loc": {
             "file": "src/app/products/page.tsx",
             "line": 22,
@@ -629,7 +790,22 @@
           }
         }
       ],
-      "usedTypes": []
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "ProductList"
+          ],
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 21,
+            "column": 7
+          }
+        }
+      ]
     },
     {
       "id": "cmp_12h7lqgksec",
@@ -714,6 +890,7 @@
           "name": "TodoDetail",
           "resolution": "project",
           "componentId": "cmp_0dvf5dfxxis",
+          "suspense": true,
           "loc": {
             "file": "src/app/todos/[id]/page.tsx",
             "line": 21,
@@ -722,6 +899,21 @@
         }
       ],
       "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "TodoDetail"
+          ],
+          "loc": {
+            "file": "src/app/todos/[id]/page.tsx",
+            "line": 20,
+            "column": 5
+          }
+        }
+      ],
       "propsType": {
         "text": "{ params: Promise<{ id: string }> }",
         "shape": {
@@ -792,6 +984,7 @@
           "name": "UserList",
           "resolution": "project",
           "componentId": "cmp_0edmy5fjwi9",
+          "suspense": true,
           "loc": {
             "file": "src/app/users/page.tsx",
             "line": 21,
@@ -799,7 +992,22 @@
           }
         }
       ],
-      "usedTypes": []
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "UserList"
+          ],
+          "loc": {
+            "file": "src/app/users/page.tsx",
+            "line": 20,
+            "column": 7
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1jq9zmbuonm",

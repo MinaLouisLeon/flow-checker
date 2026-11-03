@@ -31,6 +31,8 @@ HomePage  server  src/app/page.tsx:5
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:9
 access: open
 render: static
+boundaries: (none)
+title: Apollo Client 3 fixture  (layout metadata)
 
 ## /search  src/app/search/page.tsx
 layouts: src/app/layout.tsx
@@ -38,6 +40,8 @@ SearchPage  server  src/app/search/page.tsx:3
 └─ Search  client (use client)  src/components/Search.tsx:8
 access: open
 render: static
+boundaries: (none)
+title: Apollo Client 3 fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -46,3 +50,5 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: Apollo Client 3 fixture  (layout metadata)

@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -119,6 +119,26 @@
             }
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "sources": []
       }
     },
     {
@@ -177,6 +197,26 @@
             }
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "sources": []
       }
     },
     {
@@ -235,6 +275,26 @@
             }
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "sources": []
       }
     },
     {
@@ -303,6 +363,26 @@
             }
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-not-found",
+            "in": "layout",
+            "componentId": "cmp_0jf6im1pjt6",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/[locale]/layout.tsx",
+              "line": 19,
+              "column": 44
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "sources": []
       }
     }
   ],

@@ -208,28 +208,37 @@
     {
       "id": "check",
       "title": "To check",
-      "note": "2 open notes",
+      "note": "6 open notes",
       "items": [
         {
-          "label": "Request",
-          "value": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id: No response type was found (annotation, generic or cast).",
-          "detail": "app/users/[id]/page.tsx:9",
+          "label": "Boundary",
+          "value": "/: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
+          "detail": "lib/api.ts:5",
           "link": {
-            "to": "requests",
-            "siteId": "req_0zfyatg6d3b"
+            "to": "page",
+            "routeId": "rt_12v7saiyoj2"
           }
         },
         {
-          "label": "Request",
-          "value": "GET ? todosUrl(): The URL could not be resolved: todosUrl()",
-          "detail": "components/TodoPanel.tsx:12",
+          "label": "Boundary",
+          "value": "/: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure",
+          "detail": "lib/api.ts:5",
           "link": {
-            "to": "requests",
-            "siteId": "req_1e93pbv41le"
+            "to": "page",
+            "routeId": "rt_12v7saiyoj2"
+          }
+        },
+        {
+          "label": "Boundary",
+          "value": "/users/[id]: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
+          "detail": "lib/api.ts:12",
+          "link": {
+            "to": "page",
+            "routeId": "rt_2656kti2wza"
           }
         }
       ],
-      "more": 0,
+      "more": 3,
       "link": {
         "to": "overview"
       },

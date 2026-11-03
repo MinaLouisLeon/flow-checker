@@ -112,3 +112,4 @@ re-run them on their own before assuming a regression.
 | M38 | Render mode per page                              | Done   |
 | M39 | Server cache map                                  | Done   |
 | M40 | Cache check at runtime                            | Done   |
+| M41 | Special files and boundaries                      | Done   |

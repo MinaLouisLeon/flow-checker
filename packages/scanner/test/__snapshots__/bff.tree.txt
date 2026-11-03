@@ -28,6 +28,8 @@ HomePage  server  src/app/page.tsx:4
    └─ Link  external next/link
 access: open
 render: static
+boundaries: (none)
+title: bff fixture  (layout metadata)
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -36,3 +38,5 @@ ProductPage  client (use client)  src/app/products/[id]/page.tsx:8
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: bff fixture  (layout metadata)

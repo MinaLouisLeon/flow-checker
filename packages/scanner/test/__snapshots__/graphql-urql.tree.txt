@@ -30,6 +30,8 @@ HomePage  server  src/app/page.tsx:4
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:16
 access: open
 render: static
+boundaries: (none)
+title: urql fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -38,6 +40,8 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: urql fixture  (layout metadata)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -45,3 +49,5 @@ UsersPage  server  src/app/users/page.tsx:3
 └─ UserList  client (use client)  src/components/UserList.tsx:16
 access: open
 render: static
+boundaries: (none)
+title: urql fixture  (layout metadata)

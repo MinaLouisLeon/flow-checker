@@ -9,7 +9,7 @@ import { href } from '../router'
 import { SocketsSection } from '../SocketView'
 import { StreamsSection } from '../SseView'
 import { TrpcSection } from '../TrpcView'
-import { Empty, Section, SourceLink } from '../ui'
+import { CodeText, Empty, Section, SourceLink } from '../ui'
 import { ImpactPanel } from './ChangesScreen'
 import { CoverageBars } from './WalkScreen'
 
@@ -21,6 +21,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   'unresolved-type': 'Types that are only partly resolved',
   request: 'Requests the scan could not fully resolve',
   middleware: 'Middleware the scan could not fully read',
+  boundary: 'Pages with nothing to show while loading, or nothing to catch an error or a missing page',
 }
 
 export function Overview() {
@@ -296,5 +297,6 @@ function NoteLink({ note }: { note: ScanNote }) {
         : note.typeId
           ? href({ name: 'types', typeId: note.typeId, q: '' })
           : undefined
-  return target ? <a href={target}>{note.message}</a> : <span>{note.message}</span>
+  const message = note.kind === 'boundary' ? <CodeText text={note.message} /> : note.message
+  return target ? <a href={target}>{message}</a> : <span>{message}</span>
 }

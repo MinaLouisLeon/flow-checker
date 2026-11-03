@@ -8,6 +8,7 @@
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | guarded |
 | Rendering | dynamic |
+| Title | `server-actions fixture` |
 | Status | ✓ 1 verified |
 
 ## Access
@@ -19,6 +20,19 @@
 - dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 - dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/products/[id]/page.tsx:5`
 - dynamic: fetches with `cache: 'no-store'` (page), `src/lib/backend.ts:12`
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `src/lib/backend.ts:12`
+- ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `src/lib/backend.ts:12`
+- ⚠ no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page), `src/app/products/[id]/page.tsx:10`
+
+## Metadata
+
+- layout `metadata`: title, `src/app/layout.tsx:3`
 
 ## Component tree
 

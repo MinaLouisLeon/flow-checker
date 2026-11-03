@@ -1,0 +1,31 @@
+# Requests
+
+## Stats  src/app/dashboard/@stats/page.tsx:3
+GET http://localhost:4010/users  fetch  server-render
+  response: User[]
+  via: listUsers src/app/dashboard/@stats/page.tsx:4 > get src/lib/api.ts:13 > fetch src/lib/api.ts:7
+
+## Members  src/app/dashboard/@team/members/page.tsx:3
+GET http://localhost:4010/users  fetch  server-render
+  response: User[]
+  via: listUsers src/app/dashboard/@team/members/page.tsx:4 > get src/lib/api.ts:13 > fetch src/lib/api.ts:7
+
+## DashboardPage  src/app/dashboard/page.tsx:3
+GET http://localhost:4010/todos  fetch  server-render
+  response: Todo[]
+  via: listTodos src/app/dashboard/page.tsx:4 > get src/lib/api.ts:12 > fetch src/lib/api.ts:7
+
+## PhotoPage  src/app/photos/[id]/page.tsx:9
+GET http://localhost:4010/products/:id  fetch  server-render
+  response: Product
+  via: findProduct src/app/photos/[id]/page.tsx:11 > fetch src/lib/api.ts:17
+
+## ReportTable  src/app/reports/page.tsx:6
+GET http://localhost:4010/todos  fetch  server-render
+  response: Todo[]
+  via: listTodos src/app/reports/page.tsx:7 > get src/lib/api.ts:12 > fetch src/lib/api.ts:7
+
+## SettingsPanel  src/app/reports/page.tsx:11
+GET http://localhost:4010/settings  fetch  server-render
+  response: Settings
+  via: getSettings src/app/reports/page.tsx:12 > get src/lib/api.ts:14 > fetch src/lib/api.ts:7

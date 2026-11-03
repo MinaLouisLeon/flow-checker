@@ -30,5 +30,8 @@ Where things live
   Route handlers  app/api/  (1 handler)
   Type            User  (types/user.ts, used 2 times)
 
-To check
-  The scan resolved every page, component, type and request.
+To check (6 open notes)
+  Boundary  /dashboard: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:5)
+  Boundary  /dashboard: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure  (lib/api.ts:5)
+  Boundary  /dashboard/settings: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:10)
+  … 3 more

@@ -6,9 +6,9 @@
 
 | Area | From | Pages | Components | Flows | Endpoints | Shared components | To check |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| [home](#ar_1vn39fso9m3) | `/` | 1 | 2 | 0 | 1 | 1 | 0 |
+| [home](#ar_1vn39fso9m3) | `/` | 1 | 2 | 0 | 1 | 1 | 2 |
 | [about](#ar_1twt91jehoj) | `/about` | 1 | 1 | 0 | 0 | 1 | 0 |
-| [users](#ar_0tirr3qjab5) | `/users` | 1 | 3 | 1 | 3 | 1 | 0 |
+| [users](#ar_0tirr3qjab5) | `/users` | 1 | 3 | 1 | 3 | 1 | 2 |
 
 ## <a id="ar_1vn39fso9m3"></a>home
 
@@ -19,6 +19,7 @@
 | Components | [`HomePage`](components/HomePage.md), [`UserList`](components/UserList.md) |
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Endpoints | [`GET /users`](endpoints.md#ep_16nzt1zcm62) |
+| To check | [2 open notes](issues.md) |
 
 ## <a id="ar_1twt91jehoj"></a>about
 
@@ -39,6 +40,7 @@
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Flows | [DeleteUserButton click](flows/deleteuserbutton-click.md) |
 | Endpoints | [`GET /users/:id`](endpoints.md#ep_1xqlxqpqvbv), [`DELETE /users/:id`](endpoints.md#ep_0l1jfzv9rl3), [`GET /todos`](endpoints.md#ep_0i0im2g2p7v) |
+| To check | [2 open notes](issues.md) |
 
 ## Shared
 

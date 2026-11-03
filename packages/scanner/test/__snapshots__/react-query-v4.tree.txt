@@ -30,6 +30,8 @@ TodosPage  server  src/app/page.tsx:5
 └─ TodoStats  client (use client)  src/components/TodoStats.tsx:9
 access: open
 render: static
+boundaries: (none)
+title: react-query v4 fixture  (layout metadata)
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -38,6 +40,8 @@ SettingsPage  server  src/app/settings/page.tsx:4
 └─ SettingsPanel  client (use client)  src/components/SettingsPanel.tsx:10
 access: open
 render: static
+boundaries: (none)
+title: react-query v4 fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -47,6 +51,8 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: react-query v4 fixture  (layout metadata)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -56,3 +62,5 @@ UsersPage  server  src/app/users/page.tsx:7
 └─ UserList  client (use client)  src/components/UserList.tsx:7
 access: open
 render: static
+boundaries: (none)
+title: react-query v4 fixture  (layout metadata)

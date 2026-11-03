@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -100,6 +100,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Apollo Client 4 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Apollo Client 4 fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -164,6 +187,44 @@
             "detail": "`[id]`"
           }
         ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "suspense",
+            "file": "src/components/TodoDetail.tsx",
+            "in": "component",
+            "componentId": "cmp_1gqfw2iamk9",
+            "wraps": [
+              "TodoView"
+            ],
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 52,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Apollo Client 4 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Apollo Client 4 fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -193,6 +254,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Apollo Client 4 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Apollo Client 4 fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
       }
     }
   ],
@@ -527,6 +611,7 @@
           "name": "TodoView",
           "resolution": "project",
           "componentId": "cmp_1hizq4x2yrv",
+          "suspense": true,
           "loc": {
             "file": "src/components/TodoDetail.tsx",
             "line": 53,
@@ -535,6 +620,21 @@
         }
       ],
       "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "TodoView"
+          ],
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 52,
+            "column": 7
+          }
+        }
+      ],
       "propsType": {
         "text": "{ id: string }",
         "shape": {

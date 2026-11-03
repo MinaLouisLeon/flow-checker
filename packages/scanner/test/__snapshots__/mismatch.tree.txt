@@ -21,3 +21,7 @@ access: open
 render: dynamic
   dynamic: `export const dynamic = 'force-dynamic'` (page)  app/page.tsx:5
   dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:5
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:5
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:5
+title: mismatch fixture  (layout metadata)

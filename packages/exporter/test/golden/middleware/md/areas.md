@@ -7,9 +7,9 @@
 | Area | From | Pages | Components | Flows | Endpoints | Shared components | To check |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | [home](#ar_1vn39fso9m3) | `/` | 1 | 1 | 0 | 0 | 1 | 0 |
-| [dashboard](#ar_1q9mt49i536) | `/dashboard` | 2 | 2 | 0 | 2 | 1 | 0 |
+| [dashboard](#ar_1q9mt49i536) | `/dashboard` | 2 | 2 | 0 | 2 | 1 | 4 |
 | [login](#ar_0pgtfiopjqa) | `/login` | 1 | 1 | 0 | 0 | 1 | 0 |
-| [products](#ar_2erkuzrjb5u) | `/products` | 1 | 1 | 0 | 1 | 1 | 0 |
+| [products](#ar_2erkuzrjb5u) | `/products` | 1 | 1 | 0 | 1 | 1 | 2 |
 
 ## <a id="ar_1vn39fso9m3"></a>home
 
@@ -29,6 +29,7 @@
 | Components | [`DashboardPage`](components/DashboardPage.md), [`SettingsPage`](components/SettingsPage.md) |
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Endpoints | [`GET /users`](endpoints.md#ep_1ummwnixxxj), [`GET /settings`](endpoints.md#ep_0hbwt9tdbrl) |
+| To check | [4 open notes](issues.md) |
 
 ## <a id="ar_0pgtfiopjqa"></a>login
 
@@ -48,6 +49,7 @@
 | Components | [`ProductsPage`](components/ProductsPage.md) |
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Endpoints | [`GET /products`](endpoints.md#ep_16a5uohh2s8) |
+| To check | [2 open notes](issues.md) |
 
 ## Shared
 

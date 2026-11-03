@@ -40,6 +40,8 @@ HomePage  server  app/page.tsx:3
 └─ Link  external next/link
 access: open
 render: static
+boundaries: (none)
+title: middleware fixture  (layout metadata)
 
 ## /dashboard  app/dashboard/page.tsx
 layouts: app/layout.tsx
@@ -51,6 +53,10 @@ access: guarded
 render: dynamic
   dynamic: `export const dynamic = 'force-dynamic'` (page)  app/dashboard/page.tsx:4
   dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:5
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:5
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:5
+title: middleware fixture  (layout metadata)
 
 ## /dashboard/settings  app/dashboard/settings/page.tsx
 layouts: app/layout.tsx
@@ -61,6 +67,10 @@ access: guarded
 render: dynamic
   dynamic: `export const dynamic = 'force-dynamic'` (page)  app/dashboard/settings/page.tsx:3
   dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:10
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:10
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:10
+title: middleware fixture  (layout metadata)
 
 ## /login  app/login/page.tsx
 layouts: app/layout.tsx
@@ -68,6 +78,8 @@ LoginPage  server  app/login/page.tsx:1
 access: guarded
   redirects to `/dashboard` when `cookie session is set` (middleware)  proxy.ts:20
 render: static
+boundaries: (none)
+title: middleware fixture  (layout metadata)
 
 ## /products  app/products/page.tsx
 layouts: app/layout.tsx
@@ -76,3 +88,7 @@ access: open
 render: dynamic
   dynamic: `export const dynamic = 'force-dynamic'` (page)  app/products/page.tsx:3
   dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:15
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:15
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:15
+title: middleware fixture  (layout metadata)

@@ -22,6 +22,8 @@ HomePage  server  app/page.tsx:5
 └─ Link  external next/link
 access: open
 render: static
+boundaries: (none)
+title: WebSocket fixture  (layout metadata)
 
 ## /chat  app/chat/page.tsx
 layouts: app/layout.tsx
@@ -29,3 +31,5 @@ ChatPage  server  app/chat/page.tsx:3
 └─ Chat  client (use client)  components/Chat.tsx:9
 access: open
 render: static
+boundaries: (none)
+title: WebSocket fixture  (layout metadata)

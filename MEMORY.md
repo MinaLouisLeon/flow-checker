@@ -48,6 +48,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M38 | Render mode           | Model version 13, `Route.render`. Walk records `RenderUse`s; `scanner/src/render.ts` adds segment config and the mode.   |
 | M39 | Server cache map      | Model version 14, `AppModel.cache`. Walk records `CacheFound` / `InvalidationFound`; `scanner/src/cache.ts` links them.  |
 | M40 | Cache check (runtime) | Runtime reads Next's own records (fetch metrics, cache handlers, `IncrementalCache.get`); served model gets `runtime`.   |
+| M41 | Boundaries            | Model version 15, `Route.boundaries` / `metadata`. Refs carry `suspense` / `errorBoundary`; `scanner/src/boundaries.ts`. |
 
 ## Gotchas
 
@@ -526,3 +527,21 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   bundled line. Matching by URL is the fallback, as for request sites.
 - The recordings that `matching.test.ts` uses must exercise every request site; the caching recordings don't (cache
   hits send nothing), so they are only used by the cache tests.
+
+## M41 — Special files and boundaries (branch `feat/special-files-and-boundaries-m41`)
+
+- Next 16.4's `next build` stops at the first prerender error, so check one case per build: `cases.sh`-style, move all
+  case folders out of `app/` and copy one back per build. Strict route matching (16.4) fails the build for a slot with
+  no page or `default` for a URL a sibling slot or `children` matches, and for an intercepting route with no plain page.
+  So a planted slot gap can't live in a fixture that `render-check` builds: it is in `boundaries.test.ts` instead.
+- A folder's `loading` / `error` never cover the layout in the same folder (Next renders them inside it). The page and
+  deeper layouts are covered; `global-error` covers everything. `boundaries.ts` compares folder indexes for this.
+- `params` / `searchParams` only block with Cache Components when awaited (`await`, `use()`, `.then`): a page that hands
+  `params` to a child inside `<Suspense>` builds. The `caching` fixture's `/todos/[id]` is that case and caught it.
+- Titles: Next skips the template of the layout in the page's own folder (`i < metadataItems.length - 2` in
+  `resolve-metadata.js`) and a plain string title resets the template for what is below. Checked against built HTML.
+- A boundary's `wraps` must look inside components too (`<Catch>{children}</Catch>`), or a layout's `<Suspense>`
+  around a wrapper doesn't count for `children`.
+- Note messages are escaped in `issues.md` (`text()`); boundary notes are the tool's own wording, so they go out raw and
+  the dashboard renders them with `CodeText`. A table cell with `|` (a title template) must be escaped.
+- The Python-in-heredoc escape trap struck again (`'\n'` in `lines.join`): use the Edit tool for those lines.

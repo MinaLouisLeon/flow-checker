@@ -6,7 +6,7 @@
 
 | Area | From | Pages | Components | Flows | Endpoints | Shared components | To check |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| [home](#ar_1vn39fso9m3) | `/` | 1 | 1 | 0 | 0 | 1 | 0 |
+| [home](#ar_1vn39fso9m3) | `/` | 1 | 1 | 0 | 0 | 1 | 1 |
 | [dashboard](#ar_1q9mt49i536) | `/[locale]/dashboard` | 1 | 2 | 0 | 1 | 1 | 0 |
 | [login](#ar_0pgtfiopjqa) | `/[locale]/login` | 1 | 2 | 1 | 1 | 1 | 0 |
 | [verify](#ar_1fio74g3hsz) | `/[locale]/verify` | 1 | 2 | 0 | 1 | 1 | 0 |
@@ -19,6 +19,7 @@
 | Pages | [`/[locale]`](pages/%5Blocale%5D.md) |
 | Components | [`HomePage`](components/HomePage.md) |
 | Shared components | [`LocaleLayout`](components/LocaleLayout.md) |
+| To check | [1 open note](issues.md) |
 
 ## <a id="ar_1q9mt49i536"></a>dashboard
 

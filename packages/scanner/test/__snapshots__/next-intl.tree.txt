@@ -39,6 +39,9 @@ access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
 render: static
   info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
 
 ## /[locale]/dashboard  src/app/[locale]/dashboard/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -49,6 +52,9 @@ access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
 render: static
   info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
 
 ## /[locale]/login  src/app/[locale]/login/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -58,6 +64,9 @@ access: guarded
   shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout)  src/app/[locale]/layout.tsx:19
 render: static
   info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none
 
 ## /[locale]/verify  src/app/[locale]/verify/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -69,3 +78,6 @@ access: guarded
 render: dynamic
   dynamic: reads `searchParams`, which come with each request (page)  src/app/[locale]/verify/page.tsx:4
   info: `generateStaticParams` lists the params to prerender (layout)  src/app/[locale]/layout.tsx:7
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
+title: none

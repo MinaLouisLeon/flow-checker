@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -146,6 +146,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "SSE fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "SSE fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -251,6 +274,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "SSE fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "SSE fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -290,6 +336,29 @@
             "effect": "dynamic",
             "in": "page",
             "detail": "`[id]`"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "SSE fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "SSE fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
           }
         ]
       }

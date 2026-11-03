@@ -8,6 +8,7 @@
 | Layouts | [`LocaleLayout`](../components/LocaleLayout.md) (`src/app/[locale]/layout.tsx`) |
 | Access | guarded |
 | Rendering | dynamic |
+| Title | none |
 | Status | ✓ 1 verified |
 
 ## Access
@@ -18,6 +19,13 @@
 
 - dynamic: reads `searchParams`, which come with each request (page), `src/app/[locale]/verify/page.tsx:4`
 - info: `generateStaticParams` lists the params to prerender (layout), `src/app/[locale]/layout.tsx:7`
+
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- ⚠ no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout), `src/app/[locale]/layout.tsx:19`
 
 ## Component tree
 
