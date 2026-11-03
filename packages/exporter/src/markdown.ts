@@ -18,6 +18,7 @@ import {
   type Area,
   type AreaList,
   accessOf,
+  boundaryText,
   buildAreas,
   buildEndpoints,
   buildIndex,
@@ -49,9 +50,11 @@ import {
   GLOSSARY,
   type GraphqlInfo,
   type GraphqlOperation,
+  gapLine,
   guardText,
   invalidationText,
   invalidationWhere,
+  isBuildError,
   isInfoFlag,
   isVerified,
   type MatcherCondition,
@@ -60,6 +63,7 @@ import {
   matchedSiteIds,
   mismatchField,
   type Navigation,
+  type PageBoundary,
   type PostmanContract,
   type PostmanRequest,
   type PostmanSource,
@@ -82,6 +86,7 @@ import {
   type Trpc,
   type TypeRef,
   termId,
+  titleText,
   triggerText,
   typeRefs,
   urlText,
@@ -647,11 +652,22 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
       ['Layouts', layouts.join(' → ') || undefined],
       ['Access', accessOf(route).status],
       ['Rendering', renderLabel(renderOf(route))],
+      [
+        'Title',
+        route.metadata
+          ? route.metadata.title
+            ? // A `|` (`%s | Shop`) would end the table cell.
+              code(route.metadata.title).replace(/\|/g, '\\|')
+            : titleText(route.metadata)
+          : undefined,
+      ],
       ['Status', sites.length > 0 ? statusCounts(sites) : undefined],
     ]),
     ...accessSection(ctx, route),
     ...renderSection(route),
+    ...boundarySection(route),
     ...cacheSection(ctx, route, from),
+    ...metadataSection(route),
     '## Component tree',
     route.componentId
       ? componentTree(ctx, route.componentId, from)
@@ -698,6 +714,39 @@ function renderSection(route: Route): string[] {
     (r) => `- ${renderReasonLine(r)}${r.loc ? `, ${code(`${r.loc.file}:${r.loc.line}`)}` : ''}`,
   )
   return ['## Rendering', lines.join('\n')]
+}
+
+/** Special files and boundaries (M41): what the page shows while loading, on an error, and the gaps. */
+function boundarySection(route: Route): string[] {
+  const boundaries = route.boundaries
+  if (!boundaries) return []
+  const nearest = (kind: PageBoundary['kind']) => boundaries.items.find((i) => i.kind === kind && i.nearest)
+  const shown = (item: PageBoundary | undefined, none: string) => (item ? code(item.file) : none)
+  const lines = [
+    `- While it loads: ${shown(nearest('loading'), boundaries.items.some((i) => i.kind === 'suspense') ? 'only the `<Suspense>` parts below' : 'nothing, navigation waits for the page')}`,
+    `- On an error: ${shown(nearest('error') ?? nearest('global-error'), "Next's default error page")}`,
+    `- On \`notFound()\`: ${shown(nearest('not-found'), "Next's default 404 page")}`,
+    ...boundaries.items
+      .filter((i) => i.in !== 'segment')
+      .map((i) => `- ${boundaryText(i)}${i.loc ? `, ${code(`${i.loc.file}:${i.loc.line}`)}` : ''}`),
+    ...boundaries.gaps.map(
+      (g) =>
+        `- ${isBuildError(g) ? '⛔' : '⚠'} ${gapLine(g)}${g.loc ? `, ${code(`${g.loc.file}:${g.loc.line}`)}` : ''}`,
+    ),
+  ]
+  return ['## Boundaries', lines.join('\n')]
+}
+
+/** `metadata` / `generateMetadata` from the layouts and the page (M41). */
+function metadataSection(route: Route): string[] {
+  const sources = route.metadata?.sources ?? []
+  if (sources.length === 0) return []
+  const lines = sources.map((m) => {
+    const fields = m.fields ? m.fields.join(', ') || 'nothing' : "fields the scan can't read"
+    const template = m.template ? `, template ${code(m.template)}` : ''
+    return `- ${m.in} ${code(m.kind)}: ${fields}${template}, ${code(`${m.loc.file}:${m.loc.line}`)}`
+  })
+  return ['## Metadata', lines.join('\n')]
 }
 
 /** Server cache (M39): what the page renders with from the cache, and what refreshes it. */
@@ -1988,6 +2037,11 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: 'The code changed after every capture. Use the app again to re-check.',
   },
   {
+    title: 'Boundary gaps',
+    kinds: ['boundary'],
+    hint: 'Pages with nothing to show while they load, nothing to catch an error or a missing page, and slots or intercepting routes `next build` rejects.',
+  },
+  {
     title: 'Requests the scan could not fully resolve',
     kinds: ['request'],
     hint: 'Dynamic URLs, unknown methods or response types. Live capture fills these in.',
@@ -2084,9 +2138,16 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     target = componentLink(ctx, note.componentId, from)
   } else if (note.routeId) {
     const route = ctx.index.routes.get(note.routeId)
-    if (route) target = routeLink(ctx, route, from)
+    if (route) {
+      target = routeLink(ctx, route, from)
+      // Boundary notes start with the page, which the link already shows.
+      const prefix = `${route.path}${route.slot ? ` @${route.slot}` : ''}: `
+      if (message.startsWith(prefix)) message = message.slice(prefix.length)
+    }
   }
-  return `${target ? `${target}: ` : ''}${text(message)} (${where})`
+  // Boundary notes are the tool's own wording, with code in backticks (M41).
+  const body = note.kind === 'boundary' ? message : text(message)
+  return `${target ? `${target}: ` : ''}${body} (${where})`
 }
 
 // --- Endpoints (M29) ------------------------------------------------------------------------

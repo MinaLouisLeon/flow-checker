@@ -44,4 +44,10 @@ No flows found: no event handler leads to a request or another page.
 
 ## To check
 
-The scan resolved every page, component, type and request.
+6 open notes.
+
+- Boundary: [/dashboard: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/dashboard.md) (lib/api.ts:5)
+- Boundary: [/dashboard: no error boundary: fetches on the server (\`fetch\`), and no \`error\` file, error boundary or \`global-error\` catches a failure](pages/dashboard.md) (lib/api.ts:5)
+- Boundary: [/dashboard/settings: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/dashboard.settings.md) (lib/api.ts:10)
+
+3 more: [all open issues](issues.md).

@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -125,6 +125,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -191,6 +214,29 @@
             "revalidate": 300
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -245,6 +291,29 @@
             "revalidate": 86400
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -284,6 +353,54 @@
             "effect": "dynamic",
             "in": "page",
             "detail": "`[id]`"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_1rad9auprew",
+            "siteId": "req_21ftrjtuxeu",
+            "detail": "fetch",
+            "loc": {
+              "file": "lib/todos.js",
+              "line": 12,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_1rad9auprew",
+            "siteId": "req_21ftrjtuxeu",
+            "detail": "fetch",
+            "loc": {
+              "file": "lib/todos.js",
+              "line": 12,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "caching-15 fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "caching-15 fixture",
+            "loc": {
+              "file": "app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
           }
         ]
       }

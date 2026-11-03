@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "middleware",
   "model": {
-    "version": 14,
+    "version": 15,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -119,6 +119,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "middleware fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "middleware fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -224,6 +247,54 @@
               "detail": "cache: 'no-store'"
             }
           ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-fallback",
+              "in": "page",
+              "componentId": "cmp_23rukepv8uh",
+              "siteId": "req_02gshaf9oil",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 5,
+                "column": 21
+              }
+            },
+            {
+              "kind": "no-error-boundary",
+              "in": "page",
+              "componentId": "cmp_23rukepv8uh",
+              "siteId": "req_02gshaf9oil",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 5,
+                "column": 21
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "title": "middleware fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "middleware fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -312,6 +383,54 @@
               "detail": "cache: 'no-store'"
             }
           ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-fallback",
+              "in": "page",
+              "componentId": "cmp_005b14gxu7r",
+              "siteId": "req_0q6t9lmdld7",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 10,
+                "column": 21
+              }
+            },
+            {
+              "kind": "no-error-boundary",
+              "in": "page",
+              "componentId": "cmp_005b14gxu7r",
+              "siteId": "req_0q6t9lmdld7",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 10,
+                "column": 21
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "title": "middleware fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "middleware fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -356,6 +475,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "middleware fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "middleware fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -408,6 +550,54 @@
               "kind": "fetch",
               "effect": "dynamic",
               "detail": "cache: 'no-store'"
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-fallback",
+              "in": "page",
+              "componentId": "cmp_23k37s13z1d",
+              "siteId": "req_263u38ocrza",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 15,
+                "column": 21
+              }
+            },
+            {
+              "kind": "no-error-boundary",
+              "in": "page",
+              "componentId": "cmp_23k37s13z1d",
+              "siteId": "req_263u38ocrza",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 15,
+                "column": 21
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "title": "middleware fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "middleware fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
             }
           ]
         }

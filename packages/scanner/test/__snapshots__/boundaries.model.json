@@ -1,0 +1,3089 @@
+{
+  "version": 15,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx",
+      "global-error": "src/app/global-error.tsx",
+      "not-found": "src/app/not-found.tsx",
+      "forbidden": "src/app/forbidden.tsx",
+      "unauthorized": "src/app/unauthorized.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "account",
+          "kind": "static",
+          "name": "account"
+        },
+        "dir": "src/app/account",
+        "files": {
+          "page": "src/app/account/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "blog",
+          "kind": "static",
+          "name": "blog"
+        },
+        "dir": "src/app/blog",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[slug]",
+              "kind": "dynamic",
+              "name": "slug"
+            },
+            "dir": "src/app/blog/[slug]",
+            "files": {
+              "page": "src/app/blog/[slug]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        },
+        "dir": "src/app/dashboard",
+        "files": {
+          "layout": "src/app/dashboard/layout.tsx",
+          "page": "src/app/dashboard/page.tsx",
+          "loading": "src/app/dashboard/loading.tsx",
+          "error": "src/app/dashboard/error.tsx",
+          "default": "src/app/dashboard/default.tsx"
+        },
+        "children": [
+          {
+            "segment": {
+              "raw": "@stats",
+              "kind": "slot",
+              "name": "stats"
+            },
+            "dir": "src/app/dashboard/@stats",
+            "files": {
+              "page": "src/app/dashboard/@stats/page.tsx",
+              "default": "src/app/dashboard/@stats/default.tsx"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "@team",
+              "kind": "slot",
+              "name": "team"
+            },
+            "dir": "src/app/dashboard/@team",
+            "files": {
+              "page": "src/app/dashboard/@team/page.tsx",
+              "default": "src/app/dashboard/@team/default.tsx"
+            },
+            "children": [
+              {
+                "segment": {
+                  "raw": "members",
+                  "kind": "static",
+                  "name": "members"
+                },
+                "dir": "src/app/dashboard/@team/members",
+                "files": {
+                  "page": "src/app/dashboard/@team/members/page.tsx"
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "segment": {
+              "raw": "settings",
+              "kind": "static",
+              "name": "settings"
+            },
+            "dir": "src/app/dashboard/settings",
+            "files": {
+              "page": "src/app/dashboard/settings/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "photos",
+          "kind": "static",
+          "name": "photos"
+        },
+        "dir": "src/app/photos",
+        "files": {
+          "layout": "src/app/photos/layout.tsx",
+          "page": "src/app/photos/page.tsx",
+          "not-found": "src/app/photos/not-found.tsx"
+        },
+        "children": [
+          {
+            "segment": {
+              "raw": "@modal",
+              "kind": "slot",
+              "name": "modal"
+            },
+            "dir": "src/app/photos/@modal",
+            "files": {
+              "default": "src/app/photos/@modal/default.tsx"
+            },
+            "children": [
+              {
+                "segment": {
+                  "raw": "(.)[id]",
+                  "kind": "dynamic",
+                  "name": "id",
+                  "intercept": "(.)"
+                },
+                "dir": "src/app/photos/@modal/(.)[id]",
+                "files": {
+                  "page": "src/app/photos/@modal/(.)[id]/page.tsx"
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/photos/[id]",
+            "files": {
+              "page": "src/app/photos/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "reports",
+          "kind": "static",
+          "name": "reports"
+        },
+        "dir": "src/app/reports",
+        "files": {
+          "template": "src/app/reports/template.tsx",
+          "page": "src/app/reports/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bvhjg8zu96",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1cis2tinktq",
+      "path": "/account",
+      "kind": "page",
+      "file": "src/app/account/page.tsx",
+      "segments": [
+        {
+          "raw": "account",
+          "kind": "static",
+          "name": "account"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0azm4ecqz6g",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_1sr6qsuj7cb",
+            "kind": "unauthorized",
+            "in": "page",
+            "componentId": "cmp_0azm4ecqz6g",
+            "condition": "!session",
+            "loc": {
+              "file": "src/app/account/page.tsx",
+              "line": 7,
+              "column": 17
+            }
+          },
+          {
+            "id": "gd_25t92l4oxxc",
+            "kind": "forbidden",
+            "in": "page",
+            "componentId": "cmp_0azm4ecqz6g",
+            "condition": "session && store.get('role')?.value !== 'admin'",
+            "loc": {
+              "file": "src/app/account/page.tsx",
+              "line": 8,
+              "column": 45
+            }
+          }
+        ]
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_0azm4ecqz6g",
+            "loc": {
+              "file": "src/app/account/page.tsx",
+              "line": 5,
+              "column": 23
+            },
+            "kind": "request-api",
+            "effect": "dynamic",
+            "detail": "cookies"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_26pdaiodyqz",
+      "path": "/blog/[slug]",
+      "kind": "page",
+      "file": "src/app/blog/[slug]/page.tsx",
+      "segments": [
+        {
+          "raw": "blog",
+          "kind": "static",
+          "name": "blog"
+        },
+        {
+          "raw": "[slug]",
+          "kind": "dynamic",
+          "name": "slug"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1d227aq2xna",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_00vh8t07lo0",
+            "kind": "not-found",
+            "in": "page",
+            "componentId": "cmp_1d227aq2xna",
+            "condition": "!post",
+            "loc": {
+              "file": "src/app/blog/[slug]/page.tsx",
+              "line": 16,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "render": {
+        "mode": "static",
+        "reasons": [
+          {
+            "kind": "static-params",
+            "effect": "info",
+            "in": "page",
+            "loc": {
+              "file": "src/app/blog/[slug]/page.tsx",
+              "line": 4,
+              "column": 1
+            }
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Post {slug} | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "generateMetadata",
+            "in": "page",
+            "file": "src/app/blog/[slug]/page.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Post {slug}",
+            "loc": {
+              "file": "src/app/blog/[slug]/page.tsx",
+              "line": 8,
+              "column": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_0qxgv32ep62",
+      "path": "/dashboard",
+      "kind": "page",
+      "file": "src/app/dashboard/@stats/page.tsx",
+      "segments": [
+        {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        },
+        {
+          "raw": "@stats",
+          "kind": "slot",
+          "name": "stats"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/dashboard/layout.tsx",
+          "componentId": "cmp_0rdpl9y1qda"
+        }
+      ],
+      "slot": "stats",
+      "componentId": "cmp_1pvkmhcvngs",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_1pvkmhcvngs",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 7,
+              "column": 21
+            },
+            "siteId": "req_0e9212au3xx",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "loading",
+            "file": "src/app/dashboard/loading.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "error",
+            "file": "src/app/dashboard/error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/dashboard/layout.tsx",
+            "in": "layout",
+            "componentId": "cmp_0rdpl9y1qda",
+            "wraps": [
+              "stats"
+            ],
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 18,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Dashboard | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/dashboard/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Dashboard",
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_27jq7memw41",
+      "path": "/dashboard",
+      "kind": "page",
+      "file": "src/app/dashboard/@team/page.tsx",
+      "segments": [
+        {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        },
+        {
+          "raw": "@team",
+          "kind": "slot",
+          "name": "team"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/dashboard/layout.tsx",
+          "componentId": "cmp_0rdpl9y1qda"
+        }
+      ],
+      "slot": "team",
+      "componentId": "cmp_1t6uleovh13",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "loading",
+            "file": "src/app/dashboard/loading.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "error",
+            "file": "src/app/dashboard/error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/dashboard/layout.tsx",
+            "in": "layout",
+            "componentId": "cmp_0rdpl9y1qda",
+            "wraps": [
+              "stats"
+            ],
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 18,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Dashboard | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/dashboard/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Dashboard",
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1ssct9yyk6m",
+      "path": "/dashboard",
+      "kind": "page",
+      "file": "src/app/dashboard/page.tsx",
+      "segments": [
+        {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/dashboard/layout.tsx",
+          "componentId": "cmp_0rdpl9y1qda"
+        }
+      ],
+      "componentId": "cmp_1a521icitkt",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_1a521icitkt",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 7,
+              "column": 21
+            },
+            "siteId": "req_1sh5oq5w2tw",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "loading",
+            "file": "src/app/dashboard/loading.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "error",
+            "file": "src/app/dashboard/error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/dashboard/layout.tsx",
+            "in": "layout",
+            "componentId": "cmp_0rdpl9y1qda",
+            "wraps": [
+              "stats"
+            ],
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 18,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Dashboard | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/dashboard/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Dashboard",
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_0pxjzo4ytu4",
+      "path": "/dashboard/members",
+      "kind": "page",
+      "file": "src/app/dashboard/@team/members/page.tsx",
+      "segments": [
+        {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        },
+        {
+          "raw": "@team",
+          "kind": "slot",
+          "name": "team"
+        },
+        {
+          "raw": "members",
+          "kind": "static",
+          "name": "members"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/dashboard/layout.tsx",
+          "componentId": "cmp_0rdpl9y1qda"
+        }
+      ],
+      "slot": "team",
+      "componentId": "cmp_1yo0rgkqyiu",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_1yo0rgkqyiu",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 7,
+              "column": 21
+            },
+            "siteId": "req_0vlkuxrr5ld",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "loading",
+            "file": "src/app/dashboard/loading.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "error",
+            "file": "src/app/dashboard/error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/dashboard/layout.tsx",
+            "in": "layout",
+            "componentId": "cmp_0rdpl9y1qda",
+            "wraps": [
+              "stats"
+            ],
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 18,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Dashboard | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/dashboard/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Dashboard",
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1gefpughg7f",
+      "path": "/dashboard/settings",
+      "kind": "page",
+      "file": "src/app/dashboard/settings/page.tsx",
+      "segments": [
+        {
+          "raw": "dashboard",
+          "kind": "static",
+          "name": "dashboard"
+        },
+        {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/dashboard/layout.tsx",
+          "componentId": "cmp_0rdpl9y1qda"
+        }
+      ],
+      "componentId": "cmp_0p0balcfy4h",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "loading",
+            "file": "src/app/dashboard/loading.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "error",
+            "file": "src/app/dashboard/error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/dashboard/layout.tsx",
+            "in": "layout",
+            "componentId": "cmp_0rdpl9y1qda",
+            "wraps": [
+              "stats"
+            ],
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 18,
+              "column": 7
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Settings",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/dashboard/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Dashboard",
+            "loc": {
+              "file": "src/app/dashboard/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "page",
+            "file": "src/app/dashboard/settings/page.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Settings",
+            "loc": {
+              "file": "src/app/dashboard/settings/page.tsx",
+              "line": 1,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_0k7o8twlege",
+      "path": "/photos",
+      "kind": "page",
+      "file": "src/app/photos/page.tsx",
+      "segments": [
+        {
+          "raw": "photos",
+          "kind": "static",
+          "name": "photos"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/photos/layout.tsx",
+          "componentId": "cmp_0cge0r2flvu"
+        }
+      ],
+      "componentId": "cmp_0nel3kji06q",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "not-found",
+            "file": "src/app/photos/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Photos | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "page",
+            "file": "src/app/photos/page.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Photos",
+            "loc": {
+              "file": "src/app/photos/page.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1n17szzvwa9",
+      "path": "/photos/[id]",
+      "kind": "page",
+      "file": "src/app/photos/@modal/(.)[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "photos",
+          "kind": "static",
+          "name": "photos"
+        },
+        {
+          "raw": "@modal",
+          "kind": "slot",
+          "name": "modal"
+        },
+        {
+          "raw": "(.)[id]",
+          "kind": "dynamic",
+          "name": "id",
+          "intercept": "(.)"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/photos/layout.tsx",
+          "componentId": "cmp_0cge0r2flvu"
+        }
+      ],
+      "slot": "modal",
+      "intercepting": {
+        "marker": "(.)",
+        "from": "/photos"
+      },
+      "componentId": "cmp_1v1mt0xn2dm",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`(.)[id]`"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "not-found",
+            "file": "src/app/photos/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_0iscbbovfb0",
+      "path": "/photos/[id]",
+      "kind": "page",
+      "file": "src/app/photos/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "photos",
+          "kind": "static",
+          "name": "photos"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/photos/layout.tsx",
+          "componentId": "cmp_0cge0r2flvu"
+        }
+      ],
+      "componentId": "cmp_1d7i35jzbp0",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_29re83siamc",
+            "kind": "not-found",
+            "in": "page",
+            "componentId": "cmp_1d7i35jzbp0",
+            "condition": "!product",
+            "loc": {
+              "file": "src/app/photos/[id]/page.tsx",
+              "line": 12,
+              "column": 17
+            }
+          }
+        ]
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          },
+          {
+            "in": "page",
+            "componentId": "cmp_1d7i35jzbp0",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 17,
+              "column": 21
+            },
+            "siteId": "req_1rw7pbfer9a",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment"
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "not-found",
+            "file": "src/app/photos/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          }
+        ],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_1d7i35jzbp0",
+            "siteId": "req_1rw7pbfer9a",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 17,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Photo {id} | Boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "generateMetadata",
+            "in": "page",
+            "file": "src/app/photos/[id]/page.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Photo {id}",
+            "loc": {
+              "file": "src/app/photos/[id]/page.tsx",
+              "line": 4,
+              "column": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "rt_1yfj5i2ce5k",
+      "path": "/reports",
+      "kind": "page",
+      "file": "src/app/reports/page.tsx",
+      "segments": [
+        {
+          "raw": "reports",
+          "kind": "static",
+          "name": "reports"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "template",
+          "file": "src/app/reports/template.tsx",
+          "componentId": "cmp_0e9wrf75jtz"
+        }
+      ],
+      "componentId": "cmp_1aodno2cgi1",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_1aodno2cgi1",
+            "loc": {
+              "file": "src/app/reports/page.tsx",
+              "line": 19,
+              "column": 24
+            },
+            "kind": "request-api",
+            "effect": "dynamic",
+            "detail": "cookies"
+          },
+          {
+            "in": "component",
+            "componentId": "cmp_0mplv9u4407",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 7,
+              "column": 21
+            },
+            "siteId": "req_12d7vt6v4qr",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [
+          {
+            "kind": "not-found",
+            "file": "src/app/not-found.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "forbidden",
+            "file": "src/app/forbidden.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "unauthorized",
+            "file": "src/app/unauthorized.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "global-error",
+            "file": "src/app/global-error.tsx",
+            "in": "segment",
+            "nearest": true
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/reports/page.tsx",
+            "in": "page",
+            "componentId": "cmp_1aodno2cgi1",
+            "wraps": [
+              "ReportTable"
+            ],
+            "loc": {
+              "file": "src/app/reports/page.tsx",
+              "line": 22,
+              "column": 7
+            }
+          },
+          {
+            "kind": "suspense",
+            "file": "src/app/reports/page.tsx",
+            "in": "page",
+            "componentId": "cmp_1aodno2cgi1",
+            "wraps": [
+              "ErrorBoundary",
+              "SettingsPanel"
+            ],
+            "loc": {
+              "file": "src/app/reports/page.tsx",
+              "line": 25,
+              "column": 7
+            }
+          },
+          {
+            "kind": "error-boundary",
+            "file": "src/app/reports/page.tsx",
+            "in": "page",
+            "componentId": "cmp_1aodno2cgi1",
+            "wraps": [
+              "SettingsPanel"
+            ],
+            "loc": {
+              "file": "src/app/reports/page.tsx",
+              "line": 26,
+              "column": 9
+            }
+          }
+        ],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Reports",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title",
+              "description"
+            ],
+            "title": "Boundaries",
+            "template": "%s | Boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "page",
+            "file": "src/app/reports/page.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Reports",
+            "absolute": true,
+            "loc": {
+              "file": "src/app/reports/page.tsx",
+              "line": 16,
+              "column": 14
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_0azm4ecqz6g",
+      "name": "AccountPage",
+      "file": "src/app/account/page.tsx",
+      "loc": {
+        "file": "src/app/account/page.tsx",
+        "line": 4,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1d227aq2xna",
+      "name": "PostPage",
+      "file": "src/app/blog/[slug]/page.tsx",
+      "loc": {
+        "file": "src/app/blog/[slug]/page.tsx",
+        "line": 13,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ slug: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "slug",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1pvkmhcvngs",
+      "name": "Stats",
+      "file": "src/app/dashboard/@stats/page.tsx",
+      "loc": {
+        "file": "src/app/dashboard/@stats/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1yo0rgkqyiu",
+      "name": "Members",
+      "file": "src/app/dashboard/@team/members/page.tsx",
+      "loc": {
+        "file": "src/app/dashboard/@team/members/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1t6uleovh13",
+      "name": "Team",
+      "file": "src/app/dashboard/@team/page.tsx",
+      "loc": {
+        "file": "src/app/dashboard/@team/page.tsx",
+        "line": 1,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0rdpl9y1qda",
+      "name": "DashboardLayout",
+      "file": "src/app/dashboard/layout.tsx",
+      "loc": {
+        "file": "src/app/dashboard/layout.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Suspense",
+          "resolution": "external",
+          "module": "react",
+          "loc": {
+            "file": "src/app/dashboard/layout.tsx",
+            "line": 18,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "stats"
+          ],
+          "loc": {
+            "file": "src/app/dashboard/layout.tsx",
+            "line": 18,
+            "column": 7
+          }
+        }
+      ],
+      "propsType": {
+        "text": "{ children: ReactNode; team: ReactNode; stats: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            },
+            {
+              "name": "team",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            },
+            {
+              "name": "stats",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1a521icitkt",
+      "name": "DashboardPage",
+      "file": "src/app/dashboard/page.tsx",
+      "loc": {
+        "file": "src/app/dashboard/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0p0balcfy4h",
+      "name": "DashboardSettings",
+      "file": "src/app/dashboard/settings/page.tsx",
+      "loc": {
+        "file": "src/app/dashboard/settings/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 10,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/layout.tsx",
+            "line": 15,
+            "column": 11
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1bvhjg8zu96",
+      "name": "Home",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 1,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1v1mt0xn2dm",
+      "name": "PhotoModal",
+      "file": "src/app/photos/@modal/(.)[id]/page.tsx",
+      "loc": {
+        "file": "src/app/photos/@modal/(.)[id]/page.tsx",
+        "line": 3,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Modal",
+          "resolution": "project",
+          "componentId": "cmp_1te0rkmmezj",
+          "module": "@/components/modal",
+          "loc": {
+            "file": "src/app/photos/@modal/(.)[id]/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1d7i35jzbp0",
+      "name": "PhotoPage",
+      "file": "src/app/photos/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/photos/[id]/page.tsx",
+        "line": 9,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0cge0r2flvu",
+      "name": "PhotosLayout",
+      "file": "src/app/photos/layout.tsx",
+      "loc": {
+        "file": "src/app/photos/layout.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode; modal: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            },
+            {
+              "name": "modal",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0nel3kji06q",
+      "name": "Photos",
+      "file": "src/app/photos/page.tsx",
+      "loc": {
+        "file": "src/app/photos/page.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/photos/page.tsx",
+            "line": 10,
+            "column": 11
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0mplv9u4407",
+      "name": "ReportTable",
+      "file": "src/app/reports/page.tsx",
+      "loc": {
+        "file": "src/app/reports/page.tsx",
+        "line": 6,
+        "column": 16
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0u8zfnsxal7",
+      "name": "SettingsPanel",
+      "file": "src/app/reports/page.tsx",
+      "loc": {
+        "file": "src/app/reports/page.tsx",
+        "line": 11,
+        "column": 16
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1aodno2cgi1",
+      "name": "ReportsPage",
+      "file": "src/app/reports/page.tsx",
+      "loc": {
+        "file": "src/app/reports/page.tsx",
+        "line": 18,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Suspense",
+          "resolution": "external",
+          "module": "react",
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 22,
+            "column": 7
+          }
+        },
+        {
+          "name": "ReportTable",
+          "resolution": "project",
+          "componentId": "cmp_0mplv9u4407",
+          "suspense": true,
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 23,
+            "column": 9
+          }
+        },
+        {
+          "name": "ErrorBoundary",
+          "resolution": "project",
+          "componentId": "cmp_0ywhc0z65tw",
+          "module": "@/components/error-boundary",
+          "suspense": true,
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 26,
+            "column": 9
+          }
+        },
+        {
+          "name": "SettingsPanel",
+          "resolution": "project",
+          "componentId": "cmp_0u8zfnsxal7",
+          "suspense": true,
+          "errorBoundary": true,
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 27,
+            "column": 11
+          }
+        }
+      ],
+      "usedTypes": [],
+      "boundaries": [
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "ReportTable"
+          ],
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 22,
+            "column": 7
+          }
+        },
+        {
+          "kind": "suspense",
+          "name": "Suspense",
+          "fallback": true,
+          "wraps": [
+            "ErrorBoundary",
+            "SettingsPanel"
+          ],
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 25,
+            "column": 7
+          }
+        },
+        {
+          "kind": "error-boundary",
+          "name": "ErrorBoundary",
+          "wraps": [
+            "SettingsPanel"
+          ],
+          "loc": {
+            "file": "src/app/reports/page.tsx",
+            "line": 26,
+            "column": 9
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_0e9wrf75jtz",
+      "name": "ReportsTemplate",
+      "file": "src/app/reports/template.tsx",
+      "loc": {
+        "file": "src/app/reports/template.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0ywhc0z65tw",
+      "name": "ErrorBoundary",
+      "file": "src/components/error-boundary.tsx",
+      "loc": {
+        "file": "src/components/error-boundary.tsx",
+        "line": 6,
+        "column": 14
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ fallback: ReactNode; children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "fallback",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            },
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1te0rkmmezj",
+      "name": "Modal",
+      "file": "src/components/modal.tsx",
+      "loc": {
+        "file": "src/components/modal.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_1s1917ih72u",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_2awuae7bdft",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 7,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_13cc5ekstvg",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 12,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1zioj79pkch",
+      "name": "Settings",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/types.ts",
+        "line": 18,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "theme",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_0e9212au3xx",
+      "origin": "component",
+      "componentId": "cmp_1pvkmhcvngs",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_2awuae7bdft",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/dashboard/@stats/page.tsx",
+          "line": 4,
+          "column": 23,
+          "callee": "listUsers"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 13,
+          "column": 32,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "03m3wuzjjx8"
+    },
+    {
+      "id": "req_0vlkuxrr5ld",
+      "origin": "component",
+      "componentId": "cmp_1yo0rgkqyiu",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_2awuae7bdft",
+            "name": "User"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/dashboard/@team/members/page.tsx",
+          "line": 4,
+          "column": 23,
+          "callee": "listUsers"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 13,
+          "column": 32,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1qkm9japwos"
+    },
+    {
+      "id": "req_1sh5oq5w2tw",
+      "origin": "component",
+      "componentId": "cmp_1a521icitkt",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1s1917ih72u",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/dashboard/page.tsx",
+          "line": 4,
+          "column": 23,
+          "callee": "listTodos"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 12,
+          "column": 32,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1t6m40ww6ri"
+    },
+    {
+      "id": "req_1rw7pbfer9a",
+      "origin": "component",
+      "componentId": "cmp_1d7i35jzbp0",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}/products/${id}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/products/:id"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_13cc5ekstvg",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/photos/[id]/page.tsx",
+          "line": 11,
+          "column": 25,
+          "callee": "findProduct"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 17,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "10l0gtiwo4k"
+    },
+    {
+      "id": "req_12d7vt6v4qr",
+      "origin": "component",
+      "componentId": "cmp_0mplv9u4407",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_1s1917ih72u",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/reports/page.tsx",
+          "line": 7,
+          "column": 23,
+          "callee": "listTodos"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 12,
+          "column": 32,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1h72f8mjxaa"
+    },
+    {
+      "id": "req_0kn6rdhpr3j",
+      "origin": "component",
+      "componentId": "cmp_0u8zfnsxal7",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1zioj79pkch",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/reports/page.tsx",
+          "line": 12,
+          "column": 26,
+          "callee": "getSettings"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 14,
+          "column": 34,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 7,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "11fo3qmptb9"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_0sqx1rg2c3a",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 15,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_0gai838vctu",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/dashboard\"",
+        "confidence": "exact",
+        "path": "/dashboard"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 38
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 15,
+        "column": 38
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 38,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1ssct9yyk6m"
+    },
+    {
+      "id": "nav_0q9yc2mi8ax",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/photos\"",
+        "confidence": "exact",
+        "path": "/photos"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 16,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 16,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 16,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0k7o8twlege"
+    },
+    {
+      "id": "nav_1wx4e5h3ktm",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/reports\"",
+        "confidence": "exact",
+        "path": "/reports"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 16,
+          "column": 46
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 16,
+        "column": 46
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 16,
+          "column": 46,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1yfj5i2ce5k"
+    },
+    {
+      "id": "nav_123ciqn5vfs",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/account\"",
+        "confidence": "exact",
+        "path": "/account"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 17,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 17,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 17,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_1cis2tinktq"
+    },
+    {
+      "id": "nav_0z6f74qoag6",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/blog/hello\"",
+        "confidence": "exact",
+        "path": "/blog/hello"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 17,
+          "column": 48
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 17,
+        "column": 48
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 17,
+          "column": 48,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_26pdaiodyqz"
+    },
+    {
+      "id": "nav_1dg1pnorgf9",
+      "origin": "component",
+      "componentId": "cmp_0nel3kji06q",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/photos/${id}`",
+        "confidence": "pattern",
+        "path": "/photos/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/photos/page.tsx",
+          "line": 10,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/photos/page.tsx",
+        "line": 10,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/photos/page.tsx",
+          "line": 10,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0iscbbovfb0"
+    }
+  ],
+  "flows": [],
+  "queryLinks": [],
+  "imports": {
+    "src/app/blog/[slug]/page.tsx": [
+      "src/lib/posts.ts"
+    ],
+    "src/app/dashboard/@stats/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/app/dashboard/@team/members/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/app/dashboard/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/app/photos/@modal/(.)[id]/page.tsx": [
+      "src/components/modal.tsx"
+    ],
+    "src/app/photos/[id]/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/app/reports/page.tsx": [
+      "src/components/error-boundary.tsx",
+      "src/lib/api.ts"
+    ],
+    "src/lib/api.ts": [
+      "src/types.ts"
+    ]
+  }
+}

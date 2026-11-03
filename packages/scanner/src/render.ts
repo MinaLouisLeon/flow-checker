@@ -70,7 +70,19 @@ export function addRouteRender(input: RenderInput): void {
       for (const unread of facts.unread) {
         add({ kind: 'unread', effect: 'unknown', in: place, detail: unread.text, loc: unread.loc })
       }
-      if (cacheComponents) continue
+      if (cacheComponents) {
+        // `instant = false` lets a page block on request data: Next renders it per request (ƒ).
+        if (facts.instantFalse) {
+          add({
+            kind: 'segment-config',
+            effect: 'dynamic',
+            in: place,
+            detail: 'instant = false',
+            loc: facts.instantFalse,
+          })
+        }
+        continue
+      }
       for (const config of facts.config) {
         if (config.name === 'fetchCache' && typeof config.value === 'string') fetchCache.push(config.value)
         const reason = configReason(config, place)
@@ -164,6 +176,9 @@ export function modeOf(
   cacheComponents: boolean,
 ): Pick<RouteRender, 'mode' | 'revalidate'> {
   const has = (effect: RenderReason['effect']) => reasons.some((r) => r.effect === effect)
+  // `instant = false` (Cache Components): no static shell, the page renders per request (ƒ).
+  if (cacheComponents && reasons.some((r) => r.kind === 'segment-config' && r.detail === 'instant = false'))
+    return { mode: 'dynamic' }
   const times = reasons.flatMap((r) =>
     r.effect === 'isr' && r.revalidate !== undefined ? [r.revalidate] : [],
   )
@@ -303,6 +318,8 @@ interface FileFacts {
   staticParams?: SourceLoc
   /** Where the page (or its `generateMetadata`) reads `searchParams`. */
   searchParams?: SourceLoc
+  /** `export const instant = false` (Cache Components: the page may block on request data). */
+  instantFalse?: SourceLoc
 }
 
 const CONFIG_NAMES = ['dynamic', 'revalidate', 'fetchCache'] as const
@@ -325,11 +342,14 @@ function readFile(file: SourceFile, root: string): FileFacts {
       facts.config.push({ name, value, loc: loc(decl) })
     }
   }
+  const instant = exported.get('instant')?.[0]
+  const instantInit = instant && N.isVariableDeclaration(instant) ? instant.getInitializer() : undefined
+  if (instant && instantInit && literalOf(instantInit) === false) facts.instantFalse = loc(instant)
   const params = exported.get('generateStaticParams')?.[0]
   if (params) facts.staticParams = loc(params)
   for (const name of ['default', 'generateMetadata']) {
     const fn = functionOf(exported.get(name)?.[0])
-    const read = fn ? searchParamsRead(fn) : undefined
+    const read = fn ? propRead(fn, 'searchParams') : undefined
     if (read) {
       facts.searchParams = loc(read)
       break
@@ -359,7 +379,7 @@ function configReason(config: SegmentConfig, place: Place): RenderReason | undef
 }
 
 /** A string, number or `false` literal (through `as const`, `satisfies` and parentheses). */
-function literalOf(node: Node): string | number | false | undefined {
+export function literalOf(node: Node): string | number | false | undefined {
   let value = node
   while (N.isAsExpression(value) || N.isSatisfiesExpression(value) || N.isParenthesizedExpression(value)) {
     value = value.getExpression()
@@ -370,7 +390,8 @@ function literalOf(node: Node): string | number | false | undefined {
   return undefined
 }
 
-function functionOf(decl: Node | undefined): Node | undefined {
+/** The function a declaration holds: a function declaration, or a variable set to an arrow or function. */
+export function functionOf(decl: Node | undefined): Node | undefined {
   if (!decl) return undefined
   if (N.isFunctionDeclaration(decl) || N.isArrowFunction(decl) || N.isFunctionExpression(decl)) return decl
   if (N.isVariableDeclaration(decl)) {
@@ -380,22 +401,20 @@ function functionOf(decl: Node | undefined): Node | undefined {
   return undefined
 }
 
-/** `({ searchParams })` or `props.searchParams` in the function's first parameter. */
-function searchParamsRead(fn: Node): Node | undefined {
+/** `({ searchParams })` or `props.searchParams` (any prop name) in the function's first parameter. */
+export function propRead(fn: Node, prop: string): Node | undefined {
   if (!N.isFunctionDeclaration(fn) && !N.isArrowFunction(fn) && !N.isFunctionExpression(fn)) return undefined
   const param = fn.getParameters()[0]
   if (!param) return undefined
   const name = param.getNameNode()
   if (N.isObjectBindingPattern(name)) {
-    return name
-      .getElements()
-      .find((e) => (e.getPropertyNameNode()?.getText() ?? e.getName()) === 'searchParams')
+    return name.getElements().find((e) => (e.getPropertyNameNode()?.getText() ?? e.getName()) === prop)
   }
   if (!N.isIdentifier(name)) return undefined
   const text = name.getText()
   return fn
     .getDescendantsOfKind(ts.SyntaxKind.PropertyAccessExpression)
-    .find((p) => p.getName() === 'searchParams' && p.getExpression().getText() === text)
+    .find((p) => p.getName() === prop && p.getExpression().getText() === text)
 }
 
 /** `cacheComponents: true` (or Next 15's `experimental.dynamicIO: true`) in the Next config. */

@@ -235,8 +235,37 @@
     {
       "id": "check",
       "title": "To check",
-      "items": [],
-      "more": 0,
+      "note": "6 open notes",
+      "items": [
+        {
+          "label": "Boundary",
+          "value": "/dashboard: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
+          "detail": "lib/api.ts:5",
+          "link": {
+            "to": "page",
+            "routeId": "rt_0cs0esrbng7"
+          }
+        },
+        {
+          "label": "Boundary",
+          "value": "/dashboard: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure",
+          "detail": "lib/api.ts:5",
+          "link": {
+            "to": "page",
+            "routeId": "rt_0cs0esrbng7"
+          }
+        },
+        {
+          "label": "Boundary",
+          "value": "/dashboard/settings: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
+          "detail": "lib/api.ts:10",
+          "link": {
+            "to": "page",
+            "routeId": "rt_19fnqh7vbsp"
+          }
+        }
+      ],
+      "more": 3,
       "link": {
         "to": "overview"
       },

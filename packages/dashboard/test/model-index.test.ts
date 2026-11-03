@@ -87,9 +87,21 @@ describe('buildIndex on fixtures', () => {
   })
 
   it('has no scan notes for the clean fixtures', () => {
+    // Boundary gaps (M41) are about the app, not what the scan could read.
     for (const name of ['basic', 'bff', 'next-intl', 'react-query', 'server-actions']) {
-      expect(buildIndex(fixture(name)).notes, name).toEqual([])
+      expect(
+        buildIndex(fixture(name)).notes.filter((n) => n.kind !== 'boundary'),
+        name,
+      ).toEqual([])
     }
+  })
+
+  it('files a gap that repeats on every page under a layout as one note', () => {
+    const notes = buildIndex(fixture('next-intl')).notes.filter((n) => n.kind === 'boundary')
+    expect(notes.map((n) => n.message)).toEqual([
+      '/[locale]: no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (on 4 pages)',
+    ])
+    expect(buildIndex(fixture('basic')).notes.filter((n) => n.kind === 'boundary')).toHaveLength(4)
   })
 })
 

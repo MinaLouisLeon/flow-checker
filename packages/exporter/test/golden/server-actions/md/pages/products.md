@@ -8,6 +8,7 @@
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
 | Rendering | dynamic |
+| Title | `server-actions fixture` |
 | Status | ✓ 2 verified |
 
 ## Rendering
@@ -15,12 +16,24 @@
 - dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/products/page.tsx:5`
 - dynamic: fetches with `cache: 'no-store'` (page), `src/lib/backend.ts:7`
 
+## Boundaries
+
+- While it loads: nothing, navigation waits for the page
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `src/lib/backend.ts:7`
+- ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `src/lib/backend.ts:7`
+
 ## Server cache
 
 Refreshed by:
 
 - `revalidatePath('/products')` in server action `createProduct`, `src/actions/products.ts:25`
 - `revalidatePath('/products')` in server action `deleteProduct`, `src/actions/products.ts:32`
+
+## Metadata
+
+- layout `metadata`: title, `src/app/layout.tsx:3`
 
 ## Component tree
 

@@ -6,8 +6,8 @@
 
 | Area | From | Pages | Components | Flows | Endpoints | Shared components | To check |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| [home](#ar_1vn39fso9m3) | `/` | 1 | 3 | 1 | 4 | 1 | 2 |
-| [users](#ar_0tirr3qjab5) | `/users` | 1 | 2 | 1 | 2 | 1 | 1 |
+| [home](#ar_1vn39fso9m3) | `/` | 1 | 3 | 1 | 4 | 1 | 4 |
+| [users](#ar_0tirr3qjab5) | `/users` | 1 | 2 | 1 | 2 | 1 | 3 |
 
 ## <a id="ar_1vn39fso9m3"></a>home
 
@@ -19,7 +19,7 @@
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Flows | [TodoPanel submit](flows/todopanel-submit.md) |
 | Endpoints | [`GET /users`](endpoints.md#ep_16nzt1zcm62), [`GET /products`](endpoints.md#ep_1xk43u1zuzy), [`GET /todos`](endpoints.md#ep_26ggeb6bo31), [`POST /todos`](endpoints.md#ep_1tgnolqki2r) |
-| To check | [2 open notes](issues.md) |
+| To check | [4 open notes](issues.md) |
 
 ## <a id="ar_0tirr3qjab5"></a>users
 
@@ -31,7 +31,7 @@
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Flows | [DeleteUserButton click](flows/deleteuserbutton-click.md) |
 | Endpoints | [`GET /users/:id`](endpoints.md#ep_1xqlxqpqvbv), [`DELETE /users/:id`](endpoints.md#ep_0l1jfzv9rl3) |
-| To check | [1 open note](issues.md) |
+| To check | [3 open notes](issues.md) |
 
 ## Shared
 

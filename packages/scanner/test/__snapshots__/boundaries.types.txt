@@ -1,0 +1,31 @@
+# Types
+
+Todo  interface  src/types.ts:1
+  { id: number; title: string; done: boolean }
+User  interface  src/types.ts:7
+  { id: number; name: string }
+Product  interface  src/types.ts:12
+  { id: number; name: string; price: number }
+Settings  interface  src/types.ts:18
+  { theme: string; locale: string }
+
+# Component types
+
+PostPage  src/app/blog/[slug]/page.tsx:13
+  props: { params: Promise<{ slug: string }> }
+DashboardLayout  src/app/dashboard/layout.tsx:5
+  props: { children: ReactNode; team: ReactNode; stats: ReactNode }
+RootLayout  src/app/layout.tsx:10
+  props: { children: ReactNode }
+PhotoModal  src/app/photos/@modal/(.)[id]/page.tsx:3
+  props: { params: Promise<{ id: string }> }
+PhotoPage  src/app/photos/[id]/page.tsx:9
+  props: { params: Promise<{ id: string }> }
+PhotosLayout  src/app/photos/layout.tsx:3
+  props: { children: ReactNode; modal: ReactNode }
+ReportsTemplate  src/app/reports/template.tsx:3
+  props: { children: ReactNode }
+ErrorBoundary  src/components/error-boundary.tsx:6
+  props: { fallback: ReactNode; children: ReactNode }
+Modal  src/components/modal.tsx:6
+  props: { children: ReactNode }

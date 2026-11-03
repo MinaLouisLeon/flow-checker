@@ -1,8 +1,15 @@
 // Component trees: from each page/layout, follow JSX element references through
 // imports (barrels and path aliases included) to build the component graph (docs/PLAN.md 6.3).
-import { type Component, type ComponentRef, makeId, type SourceLoc } from '@flow-checker/shared'
+import {
+  type Component,
+  type ComponentBoundary,
+  type ComponentRef,
+  makeId,
+  type SourceLoc,
+} from '@flow-checker/shared'
 import {
   type CallExpression,
+  type JsxElement,
   type JsxOpeningElement,
   type JsxSelfClosingElement,
   type JsxTagNameExpression,
@@ -37,6 +44,9 @@ export class ComponentGraph {
   readonly #byNode = new Map<Node, string>()
   readonly #components = new Map<string, Component>()
   readonly #directiveCache = new Map<SourceFile, boolean>()
+  /** Class components that catch errors (`componentDidCatch` / `getDerivedStateFromError`). */
+  readonly #catching = new Set<string>()
+  readonly #boundaryTags = new Map<Node, ComponentBoundary['kind'] | null>()
   readonly #types: TypeResolver
 
   readonly #scanned: (file: string) => boolean
@@ -94,7 +104,10 @@ export class ComponentGraph {
     // Register before walking children so recursive components terminate.
     this.#byNode.set(key, id)
     this.#components.set(id, component)
+    if (catchesErrors(decl.body)) this.#catching.add(id)
     component.children = this.#children(decl.body)
+    const boundaries = this.#boundaries(decl.body)
+    if (boundaries.length > 0) component.boundaries = boundaries
     const props = propsOf(decl.body)
     if (props) component.propsType = this.#types.fromNode(props)
     component.usedTypes = this.#usedTypes(decl.body, props)
@@ -134,10 +147,13 @@ export class ComponentGraph {
         const id = target.componentId ?? `${target.module ?? ''}#${tag.getText()}`
         const key = target.chosen ? `${tag.getText()}>${id}` : id
         const conditional = target.chosen || isConditional(element, body)
+        const inside = this.#insideBoundaries(element, body)
         const existing = refs.get(key)
         if (existing) {
-          // Conditional only if every occurrence is conditional.
+          // Conditional (or inside a boundary) only if every occurrence is.
           if (!conditional) delete existing.conditional
+          if (!inside.has('suspense')) delete existing.suspense
+          if (!inside.has('error-boundary')) delete existing.errorBoundary
           continue
         }
         refs.set(key, {
@@ -148,11 +164,65 @@ export class ComponentGraph {
           ...(target.factory ? { factory: target.factory } : {}),
           ...(conditional ? { conditional: true } : {}),
           ...(target.dynamic ? { dynamic: true } : {}),
+          ...(inside.has('suspense') ? { suspense: true as const } : {}),
+          ...(inside.has('error-boundary') ? { errorBoundary: true as const } : {}),
           loc: this.#loc(element),
         })
       }
     }
     return [...refs.values()]
+  }
+
+  /** The boundaries around `element` inside `body`; a `fallback` prop is not inside its `<Suspense>`. */
+  #insideBoundaries(element: Node, body: Node): Set<ComponentBoundary['kind']> {
+    const kinds = new Set<ComponentBoundary['kind']>()
+    let child: Node = element
+    for (let node = element.getParent(); node && node !== body; node = node.getParent()) {
+      if (N.isJsxElement(node) && child !== node.getOpeningElement()) {
+        const kind = this.#boundaryKind(node.getOpeningElement().getTagNameNode())
+        if (kind) kinds.add(kind)
+      }
+      child = node
+    }
+    return kinds
+  }
+
+  /** `<Suspense>` and error boundaries in a component's JSX, with what each wraps. */
+  #boundaries(body: Node): ComponentBoundary[] {
+    const out: ComponentBoundary[] = []
+    for (const element of body.getDescendantsOfKind(ts.SyntaxKind.JsxElement)) {
+      const opening = element.getOpeningElement()
+      const tag = opening.getTagNameNode()
+      const kind = this.#boundaryKind(tag)
+      if (!kind) continue
+      const fallback = kind === 'suspense' && opening.getAttributes().some(isFallbackAttribute)
+      out.push({
+        kind,
+        name: tag.getText(),
+        ...(fallback ? { fallback: true as const } : {}),
+        wraps: wrapsOf(element),
+        loc: this.#loc(element),
+      })
+    }
+    return out
+  }
+
+  #boundaryKind(tag: JsxTagNameExpression): ComponentBoundary['kind'] | undefined {
+    const cached = this.#boundaryTags.get(tag)
+    if (cached !== undefined) return cached ?? undefined
+    let kind: ComponentBoundary['kind'] | null = null
+    if (!isIntrinsic(tag)) {
+      const module = importModuleOf(tag)
+      const name = importedName(tag)
+      if (module === 'react' && name === 'Suspense') kind = 'suspense'
+      else if (module === 'react-error-boundary' && name === 'ErrorBoundary') kind = 'error-boundary'
+      else {
+        const target = this.#resolveTag(tag)
+        if (target.componentId && this.#catching.has(target.componentId)) kind = 'error-boundary'
+      }
+    }
+    this.#boundaryTags.set(tag, kind)
+    return kind ?? undefined
   }
 
   /**
@@ -303,6 +373,61 @@ export class ComponentGraph {
         sides?.has('client') && sides.has('server') ? 'shared' : sides?.has('client') ? 'client' : 'server'
     }
   }
+}
+
+/** The name a tag has where it is declared: `Suspense` for `S` from `import { Suspense as S }` and `React.Suspense`. */
+function importedName(tag: JsxTagNameExpression): string | undefined {
+  if (N.isPropertyAccessExpression(tag)) return tag.getName()
+  const symbol = tag.getSymbol()
+  if (!symbol) return tag.getText()
+  for (const decl of symbol.getDeclarations()) {
+    // `getName()` is the exported name, before any `as`.
+    if (N.isImportSpecifier(decl)) return decl.getName()
+  }
+  return symbol.getName()
+}
+
+function isFallbackAttribute(attr: Node): boolean {
+  return N.isJsxAttribute(attr) && attr.getNameNode().getText() === 'fallback'
+}
+
+/** A class component with `componentDidCatch` or `static getDerivedStateFromError`. */
+function catchesErrors(body: Node): boolean {
+  if (!N.isClassDeclaration(body) && !N.isClassExpression(body)) return false
+  return body
+    .getMembers()
+    .some(
+      (m) =>
+        N.isMethodDeclaration(m) && ['componentDidCatch', 'getDerivedStateFromError'].includes(m.getName()),
+    )
+}
+
+/**
+ * What a boundary wraps, as written: the components inside it and the props it renders
+ * (`{children}`, `{props.modal}`), also when they are handed to a component inside it.
+ */
+function wrapsOf(element: JsxElement): string[] {
+  const out = new Set<string>()
+  const visit = (node: Node) => {
+    if (N.isJsxElement(node) || N.isJsxSelfClosingElement(node)) {
+      const tag = N.isJsxElement(node) ? node.getOpeningElement().getTagNameNode() : node.getTagNameNode()
+      // Components count as written; props they are handed (`<Catch>{children}</Catch>`) count too.
+      if (!isIntrinsic(tag)) out.add(tag.getText())
+      if (N.isJsxSelfClosingElement(node)) return
+    }
+    if (N.isJsxExpression(node)) {
+      const expr = node.getExpression()
+      if (expr && N.isIdentifier(expr)) out.add(expr.getText())
+      else if (expr && N.isPropertyAccessExpression(expr) && N.isIdentifier(expr.getExpression()))
+        out.add(expr.getName())
+      else if (expr) expr.forEachChild(visit)
+      return
+    }
+    if (N.isJsxOpeningElement(node) || N.isJsxClosingElement(node)) return
+    node.forEachChild(visit)
+  }
+  for (const child of element.getJsxChildren()) visit(child)
+  return [...out]
 }
 
 /** Leading string directives of a file, e.g. `['use client']`. */

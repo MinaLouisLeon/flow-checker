@@ -106,6 +106,27 @@ How Next renders a page in a production build, as read from the code. `next dev`
 | <a id="render-partial"></a>**partial** | Cache Components: a static shell is prerendered and the parts that read the request or uncached data stream in per request. | Each reason must sit inside `<Suspense>` (or `use cache`), or the build fails. |
 | <a id="render-unknown"></a>**render ?** (`unknown`) | The scan could not tell: a config value or a call it could not read. | Open the page to see what could not be read. |
 
+## Boundaries
+
+What Next shows while a page loads, when it throws or when it calls `notFound()`, read from the special files in its folders and the `<Suspense>` and error boundaries it renders.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="boundary-loading"></a>**loading** | A `loading` file: shown while the page in its folder (and the layouts in folders below) load. It does not cover the layout in its own folder. |  |
+| <a id="boundary-error"></a>**error** | An `error` file: shown when the page in its folder (or a layout in a folder below) throws. It does not catch the layout in its own folder. |  |
+| <a id="boundary-not-found"></a>**not-found** | A `not-found` file: shown when `notFound()` is called below its folder. The one in the app folder also answers URLs no page has. |  |
+| <a id="boundary-forbidden"></a>**forbidden** | A `forbidden` file: shown when `forbidden()` is called below its folder (`authInterrupts`). |  |
+| <a id="boundary-unauthorized"></a>**unauthorized** | An `unauthorized` file: shown when `unauthorized()` is called below its folder (`authInterrupts`). |  |
+| <a id="boundary-global-error"></a>**global-error** | The `global-error` file in the app folder: replaces the whole page, root layout included, when nothing nearer catches an error. |  |
+| <a id="boundary-suspense"></a>**\<Suspense\>** (`suspense`) | A `<Suspense>` a layout, the page or a component renders: its `fallback` shows while what is inside loads. |  |
+| <a id="boundary-error-boundary"></a>**error boundary** (`error-boundary`) | A component that catches what its children throw (`react-error-boundary`, or a class with `componentDidCatch` / `getDerivedStateFromError`). |  |
+| <a id="boundary-blocking-route"></a>**blocks the build** (`blocking-route`) | Cache Components: the page reads request data (`cookies()`, an uncached `fetch`, awaited `params` or `searchParams`) outside `<Suspense>`, so `next build` fails. | Wrap the part that reads it in `<Suspense>` (or add a `loading` file beside the page), cache it with `use cache`, or set `export const instant = false`. |
+| <a id="boundary-no-fallback"></a>**no loading state** (`no-fallback`) | The page is rendered per request and waits for a server request with nothing to show meanwhile: navigating to it seems stuck until the data arrives. | Add a `loading` file beside the page, or wrap the part that fetches in `<Suspense>`. |
+| <a id="boundary-no-error-boundary"></a>**no error boundary** (`no-error-boundary`) | The page fetches fresh data on the server, and no `error` file, error boundary or `global-error` catches a failure, so visitors get Next's default error page. | Add an `error` file in a folder above the page (or `global-error` in the app folder). |
+| <a id="boundary-no-not-found"></a>**no not-found page** (`no-not-found`) | `notFound()`, `forbidden()` or `unauthorized()` is called with no file of that name above it, so Next shows its plain default page. | Add the file in a folder above the call (for a layout, above its own folder). |
+| <a id="boundary-slot-no-match"></a>**slot without default** (`slot-no-match`) | A parallel slot (`@name`) of a layout around the page has no page for its URL and no `default` file. Next 16 fails the build; earlier versions show 404 on a full page load. | Add a `default` file to the slot (returning `null` or calling `notFound()`). |
+| <a id="boundary-no-canonical"></a>**no page to intercept** (`no-canonical`) | An intercepting route (`(.)`) has no plain page at the URL it intercepts, so a refresh or shared link has nothing to show. Next 16 fails the build. | Add the page at that URL, outside the slot. |
+
 ## Server cache
 
 What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).

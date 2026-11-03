@@ -26,6 +26,8 @@ Where things live
   Type            Todo  (types/index.ts, used 3 times)
   Type            Product  (types/index.ts, used 2 times)
 
-To check (2 open notes)
-  Request  GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id: No response type was found (annotation, generic or cast).  (app/users/[id]/page.tsx:9)
-  Request  GET ? todosUrl(): The URL could not be resolved: todosUrl()  (components/TodoPanel.tsx:12)
+To check (6 open notes)
+  Boundary  /: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:5)
+  Boundary  /: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure  (lib/api.ts:5)
+  Boundary  /users/[id]: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:12)
+  … 3 more

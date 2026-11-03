@@ -207,8 +207,37 @@
     {
       "id": "check",
       "title": "To check",
-      "items": [],
-      "more": 0,
+      "note": "4 open notes",
+      "items": [
+        {
+          "label": "Boundary",
+          "value": "/: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
+          "detail": "lib/api.ts:14",
+          "link": {
+            "to": "page",
+            "routeId": "rt_12v7saiyoj2"
+          }
+        },
+        {
+          "label": "Boundary",
+          "value": "/: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure",
+          "detail": "lib/api.ts:14",
+          "link": {
+            "to": "page",
+            "routeId": "rt_12v7saiyoj2"
+          }
+        },
+        {
+          "label": "Boundary",
+          "value": "/users/[id]: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
+          "detail": "lib/api.ts:20",
+          "link": {
+            "to": "page",
+            "routeId": "rt_2656kti2wza"
+          }
+        }
+      ],
+      "more": 1,
       "link": {
         "to": "overview"
       },

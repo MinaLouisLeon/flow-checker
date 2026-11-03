@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "graphql-urql",
   "model": {
-    "version": 14,
+    "version": 15,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -105,6 +105,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "urql fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "src/app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "urql fixture",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -169,6 +192,29 @@
               "detail": "`[id]`"
             }
           ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "urql fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "src/app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "urql fixture",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -198,6 +244,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "urql fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "src/app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "urql fixture",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       }
     ],

@@ -40,16 +40,21 @@ access: open
 render: ISR 15m
   ISR 1h: caches with `use cache` and `cacheLife('hours')` (page)  src/lib/todos.ts:8
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+boundaries: (none)
+title: caching fixture  (layout metadata)
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
 ProductsPage  server  src/app/products/page.tsx:17
 ├─ Suspense  external react
-└─ ProductList  server  src/app/products/page.tsx:4
+└─ ProductList  server  src/app/products/page.tsx:4  [suspense]
 access: open
 render: ISR 5m
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
   ISR 5m: fetches with `next: { revalidate: 300 }` (component)  src/lib/products.ts:6
+boundaries:
+  suspense in page around ProductList src/app/products/page.tsx:21
+title: caching fixture  (layout metadata)
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -58,27 +63,35 @@ access: open
 render: ISR 15m
   ISR 15m: caches with `use cache` (page)  src/lib/settings.ts:8
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
+boundaries: (none)
+title: caching fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
 TodoPage  server  src/app/todos/[id]/page.tsx:18
 ├─ Suspense  external react
-└─ TodoDetail  server  src/app/todos/[id]/page.tsx:5
+└─ TodoDetail  server  src/app/todos/[id]/page.tsx:5  [suspense]
 access: open
 render: partial
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
   ISR 15m: caches with `use cache` (component)  src/lib/todos.ts:14
+boundaries:
+  suspense in page around TodoDetail src/app/todos/[id]/page.tsx:20
+title: caching fixture  (layout metadata)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:16
 ├─ Suspense  external react
-└─ UserList  server  src/app/users/page.tsx:5
+└─ UserList  server  src/app/users/page.tsx:5  [suspense]
 access: open
 render: ISR 1m
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
   ISR 1m: caches with `unstable_cache` (component)  src/lib/users.js:10
+boundaries:
+  suspense in page around UserList src/app/users/page.tsx:20
+title: caching fixture  (layout metadata)
 
 # Server cache
 

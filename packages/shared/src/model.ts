@@ -184,6 +184,109 @@ export const RouteRenderSchema = z.object({
 })
 export type RouteRender = z.infer<typeof RouteRenderSchema>
 
+// Special files and boundaries (M41): what Next shows while a page loads, when it throws or calls
+// `notFound()`, and the gaps where nothing catches it. Checked against `next build` (16.4): a
+// folder's `loading` and `error` wrap its page and the layouts below it, never its own layout.
+
+/** Special files that act as a boundary for the pages below their folder. */
+export const BOUNDARY_FILES = [
+  'loading',
+  'error',
+  'not-found',
+  'forbidden',
+  'unauthorized',
+  'global-error',
+] as const
+
+export const PageBoundarySchema = z.object({
+  /**
+   * A special file in one of the page's folders (`global-error` in the app folder), or `suspense`:
+   * a `<Suspense>` that a layout, the page or a component renders, or `error-boundary`: a component
+   * that catches errors (`react-error-boundary`, or a class with `componentDidCatch`).
+   */
+  kind: z.enum([...BOUNDARY_FILES, 'suspense', 'error-boundary']),
+  /** The special file, or the file of the component that renders the boundary. */
+  file: z.string(),
+  /** `segment`: a special file. Otherwise where the boundary is rendered. */
+  in: z.enum(['segment', 'layout', 'page', 'component']),
+  componentId: z.string().optional(),
+  /** Special files: the one Next shows when the page itself suspends, throws or calls the function. */
+  nearest: z.literal(true).optional(),
+  /** `<Suspense>` and error boundaries: what they wrap, as written (`children`, `TodoList`). */
+  wraps: z.array(z.string()).optional(),
+  loc: SourceLocSchema.optional(),
+})
+export type PageBoundary = z.infer<typeof PageBoundarySchema>
+
+export const BoundaryGapSchema = z.object({
+  /**
+   * `blocking-route`: Cache Components, request data (`cookies()`, an uncached `fetch`, `params`,
+   * `searchParams`) read outside `<Suspense>`; `next build` fails. `no-fallback`: a page rendered per
+   * request waits for a server request with no `loading` file or `<Suspense>` to show meanwhile.
+   * `no-error-boundary`: a page rendered per request fetches on the server and no `error` file,
+   * error boundary or `global-error` catches a failure. `no-not-found`: `notFound()`, `forbidden()`
+   * or `unauthorized()` with no file of that name above it. `slot-no-match`: a parallel slot of a
+   * layout around the page has no page for its URL and no `default` file. `no-canonical`: an
+   * intercepting route with no plain page at the URL it intercepts.
+   */
+  kind: z.enum([
+    'blocking-route',
+    'no-fallback',
+    'no-error-boundary',
+    'no-not-found',
+    'slot-no-match',
+    'no-canonical',
+  ]),
+  /** Where it is: a layout around the page, the page, or a component they render. */
+  in: z.enum(['layout', 'page', 'component']).optional(),
+  componentId: z.string().optional(),
+  siteId: z.string().optional(),
+  /** What it is about, as written: `cookies`, `fetch`, `searchParams`, `notFound`, `@modal`, a path. */
+  detail: z.string().optional(),
+  /** `no-not-found`: the file Next looks for. */
+  file: z.enum(['not-found', 'forbidden', 'unauthorized']).optional(),
+  /** `slot-no-match`: the slot's folder. */
+  dir: z.string().optional(),
+  /** Other places on the page with the same gap, besides this one. */
+  more: z.number().int().positive().optional(),
+  loc: SourceLocSchema.optional(),
+})
+export type BoundaryGap = z.infer<typeof BoundaryGapSchema>
+
+export const RouteBoundariesSchema = z.object({
+  /** Outermost first: special files by folder, then the `<Suspense>` and error boundaries in the page's components. */
+  items: z.array(PageBoundarySchema),
+  gaps: z.array(BoundaryGapSchema),
+})
+export type RouteBoundaries = z.infer<typeof RouteBoundariesSchema>
+
+export const MetadataSourceSchema = z.object({
+  /** `export const metadata` or `export function generateMetadata`. */
+  kind: z.enum(['metadata', 'generateMetadata']),
+  in: z.enum(['layout', 'page']),
+  file: z.string(),
+  /** Fields it sets (`title`, `description`, `openGraph`). Absent when the scan can't read them. */
+  fields: z.array(z.string()).optional(),
+  /** `title`, or `title.default` / `title.absolute`, as written; `{name}` for values only known at runtime. */
+  title: z.string().optional(),
+  /** `title.template` (`%s | Shop`), which titles below this layout go into. */
+  template: z.string().optional(),
+  /** `title.absolute`: templates above don't apply. */
+  absolute: z.literal(true).optional(),
+  loc: SourceLocSchema,
+})
+export type MetadataSource = z.infer<typeof MetadataSourceSchema>
+
+export const RouteMetadataSchema = z.object({
+  /** The `<title>` Next renders for the page, with layout templates applied. */
+  title: z.string().optional(),
+  /** The nearest title comes from a `generateMetadata` (or a value) the scan can't read. */
+  titleUnread: z.literal(true).optional(),
+  /** Outermost layout first, the page last. */
+  sources: z.array(MetadataSourceSchema),
+})
+export type RouteMetadata = z.infer<typeof RouteMetadataSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -207,6 +310,10 @@ export const RouteSchema = z.object({
   access: RouteAccessSchema.optional(),
   /** Pages: how Next renders it and why (M38). Absent in older models: read it as `unknown`. */
   render: RouteRenderSchema.optional(),
+  /** Pages: the boundaries that cover it and the gaps (M41). Absent in older models. */
+  boundaries: RouteBoundariesSchema.optional(),
+  /** Pages: `metadata` / `generateMetadata` from the page and its layouts (M41). Absent in older models. */
+  metadata: RouteMetadataSchema.optional(),
 })
 export type Route = z.infer<typeof RouteSchema>
 
@@ -398,10 +505,27 @@ export const ComponentRefSchema = z.object({
   conditional: z.boolean().optional(),
   /** Loaded with `next/dynamic` or `React.lazy`. */
   dynamic: z.boolean().optional(),
+  /** Every place it is rendered is inside a `<Suspense>` in this component (M41). */
+  suspense: z.literal(true).optional(),
+  /** Every place it is rendered is inside an error boundary in this component (M41). */
+  errorBoundary: z.literal(true).optional(),
   /** First place it is rendered. */
   loc: SourceLocSchema,
 })
 export type ComponentRef = z.infer<typeof ComponentRefSchema>
+
+/** A `<Suspense>` or an error boundary that a component renders (M41). */
+export const ComponentBoundarySchema = z.object({
+  kind: z.enum(['suspense', 'error-boundary']),
+  /** The tag as written (`Suspense`, `React.Suspense`, `ErrorBoundary`). */
+  name: z.string(),
+  /** `<Suspense>` with a `fallback`. */
+  fallback: z.literal(true).optional(),
+  /** Components and props rendered inside, as written (`TodoList`, `children`, `modal`). */
+  wraps: z.array(z.string()),
+  loc: SourceLocSchema,
+})
+export type ComponentBoundary = z.infer<typeof ComponentBoundarySchema>
 
 export const ComponentSchema = z.object({
   id: z.string(),
@@ -418,6 +542,8 @@ export const ComponentSchema = z.object({
   clientBoundary: z.boolean(),
   /** Components rendered by this one, in source order, one entry per distinct target. */
   children: z.array(ComponentRefSchema),
+  /** `<Suspense>` and error boundaries it renders, in source order (M41). */
+  boundaries: z.array(ComponentBoundarySchema).optional(),
   /** Type of the props parameter. Absent when the component takes no props. */
   propsType: TypeRefSchema.optional(),
   /** Ids of named project types referenced in the component's body (not counting `propsType`), in source order. */
@@ -1329,7 +1455,8 @@ export const AppModelSchema = z.object({
    * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`),
    * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags,
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
-   * `render` (read as `unknown`), version 13 (before M39) no `cache`.
+   * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
+   * `boundaries` or `metadata`.
    */
   version: z
     .union([
@@ -1346,6 +1473,7 @@ export const AppModelSchema = z.object({
       z.literal(11),
       z.literal(12),
       z.literal(13),
+      z.literal(14),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

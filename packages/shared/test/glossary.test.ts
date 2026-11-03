@@ -1,6 +1,7 @@
 // M34: every status, flag kind, trigger kind and transport has a plain explanation.
 import { describe, expect, it } from 'vitest'
 import {
+  BoundaryGapSchema,
   CacheEntrySchema,
   CacheFlagSchema,
   CaptureMatchSchema,
@@ -15,6 +16,7 @@ import {
   GLOSSARY,
   type GlossaryGroupId,
   glossaryTerms,
+  PageBoundarySchema,
   RequestSiteSchema,
   RequestUrlSchema,
   RouteAccessSchema,
@@ -34,6 +36,8 @@ const COVERED: [GlossaryGroupId, readonly string[]][] = [
   ['url', RequestUrlSchema.shape.confidence.options],
   ['access', RouteAccessSchema.shape.status.options],
   ['render', RouteRenderSchema.shape.mode.options],
+  ['boundary', PageBoundarySchema.shape.kind.options],
+  ['boundary', BoundaryGapSchema.shape.kind.options],
   ['cache', CacheEntrySchema.shape.kind.options],
   ['cache', CacheFlagSchema.shape.kind.options],
   ['flow-status', ['confirmed', 'partial', 'unconfirmed']],

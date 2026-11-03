@@ -32,6 +32,8 @@ Home  server  app/page.tsx:5
 └─ Link  external next/link
 access: open
 render: static
+boundaries: (none)
+title: caching-15 fixture  (layout metadata)
 
 ## /products  app/products/page.tsx
 layouts: app/layout.tsx
@@ -39,6 +41,8 @@ ProductsPage  server  app/products/page.tsx:7
 access: open
 render: ISR 5m
   ISR 5m: caches with `unstable_cache` (page)  app/products/page.tsx:9
+boundaries: (none)
+title: caching-15 fixture  (layout metadata)
 
 ## /profile  app/(account)/profile/page.tsx
 layouts: app/layout.tsx > app/(account)/layout.tsx
@@ -46,6 +50,8 @@ ProfilePage  server  app/(account)/profile/page.tsx:1
 access: open
 render: ISR 1d
   ISR 1d: caches with `unstable_cache` (component)  lib/viewer.ts:7
+boundaries: (none)
+title: caching-15 fixture  (layout metadata)
 
 ## /todos/[id]  app/todos/[id]/page.tsx
 layouts: app/layout.tsx
@@ -53,6 +59,10 @@ TodoPage  server  app/todos/[id]/page.tsx:4
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/todos.js:12
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/todos.js:12
+title: caching-15 fixture  (layout metadata)
 
 # Server cache
 

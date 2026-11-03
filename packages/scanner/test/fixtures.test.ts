@@ -32,6 +32,7 @@ const FIXTURES = [
   'websocket',
   'caching',
   'caching-15',
+  'boundaries',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -228,5 +229,72 @@ describe('server cache map (M39)', () => {
       '/profile': 'isr 86400',
       '/todos/[id]': 'dynamic',
     })
+  })
+})
+
+describe('special files and boundaries (M41)', () => {
+  beforeAll(() => {
+    scan('boundaries')
+    scan('caching')
+  }, 60_000)
+
+  const key = (r: { path: string; slot?: string; intercepting?: unknown }) =>
+    `${r.path}${r.slot ? ` @${r.slot}` : ''}${r.intercepting ? ' (intercepting)' : ''}`
+
+  it('flags only the planted gap in the boundaries fixture, which `next build` accepts', () => {
+    const gaps = scan('boundaries').routes.flatMap((r) =>
+      (r.boundaries?.gaps ?? []).map((g) => `${key(r)}: ${g.kind} ${g.detail} ${g.loc?.file}`),
+    )
+    expect(gaps).toEqual(['/photos/[id]: no-fallback fetch src/lib/api.ts'])
+  })
+
+  it('finds the slots, the intercepting route and their parts', () => {
+    const pages = scan('boundaries').routes.filter((r) => r.kind === 'page')
+    expect(pages.filter((r) => r.slot || r.intercepting).map(key)).toEqual([
+      '/dashboard @stats',
+      '/dashboard @team',
+      '/dashboard/members @team',
+      '/photos/[id] @modal (intercepting)',
+    ])
+    const dashboard = pages.find((r) => key(r) === '/dashboard')
+    expect(dashboard?.boundaries?.items.filter((i) => i.nearest).map((i) => i.kind)).toEqual([
+      'not-found',
+      'forbidden',
+      'unauthorized',
+      'loading',
+      'error',
+    ])
+    const reports = pages.find((r) => r.path === '/reports')
+    expect(reports?.boundaries?.items.filter((i) => i.in !== 'segment').map((i) => i.kind)).toEqual([
+      'suspense',
+      'suspense',
+      'error-boundary',
+    ])
+  })
+
+  it('resolves titles like the built pages show them', () => {
+    // `<title>` of each page in `next build` / `next start` (16.4.3).
+    const titles = Object.fromEntries(
+      scan('boundaries')
+        .routes.filter((r) => r.kind === 'page' && !r.slot && !r.intercepting)
+        .map((r) => [r.path, r.metadata?.title]),
+    )
+    expect(titles).toEqual({
+      '/': 'Boundaries',
+      '/account': 'Boundaries',
+      '/blog/[slug]': 'Post {slug} | Boundaries',
+      '/dashboard': 'Dashboard | Boundaries',
+      '/dashboard/settings': 'Settings',
+      '/photos': 'Photos | Boundaries',
+      '/photos/[id]': 'Photo {id} | Boundaries',
+      '/reports': 'Reports',
+    })
+  })
+
+  it('flags nothing that blocks the caching fixture, which builds with Cache Components', () => {
+    const blocking = scan('caching').routes.flatMap((r) =>
+      (r.boundaries?.gaps ?? []).filter((g) => g.kind === 'blocking-route').map(() => r.path),
+    )
+    expect(blocking).toEqual([])
   })
 })

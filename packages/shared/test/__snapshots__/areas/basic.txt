@@ -4,7 +4,7 @@ home from /
   pages: /
   components: HomePage, UserList
   shared components: RootLayout
-  requests: 1, endpoints: 1, notes: 0
+  requests: 1, endpoints: 1, notes: 2
   flows: -
 
 about from /about
@@ -18,7 +18,7 @@ users from /users
   pages: /users/[id]
   components: UserPage, DeleteUserButton, ProfileCard
   shared components: RootLayout
-  requests: 3, endpoints: 3, notes: 0
+  requests: 3, endpoints: 3, notes: 2
   flows: DeleteUserButton click
 
 shared components: RootLayout

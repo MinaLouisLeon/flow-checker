@@ -8,11 +8,23 @@
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
 | Rendering | dynamic |
+| Title | `Relay fixture` |
 | Status | ✓ 2 verified |
 
 ## Rendering
 
 - dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+
+## Boundaries
+
+- While it loads: only the `<Suspense>` parts below
+- On an error: Next's default error page
+- On `notFound()`: Next's default 404 page
+- `<Suspense>` around `TodoDetail` (component), `src/components/TodoPage.tsx:15`
+
+## Metadata
+
+- layout `metadata`: title, `src/app/layout.tsx:4`
 
 ## Component tree
 

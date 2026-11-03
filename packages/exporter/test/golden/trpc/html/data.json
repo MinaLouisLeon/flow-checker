@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "trpc",
   "model": {
-    "version": 14,
+    "version": 15,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -116,6 +116,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "tRPC v11 fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "src/app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "tRPC v11 fixture",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -185,6 +208,29 @@
               "detail": "`[id]`"
             }
           ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "tRPC v11 fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "src/app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "tRPC v11 fixture",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -224,6 +270,44 @@
                 "column": 14
               },
               "effect": "dynamic"
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [
+            {
+              "kind": "suspense",
+              "file": "src/app/users/page.tsx",
+              "in": "page",
+              "componentId": "cmp_0zsf7mc3ftx",
+              "wraps": [
+                "UserList"
+              ],
+              "loc": {
+                "file": "src/app/users/page.tsx",
+                "line": 10,
+                "column": 5
+              }
+            }
+          ],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "tRPC v11 fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "src/app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "tRPC v11 fixture",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 4,
+                "column": 14
+              }
             }
           ]
         }
@@ -454,6 +538,7 @@
             "resolution": "project",
             "componentId": "cmp_20axc0bf4dg",
             "module": "@/components/UserList",
+            "suspense": true,
             "loc": {
               "file": "src/app/users/page.tsx",
               "line": 11,
@@ -461,7 +546,22 @@
             }
           }
         ],
-        "usedTypes": []
+        "usedTypes": [],
+        "boundaries": [
+          {
+            "kind": "suspense",
+            "name": "Suspense",
+            "fallback": true,
+            "wraps": [
+              "UserList"
+            ],
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 10,
+              "column": 5
+            }
+          }
+        ]
       },
       {
         "id": "cmp_0r1iugj2rde",

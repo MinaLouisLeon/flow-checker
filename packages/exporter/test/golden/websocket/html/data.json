@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "websocket",
   "model": {
-    "version": 14,
+    "version": 15,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -59,6 +59,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "WebSocket fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "WebSocket fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 3,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -88,6 +111,29 @@
         "render": {
           "mode": "static",
           "reasons": []
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": []
+        },
+        "metadata": {
+          "title": "WebSocket fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "WebSocket fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 3,
+                "column": 14
+              }
+            }
+          ]
         }
       }
     ],

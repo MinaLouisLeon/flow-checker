@@ -28,5 +28,8 @@ Where things live
   Sends requests  src/lib/backend.ts  (4 requests)
   Type            Product  (src/types/product.ts, used 3 times)
 
-To check
-  The scan resolved every page, component, type and request.
+To check (5 open notes)
+  Boundary  /products: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (src/lib/backend.ts:7)
+  Boundary  /products: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure  (src/lib/backend.ts:7)
+  Boundary  /products/[id]: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (src/lib/backend.ts:12)
+  … 2 more

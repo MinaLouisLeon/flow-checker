@@ -1,5 +1,7 @@
 // Positions for the route map graph: routes are linked to their closest parent route by URL
 // path, laid out as a left-to-right tree. Navigation edges are drawn on top (MapScreen).
+// Parallel slot pages hang off the plain page they render beside, and intercepting pages off the
+// page their navigation starts from, with an edge to the page they stand in for (M41).
 import type { Route } from '@flow-checker/shared'
 
 export interface GraphNode {
@@ -12,7 +14,12 @@ export interface GraphEdge {
   id: string
   source: string
   target: string
-  kind: 'hierarchy'
+  /**
+   * `hierarchy`: nested URL. `slot`: a parallel slot page beside the page at its URL. `intercept`:
+   * an intercepting page under the page it opens from. `intercepts`: from an intercepting page to
+   * the page it stands in for on client navigation.
+   */
+  kind: 'hierarchy' | 'slot' | 'intercept' | 'intercepts'
   /** The child sits in a later grid column, next to its parent: the map leaves the edge out. */
   grid?: boolean
 }
@@ -36,6 +43,16 @@ function pathParts(path: string): string[] {
  * route handlers, and plain pages win over slot or intercepting pages at the same path.
  */
 export function parentOf(route: Route, routes: Route[]): Route | undefined {
+  const plain = (path: string) =>
+    routes.find((r) => r !== route && r.kind === 'page' && rank(r) === 0 && r.path === path)
+  // A slot renders beside the page at its URL; an intercepting page opens over the page it starts from.
+  if (route.intercepting) {
+    const from = plain(route.intercepting.from)
+    if (from) return from
+  } else if (route.slot) {
+    const beside = plain(route.path)
+    if (beside) return beside
+  }
   const parts = pathParts(route.path)
   for (let len = parts.length - 1; len >= 0; len--) {
     const prefix = `/${parts.slice(0, len).join('/')}`
@@ -66,7 +83,25 @@ export function layoutRoutes(routes: Route[]): RouteGraph {
     const list = children.get(parent.id) ?? []
     list.push(route)
     children.set(parent.id, list)
-    edges.push({ id: `${parent.id}->${route.id}`, source: parent.id, target: route.id, kind: 'hierarchy' })
+    const kind =
+      route.intercepting && parent.path === route.intercepting.from
+        ? 'intercept'
+        : route.slot && parent.path === route.path
+          ? 'slot'
+          : 'hierarchy'
+    edges.push({ id: `${parent.id}->${route.id}`, source: parent.id, target: route.id, kind })
+    // The page an intercepting route stands in for (its canonical page).
+    const canonical = route.intercepting
+      ? sorted.find((r) => r.kind === 'page' && rank(r) === 0 && r.path === route.path)
+      : undefined
+    if (canonical) {
+      edges.push({
+        id: `${route.id}~>${canonical.id}`,
+        source: route.id,
+        target: canonical.id,
+        kind: 'intercepts',
+      })
+    }
   }
 
   const nodes: GraphNode[] = []
@@ -108,7 +143,7 @@ export function layoutRoutes(routes: Route[]): RouteGraph {
   }
   for (const root of roots) place(root, 0)
 
-  for (const edge of edges) if (gridded.has(edge.target)) edge.grid = true
+  for (const edge of edges) if (edge.kind !== 'intercepts' && gridded.has(edge.target)) edge.grid = true
   return { nodes, edges }
 }
 

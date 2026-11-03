@@ -43,8 +43,10 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 
 ## To check
 
-3 open notes.
+7 open notes.
 
 - Type mismatch: [GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products: Response doesn't match Product\[\]: \[\].price is number 49.9 (expected string) (4 of 4 captures).](components/ProductPanel.md#req_08kv7zxxjyg) (components/ProductPanel.tsx:11)
-- Request: [DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id: The Postman collection "Fixture API" has no DELETE /users/:id request.](components/DeleteUserButton.md#req_1nhvqmicx4q) (components/DeleteUserButton.tsx:13)
-- Request: [GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products: The response type Product\[\] doesn't match the Postman example "200 OK": \[\].price is number 49.9 (expected string).](components/ProductPanel.md#req_08kv7zxxjyg) (components/ProductPanel.tsx:11)
+- Boundary: [/: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/index.md) (lib/api.ts:5)
+- Boundary: [/: no error boundary: fetches on the server (\`fetch\`), and no \`error\` file, error boundary or \`global-error\` catches a failure](pages/index.md) (lib/api.ts:5)
+
+4 more: [all open issues](issues.md).

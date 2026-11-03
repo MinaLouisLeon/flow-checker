@@ -1,5 +1,5 @@
 {
-  "version": 14,
+  "version": 15,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -95,6 +95,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "server-actions fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "server-actions fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -147,6 +170,54 @@
             "kind": "fetch",
             "effect": "dynamic",
             "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "siteId": "req_1u9qpywsqwd",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/backend.ts",
+              "line": 7,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "siteId": "req_1u9qpywsqwd",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/backend.ts",
+              "line": 7,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "server-actions fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "server-actions fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
           }
         ]
       }
@@ -227,6 +298,66 @@
             "detail": "cache: 'no-store'"
           }
         ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_0w4ykuez903",
+            "siteId": "req_25a1hdpohd6",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/backend.ts",
+              "line": 12,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_0w4ykuez903",
+            "siteId": "req_25a1hdpohd6",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/backend.ts",
+              "line": 12,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-not-found",
+            "in": "page",
+            "componentId": "cmp_0w4ykuez903",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/products/[id]/page.tsx",
+              "line": 10,
+              "column": 17
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "server-actions fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "server-actions fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     },
     {
@@ -261,6 +392,29 @@
       "render": {
         "mode": "static",
         "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "server-actions fixture",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "server-actions fixture",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
       }
     }
   ],

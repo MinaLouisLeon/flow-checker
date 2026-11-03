@@ -18,6 +18,7 @@ import {
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { addRouteAccess } from './access'
+import { addRouteBoundaries } from './boundaries'
 import { buildCacheMap } from './cache'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
@@ -433,6 +434,16 @@ function analyze(
     components,
     uses: requests.renderUses(),
     unfollowed: requests.unfollowed(),
+    fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
+    cacheComponents,
+  })
+  addRouteBoundaries({
+    root,
+    appDir: relativeTo(root, discovery.appDir),
+    tree,
+    routes,
+    components,
+    uses: requests.renderUses(),
     fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
     cacheComponents,
   })

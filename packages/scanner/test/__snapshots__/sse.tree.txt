@@ -33,6 +33,8 @@ HomePage  server  app/page.tsx:4
 └─ Link  external next/link
 access: open
 render: static
+boundaries: (none)
+title: SSE fixture  (layout metadata)
 
 ## /chat  app/chat/page.tsx
 layouts: app/layout.tsx
@@ -40,6 +42,8 @@ ChatPage  server  app/chat/page.tsx:3
 └─ Chat  client (use client)  components/Chat.tsx:7
 access: open
 render: static
+boundaries: (none)
+title: SSE fixture  (layout metadata)
 
 ## /jobs/[id]  app/jobs/[id]/page.tsx
 layouts: app/layout.tsx
@@ -48,3 +52,5 @@ JobPage  server  app/jobs/[id]/page.tsx:3
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: SSE fixture  (layout metadata)

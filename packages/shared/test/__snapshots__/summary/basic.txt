@@ -26,5 +26,8 @@ Where things live
   Type            User  (types/user.ts, used 4 times)
   Type            Todo  (types/user.ts, used 2 times)
 
-To check
-  The scan resolved every page, component, type and request.
+To check (4 open notes)
+  Boundary  /: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:14)
+  Boundary  /: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure  (lib/api.ts:14)
+  Boundary  /users/[id]: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:20)
+  … 1 more

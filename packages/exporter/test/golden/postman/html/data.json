@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "postman",
   "model": {
-    "version": 14,
+    "version": 15,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -95,6 +95,54 @@
               "detail": "cache: 'no-store'"
             }
           ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-fallback",
+              "in": "page",
+              "componentId": "cmp_0ku4o3jpe9o",
+              "siteId": "req_0iv5kcsl9up",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 5,
+                "column": 21
+              }
+            },
+            {
+              "kind": "no-error-boundary",
+              "in": "page",
+              "componentId": "cmp_0ku4o3jpe9o",
+              "siteId": "req_0iv5kcsl9up",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 5,
+                "column": 21
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "title": "postman fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "postman fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 3,
+                "column": 14
+              }
+            }
+          ]
         }
       },
       {
@@ -158,6 +206,54 @@
               "kind": "fetch",
               "effect": "dynamic",
               "detail": "cache: 'no-store'"
+            }
+          ]
+        },
+        "boundaries": {
+          "items": [],
+          "gaps": [
+            {
+              "kind": "no-fallback",
+              "in": "page",
+              "componentId": "cmp_0vmo84pmvzo",
+              "siteId": "req_0zfyatg6d3b",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 12,
+                "column": 21
+              }
+            },
+            {
+              "kind": "no-error-boundary",
+              "in": "page",
+              "componentId": "cmp_0vmo84pmvzo",
+              "siteId": "req_0zfyatg6d3b",
+              "detail": "fetch",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 12,
+                "column": 21
+              }
+            }
+          ]
+        },
+        "metadata": {
+          "title": "postman fixture",
+          "sources": [
+            {
+              "kind": "metadata",
+              "in": "layout",
+              "file": "app/layout.tsx",
+              "fields": [
+                "title"
+              ],
+              "title": "postman fixture",
+              "loc": {
+                "file": "app/layout.tsx",
+                "line": 3,
+                "column": 14
+              }
             }
           ]
         }

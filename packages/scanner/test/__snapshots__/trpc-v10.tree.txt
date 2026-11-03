@@ -34,6 +34,8 @@ HomePage  server  src/app/page.tsx:6
 └─ UserList  client (use client)  src/components/UserList.tsx:5
 access: open
 render: static
+boundaries: (none)
+title: tRPC v10 fixture  (layout metadata)
 
 ## /feed  src/app/feed/page.tsx
 layouts: src/app/layout.tsx
@@ -41,6 +43,8 @@ FeedPage  server  src/app/feed/page.tsx:3
 └─ TodoFeed  client (use client)  src/components/TodoFeed.tsx:5
 access: open
 render: static
+boundaries: (none)
+title: tRPC v10 fixture  (layout metadata)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -49,3 +53,5 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 access: open
 render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+title: tRPC v10 fixture  (layout metadata)

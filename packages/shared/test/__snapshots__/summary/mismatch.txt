@@ -23,5 +23,6 @@ Where things live
   Type            Todo  (types/index.ts, used 3 times)
   Type            Settings  (types/index.ts, used 2 times)
 
-To check
-  The scan resolved every page, component, type and request.
+To check (2 open notes)
+  Boundary  /: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile  (lib/api.ts:5)
+  Boundary  /: no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure  (lib/api.ts:5)
