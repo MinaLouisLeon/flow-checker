@@ -49,6 +49,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M39 | Server cache map      | Model version 14, `AppModel.cache`. Walk records `CacheFound` / `InvalidationFound`; `scanner/src/cache.ts` links them.  |
 | M40 | Cache check (runtime) | Runtime reads Next's own records (fetch metrics, cache handlers, `IncrementalCache.get`); served model gets `runtime`.   |
 | M41 | Boundaries            | Model version 15, `Route.boundaries` / `metadata`. Refs carry `suspense` / `errorBoundary`; `scanner/src/boundaries.ts`. |
+| M42 | Release v0.4.0        | Matrix runs `next build` per version (async: it fetches from the script). Publish = tag.                                 |
 
 ## Gotchas
 
@@ -545,3 +546,15 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Note messages are escaped in `issues.md` (`text()`); boundary notes are the tool's own wording, so they go out raw and
   the dashboard renders them with `CodeText`. A table cell with `|` (a title template) must be escaped.
 - The Python-in-heredoc escape trap struck again (`'\n'` in `lines.join`): use the Edit tool for those lines.
+
+## M42 — Release v0.4.0 (branch `feat/release-040`)
+
+- The test app now lives at `work/csrf-jobseekk/jobseekk_frontend` (37 pages at its HEAD); the second app is still
+  `work/ur-dr-temp/ur-dr-frontend`. A fresh clone shows a few files modified (line endings): compare `git status`
+  before and after `explore` instead of expecting it clean.
+- `next build --webpack` works on both real-app clones (junctioned `node_modules`), and `compareRenderModes()` from
+  `scripts/next-build-table.mjs` checks a model against its output: the best check of render modes on a real app.
+- A script that runs its own HTTP server must not `spawnSync` a command that calls it (`next build` prerendering a
+  page that fetches from it): the event loop is blocked and the build retries the page for minutes.
+- New files under `.flow-checker/` need an entry in `GITIGNORE_ENTRIES` (`cli/project.ts`) unless safe to commit;
+  M40's `cache-events.jsonl` was missed until here.

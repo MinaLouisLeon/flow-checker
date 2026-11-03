@@ -104,6 +104,8 @@ export const GITIGNORE_ENTRIES = [
   '.flow-checker/cache/',
   // The imported Postman collection (M15): a copy of something kept elsewhere, maybe private.
   '.flow-checker/postman/',
+  // What Next's server cache did per request (M40): live data, like the captures.
+  '.flow-checker/cache-events.jsonl',
 ]
 
 /**
@@ -120,7 +122,7 @@ export function missingGitignoreEntries(root: string): string[] {
     if (existsSync(join(dir, '.git')) || dirname(dir) === dir) break
   }
   if (lines.has('.flow-checker') || lines.has('.flow-checker/') || lines.has('.flow-checker/*')) return []
-  return GITIGNORE_ENTRIES.filter((entry) => !lines.has(entry) && !lines.has(entry.slice(0, -1)))
+  return GITIGNORE_ENTRIES.filter((entry) => !lines.has(entry) && !lines.has(entry.replace(/\/$/, '')))
 }
 
 /** Appends the missing entries to `<root>/.gitignore`. Returns what was added. */
