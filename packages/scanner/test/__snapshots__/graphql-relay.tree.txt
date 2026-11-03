@@ -32,6 +32,7 @@ HomePage  server  src/app/page.tsx:6
 │     └─ Link  external next/link
 └─ AddTodoForm  client (use client)  src/components/AddTodoForm.tsx:8
 access: open
+render: static
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -40,9 +41,12 @@ Page  server  src/app/todos/[id]/page.tsx:3
    ├─ Suspense  external react  [conditional]
    └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:27  [conditional]
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
 UsersPage  server  src/app/users/page.tsx:3
 └─ UserList  client (use client)  src/components/UserList.tsx:7
 access: open
+render: static

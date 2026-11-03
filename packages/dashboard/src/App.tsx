@@ -195,7 +195,15 @@ function ScreenView({ screen }: { screen: Screen }) {
     case 'overview':
       return <Overview />
     case 'map':
-      return <MapScreen view={screen.view} q={screen.q} areas={screen.areas} access={screen.access} />
+      return (
+        <MapScreen
+          view={screen.view}
+          q={screen.q}
+          areas={screen.areas}
+          access={screen.access}
+          render={screen.render}
+        />
+      )
     case 'areas':
       return <AreasScreen areaId={screen.areaId} q={screen.q} />
     case 'page':

@@ -7,6 +7,7 @@
 | File | `app/(marketing)/about/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | open |
+| Rendering | static |
 
 ## Component tree
 

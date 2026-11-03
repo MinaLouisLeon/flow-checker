@@ -7,12 +7,18 @@
 | File | `app/dashboard/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | guarded |
+| Rendering | dynamic |
 | Status | ✓ 1 verified |
 
 ## Access
 
 - redirects to `/login` when `!token` (middleware), `proxy.ts:23`
 - redirects to `/login?expired=1` when `token && !user` (middleware), `proxy.ts:27`
+
+## Rendering
+
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `app/dashboard/page.tsx:4`
+- dynamic: fetches with `cache: 'no-store'` (page), `lib/api.ts:5`
 
 ## Component tree
 

@@ -94,6 +94,18 @@ Whether a page can stop a visitor (redirect to a login, show not found), as read
 | <a id="access-open"></a>**open** | Nothing in the code redirects or stops a visitor on this page. |  |
 | <a id="access-unknown"></a>**access ?** (`unknown`) | The scan could not tell: a check is in code it could not follow (a package, an excluded file). | Open the page to see what could not be read. |
 
+## Render mode
+
+How Next renders a page in a production build, as read from the code. `next dev` renders every page per request.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="render-static"></a>**static** | Prerendered once at build time; every visitor gets the same HTML until the next build. |  |
+| <a id="render-isr"></a>**ISR** (`isr`) | Prerendered at build time and rebuilt in the background after the time shown (`revalidate`, `next.revalidate` or `cacheLife`). |  |
+| <a id="render-dynamic"></a>**dynamic** | Rendered for each request, because the page reads the request (`cookies()`, `headers()`, `searchParams`), opts out of caching or has params it cannot list ahead. | Open the page to see each reason and where it is; remove the ones you did not mean. |
+| <a id="render-partial"></a>**partial** | Cache Components: a static shell is prerendered and the parts that read the request or uncached data stream in per request. | Each reason must sit inside `<Suspense>` (or `use cache`), or the build fails. |
+| <a id="render-unknown"></a>**render ?** (`unknown`) | The scan could not tell: a config value or a call it could not read. | Open the page to see what could not be read. |
+
 ## Flow status
 
 Whether a flow found in the code has been walked in the running app.

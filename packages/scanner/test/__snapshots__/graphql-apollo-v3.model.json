@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -96,6 +96,10 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
       }
     },
     {
@@ -144,6 +148,10 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
       }
     },
     {
@@ -174,6 +182,17 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          }
+        ]
       }
     }
   ],

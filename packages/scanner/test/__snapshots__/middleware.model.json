@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -110,6 +110,10 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
       }
     },
     {
@@ -186,6 +190,35 @@
             }
           }
         ]
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "segment-config",
+            "in": "page",
+            "detail": "dynamic = 'force-dynamic'",
+            "loc": {
+              "file": "app/dashboard/page.tsx",
+              "line": 4,
+              "column": 14
+            },
+            "effect": "dynamic"
+          },
+          {
+            "in": "page",
+            "componentId": "cmp_23rukepv8uh",
+            "loc": {
+              "file": "lib/api.ts",
+              "line": 5,
+              "column": 21
+            },
+            "siteId": "req_02gshaf9oil",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
       }
     },
     {
@@ -245,6 +278,35 @@
             }
           }
         ]
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "segment-config",
+            "in": "page",
+            "detail": "dynamic = 'force-dynamic'",
+            "loc": {
+              "file": "app/dashboard/settings/page.tsx",
+              "line": 3,
+              "column": 14
+            },
+            "effect": "dynamic"
+          },
+          {
+            "in": "page",
+            "componentId": "cmp_005b14gxu7r",
+            "loc": {
+              "file": "lib/api.ts",
+              "line": 10,
+              "column": 21
+            },
+            "siteId": "req_0q6t9lmdld7",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
       }
     },
     {
@@ -285,6 +347,10 @@
             }
           }
         ]
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
       }
     },
     {
@@ -310,6 +376,35 @@
       "access": {
         "status": "open",
         "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "segment-config",
+            "in": "page",
+            "detail": "dynamic = 'force-dynamic'",
+            "loc": {
+              "file": "app/products/page.tsx",
+              "line": 3,
+              "column": 14
+            },
+            "effect": "dynamic"
+          },
+          {
+            "in": "page",
+            "componentId": "cmp_23k37s13z1d",
+            "loc": {
+              "file": "lib/api.ts",
+              "line": 15,
+              "column": 21
+            },
+            "siteId": "req_263u38ocrza",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
       }
     }
   ],

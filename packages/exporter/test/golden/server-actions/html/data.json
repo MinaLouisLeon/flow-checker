@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "server-actions",
   "model": {
-    "version": 12,
+    "version": 13,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -96,6 +96,10 @@
               }
             }
           ]
+        },
+        "render": {
+          "mode": "static",
+          "reasons": []
         }
       },
       {
@@ -121,6 +125,35 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "dynamic",
+          "reasons": [
+            {
+              "kind": "segment-config",
+              "in": "page",
+              "detail": "dynamic = 'force-dynamic'",
+              "loc": {
+                "file": "src/app/products/page.tsx",
+                "line": 5,
+                "column": 14
+              },
+              "effect": "dynamic"
+            },
+            {
+              "in": "page",
+              "componentId": "cmp_115a9noj763",
+              "loc": {
+                "file": "src/lib/backend.ts",
+                "line": 7,
+                "column": 21
+              },
+              "siteId": "req_1u9qpywsqwd",
+              "kind": "fetch",
+              "effect": "dynamic",
+              "detail": "cache: 'no-store'"
+            }
+          ]
         }
       },
       {
@@ -164,6 +197,41 @@
               }
             }
           ]
+        },
+        "render": {
+          "mode": "dynamic",
+          "reasons": [
+            {
+              "kind": "dynamic-params",
+              "effect": "dynamic",
+              "in": "page",
+              "detail": "`[id]`"
+            },
+            {
+              "kind": "segment-config",
+              "in": "page",
+              "detail": "dynamic = 'force-dynamic'",
+              "loc": {
+                "file": "src/app/products/[id]/page.tsx",
+                "line": 5,
+                "column": 14
+              },
+              "effect": "dynamic"
+            },
+            {
+              "in": "page",
+              "componentId": "cmp_0w4ykuez903",
+              "loc": {
+                "file": "src/lib/backend.ts",
+                "line": 12,
+                "column": 21
+              },
+              "siteId": "req_25a1hdpohd6",
+              "kind": "fetch",
+              "effect": "dynamic",
+              "detail": "cache: 'no-store'"
+            }
+          ]
         }
       },
       {
@@ -194,6 +262,10 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "static",
+          "reasons": []
         }
       }
     ],

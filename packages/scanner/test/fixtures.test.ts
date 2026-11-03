@@ -80,6 +80,23 @@ describe.each(FIXTURES)('fixture %s', (fixture) => {
     }
   })
 
+  it('gives every page a render mode, with a reason unless it is static (M38)', () => {
+    for (const route of scan(fixture).routes) {
+      if (route.kind !== 'page') {
+        expect(route.render).toBeUndefined()
+        continue
+      }
+      const render = route.render
+      expect(render, route.path).toBeDefined()
+      if (!render || render.mode === 'static') continue
+      const effect = render.mode === 'partial' ? 'dynamic' : render.mode
+      expect(
+        render.reasons.some((r) => r.effect === effect),
+        route.path,
+      ).toBe(true)
+    }
+  })
+
   it('has no duplicate sites', () => {
     // A twin is the same network call from the same origin, reached once through a path and
     // once through the tail of it (a local function walked in place and through its hook).

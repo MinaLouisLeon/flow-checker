@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "mismatch",
   "model": {
-    "version": 12,
+    "version": 13,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -42,6 +42,35 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "dynamic",
+          "reasons": [
+            {
+              "kind": "segment-config",
+              "in": "page",
+              "detail": "dynamic = 'force-dynamic'",
+              "loc": {
+                "file": "app/page.tsx",
+                "line": 5,
+                "column": 14
+              },
+              "effect": "dynamic"
+            },
+            {
+              "in": "page",
+              "componentId": "cmp_0ku4o3jpe9o",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 5,
+                "column": 21
+              },
+              "siteId": "req_13cmzl2vi57",
+              "kind": "fetch",
+              "effect": "dynamic",
+              "detail": "cache: 'no-store'"
+            }
+          ]
         }
       }
     ],

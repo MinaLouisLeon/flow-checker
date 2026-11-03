@@ -7,7 +7,13 @@
 | File | `src/app/products/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
+| Rendering | dynamic |
 | Status | ✓ 2 verified |
+
+## Rendering
+
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/products/page.tsx:5`
+- dynamic: fetches with `cache: 'no-store'` (page), `src/lib/backend.ts:7`
 
 ## Component tree
 

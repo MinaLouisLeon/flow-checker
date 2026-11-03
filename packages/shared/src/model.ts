@@ -127,6 +127,63 @@ export const RouteAccessSchema = z.object({
 })
 export type RouteAccess = z.infer<typeof RouteAccessSchema>
 
+// Render mode (M38): how Next renders each page, and why. Read from the page, its layouts and the
+// components they render: request-time APIs, segment config, `fetch` cache options and
+// `generateStaticParams`. The modes are the ones `next build` prints.
+
+export const RenderReasonSchema = z.object({
+  /**
+   * `request-api`: `cookies()`, `headers()`, `draftMode()`, `connection()` or `unstable_noStore()`.
+   * `search-params`: the page reads its `searchParams` prop. `dynamic-params`: a dynamic segment with
+   * no `generateStaticParams`. `static-params`: `generateStaticParams` lists the params to prerender.
+   * `segment-config`: `export const dynamic` / `revalidate` / `fetchCache`. `fetch`: a server
+   * `fetch` with a `cache` or `next.revalidate` option. `uncached-data`: Cache Components only, a
+   * server request outside `use cache`. `cached`: a `use cache` scope (with its `cacheLife`).
+   * `unread`: something the scan can't read (a config value, a call it can't follow).
+   */
+  kind: z.enum([
+    'request-api',
+    'search-params',
+    'dynamic-params',
+    'static-params',
+    'segment-config',
+    'fetch',
+    'uncached-data',
+    'cached',
+    'unread',
+  ]),
+  /**
+   * What it does to the page: `dynamic` (rendered per request; with Cache Components, a part
+   * streamed per request), `isr` (prerendered, refreshed after `revalidate` seconds), `static`
+   * (`force-static` / `error`: prerendered whatever else the page does), `unknown`, or `info`
+   * (no change, shown for context).
+   */
+  effect: z.enum(['dynamic', 'isr', 'static', 'unknown', 'info']),
+  /** Where it is: a layout around the page, the page, or a component they render. */
+  in: z.enum(['layout', 'page', 'component']),
+  /** The call, option or config as written (`cookies`, `cache: 'no-store'`), or why it can't be read. */
+  detail: z.string().optional(),
+  /** Seconds, for `isr`. */
+  revalidate: z.number().optional(),
+  componentId: z.string().optional(),
+  siteId: z.string().optional(),
+  loc: SourceLocSchema.optional(),
+})
+export type RenderReason = z.infer<typeof RenderReasonSchema>
+
+export const RouteRenderSchema = z.object({
+  /**
+   * `static`: prerendered at build time. `isr`: prerendered and refreshed after `revalidate`
+   * seconds. `dynamic`: rendered for each request. `partial`: Cache Components, a static shell with
+   * parts streamed per request. `unknown`: the scan can't tell (`reasons` say why).
+   */
+  mode: z.enum(['static', 'isr', 'dynamic', 'partial', 'unknown']),
+  /** Seconds, for `isr`: the lowest time the page and its data ask for. */
+  revalidate: z.number().optional(),
+  reasons: z.array(RenderReasonSchema),
+})
+export type RouteRender = z.infer<typeof RouteRenderSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -148,6 +205,8 @@ export const RouteSchema = z.object({
   intercepting: z.object({ marker: z.string(), from: z.string() }).optional(),
   /** Pages: what can stop the page from rendering (M31). Absent in older models: read it as `unknown`. */
   access: RouteAccessSchema.optional(),
+  /** Pages: how Next renders it and why (M38). Absent in older models: read it as `unknown`. */
+  render: RouteRenderSchema.optional(),
 })
 export type Route = z.infer<typeof RouteSchema>
 
@@ -1113,6 +1172,8 @@ export const ProjectInfoSchema = z.object({
   tsconfig: z.string().optional(),
   nextConfig: z.string().optional(),
   nextVersion: z.string().optional(),
+  /** `cacheComponents: true` in the Next config (M38): pages get a static shell with streamed parts. */
+  cacheComponents: z.literal(true).optional(),
 })
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>
 
@@ -1130,7 +1191,8 @@ export const AppModelSchema = z.object({
    * version 7 (before M19) no WebSockets, version 8 no `prop` component references, version 9
    * (before M24) no `unknown` key segments (a segment the scanner couldn't read was a `param`),
    * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags,
-   * version 11 (before M31) no page `access` (read as `unknown`).
+   * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
+   * `render` (read as `unknown`).
    */
   version: z
     .union([
@@ -1145,6 +1207,7 @@ export const AppModelSchema = z.object({
       z.literal(9),
       z.literal(10),
       z.literal(11),
+      z.literal(12),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),

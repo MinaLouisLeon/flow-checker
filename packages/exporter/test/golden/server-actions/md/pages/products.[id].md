@@ -7,11 +7,18 @@
 | File | `src/app/products/[id]/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | guarded |
+| Rendering | dynamic |
 | Status | ✓ 1 verified |
 
 ## Access
 
 - shows the not-found page (404) when `!product` (page), `src/app/products/[id]/page.tsx:10`
+
+## Rendering
+
+- dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/products/[id]/page.tsx:5`
+- dynamic: fetches with `cache: 'no-store'` (page), `src/lib/backend.ts:12`
 
 ## Component tree
 

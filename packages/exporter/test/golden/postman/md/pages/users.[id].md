@@ -7,7 +7,14 @@
 | File | `app/users/[id]/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | open |
+| Rendering | dynamic |
 | Status | ✓ 2 verified |
+
+## Rendering
+
+- dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `app/users/[id]/page.tsx:4`
+- dynamic: fetches with `cache: 'no-store'` (page), `lib/api.ts:12`
 
 ## Component tree
 

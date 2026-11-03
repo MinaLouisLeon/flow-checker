@@ -7,6 +7,7 @@
 | File | `src/app/users/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
+| Rendering | static |
 | Status | ✓ 5 verified |
 
 ## Component tree

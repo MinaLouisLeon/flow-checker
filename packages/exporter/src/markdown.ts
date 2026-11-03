@@ -57,6 +57,9 @@ import {
   type RecordedStep,
   type RequestSite,
   type Route,
+  renderLabel,
+  renderOf,
+  renderReasonLine,
   requestLabel,
   type ScanNote,
   type SiteTypeCheck,
@@ -343,13 +346,14 @@ function readme(ctx: Ctx): string {
     sections.push(
       '## Pages',
       table(
-        ['Page', 'File', 'Access', 'Requests', 'Status'],
+        ['Page', 'File', 'Access', 'Rendering', 'Requests', 'Status'],
         pages.map((route) => {
           const sites = routeSites(ctx, route)
           return [
             routeLink(ctx, route, from),
             code(route.file),
             accessOf(route).status,
+            renderLabel(renderOf(route)),
             String(sites.length),
             statusCounts(sites),
           ]
@@ -620,9 +624,11 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
       ],
       ['Layouts', layouts.join(' → ') || undefined],
       ['Access', accessOf(route).status],
+      ['Rendering', renderLabel(renderOf(route))],
       ['Status', sites.length > 0 ? statusCounts(sites) : undefined],
     ]),
     ...accessSection(ctx, route),
+    ...renderSection(route),
     '## Component tree',
     route.componentId
       ? componentTree(ctx, route.componentId, from)
@@ -659,6 +665,16 @@ function accessSection(ctx: Ctx, route: Route): string[] {
     ...(access.reasons ?? []).map((r) => `- Not sure: ${r.text}`),
   ]
   return ['## Access', lines.join('\n')]
+}
+
+/** How Next renders the page in a build, and why (M38). */
+function renderSection(route: Route): string[] {
+  const render = renderOf(route)
+  if (render.reasons.length === 0) return []
+  const lines = render.reasons.map(
+    (r) => `- ${renderReasonLine(r)}${r.loc ? `, ${code(`${r.loc.file}:${r.loc.line}`)}` : ''}`,
+  )
+  return ['## Rendering', lines.join('\n')]
 }
 
 function handlerDoc(ctx: Ctx, route: Route, from: string): string {

@@ -7,7 +7,12 @@
 | File | `app/jobs/[id]/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | open |
+| Rendering | dynamic |
 | Status | ✗ 1 mismatch |
+
+## Rendering
+
+- dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 
 ## Component tree
 

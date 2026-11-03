@@ -45,6 +45,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M35 | Walk-through          | `buildWalkthrough()` / `buildCoverage()` in `shared/src/walkthrough.ts`; ticks = `FlowStatus.best.steps`; `#/walk`.      |
 | M36 | Impact check          | `buildImpact()` in `shared/src/impact.ts`; optional `AppModel.imports` (no version bump); `--fail-on` errors exit 2.     |
 | M37 | Release v0.3.0        | Matrix also runs `explore` (project files hashed before/after), `summary` and `impact`. Publish = tag.                   |
+| M38 | Render mode           | Model version 13, `Route.render`. Walk records `RenderUse`s; `scanner/src/render.ts` adds segment config and the mode.   |
 
 ## Gotchas
 
@@ -381,7 +382,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 
 ## M33 — Global search (branch `feat/m33-global-search`)
 
-- The ranking is pure (`shared/src/search.ts`) so a v0.4.0 agent tool can reuse it; the dashboard only adds the box
+- The ranking is pure (`shared/src/search.ts`) so the v1.0.0 MCP tool (M56) can reuse it; the dashboard only adds the box
   and `searchScreen()`. Add a new kind there, in `SEARCH_KINDS`, `searchScreen()` and the link test.
 - Word matching keeps each field on its own line in `allWords`: without that, `src/user` matched a component named
   `User` in `src/b.tsx` (pieces from two fields).
@@ -469,3 +470,23 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Found, not fixed (next patch): links from config data or through the project's own link components aren't
   navigations ("nothing links here" on most pages of a data-driven menu), and `router.push()` in listeners an effect
   registers, or in handlers chosen with a ternary, is read as a guard / `page-load`.
+
+## M38 — Render mode per page (branch `feat/m38-render-mode`)
+
+- Check rendering rules with a real `next build` before coding them: `scripts/render-check.mjs` builds every Next
+  fixture and compares the route table. A scratch app outside the repo needs `next build --webpack`: Turbopack won't
+  resolve a `node_modules` junction that points outside the project root.
+- A dynamic segment without `generateStaticParams` is ƒ even when the page never reads `params`; a plain server
+  `fetch` is static (it runs once at build). Most fixture "dynamic" pages are `[id]` pages for that reason.
+- With Cache Components, request data outside `<Suspense>` fails the build ("blocking route"), so `partial` pages
+  are only valid when every reason is inside a boundary. That check is M41.
+- Render uses are recorded in `#emit` for every server-render site (not only fetch), so M39 can read the cache
+  options from `RenderUse.fetch` / `cached` without another walk.
+- Never add `next.config.*` (or any file that imports Next's types) to the ts-morph project: it made every warm
+  re-scan of the basic fixture 3x slower (66 → 205 ms, first one 130 ms → 1 s) and failed `incremental.test.ts`'s
+  1 s budget under load. It is parsed on its own with `ts.createSourceFile`. The perf app has no Next config, so
+  `bench.mjs` didn't show it: time `session.update()` on a fixture too.
+- New page-view text must keep M34's badge budget (`badges.test.ts`: details off hides a third of the badges):
+  secondary badges go behind `useShowDetails()`.
+- Heredoc patch scripts again turned `'\n'` into a line break (exporter `renderSection`); use the Edit tool for
+  lines with escapes.

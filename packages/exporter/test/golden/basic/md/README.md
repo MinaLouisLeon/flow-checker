@@ -47,11 +47,11 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 ## Pages
 
-| Page | File | Access | Requests | Status |
-| --- | --- | --- | --- | --- |
-| [`/`](pages/index.md) | `app/page.tsx` | open | 1 | ✓ 1 verified |
-| [`/about`](pages/about.md) | `app/(marketing)/about/page.tsx` | open | 0 | — |
-| [`/users/[id]`](pages/users.%5Bid%5D.md) | `app/users/[id]/page.tsx` | open | 3 | ✓ 3 verified |
+| Page | File | Access | Rendering | Requests | Status |
+| --- | --- | --- | --- | --- | --- |
+| [`/`](pages/index.md) | `app/page.tsx` | open | dynamic | 1 | ✓ 1 verified |
+| [`/about`](pages/about.md) | `app/(marketing)/about/page.tsx` | open | static | 0 | — |
+| [`/users/[id]`](pages/users.%5Bid%5D.md) | `app/users/[id]/page.tsx` | open | dynamic | 3 | ✓ 3 verified |
 
 ## Areas
 

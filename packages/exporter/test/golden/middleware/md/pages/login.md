@@ -7,6 +7,7 @@
 | File | `app/login/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`app/layout.tsx`) |
 | Access | guarded |
+| Rendering | static |
 
 ## Access
 
