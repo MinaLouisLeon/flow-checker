@@ -110,3 +110,4 @@ re-run them on their own before assuming a regression.
 | M36 | Impact check                                      | Done   |
 | M37 | Release v0.3.0                                    | Done   |
 | M38 | Render mode per page                              | Done   |
+| M39 | Server cache map                                  | Done   |

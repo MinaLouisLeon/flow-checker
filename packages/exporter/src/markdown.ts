@@ -11,6 +11,7 @@
 //   areas.md             pages grouped by feature: their components, flows, endpoints and open notes (M30)
 //   ONBOARDING.md        Start here: stack, areas, entry pages, main flows, backends, where things live (M32)
 //   GLOSSARY.md          what each status, note, trigger, transport and badge means, and what to do (M34)
+//   cache.md             server cache: tags, cached data, revalidation calls and what they refresh (M39)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   type AppModel,
@@ -21,8 +22,15 @@ import {
   buildEndpoints,
   buildIndex,
   buildSummary,
+  CACHE_KIND_LABELS,
+  type CacheEntry,
+  type CacheInvalidation,
   type CapturedBody,
   type Component,
+  cacheFlags,
+  cacheKeyText,
+  cacheLifeText,
+  cacheTags,
   type Endpoint,
   type EndpointHost,
   type EndpointList,
@@ -40,6 +48,8 @@ import {
   type GraphqlInfo,
   type GraphqlOperation,
   guardText,
+  invalidationText,
+  invalidationWhere,
   isInfoFlag,
   isVerified,
   type MatcherCondition,
@@ -51,6 +61,7 @@ import {
   type PostmanContract,
   type PostmanRequest,
   type PostmanSource,
+  pageCache,
   queryLinkTarget,
   queryLinkVerb,
   type RecordedFlow,
@@ -76,6 +87,7 @@ import {
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
 import {
   AREAS,
+  CACHE,
   type DocNames,
   docNames,
   ENDPOINTS,
@@ -164,6 +176,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.postman) files[POSTMAN] = postmanDoc(ctx, model.postman)
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
+  if (model.cache) files[CACHE] = cacheDoc(ctx)
   files[ENDPOINTS] = endpointsDoc(ctx)
   files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
@@ -374,6 +387,13 @@ function readme(ctx: Ctx): string {
         ]),
         ['left', 'right', 'right', 'right'],
       ),
+    )
+  }
+  if (model.cache) {
+    const flagged = cacheFlags(model.cache).length
+    sections.push(
+      '## Server cache',
+      `${link(`${plural(model.cache.entries.length, 'cached entry', 'cached entries')} and ${plural(model.cache.invalidations.length, 'revalidation call')}`, from, CACHE)}${flagged > 0 ? `, ${plural(flagged, 'note')} to check` : ''}.`,
     )
   }
   if (handlers.length > 0) {
@@ -629,6 +649,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ]),
     ...accessSection(ctx, route),
     ...renderSection(route),
+    ...cacheSection(ctx, route, from),
     '## Component tree',
     route.componentId
       ? componentTree(ctx, route.componentId, from)
@@ -675,6 +696,104 @@ function renderSection(route: Route): string[] {
     (r) => `- ${renderReasonLine(r)}${r.loc ? `, ${code(`${r.loc.file}:${r.loc.line}`)}` : ''}`,
   )
   return ['## Rendering', lines.join('\n')]
+}
+
+/** Server cache (M39): what the page renders with from the cache, and what refreshes it. */
+function cacheSection(ctx: Ctx, route: Route, from: string): string[] {
+  if (!ctx.model.cache) return []
+  const { entries, invalidations } = pageCache(ctx.model.cache, route.id)
+  if (entries.length === 0 && invalidations.length === 0) return []
+  return [
+    '## Server cache',
+    entries.length > 0 && `Cached data it renders with (${link('all', from, CACHE)}):`,
+    entries.length > 0 && entries.map((e) => `- ${cacheEntryLine(e)}`).join('\n'),
+    invalidations.length > 0 && 'Refreshed by:',
+    invalidations.length > 0 && invalidations.map((i) => `- ${invalidationLine(ctx, i)}`).join('\n'),
+  ].filter((p): p is string => typeof p === 'string')
+}
+
+function cacheEntryLine(e: CacheEntry): string {
+  const tags = e.tags.length > 0 ? `, tags ${e.tags.map((t) => code(cacheKeyText(t))).join(', ')}` : ''
+  return `${CACHE_KIND_LABELS[e.kind]} ${code(e.name)}, kept ${cacheLifeText(e)}${tags}, ${code(`${e.loc.file}:${e.loc.line}`)}`
+}
+
+function invalidationLine(ctx: Ctx, i: CacheInvalidation): string {
+  return `${code(invalidationText(i))} in ${codeText(invalidationWhere(i, ctx.model.routes))}, ${code(`${i.loc.file}:${i.loc.line}`)}`
+}
+
+function cacheDoc(ctx: Ctx): string {
+  const { model, index } = ctx
+  const cache = model.cache
+  if (!cache) return ''
+  const from = CACHE
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  const entryName = (e: CacheEntry) => `${CACHE_KIND_LABELS[e.kind]} ${code(e.name)}`
+  const byId = new Map(cache.entries.map((e) => [e.id, e]))
+  const flagged = cacheFlags(cache)
+  const tags = cacheTags(cache)
+  return doc([
+    '# Server cache',
+    link('← Overview', from, README),
+    `What Next keeps on the server between requests (${code('fetch')} cache options, ${code('use cache')}, ${code('unstable_cache')}), the tags on it, and the calls that refresh it.${model.project.cacheComponents ? ' Cache Components is on.' : ''} Read from the code; ${code('next dev')} doesn't cache like a build does.`,
+    flagged.length > 0 && `## To check (${flagged.length})`,
+    flagged.length > 0 &&
+      flagged
+        .map(({ flag, entry, invalidation }) => {
+          const what = invalidation ? code(invalidationText(invalidation)) : entry ? entryName(entry) : ''
+          const loc = (invalidation ?? entry)?.loc
+          return `- ${what}${loc ? ` (${code(`${loc.file}:${loc.line}`)})` : ''}: ${codeText(flag.message)}`
+        })
+        .join('\n'),
+    tags.length > 0 && '## Tags',
+    tags.length > 0 &&
+      table(
+        ['Tag', 'Set by', 'Revalidated by'],
+        tags.map((row) => [
+          code(row.tag),
+          row.entries.map(entryName).join(', ') || 'nothing',
+          row.invalidations
+            .map((i) => `${code(i.api)} in ${codeText(invalidationWhere(i, model.routes))}`)
+            .join(', ') || 'nothing',
+        ]),
+      ),
+    '## Cached data',
+    cache.entries.length === 0
+      ? 'Nothing is cached.'
+      : table(
+          ['Cached', 'Kept', 'Tags', 'Used by', 'Where'],
+          cache.entries.map((e) => [
+            entryName(e),
+            cacheLifeText(e),
+            e.tags.map((t) => code(cacheKeyText(t))).join(', ') || '—',
+            routes([...e.pageIds, ...e.handlerIds]),
+            code(`${e.loc.file}:${e.loc.line}`),
+          ]),
+        ),
+    '## Revalidation calls',
+    cache.invalidations.length === 0
+      ? `Nothing calls ${code('revalidateTag')}, ${code('updateTag')} or ${code('revalidatePath')}.`
+      : table(
+          ['Call', 'In', 'Refreshes', 'Pages', 'Where'],
+          cache.invalidations.map((i) => [
+            code(invalidationText(i)),
+            codeText(invalidationWhere(i, model.routes)),
+            i.entryIds
+              .flatMap((id) => {
+                const e = byId.get(id)
+                return e ? [entryName(e)] : []
+              })
+              .join(', ') || '—',
+            routes([...i.pageIds, ...i.handlerIds]),
+            code(`${i.loc.file}:${i.loc.line}`),
+          ]),
+        ),
+  ])
 }
 
 function handlerDoc(ctx: Ctx, route: Route, from: string): string {

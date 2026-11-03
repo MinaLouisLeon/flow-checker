@@ -82,6 +82,8 @@ export type Screen =
   | { name: 'walk'; flowId?: string }
   /** Affected by changes (M36): what the latest re-scan's files affect. */
   | { name: 'changes' }
+  /** Server cache map (M39): cached data, tags and what revalidates them. */
+  | { name: 'cache' }
   | { name: 'export' }
   /** What each status, note and badge means (M34); `term` (`flag-dynamic-url`) is the one shown first. */
   | { name: 'glossary'; q: string; term?: string }
@@ -167,6 +169,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'export' }
     case 'changes':
       return { name: 'changes' }
+    case 'cache':
+      return { name: 'cache' }
     case 'glossary':
       return { name: 'glossary', q: params.get('q') ?? '', term: params.get('term') ?? undefined }
     case 'live':
@@ -252,6 +256,8 @@ export function href(screen: Screen): string {
       return '#/export'
     case 'changes':
       return '#/changes'
+    case 'cache':
+      return '#/cache'
     case 'glossary':
       return withQuery('/glossary', { q: screen.q, term: screen.term })
     case 'live':

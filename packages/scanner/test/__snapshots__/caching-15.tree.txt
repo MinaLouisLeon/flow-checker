@@ -1,0 +1,85 @@
+# Route tree
+
+app [layout, page]
+├─ (account) (group) [layout]
+│  └─ profile [page]
+├─ api
+│  └─ revalidate [route]
+├─ products [page]
+└─ todos
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  app/page.tsx
+/api/revalidate  route POST  app/api/revalidate/route.ts
+/products  page  app/products/page.tsx
+/profile  page  app/(account)/profile/page.tsx
+/todos/[id]  page  app/todos/[id]/page.tsx
+
+# Layouts
+
+AccountLayout  server  app/(account)/layout.tsx:5
+└─ AccountBar  server  components/account-bar.tsx:3
+
+RootLayout  server  app/layout.tsx:5
+
+# Pages
+
+## /  app/page.tsx
+layouts: app/layout.tsx
+Home  server  app/page.tsx:5
+└─ Link  external next/link
+access: open
+render: static
+
+## /products  app/products/page.tsx
+layouts: app/layout.tsx
+ProductsPage  server  app/products/page.tsx:7
+access: open
+render: ISR 5m
+  ISR 5m: caches with `unstable_cache` (page)  app/products/page.tsx:9
+
+## /profile  app/(account)/profile/page.tsx
+layouts: app/layout.tsx > app/(account)/layout.tsx
+ProfilePage  server  app/(account)/profile/page.tsx:1
+access: open
+render: ISR 1d
+  ISR 1d: caches with `unstable_cache` (component)  lib/viewer.ts:7
+
+## /todos/[id]  app/todos/[id]/page.tsx
+layouts: app/layout.tsx
+TodoPage  server  app/todos/[id]/page.tsx:4
+access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+
+# Server cache
+
+unstable_cache  listProducts  [products]  5m  app/products/page.tsx:9
+  used by: /products
+  ! tag-never-revalidated: Nothing revalidates the tag `products`: no `revalidateTag` or `updateTag` call has it, so the data only refreshes when its time runs out.
+fetch  {API_URL ?? http://localhost:4010}/todos  [todos]  until revalidated  lib/todos.js:6
+  used by: /
+fetch  {API_URL ?? http://localhost:4010}/todos/:id  [todos, todo-{id}]  until revalidated  lib/todos.js:12
+  used by: /todos/[id]
+unstable_cache  getViewer  [viewer]  1d  lib/viewer.ts:7
+  used by: /profile
+
+revalidateTag('todos')  in server action `createTodo`  app/actions.ts:13
+  refreshes: fetch {API_URL ?? http://localhost:4010}/todos, fetch {API_URL ?? http://localhost:4010}/todos/:id
+  pages: /, /todos/[id]
+revalidatePath('/')  in server action `createTodo`  app/actions.ts:14
+  pages: /
+revalidateTag(`todo-${id}`)  in server action `toggleTodo`  app/actions.ts:24
+  refreshes: fetch {API_URL ?? http://localhost:4010}/todos/:id
+  pages: /todos/[id]
+revalidateTag('product')  in server action `refreshProducts`  app/actions.ts:29
+  ! tag-never-set: No cached data has the tag `product`, so this call refreshes nothing. Tags are set with `next.tags` on a `fetch`, `cacheTag()` or `unstable_cache`'s `tags`.
+revalidatePath('/products', 'layout')  in server action `refreshProducts`  app/actions.ts:30
+  pages: /products
+revalidateTag('viewer')  in route handler `POST /api/revalidate`  app/api/revalidate/route.ts:5
+  refreshes: unstable_cache getViewer
+  pages: /profile
+revalidatePath('/profil')  in route handler `POST /api/revalidate`  app/api/revalidate/route.ts:7
+  ! path-no-route: No page or route handler is at `/profil`, so this call refreshes nothing. `revalidatePath` takes the route's path (for a rewrite, its destination).

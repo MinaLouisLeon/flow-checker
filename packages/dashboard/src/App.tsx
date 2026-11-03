@@ -6,6 +6,7 @@ import { GlobalSearch, shortcutLabel, useSearchShortcut } from './GlobalSearch'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
 import { AreasScreen } from './screens/AreasScreen'
+import { CacheScreen } from './screens/CacheScreen'
 import { ChangesScreen } from './screens/ChangesScreen'
 import { ComponentPanel } from './screens/ComponentPanel'
 import { ComponentsScreen } from './screens/ComponentsScreen'
@@ -30,6 +31,8 @@ const NAV: {
   match: Screen['name'][]
   needsCapture?: boolean
   needsExport?: boolean
+  /** Only when the scan found server caching (M39). */
+  needsCache?: boolean
 }[] = [
   { label: 'Start here', screen: { name: 'start' }, match: ['start'] },
   { label: 'Walk the app', screen: { name: 'walk' }, match: ['walk'] },
@@ -40,6 +43,7 @@ const NAV: {
   { label: 'Requests', screen: { name: 'requests', q: '' }, match: ['requests'] },
   { label: 'Endpoints', screen: { name: 'endpoints', q: '' }, match: ['endpoints'] },
   { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
+  { label: 'Cache', screen: { name: 'cache' }, match: ['cache'], needsCache: true },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
   { label: 'Export', screen: { name: 'export' }, match: ['export'], needsExport: true },
@@ -80,7 +84,8 @@ export function App() {
             (item) =>
               // Explore shows Live too, to explain how to turn capture on.
               (!item.needsCapture || meta.data?.capture || meta.data?.explore) &&
-              (!item.needsExport || meta.data?.export),
+              (!item.needsExport || meta.data?.export) &&
+              (!item.needsCache || Boolean(model.data?.cache)),
           ).map((item) => (
             <a
               key={item.label}
@@ -232,6 +237,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <ExportScreen />
     case 'changes':
       return <ChangesScreen />
+    case 'cache':
+      return <CacheScreen />
     case 'glossary':
       return <GlossaryScreen q={screen.q} term={screen.term} />
     case 'not-found':

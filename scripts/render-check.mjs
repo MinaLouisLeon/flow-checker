@@ -65,14 +65,22 @@ function readTable(out) {
   const start = out.indexOf('Route (app)')
   for (const line of out.slice(start).split('\n').slice(1)) {
     // A page with `generateStaticParams` prints without a symbol, its prerendered params below it.
-    const m = /^[┌├└│ ]+([○●◐ƒ])?\s*(\/\S*)(?:\s+(\S+)\s+\S+)?/.exec(line)
+    // With Cache Components a page with params prints the same way, its own mode on the row below.
+    const m = /^[┌├└│ ]+([○●◐ƒ])?\s*(\/\S*)(.*)$/.exec(line)
     if (!m) {
       if (/^\s*$/.test(line)) break
       continue
     }
-    const [, symbol, path, revalidate] = m
-    if (path === '/_not-found' || rows.has(path)) continue
-    rows.set(path, { mode: symbol ? SYMBOLS[symbol] : 'static', ...(revalidate ? { revalidate } : {}) })
+    const [, symbol, path, rest] = m
+    const known = rows.get(path)
+    if (path === '/_not-found' || (known && (known.symbol || !symbol))) continue
+    // Next 15 also prints size columns (`3.46 kB`): the revalidate column is the first duration.
+    const revalidate = rest.split(/\s+/).find((cell) => /^\d+(s|m|h|d|w|y)$/.test(cell))
+    rows.set(path, {
+      mode: symbol ? SYMBOLS[symbol] : 'static',
+      symbol: Boolean(symbol),
+      ...(revalidate ? { revalidate } : {}),
+    })
   }
   return rows
 }

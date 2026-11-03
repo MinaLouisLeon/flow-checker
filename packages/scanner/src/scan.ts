@@ -18,6 +18,7 @@ import {
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { addRouteAccess } from './access'
+import { buildCacheMap } from './cache'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
@@ -435,6 +436,12 @@ function analyze(
     fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
     cacheComponents,
   })
+  const cache = buildCacheMap({
+    routes,
+    components,
+    entries: requests.cacheEntries(),
+    invalidations: requests.invalidations(),
+  })
   const modelTypes = types.types()
   report({
     phase: 'flows',
@@ -467,6 +474,7 @@ function analyze(
     ...(streams.length > 0 ? { streams } : {}),
     ...(settings.areas ? { areas: settings.areas } : {}),
     imports: importGraph(project, root, discovery, settings),
+    ...(cache ? { cache } : {}),
   }
 }
 

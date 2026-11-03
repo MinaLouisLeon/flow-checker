@@ -1,0 +1,19 @@
+# Types
+
+Todo  interface  src/types.ts:1
+  { id: number; userId: number; title: string; done: boolean }
+Product  interface  src/types.ts:8
+  { id: number; name: string; price: number; stock: number }
+User  interface  src/types.ts:15
+  { id: number; name: string; email: string }
+Settings  interface  src/types.ts:21
+  { theme: string; locale: string }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:6
+  props: { children: ReactNode }
+TodoDetail  src/app/todos/[id]/page.tsx:5
+  props: { params: Promise<{ id: string }> }
+TodoPage  src/app/todos/[id]/page.tsx:18
+  props: { params: Promise<{ id: string }> }

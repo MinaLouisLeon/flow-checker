@@ -1819,3 +1819,41 @@ kbd {
 .impact-also {
   margin-top: 12px;
 }
+
+/* Server cache map (M39) */
+.list.cache-list li {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+.cache-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cache-flags {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+}
+.list .cache-flags li {
+  border: 0;
+  padding: 2px 0;
+  display: block;
+}
+.cache-tags {
+  width: 100%;
+  border-collapse: collapse;
+}
+.cache-tags th,
+.cache-tags td {
+  text-align: left;
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.cache-tags th {
+  color: var(--muted);
+  font-weight: 500;
+}

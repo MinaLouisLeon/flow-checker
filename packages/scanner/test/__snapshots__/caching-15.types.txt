@@ -1,0 +1,19 @@
+# Types
+
+Todo  interface  lib/types.ts:1
+  { id: number; userId: number; title: string; done: boolean }
+Product  interface  lib/types.ts:8
+  { id: number; name: string; price: number }
+User  interface  lib/types.ts:14
+  { id: number; name: string }
+
+# Component types
+
+AccountLayout  app/(account)/layout.tsx:5
+  props: { children: ReactNode }
+RootLayout  app/layout.tsx:5
+  props: { children: ReactNode }
+ProductsPage  app/products/page.tsx:7
+  uses: Product
+TodoPage  app/todos/[id]/page.tsx:4
+  props: { params: Promise<{ id: string }> }

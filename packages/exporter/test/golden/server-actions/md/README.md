@@ -64,6 +64,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [home](areas.md#ar_1vn39fso9m3) | 1 | 0 | 0 |
 | [products](areas.md#ar_2erkuzrjb5u) | 3 | 2 | 6 |
 
+## Server cache
+
+[0 cached entries and 2 revalidation calls](cache.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |

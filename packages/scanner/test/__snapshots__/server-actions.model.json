@@ -1,5 +1,5 @@
 {
-  "version": 13,
+  "version": 14,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -1178,6 +1178,85 @@
     ],
     "src/lib/backend.ts": [
       "src/types/product.ts"
+    ]
+  },
+  "cache": {
+    "entries": [],
+    "invalidations": [
+      {
+        "id": "ci_1na9ig1zjif",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/products'",
+          "value": "/products",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "createProduct",
+          "loc": {
+            "file": "src/actions/products.ts",
+            "line": 9,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/products.ts",
+            "line": 25,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 25,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_15woxpfn7et",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/products'",
+          "value": "/products",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "deleteProduct",
+          "loc": {
+            "file": "src/actions/products.ts",
+            "line": 30,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/products.ts",
+            "line": 32,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 32,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "handlerIds": [],
+        "flags": []
+      }
     ]
   }
 }
