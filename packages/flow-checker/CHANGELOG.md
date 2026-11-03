@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Render mode per page.** Each page is labeled `static`, `ISR` (with its time, e.g. `ISR 1m`), `dynamic`, `partial` (Cache Components: a static shell with parts streamed per request) or `render ?`, the way `next build` would print it, with every reason and where it is: `cookies()`, `headers()`, `draftMode()`, `connection()` or `unstable_noStore()` in the page, a layout, a component they render or a helper they call; the page or its `generateMetadata` reading `searchParams`; a dynamic segment with no `generateStaticParams`; `export const dynamic` / `revalidate` / `fetchCache` in the page or a layout; a server `fetch` with `cache: 'no-store'` or `next.revalidate`; with Cache Components, server requests outside `use cache` and the `cacheLife` of those inside. `force-static` wins over everything else, as in Next. A page is `render ?`, never `static`, when a config value or a call the scan can't follow might change it. The page view has a Rendering section and badge, the Map a badge and a filter by render mode, and the Markdown export a Rendering column and section. Models saved by 0.3 still load (pages read as `render ?` until the next scan).
+
 ## 0.3.0
 
 Onboarding: understand a Next.js project you just cloned, with nothing to set up. `npx @integr8-media/flow-checker explore` scans it, leaves every project file as it was, and opens the dashboard on **Start here**, a short tour: the stack, the areas (features), the pages to start from, the main flows, the backends and where things live. From there, Areas, Endpoints and guarded pages show how the app is built, global search finds anything, every badge explains itself, **Walk the app** turns the flows into a checklist to try with capture on, and `flow-checker impact` says what a change to a file affects. Models saved by 0.2 still load.

@@ -24,6 +24,10 @@ import {
   TRANSPORTS,
 } from './lists'
 
+/** Map filter on render mode (M38). */
+export const RENDER_FILTERS = ['static', 'isr', 'dynamic', 'partial', 'unknown'] as const
+export type RenderFilter = (typeof RENDER_FILTERS)[number]
+
 /** Map filter on page access (M31). */
 export const ACCESS_FILTERS = ['guarded', 'open', 'unknown'] as const
 export type AccessFilter = (typeof ACCESS_FILTERS)[number]
@@ -34,8 +38,8 @@ export type Screen =
   | { name: 'overview' }
   /** `handlers`: the route handlers as a list (M23). */
   /** `areas`: the Map graph draws a frame around each area's pages (M30). */
-  /** `access`: only pages with that access label stand out (M31). */
-  | { name: 'map'; view: MapView; q: string; areas?: boolean; access?: AccessFilter }
+  /** `access`: only pages with that access label stand out (M31); `render`: that render mode (M38). */
+  | { name: 'map'; view: MapView; q: string; areas?: boolean; access?: AccessFilter; render?: RenderFilter }
   /** Pages grouped by feature (M30); `areaId` is the one shown beside the cards. */
   | { name: 'areas'; areaId?: string; q: string }
   | { name: 'page'; routeId: string; componentId?: string }
@@ -109,6 +113,7 @@ export function parseHash(hash: string): Screen {
         q: params.get('q') ?? '',
         areas: params.get('areas') === '1' || undefined,
         access: oneOf(ACCESS_FILTERS, params.get('access')),
+        render: oneOf(RENDER_FILTERS, params.get('render')),
       }
     case 'areas':
       return { name: 'areas', areaId: parts[1], q: params.get('q') ?? '' }
@@ -199,6 +204,7 @@ export function href(screen: Screen): string {
         q: screen.q,
         areas: screen.areas ? '1' : undefined,
         access: screen.access,
+        render: screen.render,
       })
     case 'areas':
       return withQuery(screen.areaId ? `/areas/${encodeURIComponent(screen.areaId)}` : '/areas', {

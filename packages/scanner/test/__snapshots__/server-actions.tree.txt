@@ -23,6 +23,7 @@ layouts: src/app/layout.tsx
 Home  server  src/app/page.tsx:3
 access: guarded
   redirects to `/products` always (page)  src/app/page.tsx:4
+render: static
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -30,6 +31,9 @@ ProductsPage  server  src/app/products/page.tsx:7
 ├─ Link  external next/link
 └─ DeleteProductButton  client (use client)  src/components/DeleteProductButton.tsx:7
 access: open
+render: dynamic
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  src/app/products/page.tsx:5
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/backend.ts:7
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -37,9 +41,14 @@ ProductPage  server  src/app/products/[id]/page.tsx:7
 └─ Link  external next/link
 access: guarded
   shows the not-found page (404) when `!product` (page)  src/app/products/[id]/page.tsx:10
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  src/app/products/[id]/page.tsx:5
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/backend.ts:12
 
 ## /products/new  src/app/products/new/page.tsx
 layouts: src/app/layout.tsx
 NewProductPage  server  src/app/products/new/page.tsx:3
 └─ CreateProductForm  client (use client)  src/components/CreateProductForm.tsx:10
 access: open
+render: static

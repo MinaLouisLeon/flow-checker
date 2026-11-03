@@ -4,7 +4,7 @@
 import type { EndpointStatus } from './endpoints'
 import type { FlowStatus } from './flow-runs'
 import type { CaptureMatch } from './match'
-import type { Component, Flag, RequestSite, RequestUrl, RouteAccess, Trigger } from './model'
+import type { Component, Flag, RequestSite, RequestUrl, RouteAccess, RouteRender, Trigger } from './model'
 import type { TypeCheckStatus } from './type-check'
 
 export interface GlossaryEntry {
@@ -32,6 +32,7 @@ export type GlossaryGroupId =
   | 'request'
   | 'url'
   | 'access'
+  | 'render'
   | 'flow-status'
   | 'endpoint-status'
   | 'endpoint-side'
@@ -258,6 +259,41 @@ const ACCESS: GlossaryGroup<RouteAccess['status']> = {
   },
 }
 
+const RENDER: GlossaryGroup<RouteRender['mode']> = {
+  id: 'render',
+  title: 'Render mode',
+  intro:
+    'How Next renders a page in a production build, as read from the code. `next dev` renders every page per request.',
+  entries: {
+    static: {
+      label: 'static',
+      means: 'Prerendered once at build time; every visitor gets the same HTML until the next build.',
+    },
+    isr: {
+      label: 'ISR',
+      means:
+        'Prerendered at build time and rebuilt in the background after the time shown (`revalidate`, `next.revalidate` or `cacheLife`).',
+    },
+    dynamic: {
+      label: 'dynamic',
+      means:
+        'Rendered for each request, because the page reads the request (`cookies()`, `headers()`, `searchParams`), opts out of caching or has params it cannot list ahead.',
+      todo: 'Open the page to see each reason and where it is; remove the ones you did not mean.',
+    },
+    partial: {
+      label: 'partial',
+      means:
+        'Cache Components: a static shell is prerendered and the parts that read the request or uncached data stream in per request.',
+      todo: 'Each reason must sit inside `<Suspense>` (or `use cache`), or the build fails.',
+    },
+    unknown: {
+      label: 'render ?',
+      means: 'The scan could not tell: a config value or a call it could not read.',
+      todo: 'Open the page to see what could not be read.',
+    },
+  },
+}
+
 const FLOW_STATUS: GlossaryGroup<FlowStatus['status']> = {
   id: 'flow-status',
   title: 'Flow status',
@@ -416,6 +452,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   REQUEST,
   URL,
   ACCESS,
+  RENDER,
   FLOW_STATUS,
   ENDPOINT_STATUS,
   ENDPOINT_SIDE,

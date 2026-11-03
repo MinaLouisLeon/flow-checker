@@ -63,48 +63,63 @@ Home  server  src/app/page.tsx:13
 ├─ Image  external next/image
 └─ Missing  unresolved ./missing
 access: open
+render: static
 
 ## /dashboard  src/app/dashboard/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx > src/app/dashboard/template.tsx
 Dash  server  src/app/dashboard/page.tsx:1
 access: open
+render: static
 
 ## /docs/[[...path]]  src/app/docs/[[...path]]/page.tsx
 layouts: src/app/layout.tsx
 Docs  server  src/app/docs/[[...path]]/page.tsx:1
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[[...path]]` and no `generateStaticParams` (page)
 
 ## /feed  src/app/feed/page.tsx
 layouts: src/app/layout.tsx
 Feed  server  src/app/feed/page.tsx:1
 access: open
+render: static
 
 ## /memo  src/app/memo/page.tsx
 layouts: src/app/layout.tsx
 MemoPage  server  src/app/memo/page.tsx:2
 access: open
+render: static
 
 ## /no-default  src/app/no-default/page.tsx
 layouts: src/app/layout.tsx
 (no component)
 access: open
+render: static
 
 ## /photo/[id] @modal  src/app/@modal/(.)photo/[id]/page.tsx
 layouts: src/app/layout.tsx
 PhotoModal  server  src/app/@modal/(.)photo/[id]/page.tsx:1
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 
 ## /photo/[id]  src/app/feed/(..)photo/[id]/page.tsx
 layouts: src/app/layout.tsx
 FeedPhoto  server  src/app/feed/(..)photo/[id]/page.tsx:1
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 
 ## /photo/[id]  src/app/photo/[id]/page.tsx
 layouts: src/app/layout.tsx
 Photo  server  src/app/photo/[id]/page.tsx:1
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 
 ## /shop/[...slug]  src/app/(shop)/shop/[...slug]/page.tsx
 layouts: src/app/layout.tsx
 Shop  server  src/app/(shop)/shop/[...slug]/page.tsx:1
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[...slug]` and no `generateStaticParams` (page)

@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "websocket",
   "model": {
-    "version": 12,
+    "version": 13,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -55,6 +55,10 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "static",
+          "reasons": []
         }
       },
       {
@@ -80,6 +84,10 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "static",
+          "reasons": []
         }
       }
     ],

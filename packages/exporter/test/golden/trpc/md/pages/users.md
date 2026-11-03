@@ -7,7 +7,12 @@
 | File | `src/app/users/page.tsx` |
 | Layouts | [`RootLayout`](../components/RootLayout.md) (`src/app/layout.tsx`) |
 | Access | open |
+| Rendering | dynamic |
 | Status | ✓ 1 verified |
+
+## Rendering
+
+- dynamic: `export const dynamic = 'force-dynamic'` (page), `src/app/users/page.tsx:6`
 
 ## Component tree
 

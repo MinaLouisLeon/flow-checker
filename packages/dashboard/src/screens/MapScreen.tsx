@@ -12,14 +12,22 @@ import {
   ReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { accessOf, isVerified as isSiteVerified } from '@flow-checker/shared'
+import { accessOf, isVerified as isSiteVerified, RENDER_LABELS, renderOf } from '@flow-checker/shared'
 import { useMemo, useState } from 'react'
 import { useData } from '../context'
 import { layoutRoutes, NODE_HEIGHT, NODE_WIDTH } from '../graph-layout'
 import { areasOf } from '../lists'
 import type { ModelIndex } from '../model-index'
-import { ACCESS_FILTERS, type AccessFilter, href, type MapView, replaceScreen } from '../router'
-import { AccessBadge, Badge, Empty, matches, SearchBox, SourceLink } from '../ui'
+import {
+  ACCESS_FILTERS,
+  type AccessFilter,
+  href,
+  type MapView,
+  RENDER_FILTERS,
+  type RenderFilter,
+  replaceScreen,
+} from '../router'
+import { AccessBadge, Badge, Empty, matches, RenderBadge, SearchBox, SourceLink } from '../ui'
 
 interface RouteNodeData extends Record<string, unknown> {
   route: Route
@@ -47,19 +55,28 @@ export function MapScreen({
   q,
   areas,
   access,
+  render,
 }: {
   view: MapView
   q: string
   areas?: boolean
   access?: AccessFilter
+  render?: RenderFilter
 }) {
   const { index } = useData()
-  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas, access })
-  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas, access })
+  const setView = (next: MapView) => replaceScreen({ name: 'map', view: next, q, areas, access, render })
+  const setQuery = (next: string) => replaceScreen({ name: 'map', view, q: next, areas, access, render })
   const setAreas = (next: boolean) =>
-    replaceScreen({ name: 'map', view, q, areas: next || undefined, access })
+    replaceScreen({ name: 'map', view, q, areas: next || undefined, access, render })
   const setAccess = (next: AccessFilter | undefined) =>
-    replaceScreen({ name: 'map', view, q, areas, access: next })
+    replaceScreen({ name: 'map', view, q, areas, access: next, render })
+  const setRender = (next: RenderFilter | undefined) =>
+    replaceScreen({ name: 'map', view, q, areas, access, render: next })
+  const renderCounts = useMemo(() => {
+    const counts: Record<RenderFilter, number> = { static: 0, isr: 0, dynamic: 0, partial: 0, unknown: 0 }
+    for (const route of index.model.routes) if (route.kind === 'page') counts[renderOf(route).mode]++
+    return counts
+  }, [index])
   const accessCounts = useMemo(() => {
     const counts: Record<AccessFilter, number> = { guarded: 0, open: 0, unknown: 0 }
     for (const route of index.model.routes) if (route.kind === 'page') counts[accessOf(route).status]++
@@ -105,9 +122,27 @@ export function MapScreen({
             ))}
           </fieldset>
         )}
+        {view === 'graph' && (
+          <fieldset className="segmented" aria-label="Render mode">
+            <button type="button" aria-pressed={!render} onClick={() => setRender(undefined)}>
+              Any rendering
+            </button>
+            {RENDER_FILTERS.filter((m) => renderCounts[m] > 0 || render === m).map((m) => (
+              <button
+                key={m}
+                type="button"
+                aria-pressed={render === m}
+                onClick={() => setRender(render === m ? undefined : m)}
+                title={RENDER_HINTS[m]}
+              >
+                {RENDER_LABELS[m]} {renderCounts[m]}
+              </button>
+            ))}
+          </fieldset>
+        )}
       </div>
       {view === 'graph' ? (
-        <RouteGraphView q={q} showAreas={Boolean(areas)} access={access} />
+        <RouteGraphView q={q} showAreas={Boolean(areas)} access={access} render={render} />
       ) : view === 'tree' ? (
         <RouteTreeView q={q} />
       ) : (
@@ -117,13 +152,31 @@ export function MapScreen({
   )
 }
 
+const RENDER_HINTS: Record<RenderFilter, string> = {
+  static: 'Pages prerendered at build time',
+  isr: 'Pages prerendered and refreshed after a set time',
+  dynamic: 'Pages rendered for each request',
+  partial: 'Pages with a static shell and parts streamed per request (Cache Components)',
+  unknown: "Pages whose rendering the scan can't tell",
+}
+
 const ACCESS_HINTS: Record<AccessFilter, string> = {
   guarded: 'Pages that redirect or stop under a condition the scan read',
   open: 'Pages where nothing redirects or stops them',
   unknown: "Pages that may redirect or stop, under a condition the scan can't read",
 }
 
-function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolean; access?: AccessFilter }) {
+function RouteGraphView({
+  q,
+  showAreas,
+  access,
+  render,
+}: {
+  q: string
+  showAreas: boolean
+  access?: AccessFilter
+  render?: RenderFilter
+}) {
   const { index } = useData()
   const [showShared, setShowShared] = useState(false)
   const hasSharedEdges = index.navEdges.some((e) => e.shared)
@@ -208,11 +261,12 @@ function RouteGraphView({ q, showAreas, access }: { q: string; showAreas: boolea
           ...n.data,
           dimmed:
             !matches(q, n.data.route.path, n.data.route.file) ||
-            (!!access && (n.data.route.kind !== 'page' || accessOf(n.data.route).status !== access)),
+            (!!access && (n.data.route.kind !== 'page' || accessOf(n.data.route).status !== access)) ||
+            (!!render && (n.data.route.kind !== 'page' || renderOf(n.data.route).mode !== render)),
         },
       })),
     ],
-    [frames, nodes, q, access],
+    [frames, nodes, q, access, render],
   )
 
   if (nodes.length === 0) return <p className="empty">No routes found.</p>
@@ -367,6 +421,7 @@ function RouteNodeView({ data }: NodeProps<RouteNode>) {
         {route.intercepting && <span>intercepts</span>}
         {noteCount > 0 && <span className="warn">⚠ {noteCount}</span>}
         {!handler && <AccessBadge route={route} compact />}
+        {!handler && <RenderBadge route={route} compact />}
       </div>
       <Handle type="source" id="out" position={Position.Right} isConnectable={false} />
     </div>

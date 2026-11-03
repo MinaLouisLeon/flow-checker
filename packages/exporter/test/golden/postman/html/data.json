@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "postman",
   "model": {
-    "version": 12,
+    "version": 13,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -66,6 +66,35 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "dynamic",
+          "reasons": [
+            {
+              "kind": "segment-config",
+              "in": "page",
+              "detail": "dynamic = 'force-dynamic'",
+              "loc": {
+                "file": "app/page.tsx",
+                "line": 6,
+                "column": 14
+              },
+              "effect": "dynamic"
+            },
+            {
+              "in": "page",
+              "componentId": "cmp_0ku4o3jpe9o",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 5,
+                "column": 21
+              },
+              "siteId": "req_0iv5kcsl9up",
+              "kind": "fetch",
+              "effect": "dynamic",
+              "detail": "cache: 'no-store'"
+            }
+          ]
         }
       },
       {
@@ -96,6 +125,41 @@
         "access": {
           "status": "open",
           "guards": []
+        },
+        "render": {
+          "mode": "dynamic",
+          "reasons": [
+            {
+              "kind": "dynamic-params",
+              "effect": "dynamic",
+              "in": "page",
+              "detail": "`[id]`"
+            },
+            {
+              "kind": "segment-config",
+              "in": "page",
+              "detail": "dynamic = 'force-dynamic'",
+              "loc": {
+                "file": "app/users/[id]/page.tsx",
+                "line": 4,
+                "column": 14
+              },
+              "effect": "dynamic"
+            },
+            {
+              "in": "page",
+              "componentId": "cmp_0vmo84pmvzo",
+              "loc": {
+                "file": "lib/api.ts",
+                "line": 12,
+                "column": 21
+              },
+              "siteId": "req_0zfyatg6d3b",
+              "kind": "fetch",
+              "effect": "dynamic",
+              "detail": "cache: 'no-store'"
+            }
+          ]
         }
       }
     ],

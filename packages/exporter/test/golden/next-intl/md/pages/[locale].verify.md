@@ -7,11 +7,17 @@
 | File | `src/app/[locale]/verify/page.tsx` |
 | Layouts | [`LocaleLayout`](../components/LocaleLayout.md) (`src/app/[locale]/layout.tsx`) |
 | Access | guarded |
+| Rendering | dynamic |
 | Status | ✓ 1 verified |
 
 ## Access
 
 - shows the not-found page (404) when `!hasLocale(routing.locales, locale)` (layout), `src/app/[locale]/layout.tsx:19`
+
+## Rendering
+
+- dynamic: reads `searchParams`, which come with each request (page), `src/app/[locale]/verify/page.tsx:4`
+- info: `generateStaticParams` lists the params to prerender (layout), `src/app/[locale]/layout.tsx:7`
 
 ## Component tree
 

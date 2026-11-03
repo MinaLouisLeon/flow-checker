@@ -29,6 +29,7 @@ TodosPage  server  src/app/page.tsx:5
 │  └─ Link  external next/link  [conditional]
 └─ TodoStats  client (use client)  src/components/TodoStats.tsx:9
 access: open
+render: static
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -36,6 +37,7 @@ SettingsPage  server  src/app/settings/page.tsx:4
 ├─ SettingsBadge  client (use client)  src/components/SettingsBadge.tsx:7
 └─ SettingsPanel  client (use client)  src/components/SettingsPanel.tsx:10
 access: open
+render: static
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -43,6 +45,8 @@ TodoPage  server  src/app/todos/[id]/page.tsx:3
 └─ TodoDetail  client (use client)  src/components/TodoDetail.tsx:8
    └─ Link  external next/link  [conditional]
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -51,3 +55,4 @@ UsersPage  server  src/app/users/page.tsx:7
 │  └─ Hydrate  external @tanstack/react-query
 └─ UserList  client (use client)  src/components/UserList.tsx:7
 access: open
+render: static

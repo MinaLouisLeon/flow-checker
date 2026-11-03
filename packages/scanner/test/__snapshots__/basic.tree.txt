@@ -25,11 +25,15 @@ HomePage  server  app/page.tsx:7
 └─ UserList  server  components/UserList.tsx:9
    └─ Link  external next/link
 access: open
+render: dynamic
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  app/page.tsx:4
+  dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:14
 
 ## /about  app/(marketing)/about/page.tsx
 layouts: app/layout.tsx
 AboutPage  server  app/(marketing)/about/page.tsx:2
 access: open
+render: static
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
@@ -37,3 +41,7 @@ UserPage  server  app/users/[id]/page.tsx:8
 ├─ ProfileCard  client (use client)  components/ProfileCard.tsx:12
 └─ DeleteUserButton  client (use client)  components/DeleteUserButton.tsx:12
 access: open
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  dynamic: `export const dynamic = 'force-dynamic'` (page)  app/users/[id]/page.tsx:5
+  dynamic: fetches with `cache: 'no-store'` (page)  lib/api.ts:20

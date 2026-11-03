@@ -6,6 +6,10 @@ import {
   type GlossaryGroupId,
   guardText,
   type Route,
+  type RouteRender,
+  renderLabel,
+  renderOf,
+  renderReasonLine,
   termId,
 } from '@flow-checker/shared'
 import { type ReactNode, useEffect, useState } from 'react'
@@ -41,6 +45,30 @@ export function AccessBadge({ route, compact }: { route: Route; compact?: boolea
   return compact ? null : (
     <Badge tone="ok" title={title} term={['access', 'open']}>
       open
+    </Badge>
+  )
+}
+
+const RENDER_TONES: Record<RouteRender['mode'], 'ok' | 'shared' | 'server' | 'muted'> = {
+  static: 'ok',
+  isr: 'shared',
+  dynamic: 'server',
+  partial: 'server',
+  unknown: 'muted',
+}
+
+/**
+ * A page's render mode (M38): `static`, `ISR 1m`, `dynamic`, `partial` or `render ?`. `compact`
+ * leaves out `static`, so busy views only mark the pages that render per request or refresh.
+ */
+export function RenderBadge({ route, compact }: { route: Route; compact?: boolean }) {
+  if (route.kind !== 'page') return null
+  const render = renderOf(route)
+  if (compact && render.mode === 'static') return null
+  const title = render.reasons.map((r) => renderReasonLine(r).replaceAll('`', '')).join('\n') || undefined
+  return (
+    <Badge tone={RENDER_TONES[render.mode]} title={title} term={['render', render.mode]}>
+      {renderLabel(render)}
     </Badge>
   )
 }

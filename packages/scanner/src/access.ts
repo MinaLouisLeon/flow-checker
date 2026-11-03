@@ -172,7 +172,7 @@ function targetOf(nav: Navigation): Pick<PageGuard, 'target' | 'targetRouteId'> 
 }
 
 /** Every component rendered below one (itself first), cached. */
-function componentsBelow(components: Component[]): (id: string) => string[] {
+export function componentsBelow(components: Component[]): (id: string) => string[] {
   const byId = new Map(components.map((c) => [c.id, c]))
   const cache = new Map<string, string[]>()
   return (id) => {
@@ -195,7 +195,7 @@ function componentsBelow(components: Component[]): (id: string) => string[] {
   }
 }
 
-function groupBy<T>(items: T[], key: (item: T) => string): Map<string, T[]> {
+export function groupBy<T>(items: T[], key: (item: T) => string): Map<string, T[]> {
   const out = new Map<string, T[]>()
   for (const item of items) {
     const k = key(item)

@@ -83,12 +83,14 @@ import { type GraphQLSchema, operationShapes, usedFragments } from './graphql-sc
 import { unmask } from './graphql-types'
 import {
   type ExitKind,
+  isCacheLifeCall,
   linkApi,
   type NavApi,
   type NavKind,
   navigationCall,
   outcomeOf,
   renderExitCall,
+  requestApiCall,
 } from './navigation'
 import { compare, relativeTo } from './paths'
 import {
@@ -358,8 +360,46 @@ export interface Unfollowed {
   callee: string
   /** `excluded`: the function is in a file the config leaves out. `missing`: the import doesn't resolve. */
   why: 'excluded' | 'missing'
+  /** Runs while the server renders (a server component), not in the browser (M38). */
+  server: boolean
   loc: SourceLoc
 }
+
+/** A `fetch` call's cache options (M38). */
+export interface FetchCache {
+  /** `cache` as written: `no-store`, `force-cache`, ... */
+  cache?: string
+  /** `next.revalidate`: seconds, or `false`. */
+  revalidate?: number | false
+  /** Set when an option is there but its value can't be read. */
+  unread?: boolean
+}
+
+/** A `use cache` scope a server request runs in (M38). */
+export interface UseCache {
+  /** The `cacheLife()` argument as written, when there is one. */
+  life?: string
+  /** Seconds from the `cacheLife` profile or object; absent when it can't be read. */
+  revalidate?: number
+  loc: SourceLoc
+}
+
+/**
+ * What decides how a page renders, found while a server component renders (M38): a request-time
+ * API call, or a request with its cache options.
+ */
+export type RenderUse =
+  | { kind: 'request-api'; id: string; componentId: string; api: string; loc: SourceLoc }
+  | {
+      kind: 'data'
+      id: string
+      componentId: string
+      siteId: string
+      transport: RequestSite['transport']
+      fetch?: FetchCache
+      cached?: UseCache
+      loc: SourceLoc
+    }
 
 /** Middleware answering itself with a response (M31). */
 export interface MiddlewareResponse {
@@ -398,6 +438,8 @@ interface Found {
   socket?: SiteSocket
   /** The method is a default (none given, or `?? 'POST'`), not one the code chose. */
   methodDefault?: boolean
+  /** `fetch`: its cache options (M38). */
+  fetchCache?: FetchCache
 }
 
 /** What `#mergeTwins` needs to know about a site. */
@@ -452,6 +494,8 @@ export class RequestScanner {
   readonly #exits = new Map<string, RenderExit>()
   readonly #unfollowed = new Map<string, Unfollowed>()
   readonly #mwResponses = new Map<string, MiddlewareResponse>()
+  /** Request-time API calls and server requests while a server component renders (M38). */
+  readonly #renderUses = new Map<string, RenderUse>()
   /** Hook call (or `useQueries` entry) -> ids of the sites it runs. */
   readonly #hookSites = new Map<Node, string[]>()
   /** Site id -> what its hook does, for React Query sites. */
@@ -877,6 +921,11 @@ export class RequestScanner {
   /** Redirects and `notFound()`-like calls reached while a component renders (M31). */
   renderExits(): RenderExit[] {
     return [...this.#exits.values()].sort((a, b) => compareLoc(a.loc, b.loc))
+  }
+
+  /** Request-time API calls and server requests while server components render (M38). */
+  renderUses(): RenderUse[] {
+    return [...this.#renderUses.values()].sort((a, b) => compareLoc(a.loc, b.loc))
   }
 
   /** Calls made while a component renders that the walk couldn't follow (excluded or missing files). */
@@ -1374,6 +1423,11 @@ export class RequestScanner {
     const exit = renderExitCall(call)
     if (exit) {
       this.#emitExit(w, this.#frame(call, scope), exit, call)
+      return true
+    }
+    const api = requestApiCall(call)
+    if (api) {
+      this.#emitRequestApi(w, this.#frame(call, scope), api, call)
       return true
     }
     if (w.origin.kind === 'middleware' && this.#middlewareAnswer(call, scope, w)) return true
@@ -2528,7 +2582,35 @@ export class RequestScanner {
       url: this.#requestUrl(input, env),
       ...(body ? { bodyType: body } : {}),
       ...(methodDefault ? { methodDefault } : {}),
+      fetchCache: this.#fetchCache(init, env),
     }
+  }
+
+  /** `{ cache: 'no-store' }` and `{ next: { revalidate: 60 } }` on a `fetch` (M38). */
+  #fetchCache(init: Node | undefined, env: Env): FetchCache {
+    const out: FetchCache = {}
+    const cache = this.#prop(init, env, 'cache')
+    if (cache === 'unknown') out.unread = true
+    else if (cache !== 'absent') {
+      const value = this.#str(cache.node, cache.env)
+      const text = value?.parts.every((p) => 'text' in p) ? strText(value) : undefined
+      if (text) out.cache = text
+      else out.unread = true
+    }
+    const next = this.#prop(init, env, 'next')
+    if (next === 'unknown') out.unread = true
+    else if (next !== 'absent') {
+      const revalidate = this.#prop(next.node, next.env, 'revalidate')
+      if (revalidate === 'unknown') out.unread = true
+      else if (revalidate !== 'absent') {
+        const value = this.#evaluate(revalidate.node, revalidate.env).node
+        const literal = value ? skipWrappers(value) : undefined
+        if (literal && N.isNumericLiteral(literal)) out.revalidate = literal.getLiteralValue()
+        else if (literal && literal.getKind() === ts.SyntaxKind.FalseKeyword) out.revalidate = false
+        else out.unread = true
+      }
+    }
+    return out
   }
 
   /** `axios.get(url)`, `api.post(url, data)`, `axios(config)`, `api.request(config)`. */
@@ -2806,6 +2888,7 @@ export class RequestScanner {
         isActionStateHook(d) ||
         navigationCall(d) ||
         renderExitCall(d) ||
+        requestApiCall(d) ||
         middlewareResponse(d) ||
         (procedureCall(d)?.proxy ?? 'server') !== 'server' ||
         isGraphqlRequest(d) ||
@@ -2912,6 +2995,73 @@ export class RequestScanner {
     if (hookFrame?.hook?.def.rq) {
       this.#siteKinds.set(id, { kind: hookFrame.hook.def.kind, client: !!hookFrame.hook.def.client })
     }
+    if (w.origin.kind === 'component' && w.origin.componentId && trigger.kind === 'server-render') {
+      const cached = this.#useCache(frames)
+      this.#renderUses.set(id, {
+        kind: 'data',
+        id,
+        componentId: w.origin.componentId,
+        siteId: id,
+        transport: found.transport,
+        ...(found.fetchCache ? { fetch: found.fetchCache } : {}),
+        ...(cached ? { cached } : {}),
+        loc: this.#loc(last.node),
+      })
+    }
+  }
+
+  /** `cookies()`, `headers()`, ... while a server component renders (M38). */
+  #emitRequestApi(w: Walk, last: Frame, api: string, node: Node) {
+    if (w.origin.kind !== 'component' || !w.origin.componentId) return
+    const frames = [...w.frames, last]
+    if (this.#trigger(frames, w.origin).kind !== 'server-render') return
+    const callStack = frames.map((f) => this.#loc(f.node))
+    const id = makeId('rn', w.origin.key, ...callStack.map((f) => `${f.file}:${f.line}:${f.column}`))
+    if (this.#renderUses.has(id)) return
+    this.#renderUses.set(id, {
+      kind: 'request-api',
+      id,
+      componentId: w.origin.componentId,
+      api,
+      loc: this.#loc(node),
+    })
+  }
+
+  /** The innermost `use cache` function (or file) the frames run in, with its `cacheLife` (M38). */
+  #useCache(frames: Frame[]): UseCache | undefined {
+    for (let i = frames.length - 1; i >= 0; i--) {
+      const scope = (frames[i] as Frame).scope
+      if (isFunctionLike(scope) && ownDirective(scope)?.startsWith('use cache')) return this.#cacheLife(scope)
+      const file = scope.getSourceFile()
+      let fileDirectives = this.#fileDirectives.get(file)
+      if (!fileDirectives) {
+        fileDirectives = directives(file)
+        this.#fileDirectives.set(file, fileDirectives)
+      }
+      if (fileDirectives.some((d) => d.startsWith('use cache'))) return this.#cacheLife(scope)
+    }
+    return undefined
+  }
+
+  #cacheLife(scope: Node): UseCache {
+    const call = scope.getDescendantsOfKind(ts.SyntaxKind.CallExpression).find(isCacheLifeCall)
+    const loc = this.#loc(call ?? scope)
+    if (!call) return { revalidate: CACHE_LIFE.default as number, loc }
+    const arg = call.getArguments()[0]
+    const value = arg ? this.#evaluate(arg, EMPTY_ENV).node : undefined
+    const literal = value ? skipWrappers(value) : undefined
+    const life = oneLine(call.getText())
+    if (literal && (N.isStringLiteral(literal) || N.isNoSubstitutionTemplateLiteral(literal))) {
+      const seconds = CACHE_LIFE[literal.getLiteralValue()]
+      return { life, ...(seconds !== undefined ? { revalidate: seconds } : {}), loc }
+    }
+    if (literal && N.isObjectLiteralExpression(literal)) {
+      const prop = literal.getProperty('revalidate')
+      const init = prop && N.isPropertyAssignment(prop) ? prop.getInitializer() : undefined
+      if (!prop) return { life, revalidate: CACHE_LIFE.default as number, loc }
+      if (init && N.isNumericLiteral(init)) return { life, revalidate: init.getLiteralValue(), loc }
+    }
+    return { life, loc }
   }
 
   #emitNav(w: Walk, last: Frame, found: NavFound, node: Node, conditional = false): string | undefined {
@@ -2978,7 +3128,8 @@ export class RequestScanner {
     const loc = this.#loc(call)
     const key = `${w.origin.key}|${loc.file}:${loc.line}:${loc.column}`
     if (this.#unfollowed.has(key)) return
-    this.#unfollowed.set(key, { componentId: w.origin.componentId, callee: frame.callee, why, loc })
+    const server = trigger === 'server-render'
+    this.#unfollowed.set(key, { componentId: w.origin.componentId, callee: frame.callee, why, server, loc })
   }
 
   /**
@@ -5230,6 +5381,28 @@ function climb(node: Node): Node {
 }
 
 /** The function body starts with `'use server'`. */
+/** The `revalidate` seconds of Next's preset `cacheLife` profiles. */
+const CACHE_LIFE: Record<string, number> = {
+  default: 900,
+  seconds: 1,
+  minutes: 60,
+  hours: 3_600,
+  days: 86_400,
+  weeks: 604_800,
+  max: 2_592_000,
+}
+
+/** The function's first directive (`'use cache'`, `'use server'`), if any. */
+function ownDirective(fn: FunctionLike): string | undefined {
+  const body = fn.getBody()
+  const first = body && N.isBlock(body) ? body.getStatements()[0] : undefined
+  if (!first || !N.isExpressionStatement(first)) return undefined
+  const expr = first.getExpression()
+  return N.isStringLiteral(expr) || N.isNoSubstitutionTemplateLiteral(expr)
+    ? expr.getLiteralValue()
+    : undefined
+}
+
 function hasOwnUseServer(fn: FunctionLike): boolean {
   const body = fn.getBody()
   const first = body && N.isBlock(body) ? body.getStatements()[0] : undefined

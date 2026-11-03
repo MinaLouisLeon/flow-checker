@@ -11,6 +11,7 @@ import type {
   Route,
   RouteTreeNode,
 } from './model'
+import { renderLabel, renderOf, renderReasonLine } from './render'
 
 export function formatModel(model: AppModel): string {
   const components = new Map(model.components.map((c) => [c.id, c]))
@@ -44,6 +45,7 @@ export function formatModel(model: AppModel): string {
     }
     out.push(...(route.componentId ? formatComponentTree(route.componentId, components) : ['(no component)']))
     out.push(...formatAccess(route))
+    out.push(...formatRender(route))
   }
 
   return `${out.join('\n')}\n`
@@ -54,6 +56,16 @@ function formatAccess(route: Route): string[] {
   const out = [`access: ${access.status}`]
   for (const guard of access.guards) out.push(`  ${guardText(guard)}  ${guard.loc.file}:${guard.loc.line}`)
   for (const reason of access.reasons ?? []) out.push(`  ? ${reason.text}`)
+  return out
+}
+
+function formatRender(route: Route): string[] {
+  const render = renderOf(route)
+  const out = [`render: ${renderLabel(render)}`]
+  for (const reason of render.reasons) {
+    const at = reason.loc ? `  ${reason.loc.file}:${reason.loc.line}` : ''
+    out.push(`  ${renderReasonLine(reason)}${at}`)
+  }
   return out
 }
 
