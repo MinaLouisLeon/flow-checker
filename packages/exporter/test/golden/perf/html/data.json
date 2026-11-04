@@ -2206,7 +2206,7 @@
         "targetRouteId": "rt_0sl3wtlcos4"
       },
       {
-        "id": "nav_0ccebyvplev",
+        "id": "nav_0q9yc2mi8ax",
         "origin": "component",
         "componentId": "cmp_17dqv782ua7",
         "kind": "link",
@@ -2221,20 +2221,20 @@
           "event": "onClick",
           "loc": {
             "file": "src/app/layout.tsx",
-            "line": 15,
-            "column": 81
+            "line": 16,
+            "column": 11
           }
         },
         "loc": {
           "file": "src/app/layout.tsx",
-          "line": 15,
-          "column": 81
+          "line": 16,
+          "column": 11
         },
         "callStack": [
           {
             "file": "src/app/layout.tsx",
-            "line": 15,
-            "column": 81,
+            "line": 16,
+            "column": 11,
             "callee": "<Link>"
           }
         ],

@@ -20,7 +20,7 @@
 - link `/products` → [`/products`](../pages/products.md) · event onClick · `src/app/layout.tsx:14`
 - link `/catalog` → [`/catalog`](../pages/catalog.md) · event onClick · `src/app/layout.tsx:15`
 - link `/todos` → [`/todos`](../pages/todos.md) · event onClick · `src/app/layout.tsx:15`
-- link `/settings` → [`/settings`](../pages/settings.md) · event onClick · `src/app/layout.tsx:15`
+- link `/settings` → [`/settings`](../pages/settings.md) · event onClick · `src/app/layout.tsx:16`
 
 ## Requests
 
