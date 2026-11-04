@@ -21,6 +21,7 @@ import {
   type Node,
   type SourceFile,
   type Symbol as TsSymbol,
+  type Type,
   ts,
 } from 'ts-morph'
 import { componentsBelow } from './access'
@@ -1007,12 +1008,36 @@ function schemaLibrary(call: CallExpression): string | undefined {
 
 /** The receiver is a built-in object (`Map`, `URLSearchParams`, `FormData`, Next's cookies). */
 function builtinReceiver(receiver: Node): boolean {
-  const type = receiver.getType()
-  const symbol = type.getSymbol() ?? type.getAliasSymbol()
-  const decl = symbol?.getDeclarations()[0]
-  if (!decl) return type.isString() || type.isNumber() || type.isArray()
-  const path = decl.getSourceFile().getFilePath()
-  return /\/typescript\/lib\/|\/node_modules\/next\/|\/@types\/react\//.test(path)
+  return builtinType(receiver.getType(), 0)
+}
+
+const BUILTIN_DECLS = /\/typescript\/lib\/|\/node_modules\/next\/|\/@types\/react\//
+
+function builtinType(type: Type, depth: number): boolean {
+  if (depth > 4) return false
+  // Next types `cookies()` as `Omit<RequestCookies, ...> & Pick<ResponseCookies, ...>`: every part counts.
+  const all: Type[] = type.isUnion()
+    ? type.getUnionTypes()
+    : type.isIntersection()
+      ? type.getIntersectionTypes()
+      : []
+  if (all.length > 0) {
+    const parts = all.filter((t) => !t.isUndefined() && !t.isNull())
+    return parts.length > 0 && parts.every((t) => builtinType(t, depth + 1))
+  }
+  // TypeScript's own helpers (`Omit`, `Pick`, `Awaited`) say nothing: the type they wrap does.
+  const alias = type.getAliasSymbol()
+  const wrapped = type.getAliasTypeArguments()[0]
+  if (alias && wrapped && /\/typescript\/lib\//.test(declPath(alias) ?? ''))
+    return builtinType(wrapped, depth + 1)
+  const symbol = type.getSymbol() ?? alias
+  const path = symbol && declPath(symbol)
+  if (!path) return type.isString() || type.isNumber() || type.isArray()
+  return BUILTIN_DECLS.test(path)
+}
+
+function declPath(symbol: TsSymbol): string | undefined {
+  return symbol.getDeclarations()[0]?.getSourceFile().getFilePath()
 }
 
 /** The method of a `fetch` init: `'GET'` when it has none, undefined when it can't be read. */

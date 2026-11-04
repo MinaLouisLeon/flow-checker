@@ -514,6 +514,8 @@ export class RequestScanner {
   readonly #navs = new Map<string, Navigation>()
   readonly #reaches = new Map<Node, boolean>()
   readonly #actionsExplored = new Set<Node>()
+  /** Mutation hooks whose trigger is being followed for a call in their callbacks (no cycles). */
+  readonly #afterMutations = new Set<Node>()
   readonly #fileDirectives = new Map<SourceFile, string[]>()
   readonly #scanned: (file: string) => boolean
   readonly #clients: readonly ApiClientConfig[]
@@ -3859,6 +3861,19 @@ export class RequestScanner {
         const use = queue.shift() as Node
         if (seen.has(use)) continue
         seen.add(use)
+        // In a mutation's `onSuccess` / `onError` / `onSettled`: it runs after that mutation, so what
+        // starts the mutation starts it too.
+        const after = mutationCallbackOf(use, useScope)
+        if (after && !this.#afterMutations.has(after)) {
+          this.#afterMutations.add(after)
+          try {
+            const found = this.#mutationTrigger(after, useScope, frames.slice(0, level + 1))
+            if (found !== 'unused') return found
+          } finally {
+            this.#afterMutations.delete(after)
+          }
+          continue
+        }
         const found = this.#triggerAt(use, useScope)
         if (found) return found
         // Called in a local function (`const submit = useCallback(async () => mutate())`):
@@ -5630,6 +5645,33 @@ function subtree(id: string, components: Map<string, Component>, seen = new Set<
     if (child.componentId) subtree(child.componentId, components, seen)
   }
   return seen
+}
+
+const MUTATION_CALLBACKS = new Set(['onSuccess', 'onError', 'onSettled'])
+
+/**
+ * The mutation hook call (`useMutation({ onSuccess: () => ... })`) whose `onSuccess` / `onError` /
+ * `onSettled` callback `node` is in, between it and `scope`.
+ */
+function mutationCallbackOf(node: Node, scope: Node): CallExpression | undefined {
+  for (
+    let fn = node.getFirstAncestor(isFunctionLike);
+    fn && fn !== scope;
+    fn = fn.getFirstAncestor(isFunctionLike)
+  ) {
+    const holder = outerParens(fn).getParent()
+    const named =
+      holder && N.isPropertyAssignment(holder)
+        ? propertyName(holder.getNameNode())
+        : N.isMethodDeclaration(fn) && N.isObjectLiteralExpression(fn.getParent())
+          ? fn.getName()
+          : undefined
+    if (!named || !MUTATION_CALLBACKS.has(named)) continue
+    const object = N.isMethodDeclaration(fn) ? fn.getParent() : holder?.getParent()
+    const call = object ? outerParens(object).getParent() : undefined
+    if (call && N.isCallExpression(call) && hookOf(call)?.kind === 'mutation') return call
+  }
+  return undefined
 }
 
 function hookOf(call: CallExpression): HookDef | undefined {

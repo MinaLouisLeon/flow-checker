@@ -50,14 +50,14 @@ node scripts/record-captures.mjs   # after pnpm build: re-record the fixture cap
 pnpm vitest run packages/exporter -u   # rewrite the export golden files (packages/exporter/test/golden) after a format change
 pnpm --filter @flow-checker/dashboard dev   # dashboard with hot reload on :4401 (API proxied to :4400)
 node scripts/next-matrix.mjs [13.4 14.2 15.2 15.5 16]   # after pnpm build: explore/init/doctor/scan/summary/impact/build/capture on each Next.js version (needs network)
-node scripts/render-check.mjs [fixture]   # after pnpm build: each fixture's scanned render modes against `next build`
+node scripts/render-check.mjs [fixture]   # after pnpm build: each fixture's scanned render modes and client boundaries against `next build`
 node scripts/perf/bench.mjs [features]   # after pnpm build: scan, re-scan and API times on a synthetic large app
 ```
 
 ## Releasing
 
 1. Update the version in `packages/flow-checker/package.json` and the [changelog](packages/flow-checker/CHANGELOG.md), and merge to `main`.
-2. Tag it: `git tag v0.4.0 && git push origin v0.4.0`.
+2. Tag it: `git tag v0.5.0 && git push origin v0.5.0`.
 3. The [Release workflow](.github/workflows/release.yml) runs every check, then publishes to npm with provenance. It needs the `NPM_TOKEN` secret (or npm trusted publishing) and an `npm` environment.
 
 The repo tooling is pinned to TypeScript 6.x because TypeScript 7 (the native compiler) has no stable JavaScript API yet, and tsup's declaration build needs one. The scanner uses `ts-morph`, which ships its own compiler.

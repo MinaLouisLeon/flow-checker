@@ -538,8 +538,12 @@ const FALLBACKS = new Set([
   ts.SyntaxKind.BarBarEqualsToken,
 ])
 
-/** A fallback (`??`, `||`) or a check (`if`, `===`, `!`, `&&`) handles a missing value. */
-function isOptional(node: ts.Node): boolean {
+/**
+ * A fallback (`??`, `||`) or a check (`if`, `===`, `!`, `&&`) handles a missing value, also an optional
+ * chain (`process.env.X?.trim()`) and one of those on the variable the value is stored in
+ * (`const user = process.env.X; if (user) ...`) in the same function.
+ */
+function isOptional(node: ts.Node, stored = true): boolean {
   let cur: ts.Node = node
   let parent = cur.parent
   while (
@@ -553,8 +557,27 @@ function isOptional(node: ts.Node): boolean {
     parent = parent.parent
   }
   if (!parent) return false
+  if (
+    (ts.isPropertyAccessExpression(parent) || ts.isElementAccessExpression(parent)) &&
+    parent.expression === cur
+  )
+    return parent.questionDotToken !== undefined
+  if (
+    stored &&
+    ts.isVariableDeclaration(parent) &&
+    parent.initializer === cur &&
+    ts.isIdentifier(parent.name)
+  )
+    return checkedLater(parent.name)
   if (ts.isBinaryExpression(parent)) {
     const op = parent.operatorToken.kind
+    // `if (user && pass)`: the right side is checked when the whole is.
+    if (
+      parent.right === cur &&
+      (op === ts.SyntaxKind.AmpersandAmpersandToken || op === ts.SyntaxKind.BarBarToken) &&
+      isOptional(parent, false)
+    )
+      return true
     return (parent.left === cur && FALLBACKS.has(op)) || CHECKS.has(op)
   }
   if (ts.isPrefixUnaryExpression(parent)) return parent.operator === ts.SyntaxKind.ExclamationToken
@@ -565,6 +588,28 @@ function isOptional(node: ts.Node): boolean {
     return ts.isIdentifier(parent.expression) && parent.expression.text === 'Boolean'
   }
   return false
+}
+
+/** A use of the variable `name` declares, in the function (or file) around it, handles a missing value. */
+function checkedLater(name: ts.Identifier): boolean {
+  let scope: ts.Node = name
+  while (scope.parent && !ts.isSourceFile(scope) && !ts.isFunctionLike(scope)) scope = scope.parent
+  let found = false
+  const visit = (n: ts.Node) => {
+    if (found) return
+    if (
+      ts.isIdentifier(n) &&
+      n !== name &&
+      n.text === name.text &&
+      !(ts.isPropertyAccessExpression(n.parent) && n.parent.name === n) &&
+      !(ts.isPropertyAssignment(n.parent) && n.parent.name === n) &&
+      isOptional(n, false)
+    )
+      found = true
+    else ts.forEachChild(n, visit)
+  }
+  visit(scope)
+  return found
 }
 
 /** A name or property bound to a string constant: `const KEY = 'X'`, `KEYS.x` with `as const`. */

@@ -225,6 +225,35 @@ describe('reading process.env', () => {
     const optional = (model.env?.vars ?? []).filter((v) => v.reads[0]?.optional).map((v) => v.name)
     expect(optional).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'])
   })
+
+  it('also through an optional chain, or a check of the variable the value is stored in', () => {
+    const model = scan({
+      'src/proxy.ts': lines(
+        'export function proxy() {',
+        '  const max = Number(process.env.MAX?.trim())',
+        '  const parts = process.env.PARTS?.split(",")',
+        '  const user = process.env.USER_NAME',
+        '  const pass = process.env.PASS',
+        '  if (user && pass) console.log(user, pass)',
+        '  const region = process.env.REGION',
+        "  const where = region ?? 'eu'",
+        '  const key = process.env.KEY',
+        '  const host = process.env.HOST',
+        '  console.log(max, parts, where, key.length, `${host}/x`)',
+        '}',
+      ),
+    })
+    const optional = Object.fromEntries((model.env?.vars ?? []).map((v) => [v.name, !!v.reads[0]?.optional]))
+    expect(optional).toEqual({
+      HOST: false,
+      KEY: false,
+      MAX: true,
+      PARTS: true,
+      PASS: true,
+      REGION: true,
+      USER_NAME: true,
+    })
+  })
 })
 
 describe('sides and pages', () => {

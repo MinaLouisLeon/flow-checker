@@ -430,6 +430,37 @@ describe('what an action changes', () => {
     expect(byName(model, 'all').flags).toEqual([{ kind: 'unprotected', loc: byName(model, 'all').loc }])
     for (const name of ['reads', 'cacheOnly', 'cookieOnly']) expect(byName(model, name).flags).toBeUndefined()
   })
+
+  it("doesn't count Next's cookies as data, also through their real types and a helper", () => {
+    // Next types `cookies()` as an intersection of its two cookie classes (16.4), which has no symbol.
+    const model = scan({
+      'node_modules/next/headers.d.ts': lines(
+        "import type { RequestCookies, ResponseCookies } from './dist/compiled/@edge-runtime/cookies'",
+        "export type ReadonlyRequestCookies = Omit<RequestCookies, 'set' | 'clear' | 'delete'> & Pick<ResponseCookies, 'set' | 'delete'>",
+        'export function cookies(): Promise<ReadonlyRequestCookies>',
+      ),
+      'node_modules/next/dist/compiled/@edge-runtime/cookies/index.d.ts': lines(
+        'export declare class RequestCookies { get(n: string): { value: string } | undefined; set(n: string, v: string): this; delete(n: string): boolean; clear(): this }',
+        'export declare class ResponseCookies { set(n: string, v: string): this; delete(n: string): this }',
+      ),
+      'src/lib/auth-cookies.ts': lines(
+        "import { cookies } from 'next/headers'",
+        'async function withStore(mutate: (store: Awaited<ReturnType<typeof cookies>>) => void) {',
+        '  mutate(await cookies())',
+        '}',
+        "export async function clearSession() { return withStore((store) => store.delete('token')) }",
+      ),
+      ...actionsFile(
+        ['logout', 'remember'],
+        "import { cookies } from 'next/headers'",
+        "import { clearSession } from '@/lib/auth-cookies'",
+        'export async function logout() { await clearSession() }',
+        "export async function remember() { const store = await cookies(); store.set('theme', 'dark') }",
+      ),
+    })
+    expect(byName(model, 'logout').changes).toEqual([])
+    expect(byName(model, 'remember').changes).toEqual([])
+  })
 })
 
 describe('where actions are and who uses them', () => {
