@@ -1,0 +1,46 @@
+# Navigation
+
+## HomePage  src/app/page.tsx
+link /posts/:id -> /posts/[id]  event onClick
+
+## server action renamePost  src/lib/auth.ts
+redirect /login -> /login  server-action
+
+# Flows
+
+## HomePage submit  (/)
+1. HomePage action on /
+2. POST server action addPost
+
+## HomePage submit (2)  (/)
+1. HomePage action on /
+2. POST server action clearDrafts
+
+## AdminTools click  (/admin)
+1. AdminTools onClick on /admin
+2. POST server action banUser
+
+## AdminTools click (2)  (/admin)
+1. AdminTools onClick on /admin
+2. POST server action resetLikes
+
+## NewPostForm submit  (/posts/new)
+1. NewPostForm action on /posts/new
+2. POST server action createPost
+
+## PostActions submit  (/posts/[id])
+1. PostActions action on /posts/[id]
+2. POST server action likePost
+
+## PostActions click  (/posts/[id] -> /login)
+1. PostActions onClick on /posts/[id]
+2. POST server action renamePost
+3. redirect -> /login
+
+## PostActions click (2)  (/posts/[id])
+1. PostActions onClick on /posts/[id]
+2. POST server action deletePost
+
+## SearchBox change  (/search)
+1. SearchBox onChange on /search
+2. POST server action searchPosts

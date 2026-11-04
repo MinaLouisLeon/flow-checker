@@ -1,0 +1,226 @@
+# Route tree
+
+src/app [layout, page]
+├─ admin [page]
+├─ api
+│  └─ drafts [route]
+├─ login [page]
+├─ posts
+│  ├─ [id] (dynamic) [page]
+│  └─ new [page]
+└─ search [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/admin  page  src/app/admin/page.tsx
+/api/drafts  route DELETE  src/app/api/drafts/route.ts
+/login  page  src/app/login/page.tsx
+/posts/[id]  page  src/app/posts/[id]/page.tsx
+/posts/new  page  src/app/posts/new/page.tsx
+/search  page  src/app/search/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:8
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+HomePage  server  src/app/page.tsx:7
+└─ Link  external next/link
+access: open
+render: static
+boundaries: (none)
+title: Action safety  (layout metadata)
+client: (none)
+env: API_URL
+actions: addPost (no auth check, input checked), clearDrafts (no auth check, no input) [unprotected]
+
+## /admin  src/app/admin/page.tsx
+layouts: src/app/layout.tsx
+AdminPage  server  src/app/admin/page.tsx:3
+└─ AdminTools  client (use client)  src/components/admin-tools.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Action safety  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.5 KB
+  AdminTools  from AdminPage (page)  src/app/admin/page.tsx:7
+actions: banUser (auth checked, input checked), resetLikes (no auth check, no input) [unprotected]
+
+## /login  src/app/login/page.tsx
+layouts: src/app/layout.tsx
+LoginPage  server  src/app/login/page.tsx:1
+access: open
+render: static
+boundaries: (none)
+title: Action safety  (layout metadata)
+client: (none)
+
+## /posts/[id]  src/app/posts/[id]/page.tsx
+layouts: src/app/layout.tsx
+PostPage  server  src/app/posts/[id]/page.tsx:5
+└─ PostActions  client (use client)  src/components/post-actions.tsx:6
+access: guarded
+  shows the not-found page (404) when `!post` (page)  src/app/posts/[id]/page.tsx:8
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+boundaries: (none)
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page)  src/app/posts/[id]/page.tsx:8
+title: Action safety  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.8 KB
+  PostActions  from PostPage (page)  src/app/posts/[id]/page.tsx:13
+actions: deletePost (no auth check, input not checked) [unprotected], renamePost (auth checked, input checked), likePost (no auth check, input checked)
+
+## /posts/new  src/app/posts/new/page.tsx
+layouts: src/app/layout.tsx
+NewPostPage  server  src/app/posts/new/page.tsx:3
+└─ NewPostForm  client (use client)  src/components/new-post-form.tsx:8
+access: open
+render: static
+boundaries: (none)
+title: Action safety  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.5 KB
+  NewPostForm  from NewPostPage (page)  src/app/posts/new/page.tsx:7
+actions: createPost (auth checked, input checked)
+
+## /search  src/app/search/page.tsx
+layouts: src/app/layout.tsx
+SearchPage  server  src/app/search/page.tsx:3
+└─ SearchBox  client (use client)  src/components/search-box.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Action safety  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.4 KB
+  SearchBox  from SearchPage (page)  src/app/search/page.tsx:7
+actions: searchPosts (no auth check, input not checked)
+
+# Server cache
+
+
+revalidatePath('/admin')  in server action `banUser`  src/actions/admin.ts:12
+  pages: /admin
+revalidatePath('/')  in server action `resetLikes`  src/actions/admin.ts:18
+  pages: /
+revalidatePath('/')  in server action `createPost`  src/actions/posts.ts:20
+  pages: /
+revalidatePath('/')  in server action `deletePost`  src/actions/posts.ts:27
+  pages: /
+revalidatePath(`/posts/${input.id}`)  in server action `renamePost`  src/actions/posts.ts:35
+  pages: /posts/[id], /posts/new
+revalidatePath('/')  in server action `addPost`  src/app/page.tsx:16
+  pages: /
+
+# Client boundaries
+
+## AdminTools  src/components/admin-tools.tsx
+components: AdminTools
+modules: 1, 0.5 KB
+  src/components/admin-tools.tsx
+uses: useTransition (hook) src/components/admin-tools.tsx:7, onClick (event handler) src/components/admin-tools.tsx:10
+
+## NewPostForm  src/components/new-post-form.tsx
+components: NewPostForm
+modules: 1, 0.5 KB
+  src/components/new-post-form.tsx
+uses: useActionState (hook) src/components/new-post-form.tsx:9
+
+## PostActions  src/components/post-actions.tsx
+components: PostActions
+modules: 1, 0.8 KB
+  src/components/post-actions.tsx
+uses: useTransition (hook) src/components/post-actions.tsx:7, useState (hook) src/components/post-actions.tsx:8, onChange (event handler) src/components/post-actions.tsx:15, onClick (event handler) src/components/post-actions.tsx:16
+
+## SearchBox  src/components/search-box.tsx
+components: SearchBox
+modules: 1, 0.4 KB
+  src/components/search-box.tsx
+uses: useState (hook) src/components/search-box.tsx:7, onChange (event handler) src/components/search-box.tsx:10
+
+# Environment variables
+
+API_URL: not defined
+  server optional  src/app/page.tsx:5  /
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+# Server actions
+
+banUser (file wrapped in withAdmin) src/actions/admin.ts:9
+  auth checked: withAdmin
+  input checked (userId): z.string().min(1).parse
+  database db.user.update  src/actions/admin.ts:11
+  cache revalidatePath  src/actions/admin.ts:12
+  pages: /admin
+
+resetLikes (file wrapped in action) src/actions/admin.ts:16 [unprotected]
+  no auth check
+  no input
+  database db.post.update  src/actions/admin.ts:17
+  cache revalidatePath  src/actions/admin.ts:18
+  pages: /admin
+
+createPost (file) src/actions/posts.ts:14
+  auth checked: !session
+  input checked (formData): PostSchema.safeParse
+  database db.post.create  src/actions/posts.ts:19
+  cache revalidatePath  src/actions/posts.ts:20
+  pages: /posts/new
+
+deletePost (file) src/actions/posts.ts:25 [unprotected]
+  no auth check
+  input not checked (id?)
+  database db.post.delete  src/actions/posts.ts:26
+  cache revalidatePath  src/actions/posts.ts:27
+  pages: /posts/[id]
+
+renamePost (file) src/actions/posts.ts:31
+  auth checked: requireUser()
+  input checked (id, title): v.parse
+  database db.post.update  src/actions/posts.ts:34
+  cache revalidatePath  src/actions/posts.ts:35
+  pages: /posts/[id]
+
+likePost (file) src/actions/posts.ts:39
+  no auth check
+  input checked (formData): typeof id !== 'string' || id.length > 40
+  database db.post.update  src/actions/posts.ts:43
+  pages: /posts/[id]
+
+searchPosts (file) src/actions/posts.ts:47
+  no auth check
+  input not checked (query?)
+  pages: /search
+
+purgePosts (file) src/actions/posts.ts:52 unused
+  no auth check
+  no input
+  database db.post.delete  src/actions/posts.ts:53
+
+addPost (inline) src/app/page.tsx:11
+  no auth check
+  input checked (formData): typeof title !== 'string' || title.trim() === ''
+  database db.post.create  src/app/page.tsx:15
+  cache revalidatePath  src/app/page.tsx:16
+  pages: /
+
+clearDrafts (inline) src/app/page.tsx:20 [unprotected]
+  no auth check
+  no input
+  request fetch DELETE  src/app/page.tsx:22
+  pages: /

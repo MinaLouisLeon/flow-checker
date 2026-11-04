@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "postman",
   "model": {
-    "version": 16,
+    "version": 20,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -1391,6 +1391,128 @@
         ]
       }
     ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_API_URL",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "lib/config.ts",
+                "line": 1,
+                "column": 24
+              },
+              "side": "both",
+              "access": "direct",
+              "optional": true,
+              "routeIds": [
+                "rt_12v7saiyoj2",
+                "rt_2656kti2wza"
+              ],
+              "clientRouteIds": [
+                "rt_12v7saiyoj2",
+                "rt_2656kti2wza"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    },
     "postman": {
       "collection": {
         "name": "Fixture API",
@@ -1875,6 +1997,102 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_16nzt1zcm62",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_0iv5kcsl9up"
+          ],
+          "count": 3,
+          "p50": 18,
+          "p95": 188,
+          "max": 188,
+          "errors": 0,
+          "browser": 0,
+          "server": 3,
+          "slowestCaptureId": "cap_mvugag00n4ew8wdy"
+        },
+        {
+          "key": "ep_1xqlxqpqvbv",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_0zfyatg6d3b"
+          ],
+          "count": 1,
+          "p50": 31,
+          "p95": 31,
+          "max": 31,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvugal2km8jscstw"
+        },
+        {
+          "key": "ep_1xk43u1zuzy",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_08kv7zxxjyg"
+          ],
+          "count": 4,
+          "p50": 7,
+          "p95": 11,
+          "max": 11,
+          "errors": 0,
+          "browser": 4,
+          "server": 0,
+          "slowestCaptureId": "cap_mvugagoxl2nq3u9l"
+        },
+        {
+          "key": "ep_26ggeb6bo31",
+          "label": "GET http://localhost:4010/todos",
+          "siteIds": [
+            "req_1e93pbv41le"
+          ],
+          "count": 4,
+          "p50": 6,
+          "p95": 11,
+          "max": 11,
+          "errors": 0,
+          "browser": 4,
+          "server": 0,
+          "slowestCaptureId": "cap_mvugagoz2i06zh97"
+        },
+        {
+          "key": "ep_0l1jfzv9rl3",
+          "label": "DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_1nhvqmicx4q"
+          ],
+          "count": 1,
+          "p50": 7,
+          "p95": 7,
+          "max": 7,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvugan3gssk071e2"
+        },
+        {
+          "key": "ep_1tgnolqki2r",
+          "label": "POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_07zzxwzir2w"
+          ],
+          "count": 1,
+          "p50": 6,
+          "p95": 6,
+          "max": 6,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvugaim1vbegm98t"
+        }
+      ],
+      "loads": 7
     }
   },
   "flows": {

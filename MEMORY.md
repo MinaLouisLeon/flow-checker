@@ -51,6 +51,11 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M41 | Boundaries            | Model version 15, `Route.boundaries` / `metadata`. Refs carry `suspense` / `errorBoundary`; `scanner/src/boundaries.ts`. |
 | M42 | Release v0.4.0        | Matrix runs `next build` per version (async: it fetches from the script). Publish = tag.                                 |
 | M43 | Client boundaries     | Model version 16, `Route.client`, `AppModel.clientBoundaries`, `Component.clientUses`; `scanner/src/client.ts`.          |
+| M44 | Server/client leaks   | Model version 17, `AppModel.leaks` (module + prop); rules in `scanner/src/leaks.ts`, run from M43's client pass.         |
+| M45 | Environment variables | Model version 18, `AppModel.env`; `scanner/src/env.ts` walks value imports itself; `.env` parsed for names only.         |
+| M46 | Server action safety  | Model version 19, `AppModel.actions`; `scanner/src/actions.ts` reads each action; reuses M31's `stops()` for exits.      |
+| M47 | Request performance   | Model version 20, `AppModel.perf`; findings from call-path frames; captures grouped per load (`requestId` / `view`).     |
+| M48 | Release v0.5.0        | Matrix app has an action, an env name, a waterfall; boundaries checked against client manifests. Publish = tag.          |
 
 ## Gotchas
 
@@ -578,3 +583,103 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - `pnpm install` for a new fixture rewrites `pnpm-lock.yaml` with single quotes (7,000-line diff):
   `pnpm biome format --write pnpm-lock.yaml` leaves only the new importer.
 - The `'\n'` heredoc trap struck twice more (glossary apostrophes, exporter `join`): use the Edit tool for such lines.
+
+## M44 — Server/client leaks (branch `feat/server-client-leaks-m44`)
+
+- Check leak rules with `next dev`, one page per case, a fresh server per module case: Turbopack keeps a compile error
+  (and panics on `node:fs` in client code), so later pages fail with the earlier error. Prop errors are per request.
+- React 19 sends `Date`, `Map`, `Set`, `URL` (as its `toJSON()` string), `Error`, typed arrays, iterables, promises,
+  `Symbol.for()` and any object with `toJSON`: the plan's "Date / Map" examples are wrong for Next 15/16. React's
+  serializer (`renderModelDestructive` in `react-server-dom-*-server.*.js`) is the reference.
+- Client code may import a `'use server'` file: the browser only gets action references. M43's module walk followed it
+  (the server-actions fixture "brought" `server-only` to the browser); it now stops there, or M44 flags false leaks.
+- `path`, `crypto`, `buffer`... have browser versions (Next's webpack `fallback` list); Turbopack also maps `node:path`,
+  webpack rejects every `node:` import in client code. The scan follows Turbopack (Next 16's default).
+- The leaks fixture can't build: `render-check` (`UNBUILDABLE`) and CI's fixture build (`--filter "!@fixtures/leaks"`)
+  skip it. A new fixture that must fail needs both.
+- Component types (`forwardRef`, icon components) have call signatures: test callability before excusing React's types.
+- Map and Set are iterable: check built-in containers' type arguments before the "iterable crosses" shortcut.
+
+## M45 — Environment variables (branch `feat/env-var-m45`)
+
+- Check inlining with `next build`, then grep `.next/static` for each fake value (`fixture-value-*`). Next's docs are
+  wrong on one case: `const env = process.env; env.X` (module level or in a function) is inlined by Turbopack and
+  webpack. Only destructuring isn't. `process.env[KEY]` with a constant `KEY` is inlined by Turbopack only.
+- Don't run `next build` with the shell's working directory inside `.next/`: the next build fails with `EBUSY` on
+  `rmdir .next/static` until the folder is removed.
+- `.env` names come from Next's own dotenv regex (`@next/env` 16.4, `ENV_LINE` in `scanner/src/env.ts`), so a
+  `NAME=` line inside a multi-line quoted value isn't a name. Keep only `m[1]`; never put file text in an error.
+- The pass walks value imports itself from the app files, the middleware and both `instrumentation` files (the M36
+  import graph has no instrumentation and keeps type-only imports). Server code doesn't enter `'use client'` files,
+  client code doesn't enter `'use server'` files.
+- A read in a module both sides import has `clientRouteIds`: the client flags and the page view use them, or a page
+  that only reads it on the server gets "private name in client code" (the dashboard test caught it on `/`).
+- Every fixture now has `env` (the `instrumentation` files flow-checker adds read `FLOW_CHECKER`...), so every
+  snapshot, golden, README and the Env nav entry changed. Names the tool, Next or Vercel set are `setBy`, never flagged.
+- Fixture client components need real browser code (a hook or a handler), or M43 suggests dropping their
+  `'use client'` and its fixture test fails.
+- Dashboard and shared tests read `scanner/test/__snapshots__/*.model.json`: after a model change, update the scanner
+  snapshots first, then run them; in one parallel `-u` run they can read the old file.
+
+## M46 — Server action safety (branch `feat/server-action-safety-m46`)
+
+- Ground truth with `next build` + `next start`: `.next/server/server-reference-manifest.json` lists the actions each
+  page registers, and `curl -X POST <any page> -H 'Next-Action: <id>' -H 'Content-Type: text/plain;charset=UTF-8'
+  --data '["1"]'` runs one with those arguments (an unknown id answers 409). Actions no code imports aren't in the
+  manifest, so they are `unused` and never flagged.
+- Wrapped actions (`export const x = wrap(async () => ...)`) have no function node: `functionOf()` gives nothing, so the
+  request walk missed their calls. `wrappedAction()` / `isWrappedAction()` / `actionFunction()` in `requests.ts` handle
+  them; `#actionRef` names them by the `const`.
+- In a helper, an auth check must stop the caller (`throw`, `redirect()`...): `auth()` itself has `if (!token) return
+  null`, which would otherwise make every `auth()` call a check. Input helpers may `return` early (the caller gets null).
+- Input taint flows through receivers (`formData.get()`) and plain conversions (`String()`, `Object.fromEntries()`),
+  never through other calls' arguments: `fetch(url, { body: input })` made `if (!res.ok) throw` an input check.
+- `isWrappedAction` is a type guard: after `if (isWrappedAction(decl)) continue`, TypeScript narrows `decl` to "not a
+  `VariableDeclaration`"; widen it to `Node` first.
+- Python patch scripts must open files with `encoding='utf-8'`: the default (cp1252) fails on `⚠` / `←` in the exporter.
+  A bare `cat > file` in a bash command waits on stdin and hangs the call.
+- Several existing fixtures get real `unprotected` flags (demo actions with no auth): server-actions `deleteProduct`,
+  caching / caching-15 `createTodo` and `toggleTodo`, leaks `archiveOrder`. The dashboard's clean-fixture test skips
+  `action` notes like `boundary` ones.
+
+## M47 — Request performance (branch `feat/request-preformance-m47`)
+
+- Findings come from each site's `callStack`: every frame's `file:line:column` is the start of a call, so the pass finds
+  the call node there (compiler nodes, cached per position) and looks at the awaits and loops around it. Group
+  waterfalls by the function the awaits are in, not by call path, or a helper's waterfall repeats for every caller.
+- Server captures carry `parent.requestId` and browser captures `view` (M47) so they group per page load. The very first
+  request after `dev` starts runs before `register()` hooks the server: its fetches have no `parent` at all, and the
+  runtime check groups them by time instead.
+- A duplicate is the same call from two files, and Node's async stack loses the caller after an `await`: its captures
+  are `ambiguous` between the two sites. The runtime check counts an ambiguous capture for the sites tied at the top
+  (`capturedSites()`); without that the planted duplicate stayed "not seen".
+- React's dev double effects send each effect's request twice: an N+1 is only confirmed by two different URLs in a load,
+  and `maxCalls` counts distinct requests.
+- Next's request memoization was seen in the recording: a server component's `GET` `fetch` in a layout and its page went
+  out once per load, and a `cache()`-wrapped axios call once; the axios call without `cache()` twice.
+- The capture store keeps only the newest 2,000 captures in memory (5,000 cache events), so that is the worst case for
+  `/api/perf`; the server test times it.
+- `requestLabel()` text can contain `??` (`{NEXT_PUBLIC_API_URL ?? http://...}`): never strip a query with `/\?.*$/`;
+  rebuild the label from the URL without `query` (`timingLabel()`).
+- The mock API takes `?delay=<ms>` (any route) so fixture timings show; the endpoint key drops the query, so it doesn't
+  split endpoints.
+- Fixtures with recordings now get `perf.md` in their goldens (endpoint timings), even with no findings.
+- Bash heredocs with backticks broke a docs patch again (`unexpected EOF`) and turned `'\n'` into line breaks in the
+  exporter: patch scripts go to the scratchpad through the Write tool.
+
+## M48 — Release v0.5.0 (branch `feat/release-050`)
+
+- `next build` writes the client boundaries it found in `*client-reference-manifest.js`: `readClientReferences()` and
+  `compareClientBoundaries()` in `scripts/next-build-table.mjs` compare them with a model (`render-check` and the matrix
+  use them). Webpack lists every page's references in each manifest and Turbopack only the page's own, so only the
+  union compares. Keys are absolute paths (webpack) or `[project]/<path from the workspace root>` (Turbopack); Next 13.4
+  stores each manifest as a JSON string. `error` / `global-error` files are left out.
+- `render-check` needs the mock API on port 4010 for the `caching` fixtures: their build prerenders pages that fetch.
+- The matrix app needs `experimental.serverActions: true` on Next 13 for its `'use server'` file.
+- Neither real-app clone (nor the working copies) has a `.env`: every name is set by the shell or hosting, so "not
+  defined" is right for the repo. Compare `.env` names only with a `sed` that keeps the part before `=`; never print
+  values.
+- Checking each real-app finding against the code found six false patterns (see the M48 Built note); each fix has a
+  scanner test that fails without it. Run the matrix and real-app timings with nothing else running.
+- The heredoc backslash trap struck again (`[\\/]` became `[\/]`), even in this note: write patch scripts and any
+  text with backslashes with the Write or Edit tool.

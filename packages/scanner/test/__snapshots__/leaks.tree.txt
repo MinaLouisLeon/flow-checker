@@ -1,0 +1,317 @@
+# Route tree
+
+src/app [layout, page]
+├─ account [page]
+├─ admin [page]
+├─ files [page]
+├─ filters [page]
+├─ help [page]
+├─ keys [page]
+├─ products [page]
+├─ receipt [page]
+└─ stats [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/account  page  src/app/account/page.tsx
+/admin  page  src/app/admin/page.tsx
+/files  page  src/app/files/page.tsx
+/filters  page  src/app/filters/page.tsx
+/help  page  src/app/help/page.tsx
+/keys  page  src/app/keys/page.tsx
+/products  page  src/app/products/page.tsx
+/receipt  page  src/app/receipt/page.tsx
+/stats  page  src/app/stats/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:8
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+Home  server  src/app/page.tsx:10
+├─ OrderList  client (use client)  src/components/order-list.tsx:25
+├─ OrderActions  server  src/components/order-actions.tsx:4  [conditional]
+│  └─ ArchiveButton  client (use client)  src/components/archive-button.tsx:3
+└─ Link  external next/link
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 2 boundaries, 2 components, 2 modules, 2.1 KB, packages path
+  OrderList  from Home (page)  src/app/page.tsx:15
+  ArchiveButton  from OrderActions (component)  src/components/order-actions.tsx:5
+env: DATABASE_URL [not-defined]
+actions: archiveOrder (no auth check, input not checked) [unprotected], refreshOrders (no auth check, no input)
+
+## /account  src/app/account/page.tsx
+layouts: src/app/layout.tsx
+AccountPage  server  src/app/account/page.tsx:4
+└─ UserMenu  client (use client)  src/components/user-menu.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 2 modules, 0.4 KB
+  UserMenu  from AccountPage (page)  src/app/account/page.tsx:5
+leaks: 1
+  module next/headers in src/lib/session.ts:1
+
+## /admin  src/app/admin/page.tsx
+layouts: src/app/layout.tsx
+AdminPage  server  src/app/admin/page.tsx:4
+└─ RefreshButton  client (use client)  src/components/refresh-button.tsx:5
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.2 KB
+  RefreshButton  from AdminPage (page)  src/app/admin/page.tsx:5
+leaks: 1
+  module next/cache in src/components/refresh-button.tsx:3
+
+## /files  src/app/files/page.tsx
+layouts: src/app/layout.tsx
+FilesPage  server  src/app/files/page.tsx:4
+└─ FileBadge  client (use client)  src/components/file-badge.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 3 modules, 0.8 KB, packages fs
+  FileBadge  from FilesPage (page)  src/app/files/page.tsx:5
+leaks: 1
+  module fs in src/lib/disk.ts:2
+
+## /filters  src/app/filters/page.tsx
+layouts: src/app/layout.tsx
+FiltersPage  server  src/app/filters/page.tsx:5
+├─ FilterShell  server  src/components/filter-shell.tsx:4
+└─ FilterBar  client (use client)  src/components/filter-bar.tsx:9
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.4 KB
+  FilterBar  from FiltersPage (page)  src/app/filters/page.tsx:8
+leaks: 1
+  prop FilterBar.config.onChange (function)  src/app/filters/page.tsx:9
+
+## /help  src/app/help/page.tsx
+layouts: src/app/layout.tsx
+HelpPage  server  src/app/help/page.tsx:4
+└─ Link  external next/link
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: (none)
+leaks: 1
+  prop Link.onClick (function)  src/app/help/page.tsx:6
+
+## /keys  src/app/keys/page.tsx
+layouts: src/app/layout.tsx
+KeysPage  server  src/app/keys/page.tsx:4
+└─ ApiKeyField  client (use client)  src/components/api-key-field.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 2 modules, 0.4 KB, packages server-only
+  ApiKeyField  from KeysPage (page)  src/app/keys/page.tsx:5
+leaks: 1
+  module server-only in src/lib/keys.ts:1
+env: API_KEY [private-in-client]
+
+## /products  src/app/products/page.tsx
+layouts: src/app/layout.tsx
+ProductsPage  server  src/app/products/page.tsx:4
+└─ ProductPicker  client (use client)  src/components/product-picker.tsx:8
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.4 KB
+  ProductPicker  from ProductsPage (page)  src/app/products/page.tsx:6
+leaks: 1
+  prop ProductPicker.onSelect (function)  src/app/products/page.tsx:11
+
+## /receipt  src/app/receipt/page.tsx
+layouts: src/app/layout.tsx
+ReceiptPage  server  src/app/receipt/page.tsx:5
+└─ ReceiptTotal  client (use client)  src/components/receipt-total.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.3 KB
+  ReceiptTotal  from ReceiptPage (page)  src/app/receipt/page.tsx:6
+leaks: 1
+  prop ReceiptTotal.total (class-instance)  src/app/receipt/page.tsx:6
+
+## /stats  src/app/stats/page.tsx
+layouts: src/app/layout.tsx
+StatsPage  server  src/app/stats/page.tsx:4
+└─ StatsCard  client (use client)  src/components/stats-card.tsx:6
+access: open
+render: static
+boundaries: (none)
+title: Leaks  (layout metadata)
+client: 1 boundary, 1 component, 2 modules, 0.5 KB, packages pg
+  StatsCard  from StatsPage (page)  src/app/stats/page.tsx:5
+leaks: 1
+  module pg in src/lib/stats.ts:1
+env: DATABASE_URL [private-in-client] [not-defined]
+
+# Server cache
+
+
+revalidatePath('/')  in server action `refreshOrders`  src/actions/orders.ts:14
+  pages: /
+
+# Client boundaries
+
+## ApiKeyField  src/components/api-key-field.tsx
+components: ApiKeyField
+modules: 2, 0.4 KB
+  src/components/api-key-field.tsx
+  src/lib/keys.ts
+packages: server-only
+uses: useState (hook) src/components/api-key-field.tsx:7, onChange (event handler) src/components/api-key-field.tsx:8
+
+## ArchiveButton  src/components/archive-button.tsx
+components: ArchiveButton
+modules: 1, 0.2 KB
+  src/components/archive-button.tsx
+uses: onClick (event handler) src/components/archive-button.tsx:5
+
+## FileBadge  src/components/file-badge.tsx
+components: FileBadge
+modules: 3, 0.8 KB
+  src/components/file-badge.tsx
+  src/lib/disk.ts
+  src/lib/format-size.ts
+packages: fs
+uses: useState (hook) src/components/file-badge.tsx:7, onClick (event handler) src/components/file-badge.tsx:9
+
+## FilterBar  src/components/filter-bar.tsx
+components: FilterBar
+modules: 1, 0.4 KB
+  src/components/filter-bar.tsx
+uses: onChange (event handler) src/components/filter-bar.tsx:13
+
+## OrderList  src/components/order-list.tsx
+components: OrderList
+modules: 1, 1.9 KB
+  src/components/order-list.tsx
+packages: path
+uses: useState (hook) src/components/order-list.tsx:36, onClick (event handler) src/components/order-list.tsx:47
+
+## ProductPicker  src/components/product-picker.tsx
+components: ProductPicker
+modules: 1, 0.4 KB
+  src/components/product-picker.tsx
+uses: onChange (event handler) src/components/product-picker.tsx:16
+
+## ReceiptTotal  src/components/receipt-total.tsx
+components: ReceiptTotal
+modules: 1, 0.3 KB
+  src/components/receipt-total.tsx
+uses: useState (hook) src/components/receipt-total.tsx:7, onClick (event handler) src/components/receipt-total.tsx:9
+
+## RefreshButton  src/components/refresh-button.tsx
+components: RefreshButton
+modules: 1, 0.2 KB
+  src/components/refresh-button.tsx
+uses: onClick (event handler) src/components/refresh-button.tsx:7
+
+## StatsCard  src/components/stats-card.tsx
+components: StatsCard
+modules: 2, 0.5 KB
+  src/components/stats-card.tsx
+  src/lib/stats.ts
+packages: pg
+uses: useState (hook) src/components/stats-card.tsx:7, useEffect (hook) src/components/stats-card.tsx:8
+
+## UserMenu  src/components/user-menu.tsx
+components: UserMenu
+modules: 2, 0.4 KB
+  src/components/user-menu.tsx
+  src/lib/session.ts
+uses: useState (hook) src/components/user-menu.tsx:7, useEffect (hook) src/components/user-menu.tsx:8
+
+# Server/client leaks
+
+module revalidatePath from next/cache: a Next.js server API  src/components/refresh-button.tsx:3
+  chain: src/components/refresh-button.tsx
+  boundaries: RefreshButton; pages: /admin
+
+module fs: a Node.js module with no browser version  src/lib/disk.ts:2
+  chain: src/components/file-badge.tsx > src/lib/format-size.ts > src/lib/disk.ts
+  boundaries: FileBadge; pages: /files
+
+module server-only: the server-only marker  src/lib/keys.ts:1
+  chain: src/components/api-key-field.tsx > src/lib/keys.ts
+  boundaries: ApiKeyField; pages: /keys
+
+module next/headers: a Next.js server API  src/lib/session.ts:1
+  chain: src/components/user-menu.tsx > src/lib/session.ts
+  boundaries: UserMenu; pages: /account
+
+module pg: a database client  src/lib/stats.ts:1
+  chain: src/components/stats-card.tsx > src/lib/stats.ts
+  boundaries: StatsCard; pages: /stats
+
+prop config.onChange: function, from FiltersPage to FilterBar  src/app/filters/page.tsx:9
+  pages: /filters
+
+prop onClick: function, from HelpPage to Link (next/link)  src/app/help/page.tsx:6
+  pages: /help
+
+prop onSelect: function, from ProductsPage to ProductPicker  src/app/products/page.tsx:11
+  pages: /products
+
+prop total: class-instance Money, from ReceiptPage to ReceiptTotal  src/app/receipt/page.tsx:6
+  pages: /receipt
+
+# Environment variables
+
+API_KEY: not defined [private-in-client]
+  client optional  src/lib/keys.ts:3  /keys
+
+DATABASE_URL: not defined [private-in-client] [not-defined]
+  server  src/lib/db.ts:5  /
+  client  src/lib/stats.ts:3  /stats
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+# Server actions
+
+archiveOrder (file) src/actions/orders.ts:7 [unprotected]
+  no auth check
+  input not checked (id?)
+  database db.query  src/actions/orders.ts:8
+  file appendFileSync  src/actions/orders.ts:9
+  cache revalidatePath  src/actions/orders.ts:10
+  pages: /
+
+refreshOrders (file) src/actions/orders.ts:13
+  no auth check
+  no input
+  cache revalidatePath  src/actions/orders.ts:14
+  pages: /

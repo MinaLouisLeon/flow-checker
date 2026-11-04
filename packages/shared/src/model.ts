@@ -370,6 +370,393 @@ export const ClientBoundarySchema = z.object({
 })
 export type ClientBoundary = z.infer<typeof ClientBoundarySchema>
 
+// Server/client leaks (M44): server-only code that client code imports, and props a server
+// component hands to a client component that can't cross to the browser. Checked with `next dev`
+// (16.4.3, React 19.3): `server-only`, `next/headers`, `revalidatePath` from `next/cache`, `fs` and
+// `child_process` fail to compile in client code, also through a plain file it imports; `path` and
+// `crypto` have browser versions; a `'use server'` file is only a reference, so what it imports
+// stays on the server. Props: functions (also inside objects and arrays), class instances, objects
+// without a prototype, `Symbol()`, `RegExp` and `WeakMap` fail; `Date`, `Map`, `Set`, `URL`,
+// `Error`, typed arrays, iterables, classes with `toJSON`, `Symbol.for()`, server actions and
+// functions from a `'use client'` file pass.
+
+/**
+ * `server-only`: the marker package. `node`: a Node.js module with no browser version (`fs`,
+ * `child_process`...). `database`: a database client (`pg`, `mongoose`, `@prisma/client`...).
+ * `next-server`: an API Next only allows on the server (`next/headers`, `revalidatePath`...).
+ * `node-package`: a package that only runs on Node.js (`bcrypt`, `sharp`, `firebase-admin`...).
+ */
+export const ServerModuleKindSchema = z.enum([
+  'server-only',
+  'node',
+  'database',
+  'next-server',
+  'node-package',
+])
+export type ServerModuleKind = z.infer<typeof ServerModuleKindSchema>
+
+/** Client code reaches a project file that imports a server-only module. */
+export const ModuleLeakSchema = z.object({
+  kind: z.literal('module'),
+  /** The import as written: `fs`, `node:fs`, `server-only`, `pg`, `next/headers`. */
+  module: z.string(),
+  category: ServerModuleKindSchema,
+  /** For modules where only some exports are server-only (`next/cache`): the ones imported. */
+  names: z.array(z.string()).optional(),
+  /** The project file with the import, and where the import is. */
+  file: z.string(),
+  loc: SourceLocSchema,
+  /** Client boundaries (component ids) whose code imports the file. */
+  boundaries: z.array(z.string()),
+  /** Project files from the first boundary's file to `file`, both included. */
+  chain: z.array(z.string()),
+  /** Pages those boundaries are on. */
+  routeIds: z.array(z.string()),
+})
+export type ModuleLeak = z.infer<typeof ModuleLeakSchema>
+
+/** A server component hands a client component a prop that can't cross to the browser. */
+export const PropLeakSchema = z.object({
+  kind: z.literal('prop'),
+  /**
+   * `function`: a function that isn't a server action. `class-instance`: an instance of a class with
+   * no `toJSON` (also `RegExp`, `WeakMap`). `symbol`: `Symbol()` (only `Symbol.for()` crosses).
+   * `null-prototype`: `Object.create(null)`.
+   */
+  value: z.enum(['function', 'class-instance', 'symbol', 'null-prototype']),
+  /** The prop, with the path inside it: `onSelect`, `children`, `config.onSave`, `items[]`. */
+  prop: z.string(),
+  /** For a class instance: the class name. */
+  type: z.string().optional(),
+  /** The client component as rendered: a project component, or a package one with its module. */
+  name: z.string(),
+  componentId: z.string().optional(),
+  module: z.string().optional(),
+  /** The server component that renders it. */
+  parentId: z.string(),
+  /** The prop as written. */
+  loc: SourceLocSchema,
+  /** Pages the server component renders it on. */
+  routeIds: z.array(z.string()),
+})
+export type PropLeak = z.infer<typeof PropLeakSchema>
+
+export const LeakSchema = z.discriminatedUnion('kind', [ModuleLeakSchema, PropLeakSchema])
+export type Leak = z.infer<typeof LeakSchema>
+
+// Environment variables (M45): every `process.env` name the code reads, where and on which side,
+// and which `.env*` files define it. Values are never read into the model: `.env` files are parsed
+// for names only. Checked with `next build` (16.4.3, Turbopack and webpack) on the env fixture: a
+// name without `NEXT_PUBLIC_` read in client code is left out of the browser bundle (undefined
+// there); `process.env.X`, `process.env['X']` and reads through a variable holding `process.env`
+// are inlined; destructuring (`const { X } = process.env`) is not. `next.config` `env` names,
+// `NODE_ENV` and `NEXT_RUNTIME` are inlined on both sides.
+
+/**
+ * Where the code that reads it runs. `server`: server components, route handlers, server actions,
+ * middleware, `instrumentation`. `client`: `'use client'` files, what they import, and
+ * `instrumentation-client`. `both`: a module server and client code both import. `config`:
+ * `next.config`, read when Next starts or builds.
+ */
+export const EnvSideSchema = z.enum(['server', 'client', 'both', 'config'])
+export type EnvSide = z.infer<typeof EnvSideSchema>
+
+/**
+ * How the name is read. `direct`: `process.env.X`. `literal`: `process.env['X']`. `constant`:
+ * `process.env[KEY]` with a constant name. `alias`: through a variable holding `process.env`.
+ * `destructured`: `const { X } = process.env`.
+ */
+export const EnvAccessSchema = z.enum(['direct', 'literal', 'constant', 'alias', 'destructured'])
+export type EnvAccess = z.infer<typeof EnvAccessSchema>
+
+export const EnvReadSchema = z.object({
+  loc: SourceLocSchema,
+  side: EnvSideSchema,
+  access: EnvAccessSchema,
+  /** A fallback (`??`, `||`, a default) or a check (`if`, `===`, `!`) handles a missing value. */
+  optional: z.literal(true).optional(),
+  /** Pages and route handlers whose code reaches the read. */
+  routeIds: z.array(z.string()),
+  /** For a `both` read: the pages whose client code reaches it (the others only run it on the server). */
+  clientRouteIds: z.array(z.string()).optional(),
+})
+export type EnvRead = z.infer<typeof EnvReadSchema>
+
+/** `process.env[...]` with a name the scan can't read (built at run time). */
+export const EnvUnknownReadSchema = EnvReadSchema.omit({ access: true }).extend({
+  /** The key as written: `` `FEATURE_${name}` ``. */
+  key: z.string(),
+})
+export type EnvUnknownRead = z.infer<typeof EnvUnknownReadSchema>
+
+/**
+ * `private-in-client`: a name without `NEXT_PUBLIC_` read in client code (undefined in the
+ * browser). `not-defined`: no `.env*` file Next loads defines it, Next and the tool don't set it,
+ * and a read has no fallback. `not-inlined`: a name Next would inline, read in client code in a way
+ * it doesn't inline (destructuring), so it is undefined in the browser.
+ */
+export const EnvFlagKindSchema = z.enum(['private-in-client', 'not-defined', 'not-inlined'])
+export type EnvFlagKind = z.infer<typeof EnvFlagKindSchema>
+
+export const EnvFlagSchema = z.object({
+  kind: EnvFlagKindSchema,
+  /** The first read it is about. */
+  loc: SourceLocSchema,
+})
+export type EnvFlag = z.infer<typeof EnvFlagSchema>
+
+export const EnvVarSchema = z.object({
+  name: z.string(),
+  /** `.env*` files Next loads that define it, and the `next.config` file when its `env` has it. */
+  definedIn: z.array(z.string()),
+  /** Files Next doesn't load that list it (`.env.example`). */
+  listedIn: z.array(z.string()).optional(),
+  /** Set without a file: by Next (`NODE_ENV`, `NEXT_RUNTIME`), by flow-checker, or by Vercel. */
+  setBy: z.enum(['next', 'flow-checker', 'vercel']).optional(),
+  /** By file and line. Empty for a name a file defines and no code reads. */
+  reads: z.array(EnvReadSchema),
+  flags: z.array(EnvFlagSchema).optional(),
+})
+export type EnvVar = z.infer<typeof EnvVarSchema>
+
+export const EnvFileSchema = z.object({
+  /** Project-relative: `.env`, `.env.local`, `.env.example`. */
+  file: z.string(),
+  /** The `NODE_ENV`s Next loads it for; empty for a file Next never loads. */
+  loads: z.array(z.enum(['development', 'production', 'test'])),
+  /** How many names it defines. */
+  names: z.number().int().nonnegative(),
+})
+export type EnvFile = z.infer<typeof EnvFileSchema>
+
+export const EnvMapSchema = z.object({
+  /** `.env*` files in the project root, in Next's load order, then the others by name. */
+  files: z.array(EnvFileSchema),
+  /** By name. */
+  vars: z.array(EnvVarSchema),
+  /** Reads whose name is built at run time, by file and line. */
+  unknown: z.array(EnvUnknownReadSchema),
+})
+export type EnvMap = z.infer<typeof EnvMapSchema>
+
+// Server action safety (M46): every server action with the auth check and input check in front of
+// what it changes. Checked with `next build` + `next start` (16.4.3) on the action-safety fixture:
+// each action a page uses gets an id in the browser bundle, and a `POST` to any page with that id in
+// `Next-Action` runs it with whatever arguments the body holds (TypeScript types aren't checked). An
+// action no code imports is left out of the build (`server-reference-manifest.json`), so it can't be
+// called.
+
+/**
+ * `condition`: a `return`, `throw`, `redirect()`, `notFound()`, `forbidden()` or `unauthorized()`
+ * under a condition that reads the session or user (`if (!session) throw ...`), or the change sits
+ * inside `if (session)`. `helper`: a project function the action calls does that (`await
+ * requireUser()`). `wrapper`: the function the action is wrapped in does it (`withAdmin(async () =>
+ * ...)`). `package`: a package call that stops on its own (`auth.protect()`).
+ */
+export const ActionAuthCheckSchema = z.object({
+  kind: z.enum(['condition', 'helper', 'wrapper', 'package']),
+  /** As written: `!session`, `requireUser()`, `withAdmin`. */
+  text: z.string(),
+  loc: SourceLocSchema,
+})
+export type ActionAuthCheck = z.infer<typeof ActionAuthCheckSchema>
+
+/**
+ * `checked`: an auth check runs before the action changes anything. `none`: none was found (or only
+ * after the change, see `late`). `unclear`: the action calls code the scan can't read (a package
+ * wrapper, a file the config excludes, an import that doesn't resolve).
+ */
+export const ActionAuthSchema = z.object({
+  status: z.enum(['checked', 'none', 'unclear']),
+  checks: z.array(ActionAuthCheckSchema),
+  /** Checks found only after the first change, which don't protect it. */
+  late: z.array(ActionAuthCheckSchema).optional(),
+  /** Status `unclear`: why. */
+  reason: z.string().optional(),
+})
+export type ActionAuth = z.infer<typeof ActionAuthSchema>
+
+/**
+ * `schema`: a validation library parses it (`zod`, `valibot`, `yup`, `joi`, `superstruct`,
+ * `arktype`, `@sinclair/typebox`, `effect`), see `library`. `manual`: a `return` / `throw` /
+ * `redirect()` under a condition that reads it (`typeof id !== 'string'`), also through an error
+ * object filled under such a condition. `helper`: a project function it is passed to does either.
+ * `wrapper`: the function the action is wrapped in does either.
+ */
+export const ActionInputCheckSchema = z.object({
+  kind: z.enum(['schema', 'manual', 'helper', 'wrapper']),
+  library: z.string().optional(),
+  /** As written: `PostSchema.safeParse`, `typeof id !== 'string'`. */
+  text: z.string(),
+  /** The parameters it checks. */
+  params: z.array(z.string()),
+  loc: SourceLocSchema,
+})
+export type ActionInputCheck = z.infer<typeof ActionInputCheckSchema>
+
+/**
+ * `checked`: every parameter the action reads is checked. `partial`: some are. `none`: none is.
+ * `no-input`: it reads no parameter. `unclear`: a package wrapper hands it the input.
+ */
+export const ActionInputSchema = z.object({
+  status: z.enum(['checked', 'partial', 'none', 'no-input', 'unclear']),
+  /** The parameters it reads (a destructured one by each name), in order. */
+  params: z.array(z.object({ name: z.string(), checked: z.boolean() })),
+  checks: z.array(ActionInputCheckSchema),
+  reason: z.string().optional(),
+})
+export type ActionInput = z.infer<typeof ActionInputSchema>
+
+/**
+ * `database`: a write call on a database client or project data object (`db.post.delete()`,
+ * `prisma.user.update()`) or SQL that writes (`INSERT`, `UPDATE`, `DELETE`...). `request`: a
+ * request that isn't `GET` / `HEAD` (`fetch(url, { method: 'DELETE' })`, `api.post()`). `file`:
+ * a Node `fs` write. `cache`: `revalidatePath()`, `revalidateTag()`, `updateTag()`: it refreshes
+ * cached data, which doesn't count as changing data on its own.
+ */
+export const ActionChangeSchema = z.object({
+  kind: z.enum(['database', 'request', 'file', 'cache']),
+  /** The call as written: `db.post.delete`, `fetch DELETE`, `revalidatePath`. */
+  text: z.string(),
+  /** The project functions it goes through, from the action down (`removeProduct`). */
+  via: z.array(z.string()).optional(),
+  loc: SourceLocSchema,
+})
+export type ActionChange = z.infer<typeof ActionChangeSchema>
+
+/**
+ * `unprotected`: it changes data (not only the cache) with no auth check and no input check, and
+ * some code uses it, so anyone can send it a `POST` with any arguments.
+ */
+export const ActionFlagKindSchema = z.enum(['unprotected'])
+export type ActionFlagKind = z.infer<typeof ActionFlagKindSchema>
+
+export const ServerActionSchema = z.object({
+  id: z.string(),
+  /** The exported name, or the function's name for an inline action. */
+  name: z.string(),
+  /** The name (or the function, when it has none). */
+  loc: SourceLocSchema,
+  /** `file`: exported from a `'use server'` file. `inline`: a function with its own `'use server'`. */
+  defined: z.enum(['file', 'inline']),
+  /** The function it is wrapped in: `withAdmin` for `export const x = withAdmin(async () => ...)`. */
+  wrappedIn: z.object({ name: z.string(), module: z.string().optional() }).optional(),
+  /** Inline actions: the component it is written in. */
+  componentId: z.string().optional(),
+  /** Request sites that call it. */
+  siteIds: z.array(z.string()),
+  /** Pages whose components call it. */
+  routeIds: z.array(z.string()),
+  /** No code imports or uses it: Next leaves it out of the build, so it can't be called. */
+  unused: z.literal(true).optional(),
+  auth: ActionAuthSchema,
+  input: ActionInputSchema,
+  /** What it changes, in the order the code does it. Empty when it only reads. */
+  changes: z.array(ActionChangeSchema),
+  flags: z.array(z.object({ kind: ActionFlagKindSchema, loc: SourceLocSchema })).optional(),
+})
+export type ServerAction = z.infer<typeof ServerActionSchema>
+
+// Request performance (M47): requests that wait for each other for no reason, run once per item, or
+// are sent twice on one page load. Found from each site's call path; captures confirm them with
+// their timings (`runtime`, only in the served model).
+
+/** One awaited request of a waterfall, in code order. */
+export const PerfStepSchema = z.object({
+  /** The awaited call as written: `getPosts()`. */
+  text: z.string(),
+  /** The request sites it sends. */
+  siteIds: z.array(z.string()),
+  /** Earlier steps (indexes) whose results it uses. It waits for the others for nothing. */
+  needs: z.array(z.number().int().nonnegative()),
+  loc: SourceLocSchema,
+})
+export type PerfStep = z.infer<typeof PerfStepSchema>
+
+/**
+ * The loop of an N+1. `for`: a `for` / `for...of` / `for...in` loop. `while`: `while` / `do`.
+ * `callback`: a callback of `.map()`, `.forEach()`, `.flatMap()`... `render`: a component rendered
+ * once per item (`items.map((i) => <Row id={i.id} />)`) that sends the request itself.
+ */
+export const PerfLoopSchema = z.object({
+  kind: z.enum(['for', 'while', 'callback', 'render']),
+  /** As written: `for (const post of posts)`, `posts.map()`, `<PostRow>`. */
+  text: z.string(),
+  /** The list it goes through, as written: `posts`. */
+  over: z.string().optional(),
+  loc: SourceLocSchema,
+})
+export type PerfLoop = z.infer<typeof PerfLoopSchema>
+
+/** What captures showed for a finding (M47). Only in the served model. */
+export const PerfFindingRuntimeSchema = z.object({
+  /**
+   * `confirmed`: a page load (or request) showed it. `not-confirmed`: its requests were captured,
+   * but never as the scan said (they overlapped, or one request per load). `not-seen`: no capture yet.
+   */
+  status: z.enum(['confirmed', 'not-confirmed', 'not-seen']),
+  /** Page loads (or incoming requests) in which its requests were captured. */
+  loads: z.number().int().nonnegative(),
+  /** Of those, the ones that showed it. */
+  confirmed: z.number().int().nonnegative(),
+  /** Waterfall: median time that starting the requests together would have saved, in ms. */
+  savedMs: z.number().nonnegative().optional(),
+  /** N+1 and duplicate: the most requests one load sent for it. */
+  maxCalls: z.number().int().nonnegative().optional(),
+  /** N+1 and duplicate: median time those requests took together in a load (first start to last end), in ms. */
+  totalMs: z.number().nonnegative().optional(),
+  /** The newest capture of a load that showed it. */
+  captureId: z.string().optional(),
+  lastAt: z.string().optional(),
+})
+export type PerfFindingRuntime = z.infer<typeof PerfFindingRuntimeSchema>
+
+export const PerfFindingKindSchema = z.enum(['waterfall', 'n-plus-one', 'duplicate'])
+export type PerfFindingKind = z.infer<typeof PerfFindingKindSchema>
+
+/**
+ * `waterfall`: awaited requests in one function where a later one doesn't use an earlier one's
+ * result, so it could start at the same time (`steps`). `n-plus-one`: a request sent once per item
+ * of a list (`loop`; `sequential` when each waits for the one before). `duplicate`: the same request
+ * (method and URL, or procedure / operation) sent from more than one place on one page load, where
+ * nothing dedupes it (Next dedupes a server component's `GET` `fetch`, query libraries dedupe by key).
+ */
+export const PerfFindingSchema = z.object({
+  id: z.string(),
+  kind: PerfFindingKindSchema,
+  /** Where the requests run. Waterfalls are only looked for on the server. */
+  side: z.enum(['server', 'client']),
+  /** The function the awaits or the loop are in (`Home`, `getDashboard`); for `render`, the parent component. */
+  fn: z.string().optional(),
+  /** The component the function is in or called from, when there is one. */
+  componentId: z.string().optional(),
+  /** Origin `route-handler`: the handler's route. */
+  routeId: z.string().optional(),
+  /** Every request site involved. */
+  siteIds: z.array(z.string()),
+  /** Waterfall: the awaited requests in code order. */
+  steps: z.array(PerfStepSchema).optional(),
+  /** N+1: the loop. */
+  loop: PerfLoopSchema.optional(),
+  /** N+1: each request waits for the one before (`await` in a `for` loop). */
+  sequential: z.literal(true).optional(),
+  /** N+1: the request the list came from, when the scan saw it (the "1"). */
+  listSiteIds: z.array(z.string()).optional(),
+  /** Duplicate: the request, e.g. `GET /users/:id`. */
+  request: z.string().optional(),
+  /** Pages it slows down: pages whose load runs it, or that call the route handler / action. */
+  routeIds: z.array(z.string()),
+  loc: SourceLocSchema,
+  runtime: PerfFindingRuntimeSchema.optional(),
+})
+export type PerfFinding = z.infer<typeof PerfFindingSchema>
+
+export const PerfMapSchema = z.object({
+  /** By file and line. */
+  findings: z.array(PerfFindingSchema),
+})
+export type PerfMap = z.infer<typeof PerfMapSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -1544,7 +1931,8 @@ export const AppModelSchema = z.object({
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
    * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
    * `boundaries` or `metadata`, version 15 (before M43) no page `client`, `clientBoundaries` or
-   * component `clientUses`.
+   * component `clientUses`, version 16 (before M44) no `leaks`, version 17 (before M45) no `env`,
+   * version 18 (before M46) no `actions`, version 19 (before M47) no `perf`.
    */
   version: z
     .union([
@@ -1563,6 +1951,10 @@ export const AppModelSchema = z.object({
       z.literal(13),
       z.literal(14),
       z.literal(15),
+      z.literal(16),
+      z.literal(17),
+      z.literal(18),
+      z.literal(19),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1603,5 +1995,25 @@ export const AppModelSchema = z.object({
   cache: CacheMapSchema.optional(),
   /** `'use client'` components that server components render, sorted by file (M43). Absent when there are none. */
   clientBoundaries: z.array(ClientBoundarySchema).optional(),
+  /**
+   * Server-only modules client code imports and props that can't cross to the browser, modules
+   * first, then props, each by file and line (M44). Absent when there are none.
+   */
+  leaks: z.array(LeakSchema).optional(),
+  /**
+   * Environment variables the code reads and the `.env*` files define (M45), names only: values are
+   * never stored. Absent when there are neither.
+   */
+  env: EnvMapSchema.optional(),
+  /**
+   * Server actions (M46): exported from `'use server'` files and written inline, by file and line,
+   * each with its auth check, input check and what it changes. Absent when there are none.
+   */
+  actions: z.array(ServerActionSchema).optional(),
+  /**
+   * Request performance (M47): waterfalls, N+1 requests and duplicate requests found in the code.
+   * Absent when there are none.
+   */
+  perf: PerfMapSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

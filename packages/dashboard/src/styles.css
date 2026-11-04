@@ -1837,7 +1837,11 @@ kbd {
 
 /* Server cache map (M39) */
 .list.cache-list li,
-.list.client-list li {
+.list.client-list li,
+.list.leak-list li,
+.list.env-list li,
+.list.action-list li,
+.list.perf-list li {
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
@@ -1881,4 +1885,58 @@ details.client-details > summary {
 .list .client-modules li {
   border: 0;
   padding: 1px 0;
+}
+
+/* Environment variables (M45) */
+.env-reads {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0 0 0 12px;
+}
+.env-reads .env-read {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Server actions (M46) */
+.action-details {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0 0 0 12px;
+}
+.action-details .action-change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Request performance (M47) */
+.perf-steps {
+  margin: 4px 0 0;
+  padding: 0 0 0 20px;
+}
+.list .perf-steps li {
+  border: 0;
+  padding: 1px 0;
+  display: block;
+}
+.perf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.perf-table th,
+.perf-table td {
+  text-align: left;
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.perf-table th {
+  color: var(--muted);
+  font-weight: 500;
 }

@@ -1,0 +1,2568 @@
+{
+  "version": 20,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "catalog",
+          "kind": "static",
+          "name": "catalog"
+        },
+        "dir": "src/app/catalog",
+        "files": {
+          "page": "src/app/catalog/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        "dir": "src/app/products",
+        "files": {
+          "page": "src/app/products/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        },
+        "dir": "src/app/settings",
+        "files": {
+          "layout": "src/app/settings/layout.tsx",
+          "page": "src/app/settings/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        },
+        "dir": "src/app/todos",
+        "files": {
+          "page": "src/app/todos/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        },
+        "dir": "src/app/users",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/users/[id]",
+            "files": {
+              "page": "src/app/users/[id]/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bvhjg8zu96",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_1bvhjg8zu96",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            },
+            "siteId": "req_23ca0tetmxk",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_1bvhjg8zu96",
+            "siteId": "req_23ca0tetmxk",
+            "detail": "fetch",
+            "more": 1,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_1bvhjg8zu96",
+            "siteId": "req_23ca0tetmxk",
+            "detail": "fetch",
+            "more": 1,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Perf",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Perf",
+            "template": "%s | Perf",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_153w6v7g56f",
+      "path": "/catalog",
+      "kind": "page",
+      "file": "src/app/catalog/page.tsx",
+      "segments": [
+        {
+          "raw": "catalog",
+          "kind": "static",
+          "name": "catalog"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0cwnkxy0g6g",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_0cwnkxy0g6g",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            },
+            "siteId": "req_1nrjkflsk7s",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_0cwnkxy0g6g",
+            "siteId": "req_1nrjkflsk7s",
+            "detail": "fetch",
+            "more": 1,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_0cwnkxy0g6g",
+            "siteId": "req_1nrjkflsk7s",
+            "detail": "fetch",
+            "more": 1,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Perf",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Perf",
+            "template": "%s | Perf",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_0te2vdgan2u",
+      "path": "/products",
+      "kind": "page",
+      "file": "src/app/products/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_115a9noj763",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            },
+            "siteId": "req_14b37uscwxs",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "siteId": "req_14b37uscwxs",
+            "detail": "fetch",
+            "more": 1,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_115a9noj763",
+            "siteId": "req_14b37uscwxs",
+            "detail": "fetch",
+            "more": 1,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Perf",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Perf",
+            "template": "%s | Perf",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_14nb5m1ywic",
+      "path": "/settings",
+      "kind": "page",
+      "file": "src/app/settings/page.tsx",
+      "segments": [
+        {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        },
+        {
+          "kind": "layout",
+          "file": "src/app/settings/layout.tsx",
+          "componentId": "cmp_1krmssr0ok4"
+        }
+      ],
+      "componentId": "cmp_12h7lqgksec",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "layout",
+            "componentId": "cmp_1krmssr0ok4",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            },
+            "siteId": "req_1rc36qnaspk",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "layout",
+            "componentId": "cmp_1krmssr0ok4",
+            "siteId": "req_1rc36qnaspk",
+            "detail": "fetch",
+            "more": 5,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "layout",
+            "componentId": "cmp_1krmssr0ok4",
+            "siteId": "req_1rc36qnaspk",
+            "detail": "fetch",
+            "more": 5,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Perf",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Perf",
+            "template": "%s | Perf",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_0sl3wtlcos4",
+      "path": "/todos",
+      "kind": "page",
+      "file": "src/app/todos/page.tsx",
+      "segments": [
+        {
+          "raw": "todos",
+          "kind": "static",
+          "name": "todos"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0ru6mi41xug",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "in": "page",
+            "componentId": "cmp_0ru6mi41xug",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            },
+            "siteId": "req_14km2kuqtgu",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_0ru6mi41xug",
+            "siteId": "req_14km2kuqtgu",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_0ru6mi41xug",
+            "siteId": "req_14km2kuqtgu",
+            "detail": "fetch",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Perf",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Perf",
+            "template": "%s | Perf",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1ay1fk6qp4k",
+            "parentId": "cmp_0ru6mi41xug",
+            "in": "page",
+            "loc": {
+              "file": "src/app/todos/page.tsx",
+              "line": 10,
+              "column": 9
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 449,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_118ons9ia1z",
+      "path": "/users/[id]",
+      "kind": "page",
+      "file": "src/app/users/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "users",
+          "kind": "static",
+          "name": "users"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1xijf4vi76v",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_0b8zt393prm",
+            "kind": "not-found",
+            "in": "page",
+            "componentId": "cmp_1xijf4vi76v",
+            "condition": "!user",
+            "loc": {
+              "file": "src/app/users/[id]/page.tsx",
+              "line": 8,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          },
+          {
+            "in": "page",
+            "componentId": "cmp_1xijf4vi76v",
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            },
+            "siteId": "req_1n4wecz1zex",
+            "kind": "fetch",
+            "effect": "dynamic",
+            "detail": "cache: 'no-store'"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-fallback",
+            "in": "page",
+            "componentId": "cmp_1xijf4vi76v",
+            "siteId": "req_1n4wecz1zex",
+            "detail": "fetch",
+            "more": 3,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-error-boundary",
+            "in": "page",
+            "componentId": "cmp_1xijf4vi76v",
+            "siteId": "req_1n4wecz1zex",
+            "detail": "fetch",
+            "more": 3,
+            "loc": {
+              "file": "src/lib/api.ts",
+              "line": 8,
+              "column": 21
+            }
+          },
+          {
+            "kind": "no-not-found",
+            "in": "page",
+            "componentId": "cmp_1xijf4vi76v",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/users/[id]/page.tsx",
+              "line": 8,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Perf",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Perf",
+            "template": "%s | Perf",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_0cwnkxy0g6g",
+      "name": "CatalogPage",
+      "file": "src/app/catalog/page.tsx",
+      "loc": {
+        "file": "src/app/catalog/page.tsx",
+        "line": 4,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 9,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/layout.tsx",
+            "line": 14,
+            "column": 11
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1bvhjg8zu96",
+      "name": "Home",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 4,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_115a9noj763",
+      "name": "ProductsPage",
+      "file": "src/app/products/page.tsx",
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 5,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [
+        "typ_0v98ajm1yyv"
+      ]
+    },
+    {
+      "id": "cmp_1krmssr0ok4",
+      "name": "SettingsLayout",
+      "file": "src/app/settings/layout.tsx",
+      "loc": {
+        "file": "src/app/settings/layout.tsx",
+        "line": 7,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_12h7lqgksec",
+      "name": "SettingsPage",
+      "file": "src/app/settings/page.tsx",
+      "loc": {
+        "file": "src/app/settings/page.tsx",
+        "line": 4,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0ru6mi41xug",
+      "name": "TodosPage",
+      "file": "src/app/todos/page.tsx",
+      "loc": {
+        "file": "src/app/todos/page.tsx",
+        "line": 5,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "TodoRow",
+          "resolution": "project",
+          "componentId": "cmp_1ay1fk6qp4k",
+          "module": "@/components/todo-row",
+          "loc": {
+            "file": "src/app/todos/page.tsx",
+            "line": 10,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1xijf4vi76v",
+      "name": "UserPage",
+      "file": "src/app/users/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/users/[id]/page.tsx",
+        "line": 5,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1ay1fk6qp4k",
+      "name": "TodoRow",
+      "file": "src/components/todo-row.tsx",
+      "loc": {
+        "file": "src/components/todo-row.tsx",
+        "line": 5,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [
+        "typ_25zdvnqvuxl"
+      ],
+      "propsType": {
+        "text": "{ id: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/todo-row.tsx",
+            "line": 6,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/todo-row.tsx",
+            "line": 7,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_0mxt2h8i81o",
+      "name": "User",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/types.ts",
+        "line": 1,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "email",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "role",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0v98ajm1yyv",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/types.ts",
+        "line": 8,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "stock",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_25zdvnqvuxl",
+      "name": "Todo",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/types.ts",
+        "line": 15,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "userId",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "done",
+            "type": {
+              "kind": "primitive",
+              "name": "boolean"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0vz15qy2iug",
+      "name": "Settings",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/types.ts",
+        "line": 22,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "theme",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "digest",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                },
+                {
+                  "kind": "primitive",
+                  "name": "null"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1nrjkflsk7s",
+      "origin": "component",
+      "componentId": "cmp_0cwnkxy0g6g",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/products",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0v98ajm1yyv",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/catalog/page.tsx",
+          "line": 5,
+          "column": 26,
+          "callee": "getProducts"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 18,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "26ijdyujrpa"
+    },
+    {
+      "id": "req_07e7tpm2bap",
+      "origin": "component",
+      "componentId": "cmp_0cwnkxy0g6g",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/products/:id",
+        "query": "delay=40"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0v98ajm1yyv",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/catalog/page.tsx",
+          "line": 6,
+          "column": 63,
+          "callee": "getProduct"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 22,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0nirhe62lho"
+    },
+    {
+      "id": "req_23ca0tetmxk",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users/1",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 5,
+          "column": 22,
+          "callee": "getUser"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 14,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "17k0ojng33v"
+    },
+    {
+      "id": "req_0kd0ltojnrd",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/products",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0v98ajm1yyv",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 26,
+          "callee": "getProducts"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 18,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1mbc78gprj6"
+    },
+    {
+      "id": "req_14b37uscwxs",
+      "origin": "component",
+      "componentId": "cmp_115a9noj763",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/products",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0v98ajm1yyv",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/page.tsx",
+          "line": 6,
+          "column": 26,
+          "callee": "getProducts"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 18,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1a4abwko6f0"
+    },
+    {
+      "id": "req_16g2mworngz",
+      "origin": "component",
+      "componentId": "cmp_115a9noj763",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/products/:id",
+        "query": "delay=40"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0v98ajm1yyv",
+          "name": "Product"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/products/page.tsx",
+          "line": 9,
+          "column": 24,
+          "callee": "getProduct"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 22,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1tafdtogtri"
+    },
+    {
+      "id": "req_147qy0vyz3e",
+      "origin": "component",
+      "componentId": "cmp_1krmssr0ok4",
+      "transport": "axios",
+      "method": "GET",
+      "url": {
+        "text": "`${API}/settings?delay=40`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/settings",
+        "query": "delay=40"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0vz15qy2iug",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/layout.tsx",
+          "line": 8,
+          "column": 57,
+          "callee": "getSettings"
+        },
+        {
+          "file": "src/lib/settings.ts",
+          "line": 9,
+          "column": 21,
+          "callee": "axios.get"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1df1vcnt8b4"
+    },
+    {
+      "id": "req_1rc36qnaspk",
+      "origin": "component",
+      "componentId": "cmp_1krmssr0ok4",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users/2",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/layout.tsx",
+          "line": 8,
+          "column": 72,
+          "callee": "getUser"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 14,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "22zmz3ckih7"
+    },
+    {
+      "id": "req_03bknq0ncj5",
+      "origin": "component",
+      "componentId": "cmp_1krmssr0ok4",
+      "transport": "axios",
+      "method": "GET",
+      "url": {
+        "text": "`${API}/users/${id}?delay=20`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users/1",
+        "query": "delay=20"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/layout.tsx",
+          "line": 8,
+          "column": 84,
+          "callee": "getAccount"
+        },
+        {
+          "file": "src/lib/settings.ts",
+          "line": 15,
+          "column": 21,
+          "callee": "axios.get"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1ag0vhlf6ho"
+    },
+    {
+      "id": "req_1p429pabq9j",
+      "origin": "component",
+      "componentId": "cmp_12h7lqgksec",
+      "transport": "axios",
+      "method": "GET",
+      "url": {
+        "text": "`${API}/settings?delay=40`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/settings",
+        "query": "delay=40"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Settings",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0vz15qy2iug",
+          "name": "Settings"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/page.tsx",
+          "line": 5,
+          "column": 57,
+          "callee": "getSettings"
+        },
+        {
+          "file": "src/lib/settings.ts",
+          "line": 9,
+          "column": 21,
+          "callee": "axios.get"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1aywdm028n0"
+    },
+    {
+      "id": "req_1lhn3mfgf8g",
+      "origin": "component",
+      "componentId": "cmp_12h7lqgksec",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users/2",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/page.tsx",
+          "line": 5,
+          "column": 72,
+          "callee": "getUser"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 14,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "02qeyb6hqnl"
+    },
+    {
+      "id": "req_0vimi2c2ovq",
+      "origin": "component",
+      "componentId": "cmp_12h7lqgksec",
+      "transport": "axios",
+      "method": "GET",
+      "url": {
+        "text": "`${API}/users/${id}?delay=20`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/users/1",
+        "query": "delay=20"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/settings/page.tsx",
+          "line": 5,
+          "column": 84,
+          "callee": "getAccount"
+        },
+        {
+          "file": "src/lib/settings.ts",
+          "line": 15,
+          "column": 21,
+          "callee": "axios.get"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1anhus2cfaq"
+    },
+    {
+      "id": "req_14km2kuqtgu",
+      "origin": "component",
+      "componentId": "cmp_0ru6mi41xug",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/todos",
+        "query": "delay=40"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_25zdvnqvuxl",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/todos/page.tsx",
+          "line": 6,
+          "column": 23,
+          "callee": "getTodos"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 26,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "24j0az6lbyn"
+    },
+    {
+      "id": "req_1n4wecz1zex",
+      "origin": "component",
+      "componentId": "cmp_1xijf4vi76v",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/users/:id",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 7,
+          "column": 22,
+          "callee": "getUser"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 14,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "03ktmhemgu3"
+    },
+    {
+      "id": "req_00405rt0lsa",
+      "origin": "component",
+      "componentId": "cmp_1xijf4vi76v",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/todos",
+        "query": "userId=:userId&delay=40"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Todo[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_25zdvnqvuxl",
+            "name": "Todo"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 48,
+          "callee": "getUserTodos"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 30,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1h5hetycl9a"
+    },
+    {
+      "id": "req_21fpvnjjwok",
+      "origin": "component",
+      "componentId": "cmp_1xijf4vi76v",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "exact",
+        "base": "http://localhost:4010",
+        "path": "/products",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "Product[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0v98ajm1yyv",
+            "name": "Product"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 71,
+          "callee": "getProducts"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 18,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0aagydt0hbq"
+    },
+    {
+      "id": "req_228s24jz87h",
+      "origin": "component",
+      "componentId": "cmp_1xijf4vi76v",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`${API}${path}`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/users/:id",
+        "query": "delay=80"
+      },
+      "trigger": {
+        "kind": "server-render"
+      },
+      "responseType": {
+        "text": "User",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_0mxt2h8i81o",
+          "name": "User"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 10,
+          "column": 54,
+          "callee": "getUser"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 14,
+          "column": 10,
+          "callee": "get"
+        },
+        {
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 21,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0mc0xulgt82"
+    },
+    {
+      "id": "req_21cujfajgmg",
+      "origin": "component",
+      "componentId": "cmp_1ay1fk6qp4k",
+      "transport": "fetch",
+      "method": "GET",
+      "url": {
+        "text": "`http://localhost:4010/todos/${id}?delay=30`",
+        "confidence": "pattern",
+        "base": "http://localhost:4010",
+        "path": "/todos/:id",
+        "query": "delay=30"
+      },
+      "trigger": {
+        "kind": "effect",
+        "loc": {
+          "file": "src/components/todo-row.tsx",
+          "line": 7,
+          "column": 3
+        }
+      },
+      "responseType": {
+        "text": "Todo",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_25zdvnqvuxl",
+          "name": "Todo"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0bp3fnhcr2n"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_0m932ki3klf",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 14,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 14,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 14,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_0hm24tw828f",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/users/1\"",
+        "confidence": "exact",
+        "path": "/users/1"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 14,
+          "column": 38
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 14,
+        "column": 38
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 14,
+          "column": 38,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_118ons9ia1z"
+    },
+    {
+      "id": "nav_00n3snvd78j",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/products\"",
+        "confidence": "exact",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 14,
+          "column": 72
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 14,
+        "column": 72
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 14,
+          "column": 72,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0te2vdgan2u"
+    },
+    {
+      "id": "nav_0sqx1rg2c3a",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/catalog\"",
+        "confidence": "exact",
+        "path": "/catalog"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 15,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_153w6v7g56f"
+    },
+    {
+      "id": "nav_25xj9lgo70p",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/todos\"",
+        "confidence": "exact",
+        "path": "/todos"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 48
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 15,
+        "column": 48
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 15,
+          "column": 48,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0sl3wtlcos4"
+    },
+    {
+      "id": "nav_0q9yc2mi8ax",
+      "origin": "component",
+      "componentId": "cmp_17dqv782ua7",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/settings\"",
+        "confidence": "exact",
+        "path": "/settings"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/layout.tsx",
+          "line": 16,
+          "column": 11
+        }
+      },
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 16,
+        "column": 11
+      },
+      "callStack": [
+        {
+          "file": "src/app/layout.tsx",
+          "line": 16,
+          "column": 11,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_14nb5m1ywic"
+    }
+  ],
+  "flows": [],
+  "queryLinks": [],
+  "imports": {
+    "src/app/catalog/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/app/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/app/products/page.tsx": [
+      "src/lib/api.ts",
+      "src/lib/types.ts"
+    ],
+    "src/app/settings/layout.tsx": [
+      "src/lib/api.ts",
+      "src/lib/settings.ts"
+    ],
+    "src/app/settings/page.tsx": [
+      "src/lib/api.ts",
+      "src/lib/settings.ts"
+    ],
+    "src/app/todos/page.tsx": [
+      "src/components/todo-row.tsx",
+      "src/lib/api.ts"
+    ],
+    "src/app/users/[id]/page.tsx": [
+      "src/lib/api.ts"
+    ],
+    "src/components/todo-row.tsx": [
+      "src/lib/types.ts"
+    ],
+    "src/lib/api.ts": [
+      "src/lib/types.ts"
+    ],
+    "src/lib/settings.ts": [
+      "src/lib/types.ts"
+    ]
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_1ay1fk6qp4k",
+      "file": "src/components/todo-row.tsx",
+      "componentIds": [
+        "cmp_1ay1fk6qp4k"
+      ],
+      "modules": [
+        "src/components/todo-row.tsx"
+      ],
+      "packages": [],
+      "bytes": 449,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/todo-row.tsx",
+            "line": 6,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/todo-row.tsx",
+            "line": 7,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ],
+  "env": {
+    "files": [],
+    "vars": [
+      {
+        "name": "FLOW_CHECKER",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 3,
+              "column": 7
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          },
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 8,
+              "column": 7
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          }
+        ],
+        "setBy": "flow-checker"
+      },
+      {
+        "name": "FLOW_CHECKER_RUNTIME",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 10,
+              "column": 25
+            },
+            "side": "server",
+            "access": "direct",
+            "routeIds": []
+          }
+        ],
+        "setBy": "flow-checker"
+      },
+      {
+        "name": "NEXT_PUBLIC_FLOW_CHECKER",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation-client.ts",
+              "line": 5,
+              "column": 22
+            },
+            "side": "client",
+            "access": "direct",
+            "routeIds": []
+          }
+        ],
+        "setBy": "flow-checker"
+      },
+      {
+        "name": "NEXT_RUNTIME",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 3,
+              "column": 43
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          },
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 8,
+              "column": 43
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          }
+        ],
+        "setBy": "next"
+      }
+    ],
+    "unknown": []
+  },
+  "perf": {
+    "findings": [
+      {
+        "id": "pf_0hqq6us6c91",
+        "kind": "n-plus-one",
+        "side": "server",
+        "fn": "CatalogPage",
+        "componentId": "cmp_0cwnkxy0g6g",
+        "siteIds": [
+          "req_07e7tpm2bap"
+        ],
+        "loop": {
+          "kind": "callback",
+          "text": "products.map()",
+          "over": "products",
+          "loc": {
+            "file": "src/app/catalog/page.tsx",
+            "line": 6,
+            "column": 37
+          }
+        },
+        "listSiteIds": [
+          "req_1nrjkflsk7s"
+        ],
+        "routeIds": [
+          "rt_153w6v7g56f"
+        ],
+        "loc": {
+          "file": "src/app/catalog/page.tsx",
+          "line": 6,
+          "column": 37
+        }
+      },
+      {
+        "id": "pf_19j0ewb6e4y",
+        "kind": "waterfall",
+        "side": "server",
+        "fn": "Home",
+        "componentId": "cmp_1bvhjg8zu96",
+        "siteIds": [
+          "req_0kd0ltojnrd",
+          "req_23ca0tetmxk"
+        ],
+        "steps": [
+          {
+            "text": "getUser(1)",
+            "siteIds": [
+              "req_23ca0tetmxk"
+            ],
+            "needs": [],
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 5,
+              "column": 22
+            }
+          },
+          {
+            "text": "getProducts()",
+            "siteIds": [
+              "req_0kd0ltojnrd"
+            ],
+            "needs": [],
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 6,
+              "column": 26
+            }
+          }
+        ],
+        "routeIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 26
+        }
+      },
+      {
+        "id": "pf_25qdtqhw74w",
+        "kind": "n-plus-one",
+        "side": "server",
+        "fn": "ProductsPage",
+        "componentId": "cmp_115a9noj763",
+        "siteIds": [
+          "req_16g2mworngz"
+        ],
+        "loop": {
+          "kind": "for",
+          "text": "for (const product of products)",
+          "over": "products",
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 8,
+            "column": 3
+          }
+        },
+        "sequential": true,
+        "listSiteIds": [
+          "req_14b37uscwxs"
+        ],
+        "routeIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "loc": {
+          "file": "src/app/products/page.tsx",
+          "line": 8,
+          "column": 3
+        }
+      },
+      {
+        "id": "pf_1qz1xzevukr",
+        "kind": "duplicate",
+        "side": "server",
+        "componentId": "cmp_1krmssr0ok4",
+        "siteIds": [
+          "req_147qy0vyz3e",
+          "req_1p429pabq9j"
+        ],
+        "request": "GET http://localhost:4010/settings?delay=40",
+        "routeIds": [
+          "rt_14nb5m1ywic"
+        ],
+        "loc": {
+          "file": "src/app/settings/page.tsx",
+          "line": 5,
+          "column": 57
+        }
+      },
+      {
+        "id": "pf_1rs94z6kfy7",
+        "kind": "n-plus-one",
+        "side": "client",
+        "fn": "TodosPage",
+        "componentId": "cmp_0ru6mi41xug",
+        "siteIds": [
+          "req_21cujfajgmg"
+        ],
+        "loop": {
+          "kind": "render",
+          "text": "<TodoRow>",
+          "over": "todos",
+          "loc": {
+            "file": "src/app/todos/page.tsx",
+            "line": 10,
+            "column": 9
+          }
+        },
+        "routeIds": [
+          "rt_0sl3wtlcos4"
+        ],
+        "loc": {
+          "file": "src/app/todos/page.tsx",
+          "line": 10,
+          "column": 9
+        }
+      }
+    ]
+  }
+}

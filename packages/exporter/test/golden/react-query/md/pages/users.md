@@ -26,6 +26,12 @@
 - [`UserList`](../components/UserList.md), rendered by `UsersPage` (page): 1 component · 3 modules · 4.1 KB, `src/app/users/page.tsx:13`
   - packages: `@tanstack/react-query`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (server and client): not defined, `src/services/todos.ts:4`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

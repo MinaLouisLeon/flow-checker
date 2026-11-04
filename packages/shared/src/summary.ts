@@ -571,6 +571,10 @@ function commonFolder(files: string[]): string {
 /** The kinds most worth a look first. */
 const NOTE_ORDER: NoteKind[] = [
   'type-mismatch',
+  'leak',
+  'action',
+  'env',
+  'perf',
   'needs-recheck',
   'missing-page-component',
   'boundary',
@@ -589,6 +593,10 @@ const NOTE_LABEL: Record<NoteKind, string> = {
   middleware: 'Middleware',
   boundary: 'Boundary',
   client: 'Client',
+  leak: 'Leak',
+  action: 'Action',
+  env: 'Env',
+  perf: 'Performance',
   'unresolved-component': 'Component',
   'unresolved-type': 'Type',
 }

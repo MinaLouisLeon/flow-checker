@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "react-query",
   "model": {
-    "version": 16,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -3184,7 +3184,133 @@
           }
         ]
       }
-    ]
+    ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_API_URL",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/services/todos.ts",
+                "line": 4,
+                "column": 17
+              },
+              "side": "both",
+              "access": "direct",
+              "optional": true,
+              "routeIds": [
+                "rt_0h4e5x5madf",
+                "rt_14nb5m1ywic",
+                "rt_0rsc27vk284",
+                "rt_1xs1qhs4r3f"
+              ],
+              "clientRouteIds": [
+                "rt_0h4e5x5madf",
+                "rt_14nb5m1ywic",
+                "rt_0rsc27vk284",
+                "rt_1xs1qhs4r3f"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    }
   },
   "verification": {
     "sites": {
@@ -3325,6 +3451,123 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_16nzt1zcm62",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_01zlsrjrncf",
+            "req_0m4arr015hb",
+            "req_2a0uqvzh6dw"
+          ],
+          "count": 4,
+          "p50": 8,
+          "p95": 30,
+          "max": 30,
+          "errors": 0,
+          "browser": 3,
+          "server": 1,
+          "slowestCaptureId": "cap_mvwzwt01gxpi90sn"
+        },
+        {
+          "key": "ep_1am9fi3i0v3",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id",
+          "siteIds": [
+            "req_27sy7hb0xsq"
+          ],
+          "count": 1,
+          "p50": 11,
+          "p95": 11,
+          "max": 11,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwrpxnle9c3tv"
+        },
+        {
+          "key": "ep_014n09i1jig",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings",
+          "siteIds": [
+            "req_092dy6av59n",
+            "req_1psqg80jksx"
+          ],
+          "count": 2,
+          "p50": 7,
+          "p95": 10,
+          "max": 10,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwz4nvcbyvap3"
+        },
+        {
+          "key": "ep_0i0im2g2p7v",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_0ht2fssv0ja",
+            "req_1dhqpyygtma",
+            "req_1di2bq7b96m"
+          ],
+          "count": 6,
+          "p50": 7,
+          "p95": 9,
+          "max": 9,
+          "errors": 0,
+          "browser": 6,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwnnxvwo53wnc"
+        },
+        {
+          "key": "ep_1xqlxqpqvbv",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_0ka937821vy",
+            "req_1g8keamimjw"
+          ],
+          "count": 4,
+          "p50": 5,
+          "p95": 9,
+          "max": 9,
+          "errors": 0,
+          "browser": 4,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwxfeph8ibhco"
+        },
+        {
+          "key": "ep_04gtw68xyhb",
+          "label": "PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id",
+          "siteIds": [
+            "req_2bvpz71hbm1"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwpkuxw51iha9"
+        },
+        {
+          "key": "ep_1tgnolqki2r",
+          "label": "POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_1ybk9xw63lt"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwqt1xmjcq66o"
+        }
+      ],
+      "loads": 5
     }
   },
   "flows": {

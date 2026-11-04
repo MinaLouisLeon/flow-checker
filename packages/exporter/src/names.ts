@@ -21,6 +21,9 @@ export const AREAS = 'areas.md'
 export const ONBOARDING = 'ONBOARDING.md'
 export const GLOSSARY_DOC = 'GLOSSARY.md'
 export const CACHE = 'cache.md'
+export const ENV = 'env.md'
+export const ACTIONS = 'actions.md'
+export const PERF = 'perf.md'
 
 export function docNames(model: AppModel): DocNames {
   const routes = unique(model.routes, (r) => `pages/${routeSlug(r)}`)

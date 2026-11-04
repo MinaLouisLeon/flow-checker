@@ -26,6 +26,7 @@ export const FIXTURES = [
   'graphql-relay',
   'sse',
   'websocket',
+  'perf',
 ]
 export const NOW = new Date('2026-10-29T12:00:00.000Z')
 

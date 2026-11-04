@@ -65,3 +65,22 @@ components: ProductsTable
 modules: 1, 0.7 KB
   src/components/ProductsTable.tsx
 uses: useState (hook) src/components/ProductsTable.tsx:9, useEffect (hook) src/components/ProductsTable.tsx:11
+
+# Environment variables
+
+BACKEND_URL: not defined
+  server optional  src/lib/backend.ts:2  /api/products, /api/products/[id]
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

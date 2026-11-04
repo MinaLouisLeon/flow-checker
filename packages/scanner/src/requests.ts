@@ -71,6 +71,7 @@ import {
   type Type,
   type TypeNode,
   ts,
+  type VariableDeclaration,
 } from 'ts-morph'
 import { siteHash } from './code-hash'
 import { directives, importModuleOf, isConditional, isPackage, unalias } from './components'
@@ -513,6 +514,8 @@ export class RequestScanner {
   readonly #navs = new Map<string, Navigation>()
   readonly #reaches = new Map<Node, boolean>()
   readonly #actionsExplored = new Set<Node>()
+  /** Mutation hooks whose trigger is being followed for a call in their callbacks (no cycles). */
+  readonly #afterMutations = new Set<Node>()
   readonly #fileDirectives = new Map<SourceFile, string[]>()
   readonly #scanned: (file: string) => boolean
   readonly #clients: readonly ApiClientConfig[]
@@ -1539,7 +1542,8 @@ export class RequestScanner {
       return true
     }
     if (isActionStateHook(call)) {
-      const fn = this.#functionValue(call.getArguments()[0], env)
+      const arg = call.getArguments()[0]
+      const fn = this.#functionValue(arg, env) ?? (arg ? wrappedAction(arg) : undefined)
       if (fn && this.#isServerAction(fn) && w.origin.client) {
         const trigger = this.#formActionTrigger(call, scope)
         this.#emit(w, { ...this.#frame(call, scope), trigger }, this.#actionSite(fn, true))
@@ -1549,6 +1553,13 @@ export class RequestScanner {
     }
 
     const fn = calleeFunction(call)
+    // `export const x = withAuth(async () => ...)` in a `'use server'` file (M46).
+    const wrapped = fn ? undefined : wrappedAction(call.getExpression())
+    if (wrapped) {
+      if (w.origin.client && this.#isScanned(wrapped))
+        this.#emit(w, this.#frame(call, scope), this.#actionSite(wrapped, false))
+      return false
+    }
     if (!fn) {
       if (w.origin.kind === 'component' && isUnresolvedImport(call)) this.#unfollow(w, call, scope, 'missing')
       return false
@@ -1580,7 +1591,7 @@ export class RequestScanner {
     const formAction = trigger.event === 'action' || trigger.event === 'formAction'
     const inline = isFunctionLike(expr)
     if (!inline && !N.isIdentifier(expr) && !N.isPropertyAccessExpression(expr)) return
-    const fn = inline ? expr : this.#functionValue(expr, env)
+    const fn = inline ? expr : (this.#functionValue(expr, env) ?? wrappedAction(expr))
     if (!fn || !isProject(fn) || w.active.has(fn)) return
     const frame: Frame = {
       node: attr,
@@ -2885,10 +2896,11 @@ export class RequestScanner {
   /** A call to a server action. With `useActionState`, the first parameter is the previous state. */
   #actionSite(fn: Node, formState: boolean): Found {
     this.#exploreAction(fn)
-    const params = isFunctionLike(fn) ? fn.getParameters() : []
+    const inner = actionFunction(fn)
+    const params = inner ? inner.getParameters() : []
     const param = params[formState ? 1 : 0]
     const body = param ? this.#declaredType(param) : undefined
-    const response = isFunctionLike(fn) ? this.#returnType(fn) : undefined
+    const response = inner ? this.#returnType(inner) : undefined
     return {
       transport: 'server-action',
       method: 'POST',
@@ -2913,11 +2925,13 @@ export class RequestScanner {
   }
 
   #actionRef(fn: Node): ServerActionRef {
+    if (N.isVariableDeclaration(fn)) return { name: fn.getName(), loc: this.#loc(fn.getNameNode()) }
     return { name: functionName(fn), loc: this.#loc(functionAnchor(fn)) }
   }
 
   /** A top-level function in a `'use server'` file, or a function with its own `'use server'`. */
   #isServerAction(fn: Node): boolean {
+    if (N.isVariableDeclaration(fn)) return isWrappedAction(fn)
     if (!isFunctionLike(fn)) return false
     if (hasOwnUseServer(fn)) return true
     if (fn.getFirstAncestor((a) => isFunctionLike(a))) return false
@@ -2974,7 +2988,7 @@ export class RequestScanner {
       const callee = calleeFunction(d)
       if (callee && isProject(callee) && callee !== fn && this.#isScanned(callee)) {
         found = this.#isServerAction(callee) || this.#reachesNetwork(callee)
-      }
+      } else if (!callee && wrappedAction(d.getExpression())) found = true
       // `return handleSubmit(login)`: a project function passed on by reference runs too.
       for (const arg of found ? [] : d.getArguments()) {
         const inner = skipWrappers(arg)
@@ -3847,6 +3861,19 @@ export class RequestScanner {
         const use = queue.shift() as Node
         if (seen.has(use)) continue
         seen.add(use)
+        // In a mutation's `onSuccess` / `onError` / `onSettled`: it runs after that mutation, so what
+        // starts the mutation starts it too.
+        const after = mutationCallbackOf(use, useScope)
+        if (after && !this.#afterMutations.has(after)) {
+          this.#afterMutations.add(after)
+          try {
+            const found = this.#mutationTrigger(after, useScope, frames.slice(0, level + 1))
+            if (found !== 'unused') return found
+          } finally {
+            this.#afterMutations.delete(after)
+          }
+          continue
+        }
         const found = this.#triggerAt(use, useScope)
         if (found) return found
         // Called in a local function (`const submit = useCallback(async () => mutate())`):
@@ -5034,7 +5061,7 @@ function loopHead(loop: Node): Node | undefined {
 }
 
 /** Leaves the function: `return`, `throw`, `redirect()` / `notFound()` (they throw), or a block ending in one. */
-function stops(statement: Node): boolean {
+export function stops(statement: Node): boolean {
   if (exits(statement)) return true
   if (N.isExpressionStatement(statement)) {
     const expr = skipWrappers(statement.getExpression())
@@ -5251,7 +5278,7 @@ function navOutcome(frames: Frame[]): Navigation['outcome'] {
 
 // --- AST helpers -----------------------------------------------------------------------------
 
-type FunctionLike = FunctionDeclaration | FunctionExpression | ArrowFunction | MethodDeclaration
+export type FunctionLike = FunctionDeclaration | FunctionExpression | ArrowFunction | MethodDeclaration
 
 /** The name a local function is kept under: `const submit = useCallback(() => ...)`, `function submit() {}`. */
 function holderName(fn: Node): Node | undefined {
@@ -5442,7 +5469,7 @@ function canExit(stmt: Node): boolean {
   return found
 }
 
-function isFunctionLike(node: Node | undefined): node is FunctionLike {
+export function isFunctionLike(node: Node | undefined): node is FunctionLike {
   return (
     !!node &&
     (N.isFunctionDeclaration(node) ||
@@ -5453,7 +5480,7 @@ function isFunctionLike(node: Node | undefined): node is FunctionLike {
 }
 
 /** The function behind a declaration: `function f`, `const f = () => ...`, `{ f() {} }`, `useCallback(fn)`. */
-function functionOf(decl: Node | undefined): Node | undefined {
+export function functionOf(decl: Node | undefined): Node | undefined {
   if (!decl) return undefined
   if (N.isFunctionDeclaration(decl)) {
     if (decl.getBody()) return decl
@@ -5620,6 +5647,33 @@ function subtree(id: string, components: Map<string, Component>, seen = new Set<
   return seen
 }
 
+const MUTATION_CALLBACKS = new Set(['onSuccess', 'onError', 'onSettled'])
+
+/**
+ * The mutation hook call (`useMutation({ onSuccess: () => ... })`) whose `onSuccess` / `onError` /
+ * `onSettled` callback `node` is in, between it and `scope`.
+ */
+function mutationCallbackOf(node: Node, scope: Node): CallExpression | undefined {
+  for (
+    let fn = node.getFirstAncestor(isFunctionLike);
+    fn && fn !== scope;
+    fn = fn.getFirstAncestor(isFunctionLike)
+  ) {
+    const holder = outerParens(fn).getParent()
+    const named =
+      holder && N.isPropertyAssignment(holder)
+        ? propertyName(holder.getNameNode())
+        : N.isMethodDeclaration(fn) && N.isObjectLiteralExpression(fn.getParent())
+          ? fn.getName()
+          : undefined
+    if (!named || !MUTATION_CALLBACKS.has(named)) continue
+    const object = N.isMethodDeclaration(fn) ? fn.getParent() : holder?.getParent()
+    const call = object ? outerParens(object).getParent() : undefined
+    if (call && N.isCallExpression(call) && hookOf(call)?.kind === 'mutation') return call
+  }
+  return undefined
+}
+
 function hookOf(call: CallExpression): HookDef | undefined {
   const imported = importedName(call.getExpression())
   return imported ? HOOKS.get(`${imported.module}#${imported.name}`) : undefined
@@ -5643,7 +5697,7 @@ function importedName(expr: Node): { module: string; name: string } | undefined 
   return undefined
 }
 
-function isProject(node: Node): boolean {
+export function isProject(node: Node): boolean {
   const file = node.getSourceFile()
   return (
     !file.isInNodeModules() && !file.isDeclarationFile() && !file.getFilePath().includes('/node_modules/')
@@ -5736,7 +5790,7 @@ function outerParens(node: Node): Node {
 }
 
 /** Unwraps `(x)`, `x as T`, `x!`, `x satisfies T`, `await x`. */
-function skipWrappers(node: Node): Node {
+export function skipWrappers(node: Node): Node {
   let current = node
   for (;;) {
     if (
@@ -5822,7 +5876,46 @@ function ownDirective(fn: FunctionLike): string | undefined {
     : undefined
 }
 
-function hasOwnUseServer(fn: FunctionLike): boolean {
+/**
+ * `export const x = wrap(async () => ...)` at the top of a `'use server'` file: an action wrapped
+ * in a helper (M46). Next registers the exported value, whatever the wrapper returns.
+ */
+export function isWrappedAction(decl: Node): decl is VariableDeclaration {
+  if (!N.isVariableDeclaration(decl)) return false
+  const init = decl.getInitializer()
+  if (!init || !N.isCallExpression(skipWrappers(init))) return false
+  const statement = decl.getVariableStatement()
+  if (!statement || statement.getParent() !== decl.getSourceFile()) return false
+  const file = decl.getSourceFile()
+  const exported =
+    statement.isExported() ||
+    file
+      .getExportDeclarations()
+      .some((e) => !e.getModuleSpecifier() && e.getNamedExports().some((n) => n.getName() === decl.getName()))
+  return exported && directives(file).includes('use server')
+}
+
+/** The wrapped action a reference points to (`banUser` in `banUser(id)`). */
+export function wrappedAction(expr: Node): VariableDeclaration | undefined {
+  const target = skipWrappers(expr)
+  if (!N.isIdentifier(target) && !N.isPropertyAccessExpression(target)) return undefined
+  const symbol = target.getSymbol()
+  const decl = symbol ? unalias(symbol).getDeclarations()[0] : undefined
+  return decl && isWrappedAction(decl) ? decl : undefined
+}
+
+/** The function that gets the caller's arguments: the action, or the one handed to its wrapper. */
+export function actionFunction(action: Node): FunctionLike | undefined {
+  if (isFunctionLike(action)) return action
+  if (!N.isVariableDeclaration(action)) return undefined
+  const init = action.getInitializer()
+  const call = init ? skipWrappers(init) : undefined
+  if (!call || !N.isCallExpression(call)) return undefined
+  const arg = call.getArguments().find((a) => isFunctionLike(skipWrappers(a)))
+  return arg ? (skipWrappers(arg) as FunctionLike) : undefined
+}
+
+export function hasOwnUseServer(fn: FunctionLike): boolean {
   const body = fn.getBody()
   const first = body && N.isBlock(body) ? body.getStatements()[0] : undefined
   if (!first || !N.isExpressionStatement(first)) return false
@@ -5840,7 +5933,7 @@ function attributeTrigger(attr: JsxAttribute, loc: SourceLoc): Trigger | undefin
   return undefined
 }
 
-function oneLine(text: string): string {
+export function oneLine(text: string): string {
   const flat = text.replace(/\s*\n\s*/g, ' ')
   return flat.length > 120 ? `${flat.slice(0, 117)}...` : flat
 }

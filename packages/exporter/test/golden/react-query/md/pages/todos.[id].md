@@ -30,6 +30,12 @@
 - [`TodoDetail`](../components/TodoDetail.md), rendered by `TodoPage` (page): 1 component · 2 modules · 2.4 KB, `src/app/todos/[id]/page.tsx:7`
   - packages: `@tanstack/react-query`, `swr`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (server and client): not defined, `src/services/todos.ts:4`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

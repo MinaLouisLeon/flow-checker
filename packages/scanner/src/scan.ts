@@ -18,11 +18,13 @@ import {
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { addRouteAccess } from './access'
+import { buildActions } from './actions'
 import { addRouteBoundaries } from './boundaries'
 import { buildCacheMap } from './cache'
 import { addClientBoundaries } from './client'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
+import { buildEnvMap } from './env'
 import { inferFlows } from './flows'
 import { findGraphql, type GraphqlScanOptions } from './graphql-setup'
 import {
@@ -33,6 +35,7 @@ import {
   routesUnder,
 } from './middleware'
 import { compare, relativeTo, resolveFrom, toPosix } from './paths'
+import { buildPerf } from './perf'
 import { createProject } from './project'
 import { addRouteRender, cacheComponentsOn } from './render'
 import { RequestScanner } from './requests'
@@ -449,7 +452,7 @@ function analyze(
     cacheComponents,
   })
   const resolveImport = moduleResolver(project, root)
-  const clientBoundaries = addClientBoundaries({
+  const client = addClientBoundaries({
     root,
     routes,
     components,
@@ -463,6 +466,68 @@ function analyze(
     },
     resolveModule: resolveImport,
     readFile: (path) => (fs.fileExistsSync(path) ? fs.readFileSync(path) : undefined),
+  })
+  const env = buildEnvMap({
+    root,
+    appDir: discovery.appDir,
+    routes,
+    appFiles: project
+      .getSourceFiles()
+      .filter(
+        (f) =>
+          f.getFilePath().startsWith(`${discovery.appDir}/`) &&
+          !f.isInNodeModules() &&
+          !f.isDeclarationFile() &&
+          settings.scanned(f.getFilePath()),
+      ),
+    ...(middlewareFile && middleware
+      ? {
+          middleware: {
+            file: middlewareFile.getFilePath(),
+            routeIds: middleware.routes.map((r) => r.routeId),
+          },
+        }
+      : {}),
+    fileAt: (path) => {
+      const file = project.getSourceFile(path) ?? project.addSourceFileAtPathIfExists(path)
+      return file && !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(path)
+        ? file
+        : undefined
+    },
+    resolveModule: resolveImport,
+    listDir: (dir) =>
+      fs.directoryExistsSync(dir)
+        ? fs
+            .readDirSync(dir)
+            .filter((e) => e.isFile)
+            .map((e) => e.name.replaceAll('\\', '/').split('/').pop() as string)
+        : [],
+    readFile: (path) => (fs.fileExistsSync(path) ? fs.readFileSync(path) : undefined),
+    ...(discovery.nextConfig ? { nextConfig: discovery.nextConfig } : {}),
+  })
+  // Server actions (M46): every `'use server'` export and inline action in the files the app reaches.
+  const imports = importGraph(project, root, discovery, settings)
+  const reached = new Set<string>([...Object.keys(imports), ...Object.values(imports).flat()])
+  const actionFiles = project.getSourceFiles().filter((f) => {
+    if (f.isInNodeModules() || f.isDeclarationFile() || !settings.scanned(f.getFilePath())) return false
+    return (
+      f.getFilePath().startsWith(`${discovery.appDir}/`) || reached.has(relativeTo(root, f.getFilePath()))
+    )
+  })
+  const actions = buildActions({
+    root,
+    files: actionFiles,
+    routes,
+    components,
+    sites,
+    scanned: settings.scanned,
+  })
+  // Request performance (M47): waterfalls, N+1 and duplicate requests, from each site's call path.
+  const perf = buildPerf({
+    routes,
+    components,
+    sites,
+    fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
   })
   const cache = buildCacheMap({
     routes,
@@ -501,9 +566,13 @@ function analyze(
     ...(graphql ? { graphql } : {}),
     ...(streams.length > 0 ? { streams } : {}),
     ...(settings.areas ? { areas: settings.areas } : {}),
-    imports: importGraph(project, root, discovery, settings),
+    imports,
     ...(cache ? { cache } : {}),
-    ...(clientBoundaries.length > 0 ? { clientBoundaries } : {}),
+    ...(client.boundaries.length > 0 ? { clientBoundaries: client.boundaries } : {}),
+    ...(client.leaks.length > 0 ? { leaks: client.leaks } : {}),
+    ...(env ? { env } : {}),
+    ...(actions.length > 0 ? { actions } : {}),
+    ...(perf ? { perf } : {}),
   }
 }
 

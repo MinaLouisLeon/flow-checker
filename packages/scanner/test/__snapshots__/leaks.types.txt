@@ -1,0 +1,35 @@
+# Types
+
+FilterConfig  interface  src/components/filter-bar.tsx:3
+  { label: string; options: string[]; onChange: (value: string) => void }
+Props  interface  src/components/order-list.tsx:13
+  { orders: Order[]; updatedAt: Date; byStatus: Map<number, string>; tags: Set<string>; source: URL; archive: (id: number) => Promise<void>; archiveFirst: () => Promise<void>; format: (cents: number) => string; total: Amount }
+Product  interface  src/components/product-picker.tsx:3
+  { id: number; name: string }
+Amount  class  src/lib/amount.ts:2
+  { cents: number; toJSON: () => number }
+Money  class  src/lib/amount.ts:10
+  { cents: number; currency: string; format: () => string }
+Order  interface  src/lib/orders.ts:3
+  { id: number; status: "new" | "paid"; total: number; createdAt: Date }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:8
+  props: { children: ReactNode }
+ArchiveButton  src/components/archive-button.tsx:3
+  props: { id: number; action: (id: number) => Promise<void> }
+FileBadge  src/components/file-badge.tsx:6
+  props: { name: string; bytes: number }
+FilterBar  src/components/filter-bar.tsx:9
+  props: { config: FilterConfig }
+FilterShell  src/components/filter-shell.tsx:4
+  props: { title: string; children: ReactNode }
+OrderActions  src/components/order-actions.tsx:4
+  props: { id: number; onArchive: (id: number) => Promise<void> }
+OrderList  src/components/order-list.tsx:25
+  props: Props
+ProductPicker  src/components/product-picker.tsx:8
+  props: { products: Product[]; onSelect: (id: number) => void }
+ReceiptTotal  src/components/receipt-total.tsx:6
+  props: { total: Money }

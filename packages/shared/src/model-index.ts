@@ -1,7 +1,10 @@
 // Lookup tables and derived facts the dashboard screens and the exporter need, built once per model.
+import { actionFlagText, flaggedActions } from './actions'
 import { GAP_LABELS, gapText } from './boundaries'
 import { lowerText } from './client'
+import { envFlagText, envOf, flagRouteIds, unknownInClient, unknownText } from './env'
 import { isInfoFlag, urlText } from './format-requests'
+import { leakText } from './leaks'
 import type {
   AppModel,
   Component,
@@ -17,6 +20,7 @@ import type {
   Route,
   TypeShape,
 } from './model'
+import { perfFindings, perfRuntimeText, perfText } from './perf'
 
 export interface RenderSite {
   /** The component that renders this one. */
@@ -45,6 +49,10 @@ export type NoteKind =
   | 'middleware'
   | 'boundary'
   | 'client'
+  | 'leak'
+  | 'env'
+  | 'action'
+  | 'perf'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -459,6 +467,75 @@ function scanNotes(model: AppModel): ScanNote[] {
         ...(pages[0] ? { routeId: pages[0].id } : {}),
       })
     }
+  }
+  // Server/client leaks (M44): one note each, with the pages they break.
+  if (model.leaks) {
+    const names = new Map(model.components.map((c) => [c.id, c.name]))
+    const name = (id: string) => names.get(id) ?? '?'
+    for (const leak of model.leaks) {
+      const pages = leak.routeIds.length
+      notes.push({
+        kind: 'leak',
+        message: `${leakText(leak, name)}${pages > 1 ? ` (on ${pages} pages)` : ''}`,
+        file: leak.loc.file,
+        line: leak.loc.line,
+        column: leak.loc.column,
+        componentId: leak.kind === 'module' ? (leak.boundaries[0] as string) : leak.parentId,
+        ...(leak.routeIds[0] ? { routeId: leak.routeIds[0] } : {}),
+      })
+    }
+  }
+  // Server actions (M46): one note per action that changes data with no auth check and no input check.
+  for (const action of flaggedActions(model)) {
+    const pages = action.routeIds.length
+    notes.push({
+      kind: 'action',
+      message: `${actionFlagText(action)}${pages > 1 ? ` (on ${pages} pages)` : ''}`,
+      file: action.loc.file,
+      line: action.loc.line,
+      column: action.loc.column,
+      ...(action.componentId ? { componentId: action.componentId } : {}),
+      ...(action.routeIds[0] ? { routeId: action.routeIds[0] } : {}),
+    })
+  }
+  // Request performance (M47): one note per finding, with what capture timings showed.
+  for (const finding of perfFindings(model)) {
+    const pages = finding.routeIds.length
+    const runtime = perfRuntimeText(finding.runtime)
+    notes.push({
+      kind: 'perf',
+      message: `${perfText(finding, model)}${pages > 1 ? ` (on ${pages} pages)` : ''}${runtime ? `; ${runtime}` : ''}`,
+      file: finding.loc.file,
+      line: finding.loc.line,
+      column: finding.loc.column,
+      ...(finding.componentId ? { componentId: finding.componentId } : {}),
+      ...(finding.routeIds[0] ? { routeId: finding.routeIds[0] } : {}),
+    })
+  }
+  // Environment variables (M45): one note per flag, and one per name built at run time in client code.
+  const env = envOf(model)
+  for (const variable of env.vars) {
+    for (const flag of variable.flags ?? []) {
+      const routeIds = flagRouteIds(variable, flag.kind)
+      notes.push({
+        kind: 'env',
+        message: `${envFlagText(variable, flag.kind)}${routeIds.length > 1 ? ` (on ${routeIds.length} pages)` : ''}`,
+        file: flag.loc.file,
+        line: flag.loc.line,
+        column: flag.loc.column,
+        ...(routeIds[0] ? { routeId: routeIds[0] } : {}),
+      })
+    }
+  }
+  for (const read of unknownInClient(env)) {
+    notes.push({
+      kind: 'env',
+      message: unknownText(read),
+      file: read.loc.file,
+      line: read.loc.line,
+      column: read.loc.column,
+      ...(read.routeIds[0] ? { routeId: read.routeIds[0] } : {}),
+    })
   }
   const mw = model.middleware
   if (mw?.matcherText !== undefined) {

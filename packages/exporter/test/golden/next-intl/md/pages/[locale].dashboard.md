@@ -33,6 +33,12 @@
 - [`DashboardProfile`](../components/DashboardProfile.md), rendered by `DashboardPage` (page): 1 component · 4 modules · 2.5 KB, `src/app/[locale]/dashboard/page.tsx:6`
   - packages: `next-intl`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (client): not defined, `src/lib/auth-api.ts:3`
+
 ## Component tree
 
 - [`DashboardPage`](../components/DashboardPage.md) · server

@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "graphql-urql",
   "model": {
-    "version": 16,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -2191,7 +2191,105 @@
           }
         ]
       }
-    ]
+    ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    }
   },
   "verification": {
     "sites": {
@@ -2252,6 +2350,87 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_2c5ny8u59q2",
+          "label": "GET /api/graphql",
+          "siteIds": [
+            "req_19g4fbnqrgn"
+          ],
+          "count": 2,
+          "p50": 30,
+          "p95": 373,
+          "max": 373,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4rnx2c9t2ids"
+        },
+        {
+          "key": "ep_2dska22im0v",
+          "label": "GET /api/graphql",
+          "siteIds": [
+            "req_13zx8cl90id"
+          ],
+          "count": 2,
+          "p50": 43,
+          "p95": 57,
+          "max": 57,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4vdauhs2lpd4"
+        },
+        {
+          "key": "ep_1jutox0n6zl",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_1ncc9k5xsh8"
+          ],
+          "count": 1,
+          "p50": 36,
+          "p95": 36,
+          "max": 36,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4u08x3vxk2l1"
+        },
+        {
+          "key": "ep_0dra48drhl8",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_0pkoq320yzc"
+          ],
+          "count": 1,
+          "p50": 27,
+          "p95": 27,
+          "max": 27,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4wjt7yz0xct6"
+        },
+        {
+          "key": "ep_2fwm7w18i75",
+          "label": "GET /api/graphql",
+          "siteIds": [
+            "req_0m0edcldv9l"
+          ],
+          "count": 1,
+          "p50": 25,
+          "p95": 25,
+          "max": 25,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4ztz8ypm2m0n"
+        }
+      ],
+      "loads": 3
     }
   },
   "flows": {

@@ -66,6 +66,14 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [login](areas.md#ar_0pgtfiopjqa) | 1 | 1 | 1 |
 | [verify](areas.md#ar_1fio74g3hsz) | 1 | 0 | 1 |
 
+## Environment variables
+
+[5 names read, 0 `.env` files](env.md).
+
+## Request performance
+
+[No waterfalls, N+1 or duplicate requests, 3 endpoints timed](perf.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |

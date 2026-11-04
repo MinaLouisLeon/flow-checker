@@ -5,12 +5,14 @@ import { DataContext } from './context'
 import { GlobalSearch, shortcutLabel, useSearchShortcut } from './GlobalSearch'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
+import { ActionsScreen } from './screens/ActionsScreen'
 import { AreasScreen } from './screens/AreasScreen'
 import { CacheScreen } from './screens/CacheScreen'
 import { ChangesScreen } from './screens/ChangesScreen'
 import { ComponentPanel } from './screens/ComponentPanel'
 import { ComponentsScreen } from './screens/ComponentsScreen'
 import { EndpointsScreen } from './screens/EndpointsScreen'
+import { EnvScreen } from './screens/EnvScreen'
 import { ExportScreen } from './screens/ExportScreen'
 import { FlowsScreen } from './screens/FlowsScreen'
 import { GlossaryScreen } from './screens/GlossaryScreen'
@@ -18,6 +20,7 @@ import { LiveScreen } from './screens/LiveScreen'
 import { MapScreen } from './screens/MapScreen'
 import { Overview } from './screens/Overview'
 import { PageView } from './screens/PageView'
+import { PerfScreen } from './screens/PerfScreen'
 import { RequestsScreen } from './screens/RequestsScreen'
 import { StartScreen } from './screens/StartScreen'
 import { TypesScreen } from './screens/TypesScreen'
@@ -33,6 +36,12 @@ const NAV: {
   needsExport?: boolean
   /** Only when the scan found server caching (M39). */
   needsCache?: boolean
+  /** Only when the scan found environment variables (M45). */
+  needsEnv?: boolean
+  /** Only when the scan found server actions (M46). */
+  needsActions?: boolean
+  /** Only when the scan found performance findings or capture is on (M47). */
+  needsPerf?: boolean
 }[] = [
   { label: 'Start here', screen: { name: 'start' }, match: ['start'] },
   { label: 'Walk the app', screen: { name: 'walk' }, match: ['walk'] },
@@ -44,6 +53,9 @@ const NAV: {
   { label: 'Endpoints', screen: { name: 'endpoints', q: '' }, match: ['endpoints'] },
   { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
   { label: 'Cache', screen: { name: 'cache' }, match: ['cache'], needsCache: true },
+  { label: 'Env', screen: { name: 'env' }, match: ['env'], needsEnv: true },
+  { label: 'Actions', screen: { name: 'actions' }, match: ['actions'], needsActions: true },
+  { label: 'Perf', screen: { name: 'perf' }, match: ['perf'], needsPerf: true },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
   { label: 'Export', screen: { name: 'export' }, match: ['export'], needsExport: true },
@@ -85,7 +97,10 @@ export function App() {
               // Explore shows Live too, to explain how to turn capture on.
               (!item.needsCapture || meta.data?.capture || meta.data?.explore) &&
               (!item.needsExport || meta.data?.export) &&
-              (!item.needsCache || Boolean(model.data?.cache)),
+              (!item.needsCache || Boolean(model.data?.cache)) &&
+              (!item.needsEnv || Boolean(model.data?.env)) &&
+              (!item.needsActions || Boolean(model.data?.actions?.length)) &&
+              (!item.needsPerf || Boolean(model.data?.perf?.findings.length || meta.data?.capture)),
           ).map((item) => (
             <a
               key={item.label}
@@ -239,6 +254,12 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <ChangesScreen />
     case 'cache':
       return <CacheScreen />
+    case 'env':
+      return <EnvScreen />
+    case 'actions':
+      return <ActionsScreen />
+    case 'perf':
+      return <PerfScreen />
     case 'glossary':
       return <GlossaryScreen q={screen.q} term={screen.term} />
     case 'not-found':

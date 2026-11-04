@@ -228,6 +228,12 @@ export function buildEndpoints(index: ModelIndex): EndpointList {
   return { hosts: hostList, endpoints, byKey, bySite }
 }
 
+/** The key of the endpoint a site calls (`Endpoint.key`), without building the whole list. */
+export function endpointKeyOf(site: RequestSite): string {
+  const target = endpointTarget(site, site.url, false)
+  return makeId('ep', target.host.key, target.keyText)
+}
+
 function strip({ sortPattern: _, ...ep }: Draft): Endpoint {
   return ep
 }

@@ -7,7 +7,7 @@
 | Area | From | Pages | Components | Flows | Endpoints | Shared components | To check |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | [home](#ar_1vn39fso9m3) | `/` | 1 | 1 | 0 | 0 | 1 | 0 |
-| [products](#ar_2erkuzrjb5u) | `/products` | 3 | 5 | 2 | 6 | 1 | 5 |
+| [products](#ar_2erkuzrjb5u) | `/products` | 3 | 5 | 2 | 6 | 1 | 6 |
 
 ## <a id="ar_1vn39fso9m3"></a>home
 
@@ -28,7 +28,7 @@
 | Shared components | [`RootLayout`](components/RootLayout.md) |
 | Flows | [CreateProductForm submit](flows/createproductform-submit.md), [DeleteProductButton click](flows/deleteproductbutton-click.md) |
 | Endpoints | [`POST /products`](endpoints.md#ep_1b8rxbacsrz), [`DELETE /products/:id`](endpoints.md#ep_24zdsb1p2vt), [`GET /products/:id`](endpoints.md#ep_16zjeuqipey), [`GET /products`](endpoints.md#ep_16a5uohh2s8), [`action createProduct`](endpoints.md#ep_09hajlev2r5), [`action deleteProduct`](endpoints.md#ep_0ukrbhfpyjv) |
-| To check | [5 open notes](issues.md) |
+| To check | [6 open notes](issues.md) |
 
 ## Shared
 

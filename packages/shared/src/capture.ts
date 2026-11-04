@@ -119,6 +119,11 @@ export const CaptureParentSchema = z.object({
   captureId: z.string().optional(),
   /** Set when the incoming request called a server action. */
   serverActionId: z.string().optional(),
+  /**
+   * Id the runtime gave the incoming request (M47): captures with the same id were sent for the same
+   * page render, route handler call or server action. Absent in captures from before M47.
+   */
+  requestId: z.string().optional(),
 })
 export type CaptureParent = z.infer<typeof CaptureParentSchema>
 
@@ -138,6 +143,11 @@ export const CaptureSchema = z.object({
   durationMs: z.number(),
   /** Browser: the page URL. Server: absent (see `parent`). */
   pageUrl: z.string().optional(),
+  /**
+   * Browser: id of the page view it was sent from (M47). It changes on every navigation, so captures
+   * with the same id belong to one page load. Absent in captures from before M47.
+   */
+  view: z.string().optional(),
   request: CapturedRequestSchema,
   /** Absent when the request failed before a response arrived (see `error`). */
   response: CapturedResponseSchema.optional(),

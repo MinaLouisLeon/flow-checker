@@ -1,0 +1,2939 @@
+{
+  "version": 20,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "admin",
+          "kind": "static",
+          "name": "admin"
+        },
+        "dir": "src/app/admin",
+        "files": {
+          "page": "src/app/admin/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        "dir": "src/app/api",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "drafts",
+              "kind": "static",
+              "name": "drafts"
+            },
+            "dir": "src/app/api/drafts",
+            "files": {
+              "route": "src/app/api/drafts/route.ts"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "login",
+          "kind": "static",
+          "name": "login"
+        },
+        "dir": "src/app/login",
+        "files": {
+          "page": "src/app/login/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "posts",
+          "kind": "static",
+          "name": "posts"
+        },
+        "dir": "src/app/posts",
+        "files": {},
+        "children": [
+          {
+            "segment": {
+              "raw": "[id]",
+              "kind": "dynamic",
+              "name": "id"
+            },
+            "dir": "src/app/posts/[id]",
+            "files": {
+              "page": "src/app/posts/[id]/page.tsx"
+            },
+            "children": []
+          },
+          {
+            "segment": {
+              "raw": "new",
+              "kind": "static",
+              "name": "new"
+            },
+            "dir": "src/app/posts/new",
+            "files": {
+              "page": "src/app/posts/new/page.tsx"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "segment": {
+          "raw": "search",
+          "kind": "static",
+          "name": "search"
+        },
+        "dir": "src/app/search",
+        "files": {
+          "page": "src/app/search/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_2flvqsq9ypc",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Action safety",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Action safety",
+            "template": "%s | Action safety",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_1vstxm5jg4s",
+      "path": "/admin",
+      "kind": "page",
+      "file": "src/app/admin/page.tsx",
+      "segments": [
+        {
+          "raw": "admin",
+          "kind": "static",
+          "name": "admin"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bjye2kzkl7",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Action safety",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Action safety",
+            "template": "%s | Action safety",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_11l3pys7cjp",
+            "parentId": "cmp_1bjye2kzkl7",
+            "in": "page",
+            "loc": {
+              "file": "src/app/admin/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 526,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_1cxvkk9ze46",
+      "path": "/api/drafts",
+      "kind": "route-handler",
+      "file": "src/app/api/drafts/route.ts",
+      "segments": [
+        {
+          "raw": "api",
+          "kind": "static",
+          "name": "api"
+        },
+        {
+          "raw": "drafts",
+          "kind": "static",
+          "name": "drafts"
+        }
+      ],
+      "layoutChain": [],
+      "methods": [
+        "DELETE"
+      ]
+    },
+    {
+      "id": "rt_0mjkks73tcx",
+      "path": "/login",
+      "kind": "page",
+      "file": "src/app/login/page.tsx",
+      "segments": [
+        {
+          "raw": "login",
+          "kind": "static",
+          "name": "login"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_18o6sfko51g",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Action safety",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Action safety",
+            "template": "%s | Action safety",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_07pulgdjqgz",
+      "path": "/posts/[id]",
+      "kind": "page",
+      "file": "src/app/posts/[id]/page.tsx",
+      "segments": [
+        {
+          "raw": "posts",
+          "kind": "static",
+          "name": "posts"
+        },
+        {
+          "raw": "[id]",
+          "kind": "dynamic",
+          "name": "id"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_235okmm8sms",
+      "access": {
+        "status": "guarded",
+        "guards": [
+          {
+            "id": "gd_1ovthgvsa4p",
+            "kind": "not-found",
+            "in": "page",
+            "componentId": "cmp_235okmm8sms",
+            "condition": "!post",
+            "loc": {
+              "file": "src/app/posts/[id]/page.tsx",
+              "line": 8,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "render": {
+        "mode": "dynamic",
+        "reasons": [
+          {
+            "kind": "dynamic-params",
+            "effect": "dynamic",
+            "in": "page",
+            "detail": "`[id]`"
+          }
+        ]
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": [
+          {
+            "kind": "no-not-found",
+            "in": "page",
+            "componentId": "cmp_235okmm8sms",
+            "detail": "notFound",
+            "file": "not-found",
+            "loc": {
+              "file": "src/app/posts/[id]/page.tsx",
+              "line": 8,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Action safety",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Action safety",
+            "template": "%s | Action safety",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0i9c0oj04p4",
+            "parentId": "cmp_235okmm8sms",
+            "in": "page",
+            "loc": {
+              "file": "src/app/posts/[id]/page.tsx",
+              "line": 13,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 804,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_0pprthbg9tc",
+      "path": "/posts/new",
+      "kind": "page",
+      "file": "src/app/posts/new/page.tsx",
+      "segments": [
+        {
+          "raw": "posts",
+          "kind": "static",
+          "name": "posts"
+        },
+        {
+          "raw": "new",
+          "kind": "static",
+          "name": "new"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_20o13ivcbvo",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Action safety",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Action safety",
+            "template": "%s | Action safety",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1kst50bd8fw",
+            "parentId": "cmp_20o13ivcbvo",
+            "in": "page",
+            "loc": {
+              "file": "src/app/posts/new/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 510,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_0ogco80jbuk",
+      "path": "/search",
+      "kind": "page",
+      "file": "src/app/search/page.tsx",
+      "segments": [
+        {
+          "raw": "search",
+          "kind": "static",
+          "name": "search"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_2bfruin4l64",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Action safety",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Action safety",
+            "template": "%s | Action safety",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1egjf754eg8",
+            "parentId": "cmp_2bfruin4l64",
+            "in": "page",
+            "loc": {
+              "file": "src/app/search/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 431,
+        "packages": []
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_1bjye2kzkl7",
+      "name": "AdminPage",
+      "file": "src/app/admin/page.tsx",
+      "loc": {
+        "file": "src/app/admin/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "AdminTools",
+          "resolution": "project",
+          "componentId": "cmp_11l3pys7cjp",
+          "module": "@/components/admin-tools",
+          "loc": {
+            "file": "src/app/admin/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 8,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_18o6sfko51g",
+      "name": "LoginPage",
+      "file": "src/app/login/page.tsx",
+      "loc": {
+        "file": "src/app/login/page.tsx",
+        "line": 1,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_2flvqsq9ypc",
+      "name": "HomePage",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 7,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 31,
+            "column": 13
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_235okmm8sms",
+      "name": "PostPage",
+      "file": "src/app/posts/[id]/page.tsx",
+      "loc": {
+        "file": "src/app/posts/[id]/page.tsx",
+        "line": 5,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "PostActions",
+          "resolution": "project",
+          "componentId": "cmp_0i9c0oj04p4",
+          "module": "@/components/post-actions",
+          "loc": {
+            "file": "src/app/posts/[id]/page.tsx",
+            "line": 13,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ params: Promise<{ id: string }> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "params",
+              "type": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "object",
+                    "properties": [
+                      {
+                        "name": "id",
+                        "type": {
+                          "kind": "primitive",
+                          "name": "string"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_20o13ivcbvo",
+      "name": "NewPostPage",
+      "file": "src/app/posts/new/page.tsx",
+      "loc": {
+        "file": "src/app/posts/new/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "NewPostForm",
+          "resolution": "project",
+          "componentId": "cmp_1kst50bd8fw",
+          "module": "@/components/new-post-form",
+          "loc": {
+            "file": "src/app/posts/new/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_2bfruin4l64",
+      "name": "SearchPage",
+      "file": "src/app/search/page.tsx",
+      "loc": {
+        "file": "src/app/search/page.tsx",
+        "line": 3,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "SearchBox",
+          "resolution": "project",
+          "componentId": "cmp_1egjf754eg8",
+          "module": "@/components/search-box",
+          "loc": {
+            "file": "src/app/search/page.tsx",
+            "line": 7,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_11l3pys7cjp",
+      "name": "AdminTools",
+      "file": "src/components/admin-tools.tsx",
+      "loc": {
+        "file": "src/components/admin-tools.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ userId: string }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "userId",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTransition",
+          "loc": {
+            "file": "src/components/admin-tools.tsx",
+            "line": 7,
+            "column": 38
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/admin-tools.tsx",
+            "line": 10,
+            "column": 48
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1kst50bd8fw",
+      "name": "NewPostForm",
+      "file": "src/components/new-post-form.tsx",
+      "loc": {
+        "file": "src/components/new-post-form.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useActionState",
+          "loc": {
+            "file": "src/components/new-post-form.tsx",
+            "line": 9,
+            "column": 40
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_0i9c0oj04p4",
+      "name": "PostActions",
+      "file": "src/components/post-actions.tsx",
+      "loc": {
+        "file": "src/components/post-actions.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: string }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTransition",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 7,
+            "column": 38
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 8,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 15,
+            "column": 28
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 16,
+            "column": 48
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1egjf754eg8",
+      "name": "SearchBox",
+      "file": "src/components/search-box.tsx",
+      "loc": {
+        "file": "src/components/search-box.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/search-box.tsx",
+            "line": 7,
+            "column": 33
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/search-box.tsx",
+            "line": 10,
+            "column": 14
+          }
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_2auo0w04hy3",
+      "name": "FormState",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/actions/posts.ts",
+        "line": 9,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "error",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            },
+            "optional": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0cu55xmkbql",
+      "name": "Post",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/db.ts",
+        "line": 4,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "title",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "body",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "likes",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_0rw7u87kkds",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "clearDrafts",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 20,
+          "column": 18
+        }
+      },
+      "transport": "fetch",
+      "method": "DELETE",
+      "url": {
+        "text": "`${API_URL}/api/drafts`",
+        "confidence": "exact",
+        "base": "http://localhost:3000",
+        "baseEnv": "API_URL",
+        "path": "/api/drafts"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 22,
+          "column": 11,
+          "callee": "fetch"
+        }
+      ],
+      "status": "inferred",
+      "flags": [
+        {
+          "kind": "unknown-response",
+          "message": "No response type was found (annotation, generic or cast)."
+        }
+      ],
+      "hash": "0texh2rnvlo"
+    },
+    {
+      "id": "req_00pjoqc1j6f",
+      "origin": "component",
+      "componentId": "cmp_2flvqsq9ypc",
+      "serverAction": {
+        "name": "addPost",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 11,
+          "column": 18
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 35,
+          "column": 13
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 35,
+          "column": 13,
+          "callee": "addPost"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "10tu1oj1s5t"
+    },
+    {
+      "id": "req_0mtqhb8jvcv",
+      "origin": "component",
+      "componentId": "cmp_2flvqsq9ypc",
+      "serverAction": {
+        "name": "clearDrafts",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 20,
+          "column": 18
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 39,
+          "column": 13
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 39,
+          "column": 13,
+          "callee": "clearDrafts"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "17odqlh7g8e",
+      "chain": [
+        "req_0rw7u87kkds"
+      ]
+    },
+    {
+      "id": "req_1l9g01s8ie4",
+      "origin": "component",
+      "componentId": "cmp_11l3pys7cjp",
+      "serverAction": {
+        "name": "banUser",
+        "loc": {
+          "file": "src/actions/admin.ts",
+          "line": 9,
+          "column": 14
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/admin-tools.tsx",
+          "line": 10,
+          "column": 48
+        }
+      },
+      "bodyType": {
+        "text": "string",
+        "shape": {
+          "kind": "primitive",
+          "name": "string"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/admin-tools.tsx",
+          "line": 10,
+          "column": 85,
+          "callee": "banUser"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1kru5wj1ad8"
+    },
+    {
+      "id": "req_1smtb89lxiu",
+      "origin": "component",
+      "componentId": "cmp_11l3pys7cjp",
+      "serverAction": {
+        "name": "resetLikes",
+        "loc": {
+          "file": "src/actions/admin.ts",
+          "line": 16,
+          "column": 14
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/admin-tools.tsx",
+          "line": 13,
+          "column": 48
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/admin-tools.tsx",
+          "line": 13,
+          "column": 85,
+          "callee": "resetLikes"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0xg8sh8ck7f"
+    },
+    {
+      "id": "req_0sl9726dexw",
+      "origin": "component",
+      "componentId": "cmp_1kst50bd8fw",
+      "serverAction": {
+        "name": "createPost",
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 14,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/components/new-post-form.tsx",
+          "line": 11,
+          "column": 11
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "FormState",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_2auo0w04hy3",
+          "name": "FormState"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/new-post-form.tsx",
+          "line": 9,
+          "column": 40,
+          "callee": "useActionState"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "2fqcbi50zhq"
+    },
+    {
+      "id": "req_221d8zlwpil",
+      "origin": "component",
+      "componentId": "cmp_0i9c0oj04p4",
+      "serverAction": {
+        "name": "likePost",
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 39,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/components/post-actions.tsx",
+          "line": 11,
+          "column": 13
+        }
+      },
+      "bodyType": {
+        "text": "FormData",
+        "shape": {
+          "kind": "external",
+          "name": "FormData"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/post-actions.tsx",
+          "line": 11,
+          "column": 13,
+          "callee": "likePost"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1z4a9hwqb9z"
+    },
+    {
+      "id": "req_29c69mywno8",
+      "origin": "component",
+      "componentId": "cmp_0i9c0oj04p4",
+      "serverAction": {
+        "name": "renamePost",
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 31,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/post-actions.tsx",
+          "line": 16,
+          "column": 48
+        }
+      },
+      "bodyType": {
+        "text": "string",
+        "shape": {
+          "kind": "primitive",
+          "name": "string"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/post-actions.tsx",
+          "line": 16,
+          "column": 85,
+          "callee": "renamePost"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1mlni0zgnhv"
+    },
+    {
+      "id": "req_0vn3h2ovgfe",
+      "origin": "component",
+      "componentId": "cmp_0i9c0oj04p4",
+      "serverAction": {
+        "name": "deletePost",
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 25,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/post-actions.tsx",
+          "line": 19,
+          "column": 48
+        }
+      },
+      "bodyType": {
+        "text": "string",
+        "shape": {
+          "kind": "primitive",
+          "name": "string"
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/post-actions.tsx",
+          "line": 19,
+          "column": 85,
+          "callee": "deletePost"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "1401699917q"
+    },
+    {
+      "id": "req_2b6oqxpl3fk",
+      "origin": "component",
+      "componentId": "cmp_1egjf754eg8",
+      "serverAction": {
+        "name": "searchPosts",
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 47,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "onChange",
+        "loc": {
+          "file": "src/components/search-box.tsx",
+          "line": 10,
+          "column": 14
+        }
+      },
+      "bodyType": {
+        "text": "string",
+        "shape": {
+          "kind": "primitive",
+          "name": "string"
+        }
+      },
+      "responseType": {
+        "text": "Post[]",
+        "shape": {
+          "kind": "array",
+          "element": {
+            "kind": "ref",
+            "typeId": "typ_0cu55xmkbql",
+            "name": "Post"
+          }
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/search-box.tsx",
+          "line": 10,
+          "column": 54,
+          "callee": "searchPosts"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0tt5dimwo5g"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_0fcb0w6u7on",
+      "origin": "component",
+      "componentId": "cmp_2flvqsq9ypc",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "`/posts/${p.id}`",
+        "confidence": "pattern",
+        "path": "/posts/:id"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 31,
+          "column": 13
+        }
+      },
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 31,
+        "column": 13
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 31,
+          "column": 13,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_07pulgdjqgz"
+    },
+    {
+      "id": "nav_17tq9nc4xnh",
+      "origin": "server-action",
+      "serverAction": {
+        "name": "renamePost",
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 31,
+          "column": 23
+        }
+      },
+      "kind": "redirect",
+      "api": "next",
+      "href": {
+        "text": "'/login'",
+        "confidence": "exact",
+        "path": "/login"
+      },
+      "trigger": {
+        "kind": "server-action"
+      },
+      "loc": {
+        "file": "src/lib/auth.ts",
+        "line": 20,
+        "column": 17
+      },
+      "callStack": [
+        {
+          "file": "src/actions/posts.ts",
+          "line": 32,
+          "column": 9,
+          "callee": "requireUser"
+        },
+        {
+          "file": "src/lib/auth.ts",
+          "line": 20,
+          "column": 17,
+          "callee": "redirect"
+        }
+      ],
+      "targetRouteId": "rt_0mjkks73tcx"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_0celioiprtw",
+      "name": "HomePage submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_2flvqsq9ypc",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_2flvqsq9ypc",
+          "event": "action",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 35,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_00pjoqc1j6f"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ]
+    },
+    {
+      "id": "flw_2fikgdxcviv",
+      "name": "HomePage submit (2)",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_2flvqsq9ypc",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_2flvqsq9ypc",
+          "event": "action",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 39,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0mtqhb8jvcv"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ]
+    },
+    {
+      "id": "flw_02msg4qkeic",
+      "name": "AdminTools click",
+      "routeId": "rt_1vstxm5jg4s",
+      "componentId": "cmp_11l3pys7cjp",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1vstxm5jg4s",
+          "componentId": "cmp_11l3pys7cjp",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/admin-tools.tsx",
+            "line": 10,
+            "column": 48
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1l9g01s8ie4"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1vstxm5jg4s"
+      ]
+    },
+    {
+      "id": "flw_1hguxstzz9c",
+      "name": "AdminTools click (2)",
+      "routeId": "rt_1vstxm5jg4s",
+      "componentId": "cmp_11l3pys7cjp",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_1vstxm5jg4s",
+          "componentId": "cmp_11l3pys7cjp",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/admin-tools.tsx",
+            "line": 13,
+            "column": 48
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1smtb89lxiu"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_1vstxm5jg4s"
+      ]
+    },
+    {
+      "id": "flw_0n7ob68nn1y",
+      "name": "NewPostForm submit",
+      "routeId": "rt_0pprthbg9tc",
+      "componentId": "cmp_1kst50bd8fw",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0pprthbg9tc",
+          "componentId": "cmp_1kst50bd8fw",
+          "event": "action",
+          "loc": {
+            "file": "src/components/new-post-form.tsx",
+            "line": 11,
+            "column": 11
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0sl9726dexw"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0pprthbg9tc"
+      ]
+    },
+    {
+      "id": "flw_15oxmbz5wz9",
+      "name": "PostActions submit",
+      "routeId": "rt_07pulgdjqgz",
+      "componentId": "cmp_0i9c0oj04p4",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_07pulgdjqgz",
+          "componentId": "cmp_0i9c0oj04p4",
+          "event": "action",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 11,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_221d8zlwpil"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_07pulgdjqgz"
+      ]
+    },
+    {
+      "id": "flw_1ex9t476dou",
+      "name": "PostActions click",
+      "routeId": "rt_07pulgdjqgz",
+      "componentId": "cmp_0i9c0oj04p4",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_07pulgdjqgz",
+          "componentId": "cmp_0i9c0oj04p4",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 16,
+            "column": 48
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_29c69mywno8"
+        },
+        {
+          "kind": "navigate",
+          "navigationId": "nav_17tq9nc4xnh",
+          "routeId": "rt_0mjkks73tcx"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_07pulgdjqgz",
+        "rt_0mjkks73tcx"
+      ]
+    },
+    {
+      "id": "flw_0ny6sdtr6xc",
+      "name": "PostActions click (2)",
+      "routeId": "rt_07pulgdjqgz",
+      "componentId": "cmp_0i9c0oj04p4",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_07pulgdjqgz",
+          "componentId": "cmp_0i9c0oj04p4",
+          "event": "onClick",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 19,
+            "column": 48
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_0vn3h2ovgfe"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_07pulgdjqgz"
+      ]
+    },
+    {
+      "id": "flw_1xv2jvzwiwi",
+      "name": "SearchBox change",
+      "routeId": "rt_0ogco80jbuk",
+      "componentId": "cmp_1egjf754eg8",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0ogco80jbuk",
+          "componentId": "cmp_1egjf754eg8",
+          "event": "onChange",
+          "loc": {
+            "file": "src/components/search-box.tsx",
+            "line": 10,
+            "column": 14
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_2b6oqxpl3fk"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0ogco80jbuk"
+      ]
+    }
+  ],
+  "queryLinks": [],
+  "imports": {
+    "src/actions/admin.ts": [
+      "src/lib/auth.ts",
+      "src/lib/db.ts"
+    ],
+    "src/actions/posts.ts": [
+      "src/lib/auth.ts",
+      "src/lib/db.ts",
+      "src/lib/schemas.ts"
+    ],
+    "src/app/admin/page.tsx": [
+      "src/components/admin-tools.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/lib/db.ts"
+    ],
+    "src/app/posts/[id]/page.tsx": [
+      "src/components/post-actions.tsx",
+      "src/lib/db.ts"
+    ],
+    "src/app/posts/new/page.tsx": [
+      "src/components/new-post-form.tsx"
+    ],
+    "src/app/search/page.tsx": [
+      "src/components/search-box.tsx"
+    ],
+    "src/components/admin-tools.tsx": [
+      "src/actions/admin.ts"
+    ],
+    "src/components/new-post-form.tsx": [
+      "src/actions/posts.ts"
+    ],
+    "src/components/post-actions.tsx": [
+      "src/actions/posts.ts"
+    ],
+    "src/components/search-box.tsx": [
+      "src/actions/posts.ts"
+    ]
+  },
+  "cache": {
+    "entries": [],
+    "invalidations": [
+      {
+        "id": "ci_07vqg4n9n9r",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/admin'",
+          "value": "/admin",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "banUser",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 9,
+            "column": 14
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/admin.ts",
+            "line": 12,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/admin.ts",
+          "line": 12,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_1vstxm5jg4s"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1n1qou45eh0",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "resetLikes",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 16,
+            "column": 14
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/admin.ts",
+            "line": 18,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/admin.ts",
+          "line": 18,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1ysfhxqwmj0",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "createPost",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 14,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/posts.ts",
+            "line": 20,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 20,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_1hwop8wz5oo",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "deletePost",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 25,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/posts.ts",
+            "line": 27,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 27,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_25lzzgl7rd1",
+        "api": "revalidatePath",
+        "path": {
+          "text": "`/posts/${input.id}`",
+          "value": "/posts/{id}",
+          "confidence": "pattern"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "renamePost",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 31,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/posts.ts",
+            "line": 35,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/posts.ts",
+          "line": 35,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_07pulgdjqgz",
+          "rt_0pprthbg9tc"
+        ],
+        "handlerIds": [],
+        "flags": []
+      },
+      {
+        "id": "ci_124syev6slk",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "addPost",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 11,
+            "column": 18
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/app/page.tsx",
+            "line": 16,
+            "column": 5,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 16,
+          "column": 5
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      }
+    ]
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_11l3pys7cjp",
+      "file": "src/components/admin-tools.tsx",
+      "componentIds": [
+        "cmp_11l3pys7cjp"
+      ],
+      "modules": [
+        "src/components/admin-tools.tsx"
+      ],
+      "packages": [],
+      "bytes": 526,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTransition",
+          "loc": {
+            "file": "src/components/admin-tools.tsx",
+            "line": 7,
+            "column": 38
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/admin-tools.tsx",
+            "line": 10,
+            "column": 48
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1kst50bd8fw",
+      "file": "src/components/new-post-form.tsx",
+      "componentIds": [
+        "cmp_1kst50bd8fw"
+      ],
+      "modules": [
+        "src/components/new-post-form.tsx"
+      ],
+      "packages": [],
+      "bytes": 510,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useActionState",
+          "loc": {
+            "file": "src/components/new-post-form.tsx",
+            "line": 9,
+            "column": 40
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0i9c0oj04p4",
+      "file": "src/components/post-actions.tsx",
+      "componentIds": [
+        "cmp_0i9c0oj04p4"
+      ],
+      "modules": [
+        "src/components/post-actions.tsx"
+      ],
+      "packages": [],
+      "bytes": 804,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTransition",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 7,
+            "column": 38
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 8,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 15,
+            "column": 28
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/post-actions.tsx",
+            "line": 16,
+            "column": 48
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1egjf754eg8",
+      "file": "src/components/search-box.tsx",
+      "componentIds": [
+        "cmp_1egjf754eg8"
+      ],
+      "modules": [
+        "src/components/search-box.tsx"
+      ],
+      "packages": [],
+      "bytes": 431,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/search-box.tsx",
+            "line": 7,
+            "column": 33
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/search-box.tsx",
+            "line": 10,
+            "column": 14
+          }
+        }
+      ]
+    }
+  ],
+  "env": {
+    "files": [],
+    "vars": [
+      {
+        "name": "API_URL",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 5,
+              "column": 17
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": [
+              "rt_0h4e5x5madf"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "FLOW_CHECKER",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 3,
+              "column": 7
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          },
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 8,
+              "column": 7
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          }
+        ],
+        "setBy": "flow-checker"
+      },
+      {
+        "name": "FLOW_CHECKER_RUNTIME",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 10,
+              "column": 25
+            },
+            "side": "server",
+            "access": "direct",
+            "routeIds": []
+          }
+        ],
+        "setBy": "flow-checker"
+      },
+      {
+        "name": "NEXT_PUBLIC_FLOW_CHECKER",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation-client.ts",
+              "line": 5,
+              "column": 22
+            },
+            "side": "client",
+            "access": "direct",
+            "routeIds": []
+          }
+        ],
+        "setBy": "flow-checker"
+      },
+      {
+        "name": "NEXT_RUNTIME",
+        "definedIn": [],
+        "reads": [
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 3,
+              "column": 43
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          },
+          {
+            "loc": {
+              "file": "src/instrumentation.ts",
+              "line": 8,
+              "column": 43
+            },
+            "side": "server",
+            "access": "direct",
+            "optional": true,
+            "routeIds": []
+          }
+        ],
+        "setBy": "next"
+      }
+    ],
+    "unknown": []
+  },
+  "actions": [
+    {
+      "id": "sa_1rr9jatjkse",
+      "name": "banUser",
+      "loc": {
+        "file": "src/actions/admin.ts",
+        "line": 9,
+        "column": 14
+      },
+      "defined": "file",
+      "wrappedIn": {
+        "name": "withAdmin"
+      },
+      "siteIds": [
+        "req_1l9g01s8ie4"
+      ],
+      "routeIds": [
+        "rt_1vstxm5jg4s"
+      ],
+      "auth": {
+        "status": "checked",
+        "checks": [
+          {
+            "kind": "wrapper",
+            "text": "withAdmin",
+            "loc": {
+              "file": "src/actions/admin.ts",
+              "line": 9,
+              "column": 24
+            }
+          }
+        ]
+      },
+      "input": {
+        "status": "checked",
+        "params": [
+          {
+            "name": "userId",
+            "checked": true
+          }
+        ],
+        "checks": [
+          {
+            "kind": "schema",
+            "library": "zod",
+            "text": "z.string().min(1).parse",
+            "params": [
+              "userId"
+            ],
+            "loc": {
+              "file": "src/actions/admin.ts",
+              "line": 10,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.user.update",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 11,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 12,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_21p6fiz7yll",
+      "name": "resetLikes",
+      "loc": {
+        "file": "src/actions/admin.ts",
+        "line": 16,
+        "column": 14
+      },
+      "defined": "file",
+      "wrappedIn": {
+        "name": "action"
+      },
+      "siteIds": [
+        "req_1smtb89lxiu"
+      ],
+      "routeIds": [
+        "rt_1vstxm5jg4s"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "no-input",
+        "params": [],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.update",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 17,
+            "column": 54
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 18,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/actions/admin.ts",
+            "line": 16,
+            "column": 14
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_25ogsza800f",
+      "name": "createPost",
+      "loc": {
+        "file": "src/actions/posts.ts",
+        "line": 14,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_0sl9726dexw"
+      ],
+      "routeIds": [
+        "rt_0pprthbg9tc"
+      ],
+      "auth": {
+        "status": "checked",
+        "checks": [
+          {
+            "kind": "condition",
+            "text": "!session",
+            "loc": {
+              "file": "src/actions/posts.ts",
+              "line": 16,
+              "column": 7
+            }
+          }
+        ]
+      },
+      "input": {
+        "status": "checked",
+        "params": [
+          {
+            "name": "formData",
+            "checked": true
+          }
+        ],
+        "checks": [
+          {
+            "kind": "schema",
+            "library": "zod",
+            "text": "PostSchema.safeParse",
+            "params": [
+              "formData"
+            ],
+            "loc": {
+              "file": "src/actions/posts.ts",
+              "line": 17,
+              "column": 18
+            }
+          }
+        ]
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.create",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 19,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 20,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_1dswgzr62sz",
+      "name": "deletePost",
+      "loc": {
+        "file": "src/actions/posts.ts",
+        "line": 25,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_0vn3h2ovgfe"
+      ],
+      "routeIds": [
+        "rt_07pulgdjqgz"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "id",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.delete",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 26,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 27,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 25,
+            "column": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_27ye31zcokz",
+      "name": "renamePost",
+      "loc": {
+        "file": "src/actions/posts.ts",
+        "line": 31,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_29c69mywno8"
+      ],
+      "routeIds": [
+        "rt_07pulgdjqgz"
+      ],
+      "auth": {
+        "status": "checked",
+        "checks": [
+          {
+            "kind": "helper",
+            "text": "requireUser()",
+            "loc": {
+              "file": "src/actions/posts.ts",
+              "line": 32,
+              "column": 9
+            }
+          }
+        ]
+      },
+      "input": {
+        "status": "checked",
+        "params": [
+          {
+            "name": "id",
+            "checked": true
+          },
+          {
+            "name": "title",
+            "checked": true
+          }
+        ],
+        "checks": [
+          {
+            "kind": "schema",
+            "library": "valibot",
+            "text": "v.parse",
+            "params": [
+              "id",
+              "title"
+            ],
+            "loc": {
+              "file": "src/actions/posts.ts",
+              "line": 33,
+              "column": 17
+            }
+          }
+        ]
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.update",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 34,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 35,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_0mu9jdekvv2",
+      "name": "likePost",
+      "loc": {
+        "file": "src/actions/posts.ts",
+        "line": 39,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_221d8zlwpil"
+      ],
+      "routeIds": [
+        "rt_07pulgdjqgz"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "checked",
+        "params": [
+          {
+            "name": "formData",
+            "checked": true
+          }
+        ],
+        "checks": [
+          {
+            "kind": "manual",
+            "text": "typeof id !== 'string' || id.length > 40",
+            "params": [
+              "formData"
+            ],
+            "loc": {
+              "file": "src/actions/posts.ts",
+              "line": 41,
+              "column": 7
+            }
+          }
+        ]
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.update",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 43,
+            "column": 19
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_2dcwwh3lejh",
+      "name": "searchPosts",
+      "loc": {
+        "file": "src/actions/posts.ts",
+        "line": 47,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_2b6oqxpl3fk"
+      ],
+      "routeIds": [
+        "rt_0ogco80jbuk"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "query",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": []
+    },
+    {
+      "id": "sa_0qy63a6gezf",
+      "name": "purgePosts",
+      "loc": {
+        "file": "src/actions/posts.ts",
+        "line": 52,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [],
+      "routeIds": [],
+      "unused": true,
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "no-input",
+        "params": [],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.delete",
+          "loc": {
+            "file": "src/actions/posts.ts",
+            "line": 53,
+            "column": 54
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_1qf9rjz3wov",
+      "name": "addPost",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 11,
+        "column": 18
+      },
+      "defined": "inline",
+      "componentId": "cmp_2flvqsq9ypc",
+      "siteIds": [
+        "req_00pjoqc1j6f"
+      ],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "checked",
+        "params": [
+          {
+            "name": "formData",
+            "checked": true
+          }
+        ],
+        "checks": [
+          {
+            "kind": "manual",
+            "text": "typeof title !== 'string' || title.trim() === ''",
+            "params": [
+              "formData"
+            ],
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 14,
+              "column": 9
+            }
+          }
+        ]
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.post.create",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 15,
+            "column": 11
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 16,
+            "column": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_02jdypvvv83",
+      "name": "clearDrafts",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 20,
+        "column": 18
+      },
+      "defined": "inline",
+      "componentId": "cmp_2flvqsq9ypc",
+      "siteIds": [
+        "req_0mtqhb8jvcv"
+      ],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "no-input",
+        "params": [],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch DELETE",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 22,
+            "column": 11
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 20,
+            "column": 18
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "trpc",
   "model": {
-    "version": 16,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -2723,7 +2723,124 @@
           }
         ]
       }
-    ]
+    ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "API_URL",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/server/upstream.ts",
+                "line": 3,
+                "column": 17
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": [
+                "rt_044xcwxfqfa"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    }
   },
   "verification": {
     "sites": {
@@ -2854,6 +2971,207 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_02nhwic4gly",
+          "label": "GET /api/trpc/health.ping",
+          "siteIds": [
+            "req_0xg00gfgxqn"
+          ],
+          "count": 1,
+          "p50": 1624,
+          "p95": 1624,
+          "max": 1624,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumsmwa0y8fk5qn-0"
+        },
+        {
+          "key": "ep_0msu49db75v",
+          "label": "GET /api/trpc/todo.list",
+          "siteIds": [
+            "req_0td0aq6jy41"
+          ],
+          "count": 2,
+          "p50": 24,
+          "p95": 1624,
+          "max": 1624,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumsmwa0y8fk5qn-1"
+        },
+        {
+          "key": "ep_0ibv7krl4ej",
+          "label": "POST /api/trpc/todo.add",
+          "siteIds": [
+            "req_2e9reb96ytq"
+          ],
+          "count": 1,
+          "p50": 77,
+          "p95": 77,
+          "max": 77,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumsq77e2e0frns"
+        },
+        {
+          "key": "ep_25303l9f52p",
+          "label": "GET /api/trpc/todo.byId",
+          "siteIds": [
+            "req_1130uk5gwu8"
+          ],
+          "count": 2,
+          "p50": 22,
+          "p95": 43,
+          "max": 43,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumsro1hjaagwlh"
+        },
+        {
+          "key": "ep_1rinmezu3ej",
+          "label": "GET /api/trpc/user.list",
+          "siteIds": [
+            "req_0mfdzrz4ekf"
+          ],
+          "count": 1,
+          "p50": 41,
+          "p95": 41,
+          "max": 41,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumsuh66wcj1gfu"
+        },
+        {
+          "key": "ep_1u7mfef31ll",
+          "label": "POST /api/trpc/todo.toggle",
+          "siteIds": [
+            "req_1yefdvziu6b"
+          ],
+          "count": 1,
+          "p50": 37,
+          "p95": 37,
+          "max": 37,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumssuhai3asgqa"
+        },
+        {
+          "key": "ep_25v9o6f1xuc",
+          "label": "GET {API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_1tdume4or33"
+          ],
+          "count": 2,
+          "p50": 6,
+          "p95": 34,
+          "max": 34,
+          "errors": 0,
+          "browser": 0,
+          "server": 2,
+          "slowestCaptureId": "cap_mvumso4zmvlt4dyn"
+        },
+        {
+          "key": "ep_07ze9d1keja",
+          "label": "GET /api/trpc/user.byId",
+          "siteIds": [
+            "req_1jhjx2h6c0y"
+          ],
+          "count": 1,
+          "p50": 22,
+          "p95": 22,
+          "max": 22,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvumsrpm9yxb2kkj"
+        },
+        {
+          "key": "ep_1ummwnixxxj",
+          "label": "GET {API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_1grc5hxysxt"
+          ],
+          "count": 1,
+          "p50": 17,
+          "p95": 17,
+          "max": 17,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvumsuiauak3ttxu"
+        },
+        {
+          "key": "ep_1a9zvb2cvpx",
+          "label": "POST {API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_1pnj4az8jd4"
+          ],
+          "count": 1,
+          "p50": 5,
+          "p95": 5,
+          "max": 5,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvumsq9e7jfe7rwx"
+        },
+        {
+          "key": "ep_06drh6l9g5j",
+          "label": "PATCH {API_URL ?? http://localhost:4010}/todos/:id",
+          "siteIds": [
+            "req_0e790agvf59"
+          ],
+          "count": 1,
+          "p50": 4,
+          "p95": 4,
+          "max": 4,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvumssvju7a4rda5"
+        },
+        {
+          "key": "ep_2byawmgpkxh",
+          "label": "GET {API_URL ?? http://localhost:4010}/todos/:id",
+          "siteIds": [
+            "req_1pf3v7qr14b"
+          ],
+          "count": 2,
+          "p50": 3,
+          "p95": 3,
+          "max": 3,
+          "errors": 0,
+          "browser": 0,
+          "server": 2,
+          "slowestCaptureId": "cap_mvumsrp5a9n129k5"
+        },
+        {
+          "key": "ep_0o9nq5wpp19",
+          "label": "GET {API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_2c4oanm9vl7"
+          ],
+          "count": 1,
+          "p50": 3,
+          "p95": 3,
+          "max": 3,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvumsrq5vhcvoi9z"
+        }
+      ],
+      "loads": 10
     }
   },
   "flows": {

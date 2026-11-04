@@ -115,3 +115,19 @@ modules: 1, 0.9 KB
   src/components/UserList.tsx
 packages: react-relay
 uses: useRelayEnvironment (hook) src/components/UserList.tsx:8, useState (hook) src/components/UserList.tsx:9, onClick (event handler) src/components/UserList.tsx:30
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

@@ -19,10 +19,21 @@
 
 ## Client boundaries
 
-1 `'use client'` boundary brings 1 component and 3 project modules (about 3.1 KB of source) to the browser, plus 1 package (`server-only`).
+1 `'use client'` boundary brings 1 component and 1 project module (about 1.0 KB of source) to the browser.
 
-- [`CreateProductForm`](../components/CreateProductForm.md), rendered by `NewProductPage` (page): 1 component · 3 modules · 3.1 KB, `src/app/products/new/page.tsx:7`
-  - packages: `server-only`
+- [`CreateProductForm`](../components/CreateProductForm.md), rendered by `NewProductPage` (page): 1 component · 1 module · 1.0 KB, `src/app/products/new/page.tsx:7`
+
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `API_URL` (server): not defined, `src/lib/backend.ts:4`
+
+## Server actions
+
+Each one is a public `POST` endpoint ([all](../actions.md)).
+
+- `createProduct` (`src/actions/products.ts:9`): [no auth check](../GLOSSARY.md#action-auth-none), [input checked](../GLOSSARY.md#action-input-checked); changes data through a request
 
 ## Metadata
 

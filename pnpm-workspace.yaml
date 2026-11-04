@@ -33,6 +33,11 @@ catalog:
   yaml: ^2.8.1
   # GraphQL (M17): the scanner parses documents and schemas with graphql-js.
   graphql: ^16.14.2
+  # Server/client leaks (M44): the leaks fixture reaches a database client from client code.
+  pg: ^8.23.1
+  "@types/pg": ^8.23.1
+  # Server action safety (M46): the action-safety fixture checks input with valibot as well as zod.
+  valibot: ^1.1.0
 
 # pnpm 11 blocks dependency install scripts unless listed here.
 allowBuilds:

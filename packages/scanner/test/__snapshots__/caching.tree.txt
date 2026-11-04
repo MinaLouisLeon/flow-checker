@@ -43,6 +43,8 @@ render: ISR 15m
 boundaries: (none)
 title: caching fixture  (layout metadata)
 client: (none)
+env: API_URL
+actions: createTodo (no auth check, input not checked) [unprotected]
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -57,6 +59,7 @@ boundaries:
   suspense in page around ProductList src/app/products/page.tsx:21
 title: caching fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -68,6 +71,7 @@ render: ISR 15m
 boundaries: (none)
 title: caching fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -83,6 +87,8 @@ boundaries:
   suspense in page around TodoDetail src/app/todos/[id]/page.tsx:20
 title: caching fixture  (layout metadata)
 client: (none)
+env: API_URL
+actions: toggleTodo (no auth check, input not checked) [unprotected]
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -97,6 +103,8 @@ boundaries:
   suspense in page around UserList src/app/users/page.tsx:20
 title: caching fixture  (layout metadata)
 client: (none)
+env: API_URL
+actions: refreshUsers (no auth check, no input)
 
 # Server cache
 
@@ -148,3 +156,48 @@ updateTag('todos')  in route handler `POST /api/todos`  src/app/api/todos/route.
   refreshes: use cache listTodos
   pages: /
   ! update-tag-outside-action: `updateTag` only works in a server action; Next throws here. Use `revalidateTag(tag, { expire: 0 })` in a route handler.
+
+# Environment variables
+
+API_URL: not defined
+  server optional  src/lib/api-url.ts:1  /, /api/featured, /api/stats, /api/todos, /products, /settings, /todos/[id], /users
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+# Server actions
+
+createTodo (file) src/app/actions.ts:6 [unprotected]
+  no auth check
+  input not checked (formData?)
+  request fetch POST  src/app/actions.ts:7
+  cache updateTag  src/app/actions.ts:12
+  cache revalidatePath  src/app/actions.ts:13
+  pages: /
+
+toggleTodo (file) src/app/actions.ts:16 [unprotected]
+  no auth check
+  input not checked (formData?)
+  request fetch PATCH  src/app/actions.ts:18
+  cache updateTag  src/app/actions.ts:23
+  cache revalidatePath  src/app/actions.ts:24
+  pages: /todos/[id]
+
+refreshUsers (file) src/app/actions.ts:27
+  no auth check
+  no input
+  cache revalidateTag  src/app/actions.ts:28
+  cache revalidateTag  src/app/actions.ts:30
+  cache revalidatePath  src/app/actions.ts:31
+  pages: /users

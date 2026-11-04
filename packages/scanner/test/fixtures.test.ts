@@ -34,6 +34,10 @@ const FIXTURES = [
   'caching-15',
   'boundaries',
   'client-boundaries',
+  'leaks',
+  'env',
+  'action-safety',
+  'perf',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -380,5 +384,210 @@ describe('client boundaries (M43)', () => {
         }
       }
     }
+  })
+})
+
+describe('server/client leaks (M44)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  it('flags exactly the pages `next dev` rejects in the leaks fixture, and nothing on the others', () => {
+    const found = FIXTURES.flatMap((fixture) => {
+      const model = scan(fixture)
+      const name = (id: string) => model.components.find((c) => c.id === id)?.name ?? id
+      const path = (id: string) => model.routes.find((r) => r.id === id)?.path ?? id
+      return (model.leaks ?? []).map((l) =>
+        l.kind === 'module'
+          ? `${fixture} ${l.routeIds.map(path).join(',')}: ${l.module} in ${l.file} (${l.category})`
+          : `${fixture} ${l.routeIds.map(path).join(',')}: ${name(l.parentId)} -> ${l.name}.${l.prop} (${l.value})`,
+      )
+    })
+    // `next dev` (16.4.3) on the fixture: `/` renders; each of these pages fails with the error noted.
+    expect(found).toEqual([
+      // "You're importing a module that depends on \"revalidatePath\""
+      'leaks /admin: next/cache in src/components/refresh-button.tsx (next-server)',
+      // "Module not found: Can't resolve 'fs'"
+      'leaks /files: fs in src/lib/disk.ts (node)',
+      // "You're importing a module that depends on \"server-only\""
+      'leaks /keys: server-only in src/lib/keys.ts (server-only)',
+      // "You're importing a module that depends on \"next/headers\""
+      'leaks /account: next/headers in src/lib/session.ts (next-server)',
+      // "Module not found: Can't resolve 'dns'"
+      'leaks /stats: pg in src/lib/stats.ts (database)',
+      // "Event handlers cannot be passed to Client Component props"
+      'leaks /filters: FiltersPage -> FilterBar.config.onChange (function)',
+      'leaks /help: HelpPage -> Link.onClick (function)',
+      'leaks /products: ProductsPage -> ProductPicker.onSelect (function)',
+      // "Only plain objects, and a few built-ins, can be passed to Client Components"
+      'leaks /receipt: ReceiptPage -> ReceiptTotal.total (class-instance)',
+    ])
+  })
+
+  it('gives each module leak the import chain from the boundary', () => {
+    const model = scan('leaks')
+    const files = (model.leaks ?? []).find((l) => l.kind === 'module' && l.module === 'fs')
+    expect(files?.kind === 'module' && files.chain).toEqual([
+      'src/components/file-badge.tsx',
+      'src/lib/format-size.ts',
+      'src/lib/disk.ts',
+    ])
+  })
+})
+
+describe('environment variables (M45)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  it('flags the env fixture’s planted cases and the real ones on the leaks fixture, nothing else', () => {
+    const found = FIXTURES.flatMap((fixture) =>
+      (scan(fixture).env?.vars ?? []).flatMap((v) =>
+        (v.flags ?? []).map((f) => `${fixture} ${v.name} ${f.kind} ${f.loc.file}:${f.loc.line}`),
+      ),
+    )
+    expect(found).toEqual([
+      // Server files the leaks fixture's client code reaches on purpose read private names.
+      'leaks API_KEY private-in-client src/lib/keys.ts:3',
+      'leaks DATABASE_URL private-in-client src/lib/stats.ts:3',
+      'leaks DATABASE_URL not-defined src/lib/db.ts:5',
+      // `next build`: the value is not in the browser bundle.
+      'env API_URL private-in-client src/lib/config.ts:2',
+      // No .env file defines it, and the read has no fallback.
+      'env DATABASE_URL not-defined src/lib/db.ts:2',
+      // `next build`: destructuring is not inlined.
+      'env NEXT_PUBLIC_SITE_NAME not-inlined src/components/site-name.tsx:5',
+      'env STRIPE_SECRET_KEY private-in-client src/components/checkout-button.tsx:6',
+    ])
+  })
+
+  it('reads every form the env fixture uses and the files it has', () => {
+    const env = scan('env').env
+    const access = (name: string) =>
+      env?.vars.find((v) => v.name === name)?.reads.map((r) => `${r.side} ${r.access}`)
+    expect(access('NEXT_PUBLIC_SUPPORT_EMAIL')).toEqual(['client literal'])
+    expect(access('NEXT_PUBLIC_THEME')).toEqual(['client alias'])
+    expect(access('BUILD_LABEL')).toEqual(['client direct'])
+    expect(access('POWERED_BY')).toEqual(['config direct'])
+    expect(env?.files.map((f) => f.file)).toEqual([
+      '.env',
+      '.env.development',
+      '.env.production',
+      '.env.example',
+    ])
+    expect(env?.unknown.map((r) => `${r.side} ${r.loc.file}`)).toEqual(['server src/lib/flags.ts'])
+    // A name inside a multi-line quoted value isn't a name.
+    expect(env?.vars.some((v) => v.name === 'NOT_A_NAME')).toBe(false)
+  })
+
+  it('never puts a value from a .env file into the model or the tree text', () => {
+    const model = scan('env')
+    const text = `${JSON.stringify(model)}\n${formatModel(model)}`
+    expect(text).not.toContain('fixture-value-')
+    expect(text).not.toContain('localhost:4010')
+  })
+})
+
+describe('server action safety (M46)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  it('labels every action of the action-safety fixture as planted', () => {
+    const label = (a: NonNullable<AppModel['actions']>[number]) =>
+      `${a.name} ${a.defined}${a.wrappedIn ? ` in ${a.wrappedIn.name}` : ''}: ${a.auth.status} / ${a.input.status}${a.unused ? ' unused' : ''}${a.flags?.length ? ' [unprotected]' : ''}`
+    expect(scan('action-safety').actions?.map(label)).toEqual([
+      'banUser file in withAdmin: checked / checked',
+      'resetLikes file in action: none / no-input [unprotected]',
+      'createPost file: checked / checked',
+      'deletePost file: none / none [unprotected]',
+      'renamePost file: checked / checked',
+      'likePost file: none / checked',
+      'searchPosts file: none / none',
+      // `next build` leaves it out of `server-reference-manifest.json`.
+      'purgePosts file: none / no-input unused',
+      'addPost inline: none / checked',
+      'clearDrafts inline: none / no-input [unprotected]',
+    ])
+  })
+
+  it('flags the planted actions and the real ones on other fixtures, nothing else', () => {
+    const found = FIXTURES.flatMap((fixture) =>
+      (scan(fixture).actions ?? [])
+        .filter((a) => a.flags?.length)
+        .map((a) => `${fixture} ${a.name} ${a.loc.file}:${a.loc.line}`),
+    )
+    expect(found).toEqual([
+      // Demo actions with no auth check that send their input as it came.
+      'server-actions deleteProduct src/actions/products.ts:30',
+      'caching createTodo src/app/actions.ts:6',
+      'caching toggleTodo src/app/actions.ts:16',
+      'caching-15 createTodo app/actions.ts:7',
+      'caching-15 toggleTodo app/actions.ts:17',
+      'leaks archiveOrder src/actions/orders.ts:7',
+      'action-safety resetLikes src/actions/admin.ts:16',
+      'action-safety deletePost src/actions/posts.ts:25',
+      'action-safety clearDrafts src/app/page.tsx:20',
+    ])
+  })
+
+  it('links every used action to the pages that call it', () => {
+    for (const fixture of FIXTURES) {
+      for (const action of scan(fixture).actions ?? []) {
+        if (action.unused) expect(action.routeIds, `${fixture} ${action.name}`).toEqual([])
+        else expect(action.routeIds.length, `${fixture} ${action.name}`).toBeGreaterThan(0)
+      }
+    }
+  })
+})
+
+describe('request performance (M47)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  const label = (f: NonNullable<AppModel['perf']>['findings'][number]) =>
+    `${f.kind} ${f.side} ${f.loc.file}:${f.loc.line}${f.loop ? ` ${f.loop.kind}` : ''}${f.sequential ? ' sequential' : ''}`
+
+  it('finds the planted cases on the perf fixture, and nothing on the other fixtures', () => {
+    const found = FIXTURES.flatMap((fixture) =>
+      (scan(fixture).perf?.findings ?? []).map((f) => `${fixture} ${label(f)}`),
+    )
+    expect(found).toEqual([
+      'perf n-plus-one server src/app/catalog/page.tsx:6 callback',
+      'perf waterfall server src/app/page.tsx:6',
+      'perf n-plus-one server src/app/products/page.tsx:8 for sequential',
+      'perf duplicate server src/app/settings/page.tsx:5',
+      'perf n-plus-one client src/app/todos/page.tsx:10 render',
+    ])
+  })
+
+  it('links each finding to its requests, the list it loops over and its pages', () => {
+    const model = scan('perf')
+    const sites = new Map(model.requests.map((s) => [s.id, s]))
+    const paths = new Map(model.routes.map((r) => [r.id, r.path]))
+    const url = (id: string) => sites.get(id)?.url?.path
+    const findings = model.perf?.findings ?? []
+    const byKind = (kind: string, page: string) =>
+      findings.find((f) => f.kind === kind && f.routeIds.map((id) => paths.get(id)).includes(page))
+    const waterfall = byKind('waterfall', '/')
+    expect(waterfall?.steps?.map((s) => `${s.text} needs [${s.needs.join(',')}]`)).toEqual([
+      'getUser(1) needs []',
+      'getProducts() needs []',
+    ])
+    const loop = byKind('n-plus-one', '/products')
+    expect(loop?.siteIds.map(url)).toEqual(['/products/:id'])
+    expect(loop?.listSiteIds?.map(url)).toEqual(['/products'])
+    expect(loop?.loop?.over).toBe('products')
+    const rows = byKind('n-plus-one', '/todos')
+    expect(rows?.loop?.text).toBe('<TodoRow>')
+    expect(rows?.siteIds.map((id) => sites.get(id)?.trigger.kind)).toEqual(['effect'])
+    const duplicate = byKind('duplicate', '/settings')
+    // The layout's and the page's axios call; not the GET fetch (Next dedupes it) or `getAccount` (`cache()`).
+    expect(duplicate?.siteIds.map((id) => sites.get(id)?.callStack[0]?.file)).toEqual([
+      'src/app/settings/layout.tsx',
+      'src/app/settings/page.tsx',
+    ])
+    for (const f of findings) expect(f.routeIds.length, f.id).toBeGreaterThan(0)
   })
 })

@@ -34,6 +34,12 @@
 - [`VerifyOtpForm`](../components/VerifyOtpForm.md), rendered by `VerifyPage` (page): 1 component · 4 modules · 2.9 KB, `src/app/[locale]/verify/page.tsx:11`
   - packages: `next-intl`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (client): not defined, `src/lib/auth-api.ts:3`
+
 ## Component tree
 
 - [`VerifyPage`](../components/VerifyPage.md) · server

@@ -118,3 +118,22 @@ modules: 2, 0.6 KB
   src/trpc/client.ts
 packages: @tanstack/react-query, @trpc/tanstack-react-query
 uses: useTRPC (hook) src/components/UserList.tsx:7, useSuspenseQuery (hook) src/components/UserList.tsx:8
+
+# Environment variables
+
+API_URL: not defined
+  server optional  src/server/upstream.ts:3  /api/trpc/[trpc]
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

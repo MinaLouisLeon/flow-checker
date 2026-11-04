@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "server-actions",
   "model": {
-    "version": 16,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -247,11 +247,9 @@
             }
           ],
           "components": 1,
-          "modules": 3,
-          "bytes": 2595,
-          "packages": [
-            "server-only"
-          ]
+          "modules": 1,
+          "bytes": 423,
+          "packages": []
         }
       },
       {
@@ -469,11 +467,9 @@
             }
           ],
           "components": 1,
-          "modules": 3,
-          "bytes": 3183,
-          "packages": [
-            "server-only"
-          ]
+          "modules": 1,
+          "bytes": 1011,
+          "packages": []
         }
       }
     ],
@@ -1511,14 +1507,10 @@
           "cmp_014pegw9zf7"
         ],
         "modules": [
-          "src/components/CreateProductForm.tsx",
-          "src/actions/products.ts",
-          "src/lib/backend.ts"
+          "src/components/CreateProductForm.tsx"
         ],
-        "packages": [
-          "server-only"
-        ],
-        "bytes": 3183,
+        "packages": [],
+        "bytes": 1011,
         "uses": [
           {
             "kind": "hook",
@@ -1538,14 +1530,10 @@
           "cmp_0jz34mtqlno"
         ],
         "modules": [
-          "src/components/DeleteProductButton.tsx",
-          "src/actions/products.ts",
-          "src/lib/backend.ts"
+          "src/components/DeleteProductButton.tsx"
         ],
-        "packages": [
-          "server-only"
-        ],
-        "bytes": 2595,
+        "packages": [],
+        "bytes": 423,
         "uses": [
           {
             "kind": "hook",
@@ -1563,6 +1551,256 @@
               "file": "src/components/DeleteProductButton.tsx",
               "line": 11,
               "column": 46
+            }
+          }
+        ]
+      }
+    ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "API_URL",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/lib/backend.ts",
+                "line": 4,
+                "column": 17
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": [
+                "rt_0te2vdgan2u",
+                "rt_1kdazzrvrkg",
+                "rt_0pq5p0nm2h4"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    },
+    "actions": [
+      {
+        "id": "sa_1u4zx1o3ycz",
+        "name": "createProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 9,
+          "column": 23
+        },
+        "defined": "file",
+        "siteIds": [
+          "req_07o63rveyo8"
+        ],
+        "routeIds": [
+          "rt_0pq5p0nm2h4"
+        ],
+        "auth": {
+          "status": "none",
+          "checks": []
+        },
+        "input": {
+          "status": "checked",
+          "params": [
+            {
+              "name": "formData",
+              "checked": true
+            }
+          ],
+          "checks": [
+            {
+              "kind": "manual",
+              "text": "Object.keys(fieldErrors).length > 0",
+              "params": [
+                "formData"
+              ],
+              "loc": {
+                "file": "src/actions/products.ts",
+                "line": 17,
+                "column": 7
+              }
+            }
+          ]
+        },
+        "changes": [
+          {
+            "kind": "request",
+            "text": "fetch POST",
+            "via": [
+              "insertProduct"
+            ],
+            "loc": {
+              "file": "src/lib/backend.ts",
+              "line": 17,
+              "column": 21
+            }
+          },
+          {
+            "kind": "cache",
+            "text": "revalidatePath",
+            "loc": {
+              "file": "src/actions/products.ts",
+              "line": 25,
+              "column": 3
+            }
+          }
+        ]
+      },
+      {
+        "id": "sa_0y61g4s8lht",
+        "name": "deleteProduct",
+        "loc": {
+          "file": "src/actions/products.ts",
+          "line": 30,
+          "column": 23
+        },
+        "defined": "file",
+        "siteIds": [
+          "req_0b08g87h2vb"
+        ],
+        "routeIds": [
+          "rt_0te2vdgan2u"
+        ],
+        "auth": {
+          "status": "none",
+          "checks": []
+        },
+        "input": {
+          "status": "none",
+          "params": [
+            {
+              "name": "id",
+              "checked": false
+            }
+          ],
+          "checks": []
+        },
+        "changes": [
+          {
+            "kind": "request",
+            "text": "fetch DELETE",
+            "via": [
+              "removeProduct"
+            ],
+            "loc": {
+              "file": "src/lib/backend.ts",
+              "line": 27,
+              "column": 9
+            }
+          },
+          {
+            "kind": "cache",
+            "text": "revalidatePath",
+            "loc": {
+              "file": "src/actions/products.ts",
+              "line": 32,
+              "column": 3
+            }
+          }
+        ],
+        "flags": [
+          {
+            "kind": "unprotected",
+            "loc": {
+              "file": "src/actions/products.ts",
+              "line": 30,
+              "column": 23
             }
           }
         ]
@@ -1638,6 +1876,102 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_09hajlev2r5",
+          "label": "POST createProduct (server action)",
+          "siteIds": [
+            "req_07o63rveyo8"
+          ],
+          "count": 1,
+          "p50": 1511,
+          "p95": 1511,
+          "max": 1511,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs026no4p15coso"
+        },
+        {
+          "key": "ep_0ukrbhfpyjv",
+          "label": "POST deleteProduct (server action)",
+          "siteIds": [
+            "req_0b08g87h2vb"
+          ],
+          "count": 1,
+          "p50": 82,
+          "p95": 82,
+          "max": 82,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs02b3t4kswzebd"
+        },
+        {
+          "key": "ep_16a5uohh2s8",
+          "label": "GET {API_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_1u9qpywsqwd"
+          ],
+          "count": 4,
+          "p50": 30,
+          "p95": 58,
+          "max": 58,
+          "errors": 0,
+          "browser": 0,
+          "server": 4,
+          "slowestCaptureId": "cap_mvs0222tn9gfyq85"
+        },
+        {
+          "key": "ep_16zjeuqipey",
+          "label": "GET {API_URL ?? http://localhost:4010}/products/:id",
+          "siteIds": [
+            "req_25a1hdpohd6"
+          ],
+          "count": 1,
+          "p50": 18,
+          "p95": 18,
+          "max": 18,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs027scd3jvgvu2"
+        },
+        {
+          "key": "ep_1b8rxbacsrz",
+          "label": "POST {API_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_0h59cmicyii"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs026pcgvkd324w"
+        },
+        {
+          "key": "ep_24zdsb1p2vt",
+          "label": "DELETE {API_URL ?? http://localhost:4010}/products/:id",
+          "siteIds": [
+            "req_11sozx68f2s"
+          ],
+          "count": 1,
+          "p50": 3,
+          "p95": 3,
+          "max": 3,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs02b4jthsdx0q5"
+        }
+      ],
+      "loads": 7
     }
   },
   "flows": {

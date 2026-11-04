@@ -308,6 +308,32 @@ const FILES: Record<string, string> = {
     `}`,
   ),
 
+  // A mutation started from another one's `onSuccess`, in a hook: it runs after the first, so the
+  // form's submit starts both.
+  'src/hooks/use-publish.ts': lines(
+    `import { useMutation } from '@tanstack/react-query'`,
+    `export function usePublish() {`,
+    `  const { mutate: attach } = useMutation({`,
+    `    mutationFn: (files: string[]) => Promise.all(files.map((f) => fetch('/api/attach', { method: 'POST', body: f }))),`,
+    `  })`,
+    `  const attachAll = (files: string[]) => { attach(files) }`,
+    `  const { mutate } = useMutation({`,
+    `    mutationFn: (text: string) => fetch('/api/publish', { method: 'POST', body: text }),`,
+    `    onSuccess: () => { attachAll(['a']) },`,
+    `  })`,
+    `  const publish = (text: string) => { mutate(text) }`,
+    `  return { publish }`,
+    `}`,
+  ),
+  'src/app/publish/page.tsx': lines(
+    `'use client'`,
+    `import { usePublish } from '@/hooks/use-publish'`,
+    `export default function PublishPage() {`,
+    `  const { publish } = usePublish()`,
+    `  return <form onSubmit={() => publish('hi')} />`,
+    `}`,
+  ),
+
   // Effects: an imported function passed to useEffect.
   'src/app/effect/page.tsx': lines(
     `'use client'`,
@@ -427,5 +453,10 @@ describe('local query and mutation functions', () => {
     const all = only('/api/all')
     expect(all.hook?.name).toBe('useQuery')
     expect(all.trigger.kind).toBe('page-load')
+  })
+
+  it("gives a mutation started from another one's onSuccess that mutation's trigger", () => {
+    expect(only('/api/publish').trigger).toMatchObject({ kind: 'event', event: 'onSubmit' })
+    expect(only('/api/attach').trigger).toMatchObject({ kind: 'event', event: 'onSubmit' })
   })
 })

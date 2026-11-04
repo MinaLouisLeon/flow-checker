@@ -41,8 +41,10 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/backend.ts:7
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/backend.ts:7
 title: server-actions fixture  (layout metadata)
-client: 1 boundary, 1 component, 3 modules, 2.5 KB, packages server-only
+client: 1 boundary, 1 component, 1 module, 0.4 KB
   DeleteProductButton  from ProductsPage (page)  src/app/products/page.tsx:17
+env: API_URL
+actions: deleteProduct (no auth check, input not checked) [unprotected]
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -60,6 +62,7 @@ boundaries: (none)
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page)  src/app/products/[id]/page.tsx:10
 title: server-actions fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /products/new  src/app/products/new/page.tsx
 layouts: src/app/layout.tsx
@@ -69,8 +72,10 @@ access: open
 render: static
 boundaries: (none)
 title: server-actions fixture  (layout metadata)
-client: 1 boundary, 1 component, 3 modules, 3.1 KB, packages server-only
+client: 1 boundary, 1 component, 1 module, 1.0 KB
   CreateProductForm  from NewProductPage (page)  src/app/products/new/page.tsx:7
+env: API_URL
+actions: createProduct (no auth check, input checked)
 
 # Server cache
 
@@ -84,18 +89,47 @@ revalidatePath('/products')  in server action `deleteProduct`  src/actions/produ
 
 ## CreateProductForm  src/components/CreateProductForm.tsx
 components: CreateProductForm
-modules: 3, 3.1 KB
+modules: 1, 1.0 KB
   src/components/CreateProductForm.tsx
-  src/actions/products.ts
-  src/lib/backend.ts
-packages: server-only
 uses: useActionState (hook) src/components/CreateProductForm.tsx:11
 
 ## DeleteProductButton  src/components/DeleteProductButton.tsx
 components: DeleteProductButton
-modules: 3, 2.5 KB
+modules: 1, 0.4 KB
   src/components/DeleteProductButton.tsx
-  src/actions/products.ts
-  src/lib/backend.ts
-packages: server-only
 uses: useTransition (hook) src/components/DeleteProductButton.tsx:8, onClick (event handler) src/components/DeleteProductButton.tsx:11
+
+# Environment variables
+
+API_URL: not defined
+  server optional  src/lib/backend.ts:4  /products, /products/[id], /products/new
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+# Server actions
+
+createProduct (file) src/actions/products.ts:9
+  no auth check
+  input checked (formData): Object.keys(fieldErrors).length > 0
+  request fetch POST via insertProduct  src/lib/backend.ts:17
+  cache revalidatePath  src/actions/products.ts:25
+  pages: /products/new
+
+deleteProduct (file) src/actions/products.ts:30 [unprotected]
+  no auth check
+  input not checked (id?)
+  request fetch DELETE via removeProduct  src/lib/backend.ts:27
+  cache revalidatePath  src/actions/products.ts:32
+  pages: /products

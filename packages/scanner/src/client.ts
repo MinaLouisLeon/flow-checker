@@ -17,12 +17,25 @@ import type {
   ClientLower,
   ClientUse,
   Component,
+  ComponentRef,
+  Leak,
+  ModuleLeak,
   PageClientBoundary,
+  PropLeak,
   Route,
   SourceLoc,
 } from '@flow-checker/shared'
 import { type CallExpression, Node as N, type Node, type SourceFile, ts } from 'ts-morph'
 import { directives, importModuleOf, isPackage, unalias } from './components'
+import {
+  importedNames,
+  jsxElements,
+  packageName,
+  passedFor,
+  propLeaksIn,
+  type ServerModule,
+  serverModuleOf,
+} from './leaks'
 import { compare, relativeTo } from './paths'
 
 export interface ClientInput {
@@ -84,6 +97,21 @@ const IMPORT_BREAKING = new Set<ClientUse['kind']>(['hook', 'context', 'class-co
 /** Uses kept per boundary and per component. */
 const USES_LIMIT = 8
 
+/** Next's components that are client components (`'use client'` in their `dist` files). */
+const NEXT_CLIENT = new Set(['next/link', 'next/image', 'next/script', 'next/form'])
+
+export interface ClientResult {
+  boundaries: ClientBoundary[]
+  /** Server-only modules client code reaches, then props that can't cross (M44). */
+  leaks: Leak[]
+}
+
+/** A server-only import in a file. */
+interface ServerImport extends ServerModule {
+  module: string
+  loc: SourceLoc
+}
+
 interface FileFacts {
   path: string
   rel: string
@@ -95,10 +123,12 @@ interface FileFacts {
   /** Imports of files the scan leaves out: what they do is unknown. */
   unscanned: boolean
   packages: string[]
+  /** Imports client code can't have (M44). */
+  serverImports: ServerImport[]
 }
 
-/** Sets `client` on pages and `clientUses` on client components; returns the boundaries. */
-export function addClientBoundaries(input: ClientInput): ClientBoundary[] {
+/** Sets `client` on pages and `clientUses` on client components; returns the boundaries and leaks. */
+export function addClientBoundaries(input: ClientInput): ClientResult {
   return new ClientPass(input).run()
 }
 
@@ -114,13 +144,21 @@ class ClientPass {
   readonly #hooks = new Map<Node, boolean>()
   readonly #packageClient = new Map<string, boolean>()
   readonly #canServe = new Map<string, boolean>()
+  /** Module leaks by file and module. */
+  readonly #moduleLeaks = new Map<string, ModuleLeak>()
+  /** Prop leaks by place, and the leaks found per server component and tag. */
+  readonly #propLeaks = new Map<string, PropLeak>()
+  readonly #propsAt = new Map<string, PropLeak[]>()
+  /** A component's function -> its id, and who renders each component, for props handed on. */
+  #bodyIds?: Map<ts.Node, string>
+  #renderedBy?: Map<string, string[]>
 
   constructor(input: ClientInput) {
     this.#in = input
     this.#components = new Map(input.components.map((c) => [c.id, c]))
   }
 
-  run(): ClientBoundary[] {
+  run(): ClientResult {
     for (const component of this.#in.components) {
       if (component.kind === 'server') continue
       const body = this.#in.bodies.get(component.id)
@@ -164,11 +202,27 @@ class ClientPass {
         packages: [...packages].sort(compare),
       }
     }
-    return [...boundaries.values()].sort((a, b) => {
+    const sorted = [...boundaries.values()].sort((a, b) => {
       const ca = this.#components.get(a.componentId)
       const cb = this.#components.get(b.componentId)
       return compare(a.file, b.file) || (ca?.loc.line ?? 0) - (cb?.loc.line ?? 0)
     })
+    return { boundaries: sorted, leaks: this.#leaks() }
+  }
+
+  /** Module leaks with the pages their boundaries are on, then prop leaks; each by place. */
+  #leaks(): Leak[] {
+    const byLoc = (a: { loc: SourceLoc }, b: { loc: SourceLoc }) =>
+      compare(a.loc.file, b.loc.file) || a.loc.line - b.loc.line || a.loc.column - b.loc.column
+    const modules = [...this.#moduleLeaks.values()].sort((a, b) => byLoc(a, b) || compare(a.module, b.module))
+    for (const leak of modules) {
+      const on = new Set(leak.boundaries)
+      leak.routeIds = this.#in.routes
+        .filter((r) => r.client?.boundaries.some((e) => on.has(e.componentId)))
+        .map((r) => r.id)
+    }
+    const props = [...this.#propLeaks.values()].sort((a, b) => byLoc(a, b) || compare(a.prop, b.prop))
+    return [...modules, ...props]
   }
 
   // --- Where boundaries start ---
@@ -197,8 +251,12 @@ class ClientPass {
       if (!parent) return
       for (const ref of parent.children) {
         const child = ref.componentId ? this.#components.get(ref.componentId) : undefined
-        if (!child) continue
+        if (!child) {
+          if (this.#clientPackage(ref, parent)) this.#checkProps(parent, ref, page)
+          continue
+        }
         if (child.clientBoundary) {
+          this.#checkProps(parent, ref, page)
           const via = ref.module ? this.#via(parent.file, ref.module, child.file) : undefined
           add({
             componentId: child.id,
@@ -216,6 +274,87 @@ class ClientPass {
       if (!component) continue
       if (component.clientBoundary) add({ componentId: root.id, in: root.in, loc: component.loc })
       else visit(root.id, root.in)
+    }
+    return out
+  }
+
+  /** A package component that is a client component: from `next`, or marked `'use client'`. */
+  #clientPackage(ref: ComponentRef, parent: Component): boolean {
+    if (ref.resolution !== 'external' || !ref.module || ref.factory) return false
+    if (NEXT_CLIENT.has(ref.module)) return true
+    if (ref.module === 'next' || ref.module.startsWith('next/')) return false
+    return this.#marksClient(ref.module, this.#factsOf(parent.file))
+  }
+
+  /** Props a server component hands to a client component that can't cross, each place once (M44). */
+  #checkProps(parent: Component, ref: ComponentRef, page: Route) {
+    const key = `${parent.id}|${ref.name}`
+    let found = this.#propsAt.get(key)
+    if (!found) {
+      found = []
+      const body = this.#in.bodies.get(parent.id)
+      for (const prop of body ? propLeaksIn(body, ref.name, this.#forwarded) : []) {
+        const loc = this.#loc(prop.node)
+        const placeKey = `${loc.file}:${loc.line}:${loc.column}|${prop.prop}`
+        let leak = this.#propLeaks.get(placeKey)
+        if (!leak) {
+          leak = {
+            kind: 'prop',
+            value: prop.value,
+            prop: prop.prop,
+            ...(prop.type ? { type: prop.type } : {}),
+            name: ref.name,
+            ...(ref.componentId ? { componentId: ref.componentId } : {}),
+            ...(!ref.componentId && ref.module ? { module: ref.module } : {}),
+            parentId: parent.id,
+            loc,
+            routeIds: [],
+          }
+          this.#propLeaks.set(placeKey, leak)
+        }
+        found.push(leak)
+      }
+      this.#propsAt.set(key, found)
+    }
+    for (const leak of found) if (!leak.routeIds.includes(page.id)) leak.routeIds.push(page.id)
+  }
+
+  /**
+   * What the callers of a component (by its function) pass for one of its props. Client callers
+   * hand their props over in the browser, so only the ones that render on the server count.
+   */
+  readonly #forwarded = (fn: Node, prop: string): Node[] | undefined => {
+    if (!this.#bodyIds || !this.#renderedBy) {
+      this.#bodyIds = new Map([...this.#in.bodies].map(([id, node]) => [node.compilerNode, id]))
+      this.#renderedBy = new Map()
+      for (const parent of this.#in.components) {
+        for (const ref of parent.children) {
+          if (!ref.componentId) continue
+          const list = this.#renderedBy.get(ref.componentId) ?? []
+          if (!list.includes(parent.id)) list.push(parent.id)
+          this.#renderedBy.set(ref.componentId, list)
+        }
+      }
+    }
+    const id = this.#bodyIds.get(fn.compilerNode)
+    const callers = id ? (this.#renderedBy.get(id) ?? []) : []
+    if (!id || callers.length === 0) return undefined
+    const out: Node[] = []
+    for (const callerId of callers) {
+      const caller = this.#components.get(callerId)
+      if (caller?.kind === 'client') continue
+      const body = this.#in.bodies.get(callerId)
+      if (!caller || !body) return undefined
+      const tags = new Set(caller.children.filter((r) => r.componentId === id).map((r) => r.name))
+      for (const tag of tags) {
+        const elements = jsxElements(body, tag)
+        if (elements.length === 0) return undefined
+        for (const element of elements) {
+          const passed = passedFor(element, prop)
+          if (!passed) return undefined
+          out.push(...passed)
+        }
+      }
     }
     return out
   }
@@ -241,16 +380,22 @@ class ClientPass {
     const files: FileFacts[] = []
     const queue = own ? [own] : []
     const seen = new Set(queue.map((f) => f.path))
+    // The file that first imported each one, for the chain to a leak.
+    const from = new Map<string, FileFacts>()
     for (let i = 0; i < queue.length; i++) {
       const facts = queue[i] as FileFacts
       modules.add(facts.rel)
       files.push(facts)
       for (const name of facts.packages) packages.add(name)
+      for (const found of facts.serverImports) this.#addModuleLeak(id, facts, found, from)
       for (const path of facts.imports) {
         if (seen.has(path)) continue
         seen.add(path)
         const next = this.#facts.get(path) ?? this.#readFacts(path)
-        if (next) queue.push(next)
+        if (next) {
+          from.set(next.path, facts)
+          queue.push(next)
+        }
       }
     }
     let bytes = 0
@@ -268,6 +413,28 @@ class ClientPass {
       uses,
       ...(lower ? { lower } : {}),
     }
+  }
+
+  #addModuleLeak(boundaryId: string, facts: FileFacts, found: ServerImport, from: Map<string, FileFacts>) {
+    const key = `${facts.rel}|${found.module}`
+    const known = this.#moduleLeaks.get(key)
+    if (known) {
+      if (!known.boundaries.includes(boundaryId)) known.boundaries.push(boundaryId)
+      return
+    }
+    const chain = [facts.rel]
+    for (let f = from.get(facts.path); f; f = from.get(f.path)) chain.unshift(f.rel)
+    this.#moduleLeaks.set(key, {
+      kind: 'module',
+      module: found.module,
+      category: found.category,
+      ...(found.names ? { names: found.names } : {}),
+      file: facts.rel,
+      loc: found.loc,
+      boundaries: [boundaryId],
+      chain,
+      routeIds: [],
+    })
   }
 
   /** The component and every component below it, in tree order. */
@@ -418,6 +585,7 @@ class ClientPass {
     }
     const imports = new Set<string>()
     const packages = new Set<string>()
+    const serverImports: ServerImport[] = []
     let unscanned = false
     for (const literal of sf.getImportStringLiterals()) {
       if (typeOnly(literal)) continue
@@ -426,11 +594,19 @@ class ClientPass {
       if (resolved && !resolved.isExternalLibraryImport) {
         const target = resolved.resolvedFileName.replaceAll('\\', '/')
         if (target === path || target.endsWith('.d.ts')) continue
-        if (this.#in.fileAt(target)) imports.add(target)
-        else unscanned = true
-      } else if (isPackage(specifier) && !specifier.startsWith('node:')) {
-        const name = packageName(specifier)
-        if (!FRAMEWORK.has(name)) packages.add(name)
+        const file = this.#in.fileAt(target)
+        // A `'use server'` file reaches the browser as a reference: its code stays on the server.
+        if (file) {
+          if (!directives(file).includes('use server')) imports.add(target)
+        } else unscanned = true
+      } else {
+        if (isPackage(specifier) && !specifier.startsWith('node:')) {
+          const name = packageName(specifier)
+          if (!FRAMEWORK.has(name)) packages.add(name)
+        }
+        const server = serverModuleOf(specifier, importedNames(literal))
+        if (server)
+          serverImports.push({ module: specifier, ...server, loc: this.#loc(literal.getParent() ?? literal) })
       }
     }
     const facts: FileFacts = {
@@ -441,6 +617,7 @@ class ClientPass {
       imports: [...imports],
       unscanned,
       packages: [...packages],
+      serverImports,
     }
     this.#facts.set(path, facts)
     this.#byRel.set(facts.rel, facts)
@@ -608,14 +785,8 @@ function codeFiles(resolved: string): string[] {
   return ext ? [`${base}.${ext}js`] : [`${base}.mjs`, `${base}.js`, `${base}.cjs`]
 }
 
-/** `@scope/pkg/sub` -> `@scope/pkg`, `pkg/sub` -> `pkg`. */
-function packageName(specifier: string): string {
-  const parts = specifier.split('/')
-  return specifier.startsWith('@') ? parts.slice(0, 2).join('/') : (parts[0] as string)
-}
-
 /** An import that only brings types, so nothing of it reaches the browser. */
-function typeOnly(literal: Node): boolean {
+export function typeOnly(literal: Node): boolean {
   const parent = literal.getParent()
   if (!parent) return false
   if (N.isImportDeclaration(parent)) {

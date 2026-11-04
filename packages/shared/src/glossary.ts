@@ -5,18 +5,30 @@ import type { EndpointStatus } from './endpoints'
 import type { FlowStatus } from './flow-runs'
 import type { CaptureMatch } from './match'
 import type {
+  ActionAuth,
+  ActionChange,
+  ActionFlagKind,
+  ActionInput,
   BoundaryGap,
   CacheEntry,
   CacheFlag,
   CacheRuntime,
   ClientUse,
   Component,
+  EnvAccess,
+  EnvFlagKind,
+  EnvSide,
   Flag,
   PageBoundary,
+  PerfFindingKind,
+  PerfFindingRuntime,
+  PerfLoop,
+  PropLeak,
   RequestSite,
   RequestUrl,
   RouteAccess,
   RouteRender,
+  ServerModuleKind,
   Trigger,
 } from './model'
 import type { TypeCheckStatus } from './type-check'
@@ -49,6 +61,10 @@ export type GlossaryGroupId =
   | 'render'
   | 'boundary'
   | 'client'
+  | 'leak'
+  | 'action'
+  | 'perf'
+  | 'env'
   | 'cache'
   | 'flow-status'
   | 'endpoint-status'
@@ -452,6 +468,328 @@ const CLIENT: GlossaryGroup<ClientUse['kind'] | 'boundary' | 'lower' | 'barrel' 
   },
 }
 
+const LEAK: GlossaryGroup<'module' | 'prop' | ServerModuleKind | PropLeak['value']> = {
+  id: 'leak',
+  title: 'Server/client leaks',
+  intro:
+    "Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both, so the page fails to build or render.",
+  entries: {
+    module: {
+      label: 'server-only module',
+      means:
+        "A `'use client'` file, or a file it imports, imports something that only works on the server. Everything client code imports is sent to the browser, except a `'use server'` file (only a reference to its actions is) and type-only imports.",
+      todo: "Move the server part into a server component or a server action (a `'use server'` file), and pass the result to the client component as a prop.",
+    },
+    prop: {
+      label: "prop that can't cross",
+      means:
+        "A server component renders a client component with a prop React cannot send to the browser. Plain data crosses (also `Date`, `Map`, `Set`, `URL`, `Error`, promises, JSX), and so do server actions and functions from a `'use client'` file.",
+      todo: 'Pass plain data instead: a server action instead of a function, the fields of an object instead of a class instance; or create the value in the client component.',
+    },
+    'server-only': {
+      label: 'server-only',
+      means:
+        'The file imports `server-only`, which marks it as server code: Next fails the build when client code imports it.',
+    },
+    node: {
+      label: 'Node.js module',
+      means:
+        "A Node.js module with no browser version (`fs`, `child_process`, `net`...). Next has browser versions of a few (`path`, `crypto`, `buffer`, `url`...), which aren't flagged.",
+    },
+    database: {
+      label: 'database client',
+      means:
+        'A database client (`pg`, `mysql2`, `mongoose`, `@prisma/client`...). In client code it fails to build, or it sends a database connection to the browser.',
+    },
+    'next-server': {
+      label: 'server API',
+      means:
+        'An API Next only allows in server code: `next/headers` (`cookies()`, `headers()`), `revalidatePath`, `revalidateTag`, `cacheTag`, `cacheLife` from `next/cache`, `after` from `next/server`.',
+    },
+    'node-package': {
+      label: 'Node.js package',
+      means: 'A package that only runs on Node.js (`bcrypt`, `sharp`, `firebase-admin`, `nodemailer`...).',
+    },
+    function: {
+      label: 'function prop',
+      means:
+        "A function handed to a client component (inline, a named function, a component, or one inside an object or array). Only server actions and functions exported from a `'use client'` file cross.",
+    },
+    'class-instance': {
+      label: 'class instance prop',
+      means:
+        'An instance of a class (or a built-in such as `RegExp` or `WeakMap`). React only sends plain objects, unless the class has `toJSON` (then it sends what that returns) or can be iterated.',
+    },
+    symbol: {
+      label: 'symbol prop',
+      means: 'A symbol made with `Symbol()`. Only symbols from `Symbol.for()` cross.',
+    },
+    'null-prototype': {
+      label: 'prop without a prototype',
+      means: '`Object.create(null)`: React only sends plain objects.',
+    },
+  },
+}
+
+const ENV: GlossaryGroup<EnvSide | EnvFlagKind | EnvAccess | 'unknown-name' | 'listed'> = {
+  id: 'env',
+  title: 'Environment variables',
+  intro:
+    'Every `process.env` name the code reads, on which side, and which `.env` files define it. Only names are read: values never leave the `.env` files.',
+  entries: {
+    server: {
+      label: 'server',
+      means:
+        'Read in server code: server components, route handlers, server actions, middleware or `instrumentation`. Every name the server process has is available there.',
+    },
+    client: {
+      label: 'client',
+      means:
+        "Read in client code: a `'use client'` file, a file it imports, or `instrumentation-client`. In the browser, Next only has the names it inlined when it built the app: `NEXT_PUBLIC_` names, the `env` names in `next.config`, and `NODE_ENV`.",
+    },
+    both: {
+      label: 'server and client',
+      means:
+        'Read in a module that server code and client code both import. It has a value on the server and, unless Next inlines the name, none in the browser.',
+    },
+    config: {
+      label: 'next.config',
+      means: 'Read in `next.config`, when Next starts or builds the app.',
+    },
+    'private-in-client': {
+      label: 'private name in client code',
+      means:
+        'A name without the `NEXT_PUBLIC_` prefix is read in client code. Next leaves it out of the browser bundle, so it is undefined there; while rendering on the server it has a value, so the page can also differ between the two.',
+      todo: "Read it in server code and pass the result down as a prop, or, if it isn't a secret, rename it with the `NEXT_PUBLIC_` prefix.",
+    },
+    'not-defined': {
+      label: 'not defined',
+      means:
+        "No `.env` file Next loads defines the name, it isn't in `next.config` `env`, Next doesn't set it, and a read has no fallback. Unless the environment the app runs in sets it, the code gets undefined. Often a typo, or a name missing from `.env.example`.",
+      todo: 'Check the spelling, add it to a `.env` file (or `.env.example` for others to fill in), or give the read a fallback.',
+    },
+    'not-inlined': {
+      label: 'not inlined',
+      means:
+        "A name Next inlines (`NEXT_PUBLIC_`...) is destructured from `process.env` in client code. Next only replaces `process.env.NAME` and `process.env['NAME']` when it builds the app, so in the browser the value is undefined.",
+      todo: 'Read it as `process.env.NAME`.',
+    },
+    direct: {
+      label: 'direct',
+      means: '`process.env.NAME`.',
+    },
+    literal: {
+      label: 'literal key',
+      means: "`process.env['NAME']`: Next inlines it like `process.env.NAME`.",
+    },
+    constant: {
+      label: 'constant key',
+      means:
+        "`process.env[KEY]` where `KEY` holds a fixed name. Turbopack inlines it in client code; webpack (Next 15's default bundler) doesn't.",
+    },
+    alias: {
+      label: 'through a variable',
+      means: '`env.NAME` after `const env = process.env`. Next inlines it like `process.env.NAME`.',
+    },
+    destructured: {
+      label: 'destructured',
+      means: "`const { NAME } = process.env`. Fine on the server; in client code Next doesn't inline it.",
+    },
+    'unknown-name': {
+      label: 'name built at run time',
+      means:
+        "`process.env[name]` with a name the code builds while it runs, so the scan can't tell which variable it is. In client code it is always undefined in the browser.",
+    },
+    listed: {
+      label: 'only listed',
+      means:
+        "Listed in a file Next doesn't load, such as `.env.example`: the project expects each developer to define it, so it isn't flagged.",
+    },
+  },
+}
+
+type ActionTerm =
+  | `auth-${ActionAuth['status']}`
+  | `input-${ActionInput['status']}`
+  | `change-${ActionChange['kind']}`
+  | ActionFlagKind
+  | 'public'
+  | 'unused'
+  | 'wrapped'
+
+const ACTION: GlossaryGroup<ActionTerm> = {
+  id: 'action',
+  title: 'Server actions',
+  intro:
+    "Every server action (a `'use server'` function), with the auth check and the input check that run before it changes data. A server action is a public `POST` endpoint: anyone can call it with any arguments, not only your forms.",
+  entries: {
+    public: {
+      label: 'server action',
+      means:
+        "A function in a `'use server'` file, or one that starts with `'use server'`. Next gives each action a page uses an id that ships in the browser bundle, and runs it for any `POST` that sends the id, from anywhere, with whatever arguments the request holds. TypeScript types aren't checked when it runs.",
+    },
+    'auth-checked': {
+      label: 'auth checked',
+      means:
+        'Before it changes anything, the action stops when nobody is signed in: a `return`, `throw`, `redirect()` or `notFound()` under a check of the session or user, a helper that does that (`await requireUser()`), the function it is wrapped in, or a package guard (`auth.protect()`).',
+    },
+    'auth-none': {
+      label: 'no auth check',
+      means:
+        "No check of the session or user was found before the action changes data, so it runs for anyone, signed in or not. That's fine for public actions (a newsletter sign-up), not for ones that change someone's data.",
+      todo: 'Check the session at the top of the action (`const session = await auth(); if (!session) throw ...`), or wrap it in a helper that does.',
+    },
+    'auth-unclear': {
+      label: 'auth unclear',
+      means:
+        "The action is wrapped in, or calls, code the scan can't read (a package, a file the config excludes, an import that doesn't resolve), so it can't tell whether that code checks the session.",
+    },
+    'input-checked': {
+      label: 'input checked',
+      means:
+        "Every argument the action reads is checked before use: parsed with a validation library (zod, valibot, yup...), or checked by hand with a `return` / `throw` when it is wrong (`typeof id !== 'string'`).",
+    },
+    'input-partial': {
+      label: 'input partly checked',
+      means: 'Some arguments the action reads are checked, others are used as sent.',
+      todo: 'Parse all of the input with one schema.',
+    },
+    'input-none': {
+      label: 'input not checked',
+      means:
+        'The arguments are used as sent. A caller can send any value: another type than the TypeScript one, another id, extra fields.',
+      todo: 'Parse the input with a schema (`Schema.parse(input)`) before using it.',
+    },
+    'input-no-input': {
+      label: 'no input',
+      means: 'The action reads no arguments, so there is nothing to check.',
+    },
+    'input-unclear': {
+      label: 'input unclear',
+      means: "A package wrapper hands the action its input, and the scan can't read whether it checks it.",
+    },
+    'change-database': {
+      label: 'database',
+      means:
+        'A write call on a database client or data object (`create`, `update`, `delete`, `upsert`...) or SQL that writes (`INSERT`, `UPDATE`, `DELETE`).',
+    },
+    'change-request': {
+      label: 'request',
+      means:
+        "A request to another service that isn't `GET` or `HEAD` (`fetch(url, { method: 'DELETE' })`, `api.post()`).",
+    },
+    'change-file': {
+      label: 'file',
+      means: 'A Node.js `fs` write (`writeFile`, `appendFile`, `unlink`...).',
+    },
+    'change-cache': {
+      label: 'cache',
+      means:
+        "`revalidatePath()`, `revalidateTag()` or `updateTag()`: it refreshes cached pages and data. On its own that doesn't count as changing data.",
+    },
+    unprotected: {
+      label: 'open to anyone',
+      means:
+        'The action changes data, has no auth check and uses its input as sent (or takes none), and a page uses it. Anyone who finds its id in the browser bundle can call it with any arguments.',
+      todo: 'Check the session first and parse the input with a schema; or, if it is meant to be public, check the input so a caller can only do what the form allows.',
+    },
+    unused: {
+      label: 'unused',
+      means:
+        "No code imports or uses the action, so Next leaves it out of the build and it can't be called. It isn't flagged.",
+    },
+    wrapped: {
+      label: 'wrapped',
+      means:
+        'The action is the result of a helper (`export const save = withAuth(async () => ...)`). The helper runs first, so its checks count for the action.',
+    },
+  },
+}
+
+type PerfTerm =
+  | PerfFindingKind
+  | PerfFindingRuntime['status']
+  | `loop-${PerfLoop['kind']}`
+  | 'sequential'
+  | 'p50'
+  | 'p95'
+
+const PERF: GlossaryGroup<PerfTerm> = {
+  id: 'perf',
+  title: 'Request performance',
+  intro:
+    'Requests that wait for each other for no reason, run once per item of a list, or are sent twice on one page load, found in the code and checked against the timings of live captures.',
+  entries: {
+    waterfall: {
+      label: 'waterfall',
+      means:
+        "Requests awaited one after the other in the same function, where a later one doesn't use what an earlier one returned. Each waits for the one before, so the page takes as long as all of them together.",
+      todo: 'Start them together: `const [user, posts] = await Promise.all([getUser(), getPosts()])`, or render them in separate components inside `<Suspense>`.',
+    },
+    'n-plus-one': {
+      label: 'N+1',
+      means:
+        'A request sent once for each item of a list (in a loop, in `.map()`, or by a component rendered once per item), usually after one request for the list itself. Ten items make eleven requests.',
+      todo: 'Fetch the items in one request (an endpoint that takes a list of ids, or one that includes them), or at least start them together with `Promise.all`.',
+    },
+    duplicate: {
+      label: 'duplicate',
+      means:
+        "The same request (method and URL, called with the same arguments) is sent from more than one place on one page load, and nothing dedupes it. Next dedupes a server component's `GET` `fetch`, and query libraries dedupe the same key, but not other calls.",
+      todo: "Wrap the function that sends it in React's `cache()` (server), share one query (client), or fetch it once higher up and pass the result down.",
+    },
+    sequential: {
+      label: 'one after another',
+      means:
+        'The N+1 requests are awaited inside a `for` loop, so each one waits for the one before: the time adds up with each item.',
+      todo: 'Start them together (`await Promise.all(items.map(...))`) if they must stay separate.',
+    },
+    'loop-for': {
+      label: 'for loop',
+      means: 'A `for`, `for...of` or `for...in` loop.',
+    },
+    'loop-while': {
+      label: 'while loop',
+      means: 'A `while` or `do ... while` loop.',
+    },
+    'loop-callback': {
+      label: 'array callback',
+      means:
+        'A callback of an array method that runs once per item: `.map()`, `.forEach()`, `.flatMap()`, `.filter()`...',
+    },
+    'loop-render': {
+      label: 'rendered per item',
+      means:
+        'A component rendered once per item (`items.map((item) => <Row item={item} />)`) that sends the request itself, so each row sends its own.',
+    },
+    confirmed: {
+      label: 'confirmed at runtime',
+      means:
+        'Live capture showed it: the requests ran one after the other, or one load sent the request for several items, or the same request twice.',
+    },
+    'not-confirmed': {
+      label: 'not confirmed',
+      means:
+        'Its requests were captured, but not the way the scan says: they overlapped, or a load sent only one. It may only happen with other data (a longer list), or the scan read the code wrong.',
+      todo: 'Use the page with more data, or check the code: if it is fine, the finding can be ignored.',
+    },
+    'not-seen': {
+      label: 'not seen yet',
+      means: 'No capture of its requests yet, so the timings say nothing about it.',
+      todo: 'Open the page with capture on.',
+    },
+    p50: {
+      label: 'p50',
+      means: 'The median time: half the captured calls of the endpoint were faster than this, half slower.',
+    },
+    p95: {
+      label: 'p95',
+      means:
+        'The 95th percentile: 95 of 100 captured calls were faster than this. It shows the slow calls users hit now and then, which the median hides.',
+    },
+  },
+}
+
 const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
@@ -679,6 +1017,10 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   RENDER,
   BOUNDARY,
   CLIENT,
+  LEAK,
+  ACTION,
+  PERF,
+  ENV,
   CACHE,
   FLOW_STATUS,
   ENDPOINT_STATUS,

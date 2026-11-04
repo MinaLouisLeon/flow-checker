@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "bff",
   "model": {
-    "version": 16,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -1242,7 +1242,125 @@
           }
         ]
       }
-    ]
+    ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "BACKEND_URL",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/lib/backend.ts",
+                "line": 2,
+                "column": 21
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": [
+                "rt_1kkymdue03z",
+                "rt_0g0grflp887"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    }
   },
   "verification": {
     "sites": {
@@ -1313,6 +1431,102 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_21y4fdp2ksy",
+          "label": "GET /api/products/:id",
+          "siteIds": [
+            "req_2c3yq1l5klb"
+          ],
+          "count": 2,
+          "p50": 1453,
+          "p95": 1499,
+          "max": 1499,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs02w779bfsaxnc"
+        },
+        {
+          "key": "ep_1eafh09thyg",
+          "label": "GET /api/products",
+          "siteIds": [
+            "req_1vj2qrt6hdx"
+          ],
+          "count": 2,
+          "p50": 544,
+          "p95": 576,
+          "max": 576,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs02skgxxea2wk9"
+        },
+        {
+          "key": "ep_1wed7wd3h3i",
+          "label": "POST /api/products",
+          "siteIds": [
+            "req_2ckm3fl20ym"
+          ],
+          "count": 1,
+          "p50": 41,
+          "p95": 41,
+          "max": 41,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs02v34234dnear"
+        },
+        {
+          "key": "ep_1xle1no75i8",
+          "label": "GET {BACKEND_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_0pmni454dyo"
+          ],
+          "count": 2,
+          "p50": 4,
+          "p95": 23,
+          "max": 23,
+          "errors": 0,
+          "browser": 0,
+          "server": 2,
+          "slowestCaptureId": "cap_mvs02sy3g7dmytfa"
+        },
+        {
+          "key": "ep_0z635a4otwk",
+          "label": "POST {BACKEND_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_02nrpzzew80"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs02v3wcx68i3do"
+        },
+        {
+          "key": "ep_1rzjikzywsg",
+          "label": "GET {BACKEND_URL ?? http://localhost:4010}/products/:id",
+          "siteIds": [
+            "req_1t6ibh8o0so"
+          ],
+          "count": 2,
+          "p50": 3,
+          "p95": 5,
+          "max": 5,
+          "errors": 0,
+          "browser": 0,
+          "server": 2,
+          "slowestCaptureId": "cap_mvs02xay0u7ct5y0"
+        }
+      ],
+      "loads": 5
     }
   },
   "flows": {

@@ -144,6 +144,88 @@ Where a page's browser part starts, what it brings to the browser, and the code 
 | <a id="client-class-component"></a>**class component** (`class-component`) | Class components only work as client components. |  |
 | <a id="client-context"></a>**context** | `createContext()`: React contexts only work in client components. |  |
 
+## Server/client leaks
+
+Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both, so the page fails to build or render.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="leak-module"></a>**server-only module** (`module`) | A `'use client'` file, or a file it imports, imports something that only works on the server. Everything client code imports is sent to the browser, except a `'use server'` file (only a reference to its actions is) and type-only imports. | Move the server part into a server component or a server action (a `'use server'` file), and pass the result to the client component as a prop. |
+| <a id="leak-prop"></a>**prop that can't cross** (`prop`) | A server component renders a client component with a prop React cannot send to the browser. Plain data crosses (also `Date`, `Map`, `Set`, `URL`, `Error`, promises, JSX), and so do server actions and functions from a `'use client'` file. | Pass plain data instead: a server action instead of a function, the fields of an object instead of a class instance; or create the value in the client component. |
+| <a id="leak-server-only"></a>**server-only** | The file imports `server-only`, which marks it as server code: Next fails the build when client code imports it. |  |
+| <a id="leak-node"></a>**Node.js module** (`node`) | A Node.js module with no browser version (`fs`, `child_process`, `net`...). Next has browser versions of a few (`path`, `crypto`, `buffer`, `url`...), which aren't flagged. |  |
+| <a id="leak-database"></a>**database client** (`database`) | A database client (`pg`, `mysql2`, `mongoose`, `@prisma/client`...). In client code it fails to build, or it sends a database connection to the browser. |  |
+| <a id="leak-next-server"></a>**server API** (`next-server`) | An API Next only allows in server code: `next/headers` (`cookies()`, `headers()`), `revalidatePath`, `revalidateTag`, `cacheTag`, `cacheLife` from `next/cache`, `after` from `next/server`. |  |
+| <a id="leak-node-package"></a>**Node.js package** (`node-package`) | A package that only runs on Node.js (`bcrypt`, `sharp`, `firebase-admin`, `nodemailer`...). |  |
+| <a id="leak-function"></a>**function prop** (`function`) | A function handed to a client component (inline, a named function, a component, or one inside an object or array). Only server actions and functions exported from a `'use client'` file cross. |  |
+| <a id="leak-class-instance"></a>**class instance prop** (`class-instance`) | An instance of a class (or a built-in such as `RegExp` or `WeakMap`). React only sends plain objects, unless the class has `toJSON` (then it sends what that returns) or can be iterated. |  |
+| <a id="leak-symbol"></a>**symbol prop** (`symbol`) | A symbol made with `Symbol()`. Only symbols from `Symbol.for()` cross. |  |
+| <a id="leak-null-prototype"></a>**prop without a prototype** (`null-prototype`) | `Object.create(null)`: React only sends plain objects. |  |
+
+## Server actions
+
+Every server action (a `'use server'` function), with the auth check and the input check that run before it changes data. A server action is a public `POST` endpoint: anyone can call it with any arguments, not only your forms.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="action-public"></a>**server action** (`public`) | A function in a `'use server'` file, or one that starts with `'use server'`. Next gives each action a page uses an id that ships in the browser bundle, and runs it for any `POST` that sends the id, from anywhere, with whatever arguments the request holds. TypeScript types aren't checked when it runs. |  |
+| <a id="action-auth-checked"></a>**auth checked** (`auth-checked`) | Before it changes anything, the action stops when nobody is signed in: a `return`, `throw`, `redirect()` or `notFound()` under a check of the session or user, a helper that does that (`await requireUser()`), the function it is wrapped in, or a package guard (`auth.protect()`). |  |
+| <a id="action-auth-none"></a>**no auth check** (`auth-none`) | No check of the session or user was found before the action changes data, so it runs for anyone, signed in or not. That's fine for public actions (a newsletter sign-up), not for ones that change someone's data. | Check the session at the top of the action (`const session = await auth(); if (!session) throw ...`), or wrap it in a helper that does. |
+| <a id="action-auth-unclear"></a>**auth unclear** (`auth-unclear`) | The action is wrapped in, or calls, code the scan can't read (a package, a file the config excludes, an import that doesn't resolve), so it can't tell whether that code checks the session. |  |
+| <a id="action-input-checked"></a>**input checked** (`input-checked`) | Every argument the action reads is checked before use: parsed with a validation library (zod, valibot, yup...), or checked by hand with a `return` / `throw` when it is wrong (`typeof id !== 'string'`). |  |
+| <a id="action-input-partial"></a>**input partly checked** (`input-partial`) | Some arguments the action reads are checked, others are used as sent. | Parse all of the input with one schema. |
+| <a id="action-input-none"></a>**input not checked** (`input-none`) | The arguments are used as sent. A caller can send any value: another type than the TypeScript one, another id, extra fields. | Parse the input with a schema (`Schema.parse(input)`) before using it. |
+| <a id="action-input-no-input"></a>**no input** (`input-no-input`) | The action reads no arguments, so there is nothing to check. |  |
+| <a id="action-input-unclear"></a>**input unclear** (`input-unclear`) | A package wrapper hands the action its input, and the scan can't read whether it checks it. |  |
+| <a id="action-change-database"></a>**database** (`change-database`) | A write call on a database client or data object (`create`, `update`, `delete`, `upsert`...) or SQL that writes (`INSERT`, `UPDATE`, `DELETE`). |  |
+| <a id="action-change-request"></a>**request** (`change-request`) | A request to another service that isn't `GET` or `HEAD` (`fetch(url, { method: 'DELETE' })`, `api.post()`). |  |
+| <a id="action-change-file"></a>**file** (`change-file`) | A Node.js `fs` write (`writeFile`, `appendFile`, `unlink`...). |  |
+| <a id="action-change-cache"></a>**cache** (`change-cache`) | `revalidatePath()`, `revalidateTag()` or `updateTag()`: it refreshes cached pages and data. On its own that doesn't count as changing data. |  |
+| <a id="action-unprotected"></a>**open to anyone** (`unprotected`) | The action changes data, has no auth check and uses its input as sent (or takes none), and a page uses it. Anyone who finds its id in the browser bundle can call it with any arguments. | Check the session first and parse the input with a schema; or, if it is meant to be public, check the input so a caller can only do what the form allows. |
+| <a id="action-unused"></a>**unused** | No code imports or uses the action, so Next leaves it out of the build and it can't be called. It isn't flagged. |  |
+| <a id="action-wrapped"></a>**wrapped** | The action is the result of a helper (`export const save = withAuth(async () => ...)`). The helper runs first, so its checks count for the action. |  |
+
+## Request performance
+
+Requests that wait for each other for no reason, run once per item of a list, or are sent twice on one page load, found in the code and checked against the timings of live captures.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="perf-waterfall"></a>**waterfall** | Requests awaited one after the other in the same function, where a later one doesn't use what an earlier one returned. Each waits for the one before, so the page takes as long as all of them together. | Start them together: `const [user, posts] = await Promise.all([getUser(), getPosts()])`, or render them in separate components inside `<Suspense>`. |
+| <a id="perf-n-plus-one"></a>**N+1** (`n-plus-one`) | A request sent once for each item of a list (in a loop, in `.map()`, or by a component rendered once per item), usually after one request for the list itself. Ten items make eleven requests. | Fetch the items in one request (an endpoint that takes a list of ids, or one that includes them), or at least start them together with `Promise.all`. |
+| <a id="perf-duplicate"></a>**duplicate** | The same request (method and URL, called with the same arguments) is sent from more than one place on one page load, and nothing dedupes it. Next dedupes a server component's `GET` `fetch`, and query libraries dedupe the same key, but not other calls. | Wrap the function that sends it in React's `cache()` (server), share one query (client), or fetch it once higher up and pass the result down. |
+| <a id="perf-sequential"></a>**one after another** (`sequential`) | The N+1 requests are awaited inside a `for` loop, so each one waits for the one before: the time adds up with each item. | Start them together (`await Promise.all(items.map(...))`) if they must stay separate. |
+| <a id="perf-loop-for"></a>**for loop** (`loop-for`) | A `for`, `for...of` or `for...in` loop. |  |
+| <a id="perf-loop-while"></a>**while loop** (`loop-while`) | A `while` or `do ... while` loop. |  |
+| <a id="perf-loop-callback"></a>**array callback** (`loop-callback`) | A callback of an array method that runs once per item: `.map()`, `.forEach()`, `.flatMap()`, `.filter()`... |  |
+| <a id="perf-loop-render"></a>**rendered per item** (`loop-render`) | A component rendered once per item (`items.map((item) => <Row item={item} />)`) that sends the request itself, so each row sends its own. |  |
+| <a id="perf-confirmed"></a>**confirmed at runtime** (`confirmed`) | Live capture showed it: the requests ran one after the other, or one load sent the request for several items, or the same request twice. |  |
+| <a id="perf-not-confirmed"></a>**not confirmed** (`not-confirmed`) | Its requests were captured, but not the way the scan says: they overlapped, or a load sent only one. It may only happen with other data (a longer list), or the scan read the code wrong. | Use the page with more data, or check the code: if it is fine, the finding can be ignored. |
+| <a id="perf-not-seen"></a>**not seen yet** (`not-seen`) | No capture of its requests yet, so the timings say nothing about it. | Open the page with capture on. |
+| <a id="perf-p50"></a>**p50** | The median time: half the captured calls of the endpoint were faster than this, half slower. |  |
+| <a id="perf-p95"></a>**p95** | The 95th percentile: 95 of 100 captured calls were faster than this. It shows the slow calls users hit now and then, which the median hides. |  |
+
+## Environment variables
+
+Every `process.env` name the code reads, on which side, and which `.env` files define it. Only names are read: values never leave the `.env` files.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="env-server"></a>**server** | Read in server code: server components, route handlers, server actions, middleware or `instrumentation`. Every name the server process has is available there. |  |
+| <a id="env-client"></a>**client** | Read in client code: a `'use client'` file, a file it imports, or `instrumentation-client`. In the browser, Next only has the names it inlined when it built the app: `NEXT_PUBLIC_` names, the `env` names in `next.config`, and `NODE_ENV`. |  |
+| <a id="env-both"></a>**server and client** (`both`) | Read in a module that server code and client code both import. It has a value on the server and, unless Next inlines the name, none in the browser. |  |
+| <a id="env-config"></a>**next.config** (`config`) | Read in `next.config`, when Next starts or builds the app. |  |
+| <a id="env-private-in-client"></a>**private name in client code** (`private-in-client`) | A name without the `NEXT_PUBLIC_` prefix is read in client code. Next leaves it out of the browser bundle, so it is undefined there; while rendering on the server it has a value, so the page can also differ between the two. | Read it in server code and pass the result down as a prop, or, if it isn't a secret, rename it with the `NEXT_PUBLIC_` prefix. |
+| <a id="env-not-defined"></a>**not defined** (`not-defined`) | No `.env` file Next loads defines the name, it isn't in `next.config` `env`, Next doesn't set it, and a read has no fallback. Unless the environment the app runs in sets it, the code gets undefined. Often a typo, or a name missing from `.env.example`. | Check the spelling, add it to a `.env` file (or `.env.example` for others to fill in), or give the read a fallback. |
+| <a id="env-not-inlined"></a>**not inlined** (`not-inlined`) | A name Next inlines (`NEXT_PUBLIC_`...) is destructured from `process.env` in client code. Next only replaces `process.env.NAME` and `process.env['NAME']` when it builds the app, so in the browser the value is undefined. | Read it as `process.env.NAME`. |
+| <a id="env-direct"></a>**direct** | `process.env.NAME`. |  |
+| <a id="env-literal"></a>**literal key** (`literal`) | `process.env['NAME']`: Next inlines it like `process.env.NAME`. |  |
+| <a id="env-constant"></a>**constant key** (`constant`) | `process.env[KEY]` where `KEY` holds a fixed name. Turbopack inlines it in client code; webpack (Next 15's default bundler) doesn't. |  |
+| <a id="env-alias"></a>**through a variable** (`alias`) | `env.NAME` after `const env = process.env`. Next inlines it like `process.env.NAME`. |  |
+| <a id="env-destructured"></a>**destructured** | `const { NAME } = process.env`. Fine on the server; in client code Next doesn't inline it. |  |
+| <a id="env-unknown-name"></a>**name built at run time** (`unknown-name`) | `process.env[name]` with a name the code builds while it runs, so the scan can't tell which variable it is. In client code it is always undefined in the browser. |  |
+| <a id="env-listed"></a>**only listed** (`listed`) | Listed in a file Next doesn't load, such as `.env.example`: the project expects each developer to define it, so it isn't flagged. |  |
+
 ## Server cache
 
 What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).

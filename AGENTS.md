@@ -115,3 +115,8 @@ re-run them on their own before assuming a regression.
 | M41 | Special files and boundaries                      | Done   |
 | M42 | Release v0.4.0                                    | Done   |
 | M43 | Client boundaries                                 | Done   |
+| M44 | Server/client leaks                               | Done   |
+| M45 | Environment variables                             | Done   |
+| M46 | Server action safety                              | Done   |
+| M47 | Request performance                               | Done   |
+| M48 | Release v0.5.0                                    | Done   |

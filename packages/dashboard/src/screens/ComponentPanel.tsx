@@ -4,7 +4,17 @@ import { useShowDetails } from '../details'
 import { RequestList } from '../RequestView'
 import { href } from '../router'
 import { TypeShapeView } from '../TypeShapeView'
-import { Badge, CappedList, Empty, KindBadge, PageAccess, RefBadges, Section, SourceLink } from '../ui'
+import {
+  Badge,
+  CappedList,
+  CodeText,
+  Empty,
+  KindBadge,
+  PageAccess,
+  RefBadges,
+  Section,
+  SourceLink,
+} from '../ui'
 
 export function ComponentPanel({
   componentId,
@@ -49,7 +59,19 @@ export function ComponentPanel({
       {notes.length > 0 && (
         <ul className="notes">
           {notes.map((n) => (
-            <li key={`${n.file}:${n.line}:${n.message}`}>⚠ {n.message}</li>
+            <li key={`${n.file}:${n.line}:${n.message}`}>
+              ⚠{' '}
+              {n.kind === 'boundary' ||
+              n.kind === 'client' ||
+              n.kind === 'leak' ||
+              n.kind === 'env' ||
+              n.kind === 'action' ||
+              n.kind === 'perf' ? (
+                <CodeText text={n.message} />
+              ) : (
+                n.message
+              )}
+            </li>
           ))}
         </ul>
       )}

@@ -12,12 +12,21 @@
 //   ONBOARDING.md        Start here: stack, areas, entry pages, main flows, backends, where things live (M32)
 //   GLOSSARY.md          what each status, note, trigger, transport and badge means, and what to do (M34)
 //   cache.md             server cache: tags, cached data, revalidation calls and what they refresh (M39)
+//   perf.md              waterfalls, N+1 and duplicate requests, and endpoint timings from captures (M47)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
+  ACTION_AUTH_LABELS,
+  ACTION_CHANGE_LABELS,
+  ACTION_FLAG_LABELS,
+  ACTION_INPUT_LABELS,
   type AppModel,
   type Area,
   type AreaList,
   accessOf,
+  actionFlagText,
+  actionsOf,
+  actionsOn,
+  authText,
   boundaryText,
   buildAreas,
   buildEndpoints,
@@ -34,46 +43,74 @@ import {
   cacheLifeText,
   cacheRuntimeText,
   cacheTags,
+  changesText,
+  changeText,
   clientBoundaryOf,
   clientSummary,
   clientUseText,
+  definedText,
+  ENV_FLAG_LABELS,
+  ENV_SIDE_LABELS,
   type Endpoint,
   type EndpointHost,
   type EndpointList,
   type EndpointStatus,
+  type EndpointTiming,
   type EndpointTransport,
   type ExportCapture,
   type ExportData,
   edgeWhere,
   endpointLabel,
+  envFlags,
+  envFlagsOn,
+  envFlagText,
+  envOf,
+  envOn,
   explain,
   type Flag,
   type Flow,
   type FlowStatus,
   type FlowStep,
+  flaggedActions,
   formatQueryKey,
   GLOSSARY,
   type GraphqlInfo,
   type GraphqlOperation,
   gapLine,
   guardText,
+  hasSource,
+  inputText,
   invalidationText,
   invalidationWhere,
   isBuildError,
   isInfoFlag,
   isVerified,
+  LEAK_LABELS,
+  leakKind,
+  leaksOfComponent,
+  leaksOn,
+  leakText,
+  leakWhy,
   lowerText,
   type MatcherCondition,
   type MiddlewareMatcher,
   type ModelIndex,
   matchedSiteIds,
   mismatchField,
+  ms,
   type Navigation,
   type PageBoundary,
+  PERF_KIND_LABELS,
+  PERF_RUNTIME_LABELS,
+  type PerfFinding,
   type PostmanContract,
   type PostmanRequest,
   type PostmanSource,
   pageCache,
+  perfFindings,
+  perfOn,
+  perfRuntimeText,
+  perfText,
   queryLinkTarget,
   queryLinkVerb,
   type RecordedFlow,
@@ -85,30 +122,37 @@ import {
   renderReasonLine,
   requestLabel,
   type ScanNote,
+  type ServerAction,
   type SiteTypeCheck,
   type SseEndpoint,
   type SummaryLink,
   type SummarySectionId,
+  sidesOf,
   type Trpc,
   type TypeRef,
   termId,
   titleText,
   triggerText,
   typeRefs,
+  unknownInClient,
+  unknownText,
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
 import {
+  ACTIONS,
   AREAS,
   CACHE,
   type DocNames,
   docNames,
   ENDPOINTS,
+  ENV,
   GLOSSARY_DOC,
   GRAPHQL,
   ISSUES,
   MIDDLEWARE,
   ONBOARDING,
+  PERF,
   POSTMAN,
   README,
   RECORDED,
@@ -190,6 +234,9 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
   if (model.cache) files[CACHE] = cacheDoc(ctx)
+  if (model.env) files[ENV] = envDoc(ctx)
+  if (model.actions?.length) files[ACTIONS] = actionsDoc(ctx)
+  if (model.perf || data.verification?.perf) files[PERF] = perfDoc(ctx)
   files[ENDPOINTS] = endpointsDoc(ctx)
   files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
@@ -408,6 +455,33 @@ function readme(ctx: Ctx): string {
       '## Server cache',
       `${link(`${plural(model.cache.entries.length, 'cached entry', 'cached entries')} and ${plural(model.cache.invalidations.length, 'revalidation call')}`, from, CACHE)}${flagged > 0 ? `, ${plural(flagged, 'note')} to check` : ''}.`,
     )
+  }
+  if (model.env) {
+    const env = model.env
+    const toCheck = envFlags(env).length + unknownInClient(env).length
+    const read = env.vars.filter((v) => v.reads.length > 0).length
+    sections.push(
+      '## Environment variables',
+      `${link(`${plural(read, 'name')} read, ${plural(env.files.length, `${code('.env')} file`)}`, from, ENV)}${toCheck > 0 ? `, ${plural(toCheck, 'note')} to check` : ''}.`,
+    )
+  }
+  if (model.actions?.length) {
+    const flagged = flaggedActions(model).length
+    sections.push(
+      '## Server actions',
+      `${link(plural(model.actions.length, 'server action'), from, ACTIONS)}${flagged > 0 ? `, ${plural(flagged, 'note')} to check` : ''}.`,
+    )
+  }
+  if (model.perf || ctx.data.verification?.perf) {
+    const findings = perfFindings(model).length
+    const timed = ctx.data.verification?.perf?.endpoints.length ?? 0
+    const parts = [
+      findings > 0
+        ? plural(findings, 'request performance note')
+        : 'No waterfalls, N+1 or duplicate requests',
+      ...(timed > 0 ? [`${plural(timed, 'endpoint')} timed`] : []),
+    ]
+    sections.push('## Request performance', `${link(parts.join(', '), from, PERF)}.`)
   }
   if (handlers.length > 0) {
     sections.push(
@@ -673,6 +747,10 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ...renderSection(route),
     ...boundarySection(route),
     ...clientSection(ctx, route, from),
+    ...leakSection(ctx, route),
+    ...envSection(ctx, route, from),
+    ...actionSection(ctx, route, from),
+    ...perfSection(ctx, route, from),
     ...cacheSection(ctx, route, from),
     ...metadataSection(route),
     '## Component tree',
@@ -769,6 +847,39 @@ function clientSection(ctx: Ctx, route: Route, from: string): string[] {
   ]
 }
 
+/** Server-only code the page's client code imports, and props that can't cross (M44). */
+function leakSection(ctx: Ctx, route: Route): string[] {
+  const leaks = leaksOn(ctx.index.model, route.id)
+  if (leaks.length === 0) return []
+  const name = (id: string) => ctx.index.components.get(id)?.name ?? '?'
+  const lines = leaks.map(
+    (leak) =>
+      `- ⚠ **${LEAK_LABELS[leakKind(leak)]}**: ${leakText(leak, name)}, ${code(`${leak.loc.file}:${leak.loc.line}`)}\n  - ${leakWhy(leak)}`,
+  )
+  return [
+    '## Server/client leaks',
+    ['Next rejects these, so the page fails to build or render.', '', ...lines].join('\n'),
+  ]
+}
+
+/** The environment variables the page's code reads (M45). Names only. */
+function envSection(ctx: Ctx, route: Route, from: string): string[] {
+  const vars = envOn(ctx.index.model, route.id)
+  if (vars.length === 0) return []
+  const lines = vars.map((v) => {
+    const flags = envFlagsOn(v, route.id)
+    const first = v.reads[0]
+    const badges = flags.map((f) => ` ⚠ **${ENV_FLAG_LABELS[f.kind]}**`).join('')
+    const head = `- ${code(v.name)} (${sidesOf(v)
+      .map((s) => ENV_SIDE_LABELS[s])
+      .join(
+        ', ',
+      )}): ${codeText(definedText(v))}${badges}${first ? `, ${code(`${first.loc.file}:${first.loc.line}`)}` : ''}`
+    return [head, ...flags.map((f) => `  - ${envFlagText(v, f.kind)}`)].join('\n')
+  })
+  return ['## Environment variables', [`Names only (${link('all', from, ENV)}).`, '', ...lines].join('\n')]
+}
+
 /** `metadata` / `generateMetadata` from the layouts and the page (M41). */
 function metadataSection(route: Route): string[] {
   const sources = route.metadata?.sources ?? []
@@ -809,6 +920,222 @@ function cacheRuntimeLabel(e: CacheEntry): string {
 
 function invalidationLine(ctx: Ctx, i: CacheInvalidation): string {
   return `${code(invalidationText(i))} in ${codeText(invalidationWhere(i, ctx.model.routes))}, ${code(`${i.loc.file}:${i.loc.line}`)}`
+}
+
+/** The server actions the page uses, with their labels (M46). */
+function actionSection(ctx: Ctx, route: Route, from: string): string[] {
+  const actions = actionsOn(ctx.index.model, route.id)
+  if (actions.length === 0) return []
+  const lines = actions.map((a) => actionLine(a, from))
+  return [
+    '## Server actions',
+    [`Each one is a public ${code('POST')} endpoint (${link('all', from, ACTIONS)}).`, '', ...lines].join(
+      '\n',
+    ),
+  ]
+}
+
+function actionLine(a: ServerAction, from: string): string {
+  const term = (key: string, label: string) => link(label, from, GLOSSARY_DOC, termId('action', key))
+  const badges = [
+    ...(a.flags ?? []).map((f) => `⚠ **${term(f.kind, ACTION_FLAG_LABELS[f.kind])}**`),
+    term(`auth-${a.auth.status}`, ACTION_AUTH_LABELS[a.auth.status]),
+    term(`input-${a.input.status}`, ACTION_INPUT_LABELS[a.input.status]),
+    ...(a.unused ? [term('unused', 'unused')] : []),
+  ].join(', ')
+  const head = `- ${code(a.name)} (${code(`${a.loc.file}:${a.loc.line}`)}): ${badges}; ${changesText(a)}`
+  return [head, ...(a.flags?.length ? [`  - ${actionFlagText(a)}`] : [])].join('\n')
+}
+
+/** Every server action with its auth check, input check and what it changes (M46). */
+function actionsDoc(ctx: Ctx): string {
+  const actions = actionsOf(ctx.model)
+  const from = ACTIONS
+  const flagged = flaggedActions(ctx.model)
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = ctx.index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  return doc([
+    '# Server actions',
+    link('← Overview', from, README),
+    `Every server action, with the auth check and the input check that run before it changes data. A server action is a public ${code('POST')} endpoint: once a page uses it, anyone can call it with any arguments, not only your forms. TypeScript types aren't checked when it runs.`,
+    flagged.length > 0 && `## To check (${flagged.length})`,
+    flagged.length > 0 && flagged.map((a) => actionLine(a, from)).join('\n'),
+    '## Actions',
+    table(
+      ['Action', 'Auth', 'Input', 'Changes', 'Pages'],
+      actions.map((a) => [
+        `${code(a.name)}${(a.flags ?? []).map((f) => ` ⚠ ${ACTION_FLAG_LABELS[f.kind]}`).join('')}<br>${code(`${a.loc.file}:${a.loc.line}`)}${a.wrappedIn ? `<br>wrapped in ${code(a.wrappedIn.name)}` : ''}${a.unused ? '<br>unused' : ''}`,
+        codeText(authText(a)),
+        codeText(inputText(a)),
+        a.changes.length === 0
+          ? 'nothing'
+          : a.changes.map((c) => `${ACTION_CHANGE_LABELS[c.kind]}: ${codeText(changeText(c))}`).join('<br>'),
+        routes(a.routeIds),
+      ]),
+    ),
+  ])
+}
+
+/** The waterfalls, N+1 and duplicate requests that slow the page down (M47). */
+function perfSection(ctx: Ctx, route: Route, from: string): string[] {
+  const findings = perfOn(ctx.index.model, route.id)
+  if (findings.length === 0) return []
+  return [
+    '## Request performance',
+    [
+      `Requests that slow this page down (${link('all', from, PERF)}).`,
+      '',
+      ...findings.map((f) => perfLine(ctx, f, from)),
+    ].join('\n'),
+  ]
+}
+
+function perfLine(ctx: Ctx, f: PerfFinding, from: string): string {
+  const term = (key: string, label: string) => link(label, from, GLOSSARY_DOC, termId('perf', key))
+  const badges = [
+    `⚠ **${term(f.kind, PERF_KIND_LABELS[f.kind])}**`,
+    ...(f.sequential ? [term('sequential', 'one after another')] : []),
+    ...(f.runtime ? [term(f.runtime.status, PERF_RUNTIME_LABELS[f.runtime.status])] : []),
+  ].join(', ')
+  const runtime = f.runtime?.status === 'confirmed' ? perfRuntimeText(f.runtime) : undefined
+  const lines = [`- ${badges} (${code(`${f.loc.file}:${f.loc.line}`)}): ${perfText(f, ctx.model)}.`]
+  if (runtime) lines.push(`  - ${runtime}.`)
+  for (const [i, step] of (f.steps ?? []).entries()) {
+    const needs = step.needs.length ? `, uses ${step.needs.map((n) => n + 1).join(', ')}` : ''
+    lines.push(
+      `  ${i + 1}. ${code(`await ${step.text}`)} (${code(`${step.loc.file}:${step.loc.line}`)}${needs})`,
+    )
+  }
+  return lines.join('\n')
+}
+
+/** Every performance finding, and the endpoints captures timed, slowest first (M47). */
+function perfDoc(ctx: Ctx): string {
+  const findings = perfFindings(ctx.model)
+  const from = PERF
+  const timings = ctx.data.verification?.perf
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = ctx.index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  return doc([
+    '# Request performance',
+    link('← Overview', from, README),
+    'Requests that wait for each other for no reason (waterfalls), run once per item of a list (N+1), or are sent twice on one page load, found in the code. Capture timings of each page load confirm them, and give each endpoint its median (p50) and slow-call (p95) time.',
+    `## To check (${findings.length})`,
+    findings.length > 0
+      ? table(
+          ['Finding', 'Where', 'At runtime', 'Pages'],
+          findings.map((f) => [
+            `${PERF_KIND_LABELS[f.kind]}: ${codeText(perfText(f, ctx.model))}`,
+            `${f.fn ? `${code(f.fn)}<br>` : ''}${code(`${f.loc.file}:${f.loc.line}`)}`,
+            f.runtime ? text(perfRuntimeText(f.runtime) ?? '') : '—',
+            routes(f.routeIds),
+          ]),
+        )
+      : 'The scan found no waterfalls, N+1 requests or duplicate requests.',
+    '## Slowest endpoints',
+    timings?.endpoints.length
+      ? [
+          `From ${plural(timings.loads, 'page load')} and server requests. Times in dev include compiling, so compare endpoints with each other.`,
+          '',
+          table(
+            ['Endpoint', 'p50', 'p95', 'Slowest', 'Calls', 'Failed'],
+            timings.endpoints.map((e: EndpointTiming) => [
+              code(e.label),
+              ms(e.p50),
+              ms(e.p95),
+              ms(e.max),
+              String(e.count),
+              String(e.errors),
+            ]),
+          ),
+        ].join('\n')
+      : 'No request was captured. Run the app with capture on to time its endpoints.',
+  ])
+}
+
+/** Every name the code reads or a `.env` file defines (M45). Values are never in the model. */
+function envDoc(ctx: Ctx): string {
+  const env = envOf(ctx.model)
+  const from = ENV
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = ctx.index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  const flagged = envFlags(env)
+  const unknownClient = unknownInClient(env)
+  const read = env.vars.filter((v) => v.reads.length > 0)
+  const unread = env.vars.filter((v) => v.reads.length === 0)
+  const MODES = { development: 'dev', production: 'build / start', test: 'test' } as const
+  return doc([
+    '# Environment variables',
+    link('← Overview', from, README),
+    `Every ${code('process.env')} name the code reads, on which side, and which ${code('.env')} files define it. Only names are read: values never leave the ${code('.env')} files. In the browser, Next only has the names it inlined when it built the app (${code('NEXT_PUBLIC_')} names, the ${code('env')} names in ${code('next.config')}, ${code('NODE_ENV')}).`,
+    flagged.length + unknownClient.length > 0 && `## To check (${flagged.length + unknownClient.length})`,
+    flagged.length + unknownClient.length > 0 &&
+      [
+        ...flagged.map(
+          ({ variable, flag }) =>
+            `- **${link(ENV_FLAG_LABELS[flag.kind], from, GLOSSARY_DOC, termId('env', flag.kind))}**: ${envFlagText(variable, flag.kind)} (${code(`${flag.loc.file}:${flag.loc.line}`)})`,
+        ),
+        ...unknownClient.map(
+          (r) =>
+            `- **${link('name built at run time', from, GLOSSARY_DOC, termId('env', 'unknown-name'))}**: ${unknownText(r)} (${code(`${r.loc.file}:${r.loc.line}`)})`,
+        ),
+      ].join('\n'),
+    '## Names the code reads',
+    read.length === 0
+      ? `No code reads a name from ${code('process.env')}.`
+      : table(
+          ['Name', 'Defined in', 'Read', 'Pages'],
+          read.map((v) => [
+            `${code(v.name)}${(v.flags ?? []).map((f) => ` ⚠ ${ENV_FLAG_LABELS[f.kind]}`).join('')}`,
+            hasSource(v) ? codeText(definedText(v)) : `**${codeText(definedText(v))}**`,
+            v.reads
+              .map(
+                (r) =>
+                  `${code(`${r.loc.file}:${r.loc.line}`)} ${ENV_SIDE_LABELS[r.side]}${r.access === 'direct' ? '' : `, ${r.access}`}${r.optional ? ', has a fallback' : ''}`,
+              )
+              .join('<br>'),
+            routes([...new Set(v.reads.flatMap((r) => r.routeIds))]),
+          ]),
+        ),
+    env.unknown.length > 0 && '## Names built at run time',
+    env.unknown.length > 0 &&
+      env.unknown
+        .map(
+          (r) =>
+            `- ${code(`process.env[${r.key}]`)} (${ENV_SIDE_LABELS[r.side]}), ${code(`${r.loc.file}:${r.loc.line}`)}`,
+        )
+        .join('\n'),
+    unread.length > 0 && '## Defined but not read',
+    unread.length > 0 &&
+      `Names a ${code('.env')} file defines that no scanned code reads: ${unread.map((v) => code(v.name)).join(', ')}.`,
+    '## Files',
+    env.files.length === 0
+      ? `No ${code('.env')} file in the project root.`
+      : table(
+          ['File', 'Loaded for', 'Names'],
+          env.files.map((f) => [
+            code(f.file),
+            f.loads.length === 0 ? "never (Next doesn't load it)" : f.loads.map((m) => MODES[m]).join(', '),
+            String(f.names),
+          ]),
+          ['left', 'left', 'right'],
+        ),
+  ])
 }
 
 function cacheDoc(ctx: Ctx): string {
@@ -1405,6 +1732,7 @@ function componentDoc(ctx: Ctx, component: Component, from: string): string {
       ['Kind', `${component.kind}${component.clientBoundary ? ` (${code("'use client'")})` : ''}`],
       ['Needs the browser for', component.clientUses?.map(clientUseText).join(', ')],
       ['Brings to the browser', clientBrings(ctx, component.id)],
+      ['Leaks', componentLeaks(ctx, component.id)],
       ['Used on', routes.map((r) => routeLink(ctx, r, from)).join(', ') || undefined],
       ['Rendered by', renderedBy.map((id) => componentLink(ctx, id, from)).join(', ') || undefined],
       ['Renders', [...new Set(children)].join(', ') || undefined],
@@ -1422,6 +1750,14 @@ function componentDoc(ctx: Ctx, component: Component, from: string): string {
     sites.length === 0 ? 'Sends no requests.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
   ])
+}
+
+/** Leaks through a boundary, or that a component hands on or receives (M44). */
+function componentLeaks(ctx: Ctx, componentId: string): string | undefined {
+  const leaks = leaksOfComponent(ctx.index.model, componentId)
+  if (leaks.length === 0) return undefined
+  const name = (id: string) => ctx.index.components.get(id)?.name ?? '?'
+  return leaks.map((leak) => `⚠ ${leakText(leak, name)}`).join('; ')
 }
 
 /** A client boundary's components, modules and size, packages, and whether it could move lower (M43). */
@@ -2076,6 +2412,26 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: 'Captured data does not fit the declared types.',
   },
   {
+    title: 'Server/client leaks',
+    kinds: ['leak'],
+    hint: "Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both.",
+  },
+  {
+    title: 'Server actions open to anyone',
+    kinds: ['action'],
+    hint: 'Server actions that change data with no auth check and no input check. A server action is a public `POST` endpoint: anyone can call it with any arguments.',
+  },
+  {
+    title: 'Request performance',
+    kinds: ['perf'],
+    hint: 'Requests that wait for each other for no reason, run once per item of a list, or are sent twice on one page load.',
+  },
+  {
+    title: 'Environment variables',
+    kinds: ['env'],
+    hint: "Names read where they have no value: private names in client code, names Next doesn't inline there, and names nothing defines.",
+  },
+  {
     title: 'Needs a re-check',
     kinds: ['needs-recheck'],
     hint: 'The code changed after every capture. Use the app again to re-check.',
@@ -2183,7 +2539,7 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     }
   } else if (note.typeId) {
     target = typeLink(ctx, note.typeId, from)
-  } else if (note.componentId) {
+  } else if (note.componentId && note.kind !== 'leak') {
     target = componentLink(ctx, note.componentId, from)
     // Client notes start with the component, which the link already shows.
     const prefix = `\`${ctx.index.components.get(note.componentId)?.name}\`: `
@@ -2197,8 +2553,16 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
       if (message.startsWith(prefix)) message = message.slice(prefix.length)
     }
   }
-  // Boundary notes are the tool's own wording, with code in backticks (M41).
-  const body = note.kind === 'boundary' || note.kind === 'client' ? message : text(message)
+  // Boundary, client, leak and env notes are the tool's own wording, with code in backticks (M41).
+  const body =
+    note.kind === 'boundary' ||
+    note.kind === 'client' ||
+    note.kind === 'leak' ||
+    note.kind === 'env' ||
+    note.kind === 'action' ||
+    note.kind === 'perf'
+      ? message
+      : text(message)
   return `${target ? `${target}: ` : ''}${body} (${where})`
 }
 

@@ -226,8 +226,17 @@
     {
       "id": "check",
       "title": "To check",
-      "note": "5 open notes",
+      "note": "6 open notes",
       "items": [
+        {
+          "label": "Action",
+          "value": "Server action `deleteProduct` changes data (`fetch DELETE` through `removeProduct`) with no auth check and uses its input as sent: a server action is a public `POST` endpoint, so anyone can call it with any arguments",
+          "detail": "src/actions/products.ts:30",
+          "link": {
+            "to": "page",
+            "routeId": "rt_0te2vdgan2u"
+          }
+        },
         {
           "label": "Boundary",
           "value": "/products: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
@@ -245,18 +254,9 @@
             "to": "page",
             "routeId": "rt_0te2vdgan2u"
           }
-        },
-        {
-          "label": "Boundary",
-          "value": "/products/[id]: no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile",
-          "detail": "src/lib/backend.ts:12",
-          "link": {
-            "to": "page",
-            "routeId": "rt_1kdazzrvrkg"
-          }
         }
       ],
-      "more": 2,
+      "more": 3,
       "link": {
         "to": "overview"
       },

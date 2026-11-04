@@ -33,6 +33,7 @@ boundaries: (none)
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:14
 title: basic fixture  (layout metadata)
 client: (none)
+env: NEXT_PUBLIC_API_URL
 
 ## /about  app/(marketing)/about/page.tsx
 layouts: app/layout.tsx
@@ -60,6 +61,7 @@ title: basic fixture  (layout metadata)
 client: 2 boundaries, 2 components, 4 modules, 2.5 KB, packages axios
   ProfileCard  from UserPage (page)  app/users/[id]/page.tsx:13
   DeleteUserButton  from UserPage (page)  app/users/[id]/page.tsx:14
+env: NEXT_PUBLIC_API_URL
 
 # Client boundaries
 
@@ -80,3 +82,22 @@ modules: 3, 1.7 KB
   lib/config.ts
 packages: axios
 uses: useState (hook) components/ProfileCard.tsx:13, useEffect (hook) components/ProfileCard.tsx:15
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_API_URL: not defined
+  both optional  lib/config.ts:1  /, /users/[id]
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

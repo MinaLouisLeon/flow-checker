@@ -14,8 +14,12 @@
 //             urql GraphQL operation, an EventSource, a native WebSocket, and the Postman
 //             collection matched to the code; and v0.3.0: the account page is `guarded`;
 //             and v0.4.0: each page's render mode, the cached fetch with its tag and the route
-//             handler that revalidates it, a missing loading state and a templated title
-//   build   → `next build` prints the same render mode for every page as the scan (M38)
+//             handler that revalidates it, a missing loading state and a templated title;
+//             and v0.5.0: client boundaries and no server/client leak, a private env name read in
+//             client code (its `.env` value never written out), an open server action next to a
+//             checked one, and a server waterfall
+//   build   → `next build` prints the same render mode for every page as the scan (M38), and its
+//             client reference manifests list the scanned client boundaries (M43, from 14.2)
 //   summary → Start here names the Next.js version, the middleware and the start page (M32)
 //   impact  → the route handler file affects the page that calls it (M36)
 //   dev     →a page-load server fetch, a click-triggered browser fetch and the route handler's
@@ -24,7 +28,7 @@
 //             the query is matched by key, the tRPC batch is split per procedure, the GraphQL
 //             capture is matched and type-checked, and the event stream's and socket's messages
 //             are captured and matched; the cached fetch is a hit on the second visit (M40,
-//             Next 15 and later)
+//             Next 15 and later); the waterfall is confirmed by capture timings (M47)
 //
 // Run after `pnpm build` (needs network for npm and Playwright's Chromium):
 //   node scripts/next-matrix.mjs                 # every version below
@@ -38,7 +42,12 @@ import { createServer as createNetServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { chromium } from '@playwright/test'
-import { compareRenderModes, readBuildTable } from './next-build-table.mjs'
+import {
+  compareClientBoundaries,
+  compareRenderModes,
+  readBuildTable,
+  readClientReferences,
+} from './next-build-table.mjs'
 
 const repo = resolve(import.meta.dirname, '..')
 const pkgDir = join(repo, 'packages', 'flow-checker')
@@ -52,6 +61,9 @@ export const VERSIONS = {
   15.5: { next: '15.5.28', react: '19.1.1' },
   16: { next: '16.4.3', react: '19.3.1' },
 }
+
+/** A fake value for the `.env` name the client reads; it must never appear in the scan's output. */
+const SECRET = 'matrix-secret-value'
 
 const args = process.argv.slice(2)
 const keep = args.includes('--keep')
@@ -115,7 +127,7 @@ if (results.some((r) => !r.ok)) process.exitCode = 1
 async function checkVersion(key, { next, react }, { tarball, upstream, browser, log }) {
   console.log(`\n▶ Next ${next}`)
   const app = join(work, `next-${key}`)
-  writeApp(app, atLeast(next, 16, 0))
+  writeApp(app, next)
   const legacy = !atLeast(next, 15, 3)
   const reactTypes = react.startsWith('18') ? '18' : '19'
   run(
@@ -168,7 +180,7 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   if (legacy) {
     writeFileSync(
       join(app, 'next.config.js'),
-      "const { withFlowChecker } = require('@integr8-media/flow-checker/next')\n\nmodule.exports = withFlowChecker({})\n",
+      `const { withFlowChecker } = require('@integr8-media/flow-checker/next')\n\nmodule.exports = withFlowChecker(${nextConfig(next)})\n`,
     )
   }
   // The Postman contract (M15), added to the config init wrote.
@@ -216,11 +228,25 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
     /## \/ {2}app\/page\.tsx\n[^#]*! no loading state:/,
     /fetch {2}\{UPSTREAM_URL\}\/quote {2}\[quote\] {2}1m {2}app\/cached\/page\.tsx:\d+\n {2}used by: \/cached\n/,
     /revalidateTag\('quote'[^)]*\) {2}in route handler `POST \/api\/refresh`[^\n]*\n {2}refreshes: fetch \{UPSTREAM_URL\}\/quote\n {2}pages: \/cached\n/,
+    // v0.5.0: client boundaries (M43), env names (M45), server actions (M46), a waterfall (M47).
+    /## \/ {2}app\/page\.tsx\n[^#]*client: 7 boundaries/,
+    /^MATRIX_SECRET: \.env \[private-in-client\]$/m,
+    /^UPSTREAM_URL: not defined \[not-defined\]$/m,
+    /deleteNote \(no auth check, input not checked\) \[unprotected\]/,
+    /renameNote \(auth checked, input checked\)/,
+    /waterfall \(server\) in Slow app\/slow\/page\.tsx:\d+\n {2}1\. await getUser\(\) [^\n]*\n {2}2\. await getStats\(\) /,
   ]
   for (const expected of expectations) {
     const found = typeof expected === 'string' ? scan.includes(expected) : expected.test(scan)
     if (!found) throw new Error(`scan is missing ${expected}:\n${scan}`)
   }
+  const modelText = readFileSync(join(app, '.flow-checker', 'model.json'), 'utf8')
+  const model = JSON.parse(modelText)
+  // M44: nothing in the app crosses the server/client line wrongly (it builds and runs).
+  if (model.leaks?.length)
+    throw new Error(`scan found leaks in an app that runs:\n${JSON.stringify(model.leaks)}`)
+  // M45: names only, never the value from `.env`.
+  if (scan.includes(SECRET) || modelText.includes(SECRET)) throw new Error('the scan wrote a value from .env')
   console.log('  scan ok')
 
   // v0.3.0: Start here in the terminal (M32) and the impact of a route handler file (M36).
@@ -239,7 +265,6 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
   console.log('  summary and impact ok')
 
   // M38: `next build` prints the render mode the scan gives each page.
-  const model = JSON.parse(readFileSync(join(app, '.flow-checker', 'model.json'), 'utf8'))
   // Not spawnSync: the build fetches from the upstream server, which runs in this process.
   const build = await runAsync(
     process.execPath,
@@ -256,9 +281,18 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
       `next build and the scan disagree (${built.size} routes read):\n${modes.join('\n')}\n${buildOut}`,
     )
   }
+  // M43: the build's client references are the scanned boundaries.
+  const references = readClientReferences(app)
+  const refProblems = references
+    ? compareClientBoundaries(model, references)
+    : ['no client reference manifest']
+  if (refProblems.length) {
+    throw new Error(`next build and the scanned client boundaries differ:\n${refProblems.join('\n')}`)
+  }
+  const clientRefs = `${references.size} client references`
   // dev must not start from the production build.
   removeDir(join(app, '.next'))
-  console.log(`  build ok (${built.size} routes, same render modes)`)
+  console.log(`  build ok (${built.size} routes, same render modes, ${clientRefs})`)
 
   // dev: dashboard + the app with capture on.
   const env = {
@@ -318,8 +352,12 @@ async function checkVersion(key, { next, react }, { tarball, upstream, browser, 
         }
         cache = `cached fetch ${await waitForCacheHit(dashboard)}`
       }
+      // M47: the two independent awaits run one after the other at runtime.
+      await page.goto(`${appUrl}/slow`)
+      await page.getByText('Slow: Matrix user, 3 stats').waitFor({ timeout: 60_000 })
+      const waterfall = await waitForWaterfall(dashboard)
       console.log(
-        `  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches, ${transports}, ${cache})`,
+        `  dev ok (${captures.length} captures matched, chain linked, ${flags} middleware fetches, ${transports}, ${cache}, ${waterfall})`,
       )
     } finally {
       await page.close()
@@ -513,9 +551,44 @@ function waitForCacheHit(dashboard) {
   })
 }
 
+/** The waterfall finding's runtime result: a load where the second request waited for the first. */
+function waitForWaterfall(dashboard) {
+  const finding = async () =>
+    (await (await fetch(`${dashboard}/api/model`)).json()).perf?.findings?.find(
+      (f) => f.kind === 'waterfall' && f.fn === 'Slow',
+    )
+  return waitFor(
+    async () => {
+      const id = (await finding())?.id
+      const runtime = id && (await (await fetch(`${dashboard}/api/perf`)).json()).findings?.[id]
+      return runtime?.status === 'confirmed'
+        ? `waterfall confirmed, ${runtime.savedMs} ms to save`
+        : undefined
+    },
+    'the waterfall to be confirmed at runtime',
+    30_000,
+  ).catch(async (error) => {
+    const f = await finding().catch(() => undefined)
+    const perf = await (await fetch(`${dashboard}/api/perf`)).json().catch(() => ({}))
+    const list = await (await fetch(`${dashboard}/api/captures`)).json().catch(() => [])
+    error.message += `\nFinding: ${JSON.stringify(f ?? null)}\nRuntime: ${JSON.stringify(f ? perf.findings?.[f.id] : perf)}`
+    error.message += `\nCaptured:\n${list
+      .filter((c) => c.url.includes('/slow/'))
+      .map((c) => `  ${c.origin} ${c.url} match=${c.match?.status ?? '-'} at=${c.timestamp ?? '-'}`)
+      .join('\n')}`
+    throw error
+  })
+}
+
 // --- The app ----------------------------------------------------------------------------------
 
-function writeApp(dir, proxy) {
+/** next.config: Next 13 needs server actions turned on. */
+function nextConfig(next) {
+  return atLeast(next, 14, 0) ? '{}' : '{ experimental: { serverActions: true } }'
+}
+
+function writeApp(dir, next) {
+  const proxy = atLeast(next, 16, 0)
   const files = {
     'package.json': JSON.stringify(
       { name: 'matrix-app', private: true, scripts: { dev: 'next dev' } },
@@ -580,7 +653,8 @@ export default async function Account() {
   return <p>Account</p>
 }
 `,
-    'app/page.tsx': `import { EchoSocket } from '@/components/Echo'
+    'app/page.tsx': `import { Admin } from '@/components/Admin'
+import { EchoSocket } from '@/components/Echo'
 import { Hello } from '@/components/Hello'
 import { Notes } from '@/components/Notes'
 import { Ticks } from '@/components/Ticks'
@@ -609,6 +683,7 @@ export default async function Home() {
       <Notes />
       <Ticks />
       <EchoSocket />
+      <Admin />
     </main>
   )
 }
@@ -670,7 +745,84 @@ export async function GET() {
   return Response.json(await res.json())
 }
 `,
-    'next.config.js': 'module.exports = {}\n',
+    'next.config.js': `module.exports = ${nextConfig(next)}\n`,
+    // --- v0.5.0 (M43–M47) ---
+    // M45: a name without NEXT_PUBLIC_, defined in .env and read in client code (undefined there).
+    '.env': `MATRIX_SECRET=${SECRET}\n`,
+    // M46: an action anyone can call that deletes, next to one that checks the session and its input.
+    'app/actions.ts': `'use server'
+import { cookies } from 'next/headers'
+
+export async function deleteNote(id: string) {
+  await fetch(\`\${process.env.UPSTREAM_URL}/notes/\${id}\`, { method: 'DELETE' })
+}
+
+export async function renameNote(id: string, text: string) {
+  const session = (await cookies()).get('session')
+  if (!session) throw new Error('Not signed in')
+  if (typeof id !== 'string' || typeof text !== 'string' || text.length > 100) throw new Error('Bad input')
+  await fetch(\`\${process.env.UPSTREAM_URL}/notes/\${id}\`, { method: 'PUT', body: JSON.stringify({ text }) })
+}
+`,
+    // M43: one more client boundary on the home page; it calls both actions and reads the env name.
+    'components/Admin.tsx': `'use client'
+import { useState } from 'react'
+import { deleteNote, renameNote } from '@/app/actions'
+
+export function Admin() {
+  const [done, setDone] = useState('')
+  async function onDelete() {
+    await deleteNote('1')
+    setDone(process.env.MATRIX_SECRET ? 'Deleted with a key' : 'Deleted')
+  }
+  async function onRename() {
+    await renameNote('1', 'Renamed')
+    setDone('Renamed')
+  }
+  return (
+    <div>
+      <button type="button" onClick={onDelete}>
+        Delete note
+      </button>
+      <button type="button" onClick={onRename}>
+        Rename note
+      </button>
+      <p>{done}</p>
+    </div>
+  )
+}
+`,
+    // M47: two requests that don't depend on each other, awaited one after the other.
+    'app/slow/page.tsx': `export const dynamic = 'force-dynamic'
+
+interface User {
+  name: string
+}
+
+interface Stats {
+  count: number
+}
+
+async function getUser(): Promise<User> {
+  const res = await fetch(\`\${process.env.UPSTREAM_URL}/slow/user\`, { cache: 'no-store' })
+  return res.json()
+}
+
+async function getStats(): Promise<Stats> {
+  const res = await fetch(\`\${process.env.UPSTREAM_URL}/slow/stats\`, { cache: 'no-store' })
+  return res.json()
+}
+
+export default async function Slow() {
+  const user = await getUser()
+  const stats = await getStats()
+  return (
+    <p>
+      Slow: {user.name}, {stats.count} stats
+    </p>
+  )
+}
+`,
     // --- v0.2.0 transports (M13, M15–M19), all rendered on the home page ---
     // React Query (M13): a query whose key is captured with its request.
     'components/Todos.tsx': `'use client'
@@ -912,6 +1064,11 @@ function startUpstream() {
       else if (req.url === '/flags') res.end(JSON.stringify({ beta: true }))
       else if (req.url === '/page') res.end(JSON.stringify({ title: 'Matrix app' }))
       else if (req.url === '/quote') res.end(JSON.stringify({ text: 'Matrix quote' }))
+      // Slow enough that the waterfall shows in the capture timings (M47).
+      else if (req.url === '/slow/user')
+        setTimeout(() => res.end(JSON.stringify({ name: 'Matrix user' })), 150)
+      else if (req.url === '/slow/stats') setTimeout(() => res.end(JSON.stringify({ count: 3 })), 150)
+      else if (req.url.startsWith('/notes/')) res.end('{}')
       else {
         res.statusCode = 404
         res.end('{}')

@@ -1,9 +1,12 @@
 // Plain-text rendering of a model: used by `flow-checker scan --tree` and snapshot tests.
 import { accessOf, guardText } from './access'
+import { ACTION_AUTH_LABELS, ACTION_INPUT_LABELS, actionsOn, formatActions } from './actions'
 import { gapLine, titleText } from './boundaries'
 import { formatCache } from './cache'
 import { CLIENT_USE_LABELS, sizeText } from './client'
+import { envFlagsOn, envOn, formatEnv } from './env'
 import { urlText } from './format-requests'
+import { importText, leaksOn, SERVER_MODULE_LABELS } from './leaks'
 import type {
   AppModel,
   Component,
@@ -14,6 +17,7 @@ import type {
   Route,
   RouteTreeNode,
 } from './model'
+import { formatPerf, perfOn } from './perf'
 import { renderLabel, renderOf, renderReasonLine } from './render'
 
 export function formatModel(model: AppModel): string {
@@ -51,11 +55,19 @@ export function formatModel(model: AppModel): string {
     out.push(...formatRender(route))
     out.push(...formatBoundaries(route))
     out.push(...formatClient(route, components))
+    out.push(...formatPageLeaks(model, route))
+    out.push(...formatPageEnv(model, route))
+    out.push(...formatPageActions(model, route))
+    out.push(...formatPagePerf(model, route))
   }
 
   const cache = formatCache(model)
   if (cache.length > 0) out.push('', ...cache)
   if (model.clientBoundaries) out.push('', ...formatClientBoundaries(model, components))
+  if (model.leaks) out.push('', ...formatLeaks(model, components))
+  if (model.env) out.push('', ...formatEnv(model))
+  if (model.actions) out.push('', ...formatActions(model))
+  if (model.perf) out.push('', ...formatPerf(model))
 
   return `${out.join('\n')}\n`
 }
@@ -140,6 +152,79 @@ function formatClientBoundaries(model: AppModel, components: Map<string, Compone
     if (b.lower) {
       const into = b.lower.into.length > 0 ? b.lower.into.map(name).join(', ') : '(nothing: drop it)'
       out.push(`could move lower: into ${into}; on the server: ${b.lower.server.map(name).join(', ')}`)
+    }
+  }
+  return out
+}
+
+/** The page's server/client leaks, one line each (M44). */
+function formatPageLeaks(model: AppModel, route: Route): string[] {
+  const leaks = leaksOn(model, route.id)
+  if (leaks.length === 0) return []
+  return [
+    `leaks: ${leaks.length}`,
+    ...leaks.map((l) =>
+      l.kind === 'module'
+        ? `  module ${l.module} in ${l.file}:${l.loc.line}`
+        : `  prop ${l.name}.${l.prop} (${l.value})  ${l.loc.file}:${l.loc.line}`,
+    ),
+  ]
+}
+
+/** The environment variables the page's code reads, with the flags that show up on it (M45). */
+function formatPageEnv(model: AppModel, route: Route): string[] {
+  const vars = envOn(model, route.id)
+  if (vars.length === 0) return []
+  const line = vars
+    .map((v) => {
+      const flags = envFlagsOn(v, route.id).map((f) => ` [${f.kind}]`)
+      return `${v.name}${flags.join('')}`
+    })
+    .join(', ')
+  return [`env: ${line}`]
+}
+
+/** The server actions the page uses, with their labels (M46). */
+function formatPageActions(model: AppModel, route: Route): string[] {
+  const actions = actionsOn(model, route.id)
+  if (actions.length === 0) return []
+  const line = actions
+    .map((a) => {
+      const flags = (a.flags ?? []).map((f) => ` [${f.kind}]`).join('')
+      return `${a.name} (${ACTION_AUTH_LABELS[a.auth.status]}, ${ACTION_INPUT_LABELS[a.input.status]})${flags}`
+    })
+    .join(', ')
+  return [`actions: ${line}`]
+}
+
+function formatPagePerf(model: AppModel, route: Route): string[] {
+  const findings = perfOn(model, route.id)
+  if (findings.length === 0) return []
+  return [`perf: ${findings.map((f) => `${f.kind}${f.fn ? ` in ${f.fn}` : ''}`).join(', ')}`]
+}
+
+/** Every leak: server-only modules client code imports, then props that can't cross (M44). */
+function formatLeaks(model: AppModel, components: Map<string, Component>): string[] {
+  const name = (id: string) => components.get(id)?.name ?? '?'
+  const paths = (ids: string[]) => {
+    const routes = new Map(model.routes.map((r) => [r.id, r.path]))
+    return ids.map((id) => routes.get(id) ?? '?').join(', ') || '(none)'
+  }
+  const out = ['# Server/client leaks']
+  for (const l of model.leaks ?? []) {
+    out.push('')
+    if (l.kind === 'module') {
+      out.push(
+        `module ${importText(l).replaceAll('`', '')}: ${SERVER_MODULE_LABELS[l.category].replaceAll('`', '')}  ${l.file}:${l.loc.line}`,
+        `  chain: ${l.chain.join(' > ')}`,
+        `  boundaries: ${l.boundaries.map(name).join(', ')}; pages: ${paths(l.routeIds)}`,
+      )
+    } else {
+      const to = l.module ? `${l.name} (${l.module})` : l.name
+      out.push(
+        `prop ${l.prop}: ${l.value}${l.type ? ` ${l.type}` : ''}, from ${name(l.parentId)} to ${to}  ${l.loc.file}:${l.loc.line}`,
+        `  pages: ${paths(l.routeIds)}`,
+      )
     }
   }
   return out

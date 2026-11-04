@@ -1,0 +1,27 @@
+{
+  "name": "@fixtures/action-safety",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: server action safety. Actions in a 'use server' file, wrapped in a helper and written inline, each with or without an auth check (inline, a helper that redirects, a wrapper) and input validation (zod, valibot, FormData checks); three planted actions change data with neither.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "server-only": "^0.0.1",
+    "valibot": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@integr8-media/flow-checker": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

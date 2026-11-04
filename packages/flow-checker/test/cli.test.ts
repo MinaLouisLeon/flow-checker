@@ -109,6 +109,29 @@ describe('cli scan', () => {
     expect(model.routes.map((r: { path: string }) => r.path)).toEqual(['/', '/api/ping'])
   })
 
+  it('prints and writes environment variable names, never their values (M45)', async () => {
+    const root = project({
+      '.env': 'API_TOKEN=cli-secret-value-1\nexport DB_PASSWORD="cli-secret-value-2"\n',
+      '.env.local': 'NEXT_PUBLIC_KEY=cli-secret-value-3\n',
+      'app/layout.tsx': 'export default function Root({ children }) { return <html>{children}</html> }',
+      'app/page.tsx': [
+        'export default async function Home() {',
+        '  await fetch("https://api.test/items", { headers: { token: process.env.API_TOKEN } })',
+        '  return <main>{process.env.NEXT_PUBLIC_KEY}{process.env.DB_PASSWORD}{process.env.MISSING}</main>',
+        '}',
+      ].join('\n'),
+    })
+    const { io, out, err } = capture()
+    expect(await runCli(['scan', '--root', root, '--tree', '--requests'], io)).toBe(0)
+    const printed = [...out, ...err].join('\n')
+    expect(printed).toContain('# Environment variables')
+    expect(printed).toContain('API_TOKEN: .env')
+    expect(printed).toContain('NEXT_PUBLIC_KEY: .env.local')
+    expect(printed).toContain('MISSING: not defined [not-defined]')
+    const written = readFileSync(join(root, '.flow-checker', 'model.json'), 'utf8')
+    for (const text of [printed, written]) expect(text).not.toContain('cli-secret-value')
+  })
+
   it('fails with a clear message when there is no app directory', async () => {
     const root = project({ 'pages/index.tsx': 'export default () => null' })
     const { io, err } = capture()

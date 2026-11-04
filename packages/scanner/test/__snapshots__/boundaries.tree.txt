@@ -257,3 +257,19 @@ components: Modal
 modules: 1, 0.3 KB
   src/components/modal.tsx
 uses: useRouter (hook) src/components/modal.tsx:7, onClick (event handler) src/components/modal.tsx:11
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

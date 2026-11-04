@@ -1,6 +1,10 @@
 // M34: every status, flag kind, trigger kind and transport has a plain explanation.
 import { describe, expect, it } from 'vitest'
 import {
+  ActionAuthSchema,
+  ActionChangeSchema,
+  ActionFlagKindSchema,
+  ActionInputSchema,
   BoundaryGapSchema,
   CacheEntrySchema,
   CacheFlagSchema,
@@ -8,6 +12,9 @@ import {
   ComponentSchema,
   ENDPOINT_STATUSES,
   ENDPOINT_TRANSPORTS,
+  EnvAccessSchema,
+  EnvFlagKindSchema,
+  EnvSideSchema,
   explain,
   explainTitle,
   FlagSchema,
@@ -17,6 +24,9 @@ import {
   type GlossaryGroupId,
   glossaryTerms,
   PageBoundarySchema,
+  PerfFindingKindSchema,
+  PerfFindingRuntimeSchema,
+  PerfLoopSchema,
   RequestSiteSchema,
   RequestUrlSchema,
   RouteAccessSchema,
@@ -45,6 +55,17 @@ const COVERED: [GlossaryGroupId, readonly string[]][] = [
   ['capture', CaptureMatchSchema.shape.status.options],
   ['type-check', TypeCheckPartSchema.shape.status.options],
   ['component', ComponentSchema.shape.kind.options],
+  ['env', EnvSideSchema.options],
+  ['env', EnvFlagKindSchema.options],
+  ['env', EnvAccessSchema.options],
+  ['action', ActionAuthSchema.shape.status.options.map((s) => `auth-${s}`)],
+  ['action', ActionInputSchema.shape.status.options.map((s) => `input-${s}`)],
+  ['action', ActionChangeSchema.shape.kind.options.map((k) => `change-${k}`)],
+  ['action', ActionFlagKindSchema.options],
+  ['perf', PerfFindingKindSchema.options],
+  ['perf', PerfFindingRuntimeSchema.shape.status.options],
+  ['perf', PerfLoopSchema.shape.kind.options.map((k) => `loop-${k}`)],
+  ['perf', ['sequential', 'p50', 'p95']],
 ]
 
 describe('glossary', () => {

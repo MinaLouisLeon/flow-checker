@@ -421,6 +421,9 @@ function mountCapture(app: Hono, capture: CaptureOptions, verifier: Verifier, fl
 
   app.get('/api/verification', (c) => c.json(verifier.summary()))
 
+  // Request performance (M47): findings checked against capture timings, and endpoint timings.
+  app.get('/api/perf', (c) => c.json(verifier.perfResults()))
+
   // Flows (M7): which inferred flows were walked, recorded variants and named recordings.
   app.get('/api/flows', (c) => c.json(flows.summary()))
 

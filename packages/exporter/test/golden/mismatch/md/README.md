@@ -45,6 +45,14 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | --- | --- | --- | --- | --- | --- |
 | [`/`](pages/index.md) | `app/page.tsx` | open | dynamic | 4 | ✓ 1 verified, ✗ 3 mismatch |
 
+## Environment variables
+
+[5 names read, 0 `.env` files](env.md).
+
+## Request performance
+
+[No waterfalls, N+1 or duplicate requests, 4 endpoints timed](perf.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |
