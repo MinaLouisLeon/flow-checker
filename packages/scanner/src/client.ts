@@ -782,7 +782,7 @@ function codeFiles(resolved: string): string[] {
 }
 
 /** An import that only brings types, so nothing of it reaches the browser. */
-function typeOnly(literal: Node): boolean {
+export function typeOnly(literal: Node): boolean {
   const parent = literal.getParent()
   if (!parent) return false
   if (N.isImportDeclaration(parent)) {

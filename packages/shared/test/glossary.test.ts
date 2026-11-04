@@ -8,6 +8,9 @@ import {
   ComponentSchema,
   ENDPOINT_STATUSES,
   ENDPOINT_TRANSPORTS,
+  EnvAccessSchema,
+  EnvFlagKindSchema,
+  EnvSideSchema,
   explain,
   explainTitle,
   FlagSchema,
@@ -45,6 +48,9 @@ const COVERED: [GlossaryGroupId, readonly string[]][] = [
   ['capture', CaptureMatchSchema.shape.status.options],
   ['type-check', TypeCheckPartSchema.shape.status.options],
   ['component', ComponentSchema.shape.kind.options],
+  ['env', EnvSideSchema.options],
+  ['env', EnvFlagKindSchema.options],
+  ['env', EnvAccessSchema.options],
 ]
 
 describe('glossary', () => {

@@ -32,6 +32,7 @@ title: postman fixture  (layout metadata)
 client: 2 boundaries, 2 components, 5 modules, 3.0 KB
   ProductPanel  from HomePage (page)  app/page.tsx:21
   TodoPanel  from HomePage (page)  app/page.tsx:22
+env: NEXT_PUBLIC_API_URL
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
@@ -48,6 +49,7 @@ boundaries: (none)
 title: postman fixture  (layout metadata)
 client: 1 boundary, 1 component, 3 modules, 1.6 KB
   DeleteUserButton  from UserPage (page)  app/users/[id]/page.tsx:14
+env: NEXT_PUBLIC_API_URL
 
 # Client boundaries
 
@@ -75,3 +77,22 @@ modules: 4, 2.5 KB
   lib/config.ts
   lib/todos.ts
 uses: useState (hook) components/TodoPanel.tsx:9, useEffect (hook) components/TodoPanel.tsx:11, onSubmit (event handler) components/TodoPanel.tsx:30
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_API_URL: not defined
+  both optional  lib/config.ts:1  /, /users/[id]
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

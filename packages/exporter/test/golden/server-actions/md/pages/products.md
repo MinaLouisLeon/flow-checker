@@ -30,6 +30,12 @@
 
 - [`DeleteProductButton`](../components/DeleteProductButton.md), rendered by `ProductsPage` (page): 1 component · 1 module · 0.4 KB, `src/app/products/page.tsx:17`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `API_URL` (server): not defined, `src/lib/backend.ts:4`
+
 ## Server cache
 
 Refreshed by:

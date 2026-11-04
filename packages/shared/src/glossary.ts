@@ -11,6 +11,9 @@ import type {
   CacheRuntime,
   ClientUse,
   Component,
+  EnvAccess,
+  EnvFlagKind,
+  EnvSide,
   Flag,
   PageBoundary,
   PropLeak,
@@ -52,6 +55,7 @@ export type GlossaryGroupId =
   | 'boundary'
   | 'client'
   | 'leak'
+  | 'env'
   | 'cache'
   | 'flow-status'
   | 'endpoint-status'
@@ -518,6 +522,83 @@ const LEAK: GlossaryGroup<'module' | 'prop' | ServerModuleKind | PropLeak['value
   },
 }
 
+const ENV: GlossaryGroup<EnvSide | EnvFlagKind | EnvAccess | 'unknown-name' | 'listed'> = {
+  id: 'env',
+  title: 'Environment variables',
+  intro:
+    'Every `process.env` name the code reads, on which side, and which `.env` files define it. Only names are read: values never leave the `.env` files.',
+  entries: {
+    server: {
+      label: 'server',
+      means:
+        'Read in server code: server components, route handlers, server actions, middleware or `instrumentation`. Every name the server process has is available there.',
+    },
+    client: {
+      label: 'client',
+      means:
+        "Read in client code: a `'use client'` file, a file it imports, or `instrumentation-client`. In the browser, Next only has the names it inlined when it built the app: `NEXT_PUBLIC_` names, the `env` names in `next.config`, and `NODE_ENV`.",
+    },
+    both: {
+      label: 'server and client',
+      means:
+        'Read in a module that server code and client code both import. It has a value on the server and, unless Next inlines the name, none in the browser.',
+    },
+    config: {
+      label: 'next.config',
+      means: 'Read in `next.config`, when Next starts or builds the app.',
+    },
+    'private-in-client': {
+      label: 'private name in client code',
+      means:
+        'A name without the `NEXT_PUBLIC_` prefix is read in client code. Next leaves it out of the browser bundle, so it is undefined there; while rendering on the server it has a value, so the page can also differ between the two.',
+      todo: "Read it in server code and pass the result down as a prop, or, if it isn't a secret, rename it with the `NEXT_PUBLIC_` prefix.",
+    },
+    'not-defined': {
+      label: 'not defined',
+      means:
+        "No `.env` file Next loads defines the name, it isn't in `next.config` `env`, Next doesn't set it, and a read has no fallback. Unless the environment the app runs in sets it, the code gets undefined. Often a typo, or a name missing from `.env.example`.",
+      todo: 'Check the spelling, add it to a `.env` file (or `.env.example` for others to fill in), or give the read a fallback.',
+    },
+    'not-inlined': {
+      label: 'not inlined',
+      means:
+        "A name Next inlines (`NEXT_PUBLIC_`...) is destructured from `process.env` in client code. Next only replaces `process.env.NAME` and `process.env['NAME']` when it builds the app, so in the browser the value is undefined.",
+      todo: 'Read it as `process.env.NAME`.',
+    },
+    direct: {
+      label: 'direct',
+      means: '`process.env.NAME`.',
+    },
+    literal: {
+      label: 'literal key',
+      means: "`process.env['NAME']`: Next inlines it like `process.env.NAME`.",
+    },
+    constant: {
+      label: 'constant key',
+      means:
+        "`process.env[KEY]` where `KEY` holds a fixed name. Turbopack inlines it in client code; webpack (Next 15's default bundler) doesn't.",
+    },
+    alias: {
+      label: 'through a variable',
+      means: '`env.NAME` after `const env = process.env`. Next inlines it like `process.env.NAME`.',
+    },
+    destructured: {
+      label: 'destructured',
+      means: "`const { NAME } = process.env`. Fine on the server; in client code Next doesn't inline it.",
+    },
+    'unknown-name': {
+      label: 'name built at run time',
+      means:
+        "`process.env[name]` with a name the code builds while it runs, so the scan can't tell which variable it is. In client code it is always undefined in the browser.",
+    },
+    listed: {
+      label: 'only listed',
+      means:
+        "Listed in a file Next doesn't load, such as `.env.example`: the project expects each developer to define it, so it isn't flagged.",
+    },
+  },
+}
+
 const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
@@ -746,6 +827,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   BOUNDARY,
   CLIENT,
   LEAK,
+  ENV,
   CACHE,
   FLOW_STATUS,
   ENDPOINT_STATUS,

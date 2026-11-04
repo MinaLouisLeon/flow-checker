@@ -58,6 +58,7 @@ boundaries: (none)
 title: none
 client: 1 boundary, 1 component, 4 modules, 2.5 KB, packages next-intl
   DashboardProfile  from DashboardPage (page)  src/app/[locale]/dashboard/page.tsx:6
+env: NEXT_PUBLIC_API_URL
 
 ## /[locale]/login  src/app/[locale]/login/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -72,6 +73,7 @@ boundaries: (none)
 title: none
 client: 1 boundary, 1 component, 4 modules, 2.8 KB, packages next-intl
   LoginForm  from LoginPage (page)  src/app/[locale]/login/page.tsx:6
+env: NEXT_PUBLIC_API_URL
 
 ## /[locale]/verify  src/app/[locale]/verify/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -88,6 +90,7 @@ boundaries: (none)
 title: none
 client: 1 boundary, 1 component, 4 modules, 2.9 KB, packages next-intl
   VerifyOtpForm  from VerifyPage (page)  src/app/[locale]/verify/page.tsx:11
+env: NEXT_PUBLIC_API_URL
 
 # Client boundaries
 
@@ -120,3 +123,22 @@ modules: 4, 2.9 KB
   src/lib/auth-api.ts
 packages: next-intl
 uses: useRouter (hook) src/components/VerifyOtpForm.tsx:15, useState (hook) src/components/VerifyOtpForm.tsx:16, onSubmit (event handler) src/components/VerifyOtpForm.tsx:36
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_API_URL: not defined
+  client optional  src/lib/auth-api.ts:3  /[locale]/dashboard, /[locale]/login, /[locale]/verify
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

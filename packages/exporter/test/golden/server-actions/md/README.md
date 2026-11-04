@@ -68,6 +68,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 [0 cached entries and 2 revalidation calls](cache.md).
 
+## Environment variables
+
+[5 names read, 0 `.env` files](env.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |

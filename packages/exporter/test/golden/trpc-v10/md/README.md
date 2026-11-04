@@ -61,6 +61,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [feed](areas.md#ar_005q5nhjyp9) | 1 | 0 | 4 |
 | [todos](areas.md#ar_1zap1ick15k) | 1 | 1 | 7 |
 
+## Environment variables
+
+[5 names read, 0 `.env` files](env.md).
+
 ## Route handlers
 
 | Route | Methods | File | Requests it sends |

@@ -84,6 +84,8 @@ export type Screen =
   | { name: 'changes' }
   /** Server cache map (M39): cached data, tags and what revalidates them. */
   | { name: 'cache' }
+  /** Environment variables (M45): every name the code reads and the `.env` files that define it. */
+  | { name: 'env' }
   | { name: 'export' }
   /** What each status, note and badge means (M34); `term` (`flag-dynamic-url`) is the one shown first. */
   | { name: 'glossary'; q: string; term?: string }
@@ -171,6 +173,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'changes' }
     case 'cache':
       return { name: 'cache' }
+    case 'env':
+      return { name: 'env' }
     case 'glossary':
       return { name: 'glossary', q: params.get('q') ?? '', term: params.get('term') ?? undefined }
     case 'live':
@@ -258,6 +262,8 @@ export function href(screen: Screen): string {
       return '#/changes'
     case 'cache':
       return '#/cache'
+    case 'env':
+      return '#/env'
     case 'glossary':
       return withQuery('/glossary', { q: screen.q, term: screen.term })
     case 'live':

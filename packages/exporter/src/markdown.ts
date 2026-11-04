@@ -37,6 +37,9 @@ import {
   clientBoundaryOf,
   clientSummary,
   clientUseText,
+  definedText,
+  ENV_FLAG_LABELS,
+  ENV_SIDE_LABELS,
   type Endpoint,
   type EndpointHost,
   type EndpointList,
@@ -46,6 +49,11 @@ import {
   type ExportData,
   edgeWhere,
   endpointLabel,
+  envFlags,
+  envFlagsOn,
+  envFlagText,
+  envOf,
+  envOn,
   explain,
   type Flag,
   type Flow,
@@ -57,6 +65,7 @@ import {
   type GraphqlOperation,
   gapLine,
   guardText,
+  hasSource,
   invalidationText,
   invalidationWhere,
   isBuildError,
@@ -95,12 +104,15 @@ import {
   type SseEndpoint,
   type SummaryLink,
   type SummarySectionId,
+  sidesOf,
   type Trpc,
   type TypeRef,
   termId,
   titleText,
   triggerText,
   typeRefs,
+  unknownInClient,
+  unknownText,
   urlText,
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
@@ -110,6 +122,7 @@ import {
   type DocNames,
   docNames,
   ENDPOINTS,
+  ENV,
   GLOSSARY_DOC,
   GRAPHQL,
   ISSUES,
@@ -196,6 +209,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.trpc) files[TRPC] = trpcDoc(ctx, model.trpc)
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
   if (model.cache) files[CACHE] = cacheDoc(ctx)
+  if (model.env) files[ENV] = envDoc(ctx)
   files[ENDPOINTS] = endpointsDoc(ctx)
   files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
@@ -413,6 +427,15 @@ function readme(ctx: Ctx): string {
     sections.push(
       '## Server cache',
       `${link(`${plural(model.cache.entries.length, 'cached entry', 'cached entries')} and ${plural(model.cache.invalidations.length, 'revalidation call')}`, from, CACHE)}${flagged > 0 ? `, ${plural(flagged, 'note')} to check` : ''}.`,
+    )
+  }
+  if (model.env) {
+    const env = model.env
+    const toCheck = envFlags(env).length + unknownInClient(env).length
+    const read = env.vars.filter((v) => v.reads.length > 0).length
+    sections.push(
+      '## Environment variables',
+      `${link(`${plural(read, 'name')} read, ${plural(env.files.length, `${code('.env')} file`)}`, from, ENV)}${toCheck > 0 ? `, ${plural(toCheck, 'note')} to check` : ''}.`,
     )
   }
   if (handlers.length > 0) {
@@ -680,6 +703,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ...boundarySection(route),
     ...clientSection(ctx, route, from),
     ...leakSection(ctx, route),
+    ...envSection(ctx, route, from),
     ...cacheSection(ctx, route, from),
     ...metadataSection(route),
     '## Component tree',
@@ -791,6 +815,24 @@ function leakSection(ctx: Ctx, route: Route): string[] {
   ]
 }
 
+/** The environment variables the page's code reads (M45). Names only. */
+function envSection(ctx: Ctx, route: Route, from: string): string[] {
+  const vars = envOn(ctx.index.model, route.id)
+  if (vars.length === 0) return []
+  const lines = vars.map((v) => {
+    const flags = envFlagsOn(v, route.id)
+    const first = v.reads[0]
+    const badges = flags.map((f) => ` ⚠ **${ENV_FLAG_LABELS[f.kind]}**`).join('')
+    const head = `- ${code(v.name)} (${sidesOf(v)
+      .map((s) => ENV_SIDE_LABELS[s])
+      .join(
+        ', ',
+      )}): ${codeText(definedText(v))}${badges}${first ? `, ${code(`${first.loc.file}:${first.loc.line}`)}` : ''}`
+    return [head, ...flags.map((f) => `  - ${envFlagText(v, f.kind)}`)].join('\n')
+  })
+  return ['## Environment variables', [`Names only (${link('all', from, ENV)}).`, '', ...lines].join('\n')]
+}
+
 /** `metadata` / `generateMetadata` from the layouts and the page (M41). */
 function metadataSection(route: Route): string[] {
   const sources = route.metadata?.sources ?? []
@@ -831,6 +873,81 @@ function cacheRuntimeLabel(e: CacheEntry): string {
 
 function invalidationLine(ctx: Ctx, i: CacheInvalidation): string {
   return `${code(invalidationText(i))} in ${codeText(invalidationWhere(i, ctx.model.routes))}, ${code(`${i.loc.file}:${i.loc.line}`)}`
+}
+
+/** Every name the code reads or a `.env` file defines (M45). Values are never in the model. */
+function envDoc(ctx: Ctx): string {
+  const env = envOf(ctx.model)
+  const from = ENV
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = ctx.index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  const flagged = envFlags(env)
+  const unknownClient = unknownInClient(env)
+  const read = env.vars.filter((v) => v.reads.length > 0)
+  const unread = env.vars.filter((v) => v.reads.length === 0)
+  const MODES = { development: 'dev', production: 'build / start', test: 'test' } as const
+  return doc([
+    '# Environment variables',
+    link('← Overview', from, README),
+    `Every ${code('process.env')} name the code reads, on which side, and which ${code('.env')} files define it. Only names are read: values never leave the ${code('.env')} files. In the browser, Next only has the names it inlined when it built the app (${code('NEXT_PUBLIC_')} names, the ${code('env')} names in ${code('next.config')}, ${code('NODE_ENV')}).`,
+    flagged.length + unknownClient.length > 0 && `## To check (${flagged.length + unknownClient.length})`,
+    flagged.length + unknownClient.length > 0 &&
+      [
+        ...flagged.map(
+          ({ variable, flag }) =>
+            `- **${link(ENV_FLAG_LABELS[flag.kind], from, GLOSSARY_DOC, termId('env', flag.kind))}**: ${envFlagText(variable, flag.kind)} (${code(`${flag.loc.file}:${flag.loc.line}`)})`,
+        ),
+        ...unknownClient.map(
+          (r) =>
+            `- **${link('name built at run time', from, GLOSSARY_DOC, termId('env', 'unknown-name'))}**: ${unknownText(r)} (${code(`${r.loc.file}:${r.loc.line}`)})`,
+        ),
+      ].join('\n'),
+    '## Names the code reads',
+    read.length === 0
+      ? `No code reads a name from ${code('process.env')}.`
+      : table(
+          ['Name', 'Defined in', 'Read', 'Pages'],
+          read.map((v) => [
+            `${code(v.name)}${(v.flags ?? []).map((f) => ` ⚠ ${ENV_FLAG_LABELS[f.kind]}`).join('')}`,
+            hasSource(v) ? codeText(definedText(v)) : `**${codeText(definedText(v))}**`,
+            v.reads
+              .map(
+                (r) =>
+                  `${code(`${r.loc.file}:${r.loc.line}`)} ${ENV_SIDE_LABELS[r.side]}${r.access === 'direct' ? '' : `, ${r.access}`}${r.optional ? ', has a fallback' : ''}`,
+              )
+              .join('<br>'),
+            routes([...new Set(v.reads.flatMap((r) => r.routeIds))]),
+          ]),
+        ),
+    env.unknown.length > 0 && '## Names built at run time',
+    env.unknown.length > 0 &&
+      env.unknown
+        .map(
+          (r) =>
+            `- ${code(`process.env[${r.key}]`)} (${ENV_SIDE_LABELS[r.side]}), ${code(`${r.loc.file}:${r.loc.line}`)}`,
+        )
+        .join('\n'),
+    unread.length > 0 && '## Defined but not read',
+    unread.length > 0 &&
+      `Names a ${code('.env')} file defines that no scanned code reads: ${unread.map((v) => code(v.name)).join(', ')}.`,
+    '## Files',
+    env.files.length === 0
+      ? `No ${code('.env')} file in the project root.`
+      : table(
+          ['File', 'Loaded for', 'Names'],
+          env.files.map((f) => [
+            code(f.file),
+            f.loads.length === 0 ? "never (Next doesn't load it)" : f.loads.map((m) => MODES[m]).join(', '),
+            String(f.names),
+          ]),
+          ['left', 'left', 'right'],
+        ),
+  ])
 }
 
 function cacheDoc(ctx: Ctx): string {
@@ -2112,6 +2229,11 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: "Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both.",
   },
   {
+    title: 'Environment variables',
+    kinds: ['env'],
+    hint: "Names read where they have no value: private names in client code, names Next doesn't inline there, and names nothing defines.",
+  },
+  {
     title: 'Needs a re-check',
     kinds: ['needs-recheck'],
     hint: 'The code changed after every capture. Use the app again to re-check.',
@@ -2233,9 +2355,11 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
       if (message.startsWith(prefix)) message = message.slice(prefix.length)
     }
   }
-  // Boundary, client and leak notes are the tool's own wording, with code in backticks (M41).
+  // Boundary, client, leak and env notes are the tool's own wording, with code in backticks (M41).
   const body =
-    note.kind === 'boundary' || note.kind === 'client' || note.kind === 'leak' ? message : text(message)
+    note.kind === 'boundary' || note.kind === 'client' || note.kind === 'leak' || note.kind === 'env'
+      ? message
+      : text(message)
   return `${target ? `${target}: ` : ''}${body} (${where})`
 }
 

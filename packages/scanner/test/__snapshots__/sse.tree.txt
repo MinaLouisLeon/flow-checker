@@ -81,3 +81,19 @@ components: JobProgress
 modules: 1, 0.9 KB
   components/JobProgress.tsx
 uses: useState (hook) components/JobProgress.tsx:8, onClick (event handler) components/JobProgress.tsx:27
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

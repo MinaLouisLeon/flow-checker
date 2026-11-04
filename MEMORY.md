@@ -52,6 +52,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M42 | Release v0.4.0        | Matrix runs `next build` per version (async: it fetches from the script). Publish = tag.                                 |
 | M43 | Client boundaries     | Model version 16, `Route.client`, `AppModel.clientBoundaries`, `Component.clientUses`; `scanner/src/client.ts`.          |
 | M44 | Server/client leaks   | Model version 17, `AppModel.leaks` (module + prop); rules in `scanner/src/leaks.ts`, run from M43's client pass.         |
+| M45 | Environment variables | Model version 18, `AppModel.env`; `scanner/src/env.ts` walks value imports itself; `.env` parsed for names only.         |
 
 ## Gotchas
 
@@ -595,3 +596,24 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   skip it. A new fixture that must fail needs both.
 - Component types (`forwardRef`, icon components) have call signatures: test callability before excusing React's types.
 - Map and Set are iterable: check built-in containers' type arguments before the "iterable crosses" shortcut.
+
+## M45 — Environment variables (branch `feat/env-var-m45`)
+
+- Check inlining with `next build`, then grep `.next/static` for each fake value (`fixture-value-*`). Next's docs are
+  wrong on one case: `const env = process.env; env.X` (module level or in a function) is inlined by Turbopack and
+  webpack. Only destructuring isn't. `process.env[KEY]` with a constant `KEY` is inlined by Turbopack only.
+- Don't run `next build` with the shell's working directory inside `.next/`: the next build fails with `EBUSY` on
+  `rmdir .next/static` until the folder is removed.
+- `.env` names come from Next's own dotenv regex (`@next/env` 16.4, `ENV_LINE` in `scanner/src/env.ts`), so a
+  `NAME=` line inside a multi-line quoted value isn't a name. Keep only `m[1]`; never put file text in an error.
+- The pass walks value imports itself from the app files, the middleware and both `instrumentation` files (the M36
+  import graph has no instrumentation and keeps type-only imports). Server code doesn't enter `'use client'` files,
+  client code doesn't enter `'use server'` files.
+- A read in a module both sides import has `clientRouteIds`: the client flags and the page view use them, or a page
+  that only reads it on the server gets "private name in client code" (the dashboard test caught it on `/`).
+- Every fixture now has `env` (the `instrumentation` files flow-checker adds read `FLOW_CHECKER`...), so every
+  snapshot, golden, README and the Env nav entry changed. Names the tool, Next or Vercel set are `setBy`, never flagged.
+- Fixture client components need real browser code (a hook or a handler), or M43 suggests dropping their
+  `'use client'` and its fixture test fails.
+- Dashboard and shared tests read `scanner/test/__snapshots__/*.model.json`: after a model change, update the scanner
+  snapshots first, then run them; in one parallel `-u` run they can read the old file.

@@ -28,6 +28,12 @@
 - [`SettingsPanel`](../components/SettingsPanel.md), rendered by `SettingsPage` (page): 1 component · 6 modules · 4.6 KB, `src/app/settings/page.tsx:9`
   - packages: `@tanstack/react-query`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (server and client): not defined, `src/services/todos.ts:4`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

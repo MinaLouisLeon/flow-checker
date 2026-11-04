@@ -43,6 +43,7 @@ boundaries: (none)
 title: server-actions fixture  (layout metadata)
 client: 1 boundary, 1 component, 1 module, 0.4 KB
   DeleteProductButton  from ProductsPage (page)  src/app/products/page.tsx:17
+env: API_URL
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -60,6 +61,7 @@ boundaries: (none)
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page)  src/app/products/[id]/page.tsx:10
 title: server-actions fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /products/new  src/app/products/new/page.tsx
 layouts: src/app/layout.tsx
@@ -71,6 +73,7 @@ boundaries: (none)
 title: server-actions fixture  (layout metadata)
 client: 1 boundary, 1 component, 1 module, 1.0 KB
   CreateProductForm  from NewProductPage (page)  src/app/products/new/page.tsx:7
+env: API_URL
 
 # Server cache
 
@@ -93,3 +96,22 @@ components: DeleteProductButton
 modules: 1, 0.4 KB
   src/components/DeleteProductButton.tsx
 uses: useTransition (hook) src/components/DeleteProductButton.tsx:8, onClick (event handler) src/components/DeleteProductButton.tsx:11
+
+# Environment variables
+
+API_URL: not defined
+  server optional  src/lib/backend.ts:4  /products, /products/[id], /products/new
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

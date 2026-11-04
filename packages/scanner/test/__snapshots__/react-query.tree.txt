@@ -35,6 +35,7 @@ client: 3 boundaries, 3 components, 4 modules, 4.2 KB, packages @tanstack/react-
   Providers  from RootLayout (layout)  src/app/layout.tsx:10
   AddTodoForm  from TodosPage (page)  src/app/page.tsx:8
   TodoList  from TodosPage (page)  src/app/page.tsx:9
+env: NEXT_PUBLIC_API_URL
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -49,6 +50,7 @@ client: 3 boundaries, 3 components, 8 modules, 5.3 KB, packages @tanstack/react-
   Providers  from RootLayout (layout)  src/app/layout.tsx:10
   SettingsBadge  from SettingsPage (page)  src/app/settings/page.tsx:8
   SettingsPanel  from SettingsPage (page)  src/app/settings/page.tsx:9
+env: NEXT_PUBLIC_API_URL
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -63,6 +65,7 @@ title: react-query fixture  (layout metadata)
 client: 2 boundaries, 2 components, 3 modules, 2.7 KB, packages @tanstack/react-query, swr
   Providers  from RootLayout (layout)  src/app/layout.tsx:10
   TodoDetail  from TodoPage (page)  src/app/todos/[id]/page.tsx:7
+env: NEXT_PUBLIC_API_URL
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -76,6 +79,7 @@ title: react-query fixture  (layout metadata)
 client: 2 boundaries, 2 components, 4 modules, 4.4 KB, packages @tanstack/react-query
   Providers  from RootLayout (layout)  src/app/layout.tsx:10
   UserList  from UsersPage (page)  src/app/users/page.tsx:13
+env: NEXT_PUBLIC_API_URL
 
 # Client boundaries
 
@@ -141,3 +145,22 @@ modules: 3, 4.1 KB
   src/services/users.ts
 packages: @tanstack/react-query
 uses: useQueryClient (hook) src/components/UserList.tsx:8, useQuery (hook) src/components/UserList.tsx:9, useQueries (hook) src/components/UserList.tsx:10, onMouseEnter (event handler) src/components/UserList.tsx:29, onClick (event handler) src/components/UserList.tsx:30
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_API_URL: not defined
+  both optional  src/services/todos.ts:4  /, /settings, /todos/[id], /users
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

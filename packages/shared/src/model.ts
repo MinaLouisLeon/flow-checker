@@ -444,6 +444,101 @@ export type PropLeak = z.infer<typeof PropLeakSchema>
 export const LeakSchema = z.discriminatedUnion('kind', [ModuleLeakSchema, PropLeakSchema])
 export type Leak = z.infer<typeof LeakSchema>
 
+// Environment variables (M45): every `process.env` name the code reads, where and on which side,
+// and which `.env*` files define it. Values are never read into the model: `.env` files are parsed
+// for names only. Checked with `next build` (16.4.3, Turbopack and webpack) on the env fixture: a
+// name without `NEXT_PUBLIC_` read in client code is left out of the browser bundle (undefined
+// there); `process.env.X`, `process.env['X']` and reads through a variable holding `process.env`
+// are inlined; destructuring (`const { X } = process.env`) is not. `next.config` `env` names,
+// `NODE_ENV` and `NEXT_RUNTIME` are inlined on both sides.
+
+/**
+ * Where the code that reads it runs. `server`: server components, route handlers, server actions,
+ * middleware, `instrumentation`. `client`: `'use client'` files, what they import, and
+ * `instrumentation-client`. `both`: a module server and client code both import. `config`:
+ * `next.config`, read when Next starts or builds.
+ */
+export const EnvSideSchema = z.enum(['server', 'client', 'both', 'config'])
+export type EnvSide = z.infer<typeof EnvSideSchema>
+
+/**
+ * How the name is read. `direct`: `process.env.X`. `literal`: `process.env['X']`. `constant`:
+ * `process.env[KEY]` with a constant name. `alias`: through a variable holding `process.env`.
+ * `destructured`: `const { X } = process.env`.
+ */
+export const EnvAccessSchema = z.enum(['direct', 'literal', 'constant', 'alias', 'destructured'])
+export type EnvAccess = z.infer<typeof EnvAccessSchema>
+
+export const EnvReadSchema = z.object({
+  loc: SourceLocSchema,
+  side: EnvSideSchema,
+  access: EnvAccessSchema,
+  /** A fallback (`??`, `||`, a default) or a check (`if`, `===`, `!`) handles a missing value. */
+  optional: z.literal(true).optional(),
+  /** Pages and route handlers whose code reaches the read. */
+  routeIds: z.array(z.string()),
+  /** For a `both` read: the pages whose client code reaches it (the others only run it on the server). */
+  clientRouteIds: z.array(z.string()).optional(),
+})
+export type EnvRead = z.infer<typeof EnvReadSchema>
+
+/** `process.env[...]` with a name the scan can't read (built at run time). */
+export const EnvUnknownReadSchema = EnvReadSchema.omit({ access: true }).extend({
+  /** The key as written: `` `FEATURE_${name}` ``. */
+  key: z.string(),
+})
+export type EnvUnknownRead = z.infer<typeof EnvUnknownReadSchema>
+
+/**
+ * `private-in-client`: a name without `NEXT_PUBLIC_` read in client code (undefined in the
+ * browser). `not-defined`: no `.env*` file Next loads defines it, Next and the tool don't set it,
+ * and a read has no fallback. `not-inlined`: a name Next would inline, read in client code in a way
+ * it doesn't inline (destructuring), so it is undefined in the browser.
+ */
+export const EnvFlagKindSchema = z.enum(['private-in-client', 'not-defined', 'not-inlined'])
+export type EnvFlagKind = z.infer<typeof EnvFlagKindSchema>
+
+export const EnvFlagSchema = z.object({
+  kind: EnvFlagKindSchema,
+  /** The first read it is about. */
+  loc: SourceLocSchema,
+})
+export type EnvFlag = z.infer<typeof EnvFlagSchema>
+
+export const EnvVarSchema = z.object({
+  name: z.string(),
+  /** `.env*` files Next loads that define it, and the `next.config` file when its `env` has it. */
+  definedIn: z.array(z.string()),
+  /** Files Next doesn't load that list it (`.env.example`). */
+  listedIn: z.array(z.string()).optional(),
+  /** Set without a file: by Next (`NODE_ENV`, `NEXT_RUNTIME`), by flow-checker, or by Vercel. */
+  setBy: z.enum(['next', 'flow-checker', 'vercel']).optional(),
+  /** By file and line. Empty for a name a file defines and no code reads. */
+  reads: z.array(EnvReadSchema),
+  flags: z.array(EnvFlagSchema).optional(),
+})
+export type EnvVar = z.infer<typeof EnvVarSchema>
+
+export const EnvFileSchema = z.object({
+  /** Project-relative: `.env`, `.env.local`, `.env.example`. */
+  file: z.string(),
+  /** The `NODE_ENV`s Next loads it for; empty for a file Next never loads. */
+  loads: z.array(z.enum(['development', 'production', 'test'])),
+  /** How many names it defines. */
+  names: z.number().int().nonnegative(),
+})
+export type EnvFile = z.infer<typeof EnvFileSchema>
+
+export const EnvMapSchema = z.object({
+  /** `.env*` files in the project root, in Next's load order, then the others by name. */
+  files: z.array(EnvFileSchema),
+  /** By name. */
+  vars: z.array(EnvVarSchema),
+  /** Reads whose name is built at run time, by file and line. */
+  unknown: z.array(EnvUnknownReadSchema),
+})
+export type EnvMap = z.infer<typeof EnvMapSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -1618,7 +1713,7 @@ export const AppModelSchema = z.object({
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
    * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
    * `boundaries` or `metadata`, version 15 (before M43) no page `client`, `clientBoundaries` or
-   * component `clientUses`, version 16 (before M44) no `leaks`.
+   * component `clientUses`, version 16 (before M44) no `leaks`, version 17 (before M45) no `env`.
    */
   version: z
     .union([
@@ -1638,6 +1733,7 @@ export const AppModelSchema = z.object({
       z.literal(14),
       z.literal(15),
       z.literal(16),
+      z.literal(17),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1683,5 +1779,10 @@ export const AppModelSchema = z.object({
    * first, then props, each by file and line (M44). Absent when there are none.
    */
   leaks: z.array(LeakSchema).optional(),
+  /**
+   * Environment variables the code reads and the `.env*` files define (M45), names only: values are
+   * never stored. Absent when there are neither.
+   */
+  env: EnvMapSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

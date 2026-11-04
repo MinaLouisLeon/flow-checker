@@ -35,6 +35,7 @@ render: static
 boundaries: (none)
 title: caching-15 fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /products  app/products/page.tsx
 layouts: app/layout.tsx
@@ -45,6 +46,7 @@ render: ISR 5m
 boundaries: (none)
 title: caching-15 fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /profile  app/(account)/profile/page.tsx
 layouts: app/layout.tsx > app/(account)/layout.tsx
@@ -55,6 +57,7 @@ render: ISR 1d
 boundaries: (none)
 title: caching-15 fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /todos/[id]  app/todos/[id]/page.tsx
 layouts: app/layout.tsx
@@ -67,6 +70,7 @@ boundaries: (none)
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/todos.js:12
 title: caching-15 fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 # Server cache
 
@@ -99,3 +103,25 @@ revalidateTag('viewer')  in route handler `POST /api/revalidate`  app/api/revali
   pages: /profile
 revalidatePath('/profil')  in route handler `POST /api/revalidate`  app/api/revalidate/route.ts:7
   ! path-no-route: No page or route handler is at `/profil`, so this call refreshes nothing. `revalidatePath` takes the route's path (for a rewrite, its destination).
+
+# Environment variables
+
+API_URL: not defined
+  server optional  app/actions.ts:5  /, /products, /todos/[id]
+  server optional  app/products/page.tsx:5  /products
+  server optional  lib/todos.js:1  /, /todos/[id]
+  server optional  lib/viewer.ts:4  /profile
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

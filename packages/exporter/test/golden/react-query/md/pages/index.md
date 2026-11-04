@@ -28,6 +28,12 @@
 - [`TodoList`](../components/TodoList.md), rendered by `TodosPage` (page): 1 component · 2 modules · 2.8 KB, `src/app/page.tsx:9`
   - packages: `@tanstack/react-query`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (server and client): not defined, `src/services/todos.ts:4`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

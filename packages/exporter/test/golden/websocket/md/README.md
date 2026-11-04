@@ -57,6 +57,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [home](areas.md#ar_1vn39fso9m3) | 1 | 1 | 2 |
 | [chat](areas.md#ar_19t50bf2akw) | 1 | 0 | 1 |
 
+## Environment variables
+
+[4 names read, 0 `.env` files](env.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |

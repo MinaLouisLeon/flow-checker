@@ -31,6 +31,12 @@
 
 - [`DeleteUserButton`](../components/DeleteUserButton.md), rendered by `UserPage` (page): 1 component · 3 modules · 1.6 KB, `app/users/[id]/page.tsx:14`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (server and client): not defined, `lib/config.ts:1`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

@@ -31,6 +31,12 @@
 - [`SettingsPanel`](../components/SettingsPanel.md), rendered by `HomePage` (page): 1 component · 3 modules · 1.4 KB, `app/page.tsx:20`
 - [`TodoPanel`](../components/TodoPanel.md), rendered by `HomePage` (page): 1 component · 3 modules · 2.0 KB, `app/page.tsx:21`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (server and client): not defined, `lib/config.ts:1`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

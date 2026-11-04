@@ -59,6 +59,7 @@ boundaries: (none)
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:5
 title: middleware fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /dashboard/settings  app/dashboard/settings/page.tsx
 layouts: app/layout.tsx
@@ -74,6 +75,7 @@ boundaries: (none)
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:10
 title: middleware fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /login  app/login/page.tsx
 layouts: app/layout.tsx
@@ -84,6 +86,7 @@ render: static
 boundaries: (none)
 title: middleware fixture  (layout metadata)
 client: (none)
+env: API_URL
 
 ## /products  app/products/page.tsx
 layouts: app/layout.tsx
@@ -97,3 +100,23 @@ boundaries: (none)
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:15
 title: middleware fixture  (layout metadata)
 client: (none)
+env: API_URL
+
+# Environment variables
+
+API_URL: not defined
+  server optional  lib/config.ts:1  /dashboard, /dashboard/settings, /login, /products
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

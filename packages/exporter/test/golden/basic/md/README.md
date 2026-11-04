@@ -61,6 +61,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 | [about](areas.md#ar_1twt91jehoj) | 1 | 0 | 0 |
 | [users](areas.md#ar_0tirr3qjab5) | 1 | 1 | 3 |
 
+## Environment variables
+
+[5 names read, 0 `.env` files](env.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |
