@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoFeed.tsx:5` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useInfiniteQuery` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 0.9 KB, packages `@trpc/client`, `@trpc/react-query` |
 | Used on | [`/feed`](../pages/feed.md) |
 | Rendered by | [`FeedPage`](FeedPage.md) |
 

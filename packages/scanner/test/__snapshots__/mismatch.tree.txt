@@ -25,3 +25,24 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:5
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:5
 title: mismatch fixture  (layout metadata)
+client: 2 boundaries, 2 components, 4 modules, 2.5 KB
+  SettingsPanel  from HomePage (page)  app/page.tsx:20
+  TodoPanel  from HomePage (page)  app/page.tsx:21
+
+# Client boundaries
+
+## SettingsPanel  components/SettingsPanel.tsx
+components: SettingsPanel
+modules: 3, 1.4 KB
+  components/SettingsPanel.tsx
+  lib/api.ts
+  lib/config.ts
+uses: useState (hook) components/SettingsPanel.tsx:9, useEffect (hook) components/SettingsPanel.tsx:11
+
+## TodoPanel  components/TodoPanel.tsx
+components: TodoPanel
+modules: 3, 2.0 KB
+  components/TodoPanel.tsx
+  lib/api.ts
+  lib/config.ts
+uses: useState (hook) components/TodoPanel.tsx:10, useEffect (hook) components/TodoPanel.tsx:12, onSubmit (event handler) components/TodoPanel.tsx:34

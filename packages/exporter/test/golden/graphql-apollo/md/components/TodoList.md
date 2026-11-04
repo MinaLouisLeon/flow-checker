@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoList.tsx:17` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useQuery` (hook), `onChange` (event handler) |
+| Brings to the browser | 2 components · 6 modules · 21 KB, packages `@apollo/client`, `@graphql-typed-document-node/core`, `graphql` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 | Renders | [`TodoItem`](TodoItem.md) |

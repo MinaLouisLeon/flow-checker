@@ -22,6 +22,15 @@
 - On `notFound()`: Next's default 404 page
 - `<Suspense>` around `TodoDetail` (component), `src/components/TodoPage.tsx:15`
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 3 components and 4 project modules (about 2.8 KB of source) to the browser, plus 2 packages (`react-relay`, `relay-runtime`).
+
+- [`Providers`](../components/Providers.md), rendered by `RootLayout` (layout): 1 component · 2 modules · 0.9 KB, `src/app/layout.tsx:10`
+  - packages: `react-relay`, `relay-runtime`
+- [`TodoPage`](../components/TodoPage.md), rendered by `Page` (page): 2 components · 2 modules · 1.9 KB, `src/app/todos/[id]/page.tsx:5`
+  - packages: `react-relay`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

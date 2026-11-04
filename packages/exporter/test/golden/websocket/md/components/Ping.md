@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/Ping.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 0.8 KB |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

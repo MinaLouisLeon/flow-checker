@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/DeleteUserButton.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRouter` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 3 modules · 1.6 KB |
 | Used on | [`/users/[id]`](../pages/users.%5Bid%5D.md) |
 | Rendered by | [`UserPage`](UserPage.md) |
 

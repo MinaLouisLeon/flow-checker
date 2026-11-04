@@ -17,6 +17,12 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 1 project module (about 1.1 KB of source) to the browser.
+
+- [`Clock`](../components/Clock.md), rendered by `HomePage` (page): 1 component · 1 module · 1.1 KB, `app/page.tsx:8`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

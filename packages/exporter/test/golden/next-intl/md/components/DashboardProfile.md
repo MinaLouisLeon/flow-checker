@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/DashboardProfile.tsx:10` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRouter` (hook), `useState` (hook), `useEffect` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 4 modules · 2.5 KB, packages `next-intl` |
 | Used on | [`/[locale]/dashboard`](../pages/%5Blocale%5D.dashboard.md) |
 | Rendered by | [`DashboardPage`](DashboardPage.md) |
 | Renders | `Link` (`@/i18n/navigation`) |

@@ -26,6 +26,7 @@ access: guarded
 render: static
 boundaries: (none)
 title: server-actions fixture  (layout metadata)
+client: (none)
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -40,6 +41,8 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/backend.ts:7
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/backend.ts:7
 title: server-actions fixture  (layout metadata)
+client: 1 boundary, 1 component, 3 modules, 2.5 KB, packages server-only
+  DeleteProductButton  from ProductsPage (page)  src/app/products/page.tsx:17
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -56,6 +59,7 @@ boundaries: (none)
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/backend.ts:12
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page)  src/app/products/[id]/page.tsx:10
 title: server-actions fixture  (layout metadata)
+client: (none)
 
 ## /products/new  src/app/products/new/page.tsx
 layouts: src/app/layout.tsx
@@ -65,6 +69,8 @@ access: open
 render: static
 boundaries: (none)
 title: server-actions fixture  (layout metadata)
+client: 1 boundary, 1 component, 3 modules, 3.1 KB, packages server-only
+  CreateProductForm  from NewProductPage (page)  src/app/products/new/page.tsx:7
 
 # Server cache
 
@@ -73,3 +79,23 @@ revalidatePath('/products')  in server action `createProduct`  src/actions/produ
   pages: /products
 revalidatePath('/products')  in server action `deleteProduct`  src/actions/products.ts:32
   pages: /products
+
+# Client boundaries
+
+## CreateProductForm  src/components/CreateProductForm.tsx
+components: CreateProductForm
+modules: 3, 3.1 KB
+  src/components/CreateProductForm.tsx
+  src/actions/products.ts
+  src/lib/backend.ts
+packages: server-only
+uses: useActionState (hook) src/components/CreateProductForm.tsx:11
+
+## DeleteProductButton  src/components/DeleteProductButton.tsx
+components: DeleteProductButton
+modules: 3, 2.5 KB
+  src/components/DeleteProductButton.tsx
+  src/actions/products.ts
+  src/lib/backend.ts
+packages: server-only
+uses: useTransition (hook) src/components/DeleteProductButton.tsx:8, onClick (event handler) src/components/DeleteProductButton.tsx:11

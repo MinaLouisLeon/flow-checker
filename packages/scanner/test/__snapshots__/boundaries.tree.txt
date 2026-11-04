@@ -55,6 +55,7 @@ boundaries:
   unauthorized* src/app/unauthorized.tsx
   global-error* src/app/global-error.tsx
 title: Boundaries  (layout metadata)
+client: (none)
 
 ## /account  src/app/account/page.tsx
 layouts: src/app/layout.tsx
@@ -70,6 +71,7 @@ boundaries:
   unauthorized* src/app/unauthorized.tsx
   global-error* src/app/global-error.tsx
 title: Boundaries  (layout metadata)
+client: (none)
 
 ## /blog/[slug]  src/app/blog/[slug]/page.tsx
 layouts: src/app/layout.tsx
@@ -84,6 +86,7 @@ boundaries:
   unauthorized* src/app/unauthorized.tsx
   global-error* src/app/global-error.tsx
 title: Post {slug} | Boundaries  (layout metadata, page generateMetadata)
+client: (none)
 
 ## /dashboard @stats  src/app/dashboard/@stats/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
@@ -100,6 +103,7 @@ boundaries:
   error* src/app/dashboard/error.tsx
   suspense in layout around stats src/app/dashboard/layout.tsx:18
 title: Dashboard | Boundaries  (layout metadata, layout metadata)
+client: (none)
 
 ## /dashboard @team  src/app/dashboard/@team/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
@@ -115,6 +119,7 @@ boundaries:
   error* src/app/dashboard/error.tsx
   suspense in layout around stats src/app/dashboard/layout.tsx:18
 title: Dashboard | Boundaries  (layout metadata, layout metadata)
+client: (none)
 
 ## /dashboard  src/app/dashboard/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
@@ -131,6 +136,7 @@ boundaries:
   error* src/app/dashboard/error.tsx
   suspense in layout around stats src/app/dashboard/layout.tsx:18
 title: Dashboard | Boundaries  (layout metadata, layout metadata)
+client: (none)
 
 ## /dashboard/members @team  src/app/dashboard/@team/members/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
@@ -147,6 +153,7 @@ boundaries:
   error* src/app/dashboard/error.tsx
   suspense in layout around stats src/app/dashboard/layout.tsx:18
 title: Dashboard | Boundaries  (layout metadata, layout metadata)
+client: (none)
 
 ## /dashboard/settings  src/app/dashboard/settings/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx
@@ -162,6 +169,7 @@ boundaries:
   error* src/app/dashboard/error.tsx
   suspense in layout around stats src/app/dashboard/layout.tsx:18
 title: Settings  (layout metadata, layout metadata, page metadata)
+client: (none)
 
 ## /photos  src/app/photos/page.tsx
 layouts: src/app/layout.tsx > src/app/photos/layout.tsx
@@ -176,6 +184,7 @@ boundaries:
   global-error* src/app/global-error.tsx
   not-found* src/app/photos/not-found.tsx
 title: Photos | Boundaries  (layout metadata, page metadata)
+client: (none)
 
 ## /photos/[id] @modal  src/app/photos/@modal/(.)[id]/page.tsx
 layouts: src/app/layout.tsx > src/app/photos/layout.tsx
@@ -191,6 +200,8 @@ boundaries:
   global-error* src/app/global-error.tsx
   not-found* src/app/photos/not-found.tsx
 title: Boundaries  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.3 KB
+  Modal  from PhotoModal (page)  src/app/photos/@modal/(.)[id]/page.tsx:5
 
 ## /photos/[id]  src/app/photos/[id]/page.tsx
 layouts: src/app/layout.tsx > src/app/photos/layout.tsx
@@ -208,6 +219,7 @@ boundaries:
   not-found* src/app/photos/not-found.tsx
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:17
 title: Photo {id} | Boundaries  (layout metadata, page generateMetadata)
+client: (none)
 
 ## /reports  src/app/reports/page.tsx
 layouts: src/app/layout.tsx > src/app/reports/template.tsx
@@ -229,3 +241,19 @@ boundaries:
   suspense in page around ErrorBoundary, SettingsPanel src/app/reports/page.tsx:25
   error-boundary in page around SettingsPanel src/app/reports/page.tsx:26
 title: Reports  (layout metadata, page metadata)
+client: 1 boundary, 1 component, 1 module, 0.5 KB
+  ErrorBoundary  from ReportsPage (page)  src/app/reports/page.tsx:26
+
+# Client boundaries
+
+## ErrorBoundary  src/components/error-boundary.tsx
+components: ErrorBoundary
+modules: 1, 0.5 KB
+  src/components/error-boundary.tsx
+uses: ErrorBoundary (class component) src/components/error-boundary.tsx:6
+
+## Modal  src/components/modal.tsx
+components: Modal
+modules: 1, 0.3 KB
+  src/components/modal.tsx
+uses: useRouter (hook) src/components/modal.tsx:7, onClick (event handler) src/components/modal.tsx:11

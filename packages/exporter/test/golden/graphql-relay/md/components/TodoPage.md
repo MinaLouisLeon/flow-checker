@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoPage.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQueryLoader` (hook), `useEffect` (hook) |
+| Brings to the browser | 2 components · 2 modules · 1.9 KB, packages `react-relay` |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`Page`](Page.md) |
 | Renders | `Suspense` (`react`), [`TodoDetail`](TodoDetail.md) |

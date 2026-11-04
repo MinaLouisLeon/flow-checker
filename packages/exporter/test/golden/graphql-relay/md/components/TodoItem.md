@@ -6,6 +6,7 @@
 | --- | --- |
 | File | `src/components/TodoItem.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useFragment` (hook) |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`TodoList`](TodoList.md) |
 | Renders | `Link` (`next/link`) |

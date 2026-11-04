@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -112,6 +112,46 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_0r1iugj2rde",
+            "parentId": "cmp_1bn0u7kkfdm",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 8,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0l3kw3n479w",
+            "parentId": "cmp_1bn0u7kkfdm",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          }
+        ],
+        "components": 3,
+        "modules": 4,
+        "bytes": 4327,
+        "packages": [
+          "@tanstack/react-query"
+        ]
       }
     },
     {
@@ -163,6 +203,46 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_1ln0r85hq1r",
+            "parentId": "cmp_12h7lqgksec",
+            "in": "page",
+            "loc": {
+              "file": "src/app/settings/page.tsx",
+              "line": 8,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0xxl3asjm3d",
+            "parentId": "cmp_12h7lqgksec",
+            "in": "page",
+            "loc": {
+              "file": "src/app/settings/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          }
+        ],
+        "components": 3,
+        "modules": 8,
+        "bytes": 5477,
+        "packages": [
+          "@tanstack/react-query"
         ]
       }
     },
@@ -228,6 +308,37 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_1gqfw2iamk9",
+            "parentId": "cmp_1an2304y5ca",
+            "in": "page",
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 3,
+        "bytes": 2748,
+        "packages": [
+          "@tanstack/react-query",
+          "swr"
+        ]
       }
     },
     {
@@ -279,6 +390,36 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_20axc0bf4dg",
+            "parentId": "cmp_0zsf7mc3ftx",
+            "in": "page",
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 13,
+              "column": 9
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 4,
+        "bytes": 4495,
+        "packages": [
+          "@tanstack/react-query"
         ]
       }
     }
@@ -402,7 +543,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 7,
+            "column": 20
+          }
+        }
+      ]
     },
     {
       "id": "cmp_12h7lqgksec",
@@ -544,7 +696,63 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 10,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 12,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 14,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 28,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 28
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1ln0r85hq1r",
@@ -558,7 +766,18 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useApiQuery",
+          "loc": {
+            "file": "src/components/SettingsBadge.tsx",
+            "line": 9,
+            "column": 20
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0xxl3asjm3d",
@@ -572,7 +791,45 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 14,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useApiQuery",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 15,
+            "column": 30
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 16,
+            "column": 32
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 24,
+            "column": 29
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1gqfw2iamk9",
@@ -608,7 +865,18 @@
           "typeId": "typ_28rtveus0ih",
           "name": "TodoDetailProps"
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useSWR",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 14,
+            "column": 38
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0l3kw3n479w",
@@ -636,6 +904,44 @@
       ],
       "usedTypes": [
         "typ_0fc96ucq8sd"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 10,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 11,
+            "column": 38
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 13,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 28,
+            "column": 54
+          }
+        }
       ]
     },
     {
@@ -650,7 +956,54 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 8,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 9,
+            "column": 32
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueries",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 10,
+            "column": 22
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onMouseEnter",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 29,
+            "column": 15
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 30,
+            "column": 15
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -2490,5 +2843,341 @@
       "src/types/todo.ts",
       "src/types/user.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_27t3g1lua9i",
+      "file": "src/app/providers.tsx",
+      "componentIds": [
+        "cmp_27t3g1lua9i"
+      ],
+      "modules": [
+        "src/app/providers.tsx"
+      ],
+      "packages": [
+        "@tanstack/react-query"
+      ],
+      "bytes": 338,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 7,
+            "column": 20
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0r1iugj2rde",
+      "file": "src/components/AddTodoForm.tsx",
+      "componentIds": [
+        "cmp_0r1iugj2rde"
+      ],
+      "modules": [
+        "src/components/AddTodoForm.tsx",
+        "src/services/todos.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query"
+      ],
+      "bytes": 2867,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 10,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 12,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 14,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 28,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 28
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1ln0r85hq1r",
+      "file": "src/components/SettingsBadge.tsx",
+      "componentIds": [
+        "cmp_1ln0r85hq1r"
+      ],
+      "modules": [
+        "src/components/SettingsBadge.tsx",
+        "src/hooks/useApiQuery.ts",
+        "src/services/keys.ts",
+        "src/services/settings.ts",
+        "src/services/todos.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query"
+      ],
+      "bytes": 2997,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useApiQuery",
+          "loc": {
+            "file": "src/components/SettingsBadge.tsx",
+            "line": 9,
+            "column": 20
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/hooks/useApiQuery.ts",
+            "line": 6,
+            "column": 10
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0xxl3asjm3d",
+      "file": "src/components/SettingsPanel.tsx",
+      "componentIds": [
+        "cmp_0xxl3asjm3d"
+      ],
+      "modules": [
+        "src/components/SettingsPanel.tsx",
+        "src/hooks/useApiQuery.ts",
+        "src/services/keys.ts",
+        "src/services/settings.ts",
+        "src/services/todos.ts",
+        "src/services/users.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query"
+      ],
+      "bytes": 4707,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 14,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useApiQuery",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 15,
+            "column": 30
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 16,
+            "column": 32
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/SettingsPanel.tsx",
+            "line": 24,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1gqfw2iamk9",
+      "file": "src/components/TodoDetail.tsx",
+      "componentIds": [
+        "cmp_1gqfw2iamk9"
+      ],
+      "modules": [
+        "src/components/TodoDetail.tsx",
+        "src/services/todos.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "swr"
+      ],
+      "bytes": 2410,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useSWR",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 14,
+            "column": 38
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0l3kw3n479w",
+      "file": "src/components/TodoList.tsx",
+      "componentIds": [
+        "cmp_0l3kw3n479w"
+      ],
+      "modules": [
+        "src/components/TodoList.tsx",
+        "src/services/todos.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query"
+      ],
+      "bytes": 2874,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 10,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 11,
+            "column": 38
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 13,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 28,
+            "column": 54
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_20axc0bf4dg",
+      "file": "src/components/UserList.tsx",
+      "componentIds": [
+        "cmp_20axc0bf4dg"
+      ],
+      "modules": [
+        "src/components/UserList.tsx",
+        "src/services/todos.ts",
+        "src/services/users.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query"
+      ],
+      "bytes": 4157,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 8,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 9,
+            "column": 32
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueries",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 10,
+            "column": 22
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onMouseEnter",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 29,
+            "column": 15
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 30,
+            "column": 15
+          }
+        }
+      ]
+    }
+  ]
 }

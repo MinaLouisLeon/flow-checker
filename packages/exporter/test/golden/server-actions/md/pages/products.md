@@ -24,6 +24,13 @@
 - ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `src/lib/backend.ts:7`
 - ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `src/lib/backend.ts:7`
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 3 project modules (about 2.5 KB of source) to the browser, plus 1 package (`server-only`).
+
+- [`DeleteProductButton`](../components/DeleteProductButton.md), rendered by `ProductsPage` (page): 1 component · 3 modules · 2.5 KB, `src/app/products/page.tsx:17`
+  - packages: `server-only`
+
 ## Server cache
 
 Refreshed by:

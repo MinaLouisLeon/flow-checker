@@ -33,6 +33,11 @@ access: open
 render: static
 boundaries: (none)
 title: Apollo Client 3 fixture  (layout metadata)
+client: 4 boundaries, 4 components, 6 modules, 3.7 KB, packages @apollo/client
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  ViewerBadge  from HomePage (page)  src/app/page.tsx:9
+  TodoList  from HomePage (page)  src/app/page.tsx:10
+  AddTodoForm  from HomePage (page)  src/app/page.tsx:11
 
 ## /search  src/app/search/page.tsx
 layouts: src/app/layout.tsx
@@ -42,6 +47,9 @@ access: open
 render: static
 boundaries: (none)
 title: Apollo Client 3 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 4 modules, 3.0 KB, packages @apollo/client
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  Search  from SearchPage (page)  src/app/search/page.tsx:7
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -52,3 +60,56 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: Apollo Client 3 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 4 modules, 2.9 KB, packages @apollo/client
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoDetail  from TodoPage (page)  src/app/todos/[id]/page.tsx:5
+
+# Client boundaries
+
+## Providers  src/app/providers.tsx
+components: Providers
+modules: 2, 1.1 KB
+  src/app/providers.tsx
+  src/lib/apollo.ts
+packages: @apollo/client
+uses: useState (hook) src/app/providers.tsx:8
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+components: AddTodoForm
+modules: 2, 1.9 KB
+  src/components/AddTodoForm.tsx
+  src/graphql/todos.ts
+packages: @apollo/client
+uses: useState (hook) src/components/AddTodoForm.tsx:10, useRouter (hook) src/components/AddTodoForm.tsx:11, useMutation (hook) src/components/AddTodoForm.tsx:12, onSubmit (event handler) src/components/AddTodoForm.tsx:23, onChange (event handler) src/components/AddTodoForm.tsx:24
+
+## Search  src/components/Search.tsx
+components: Search
+modules: 2, 1.9 KB
+  src/components/Search.tsx
+  src/graphql/todos.ts
+packages: @apollo/client
+uses: useState (hook) src/components/Search.tsx:9, useLazyQuery (hook) src/components/Search.tsx:10, onSubmit (event handler) src/components/Search.tsx:19, onChange (event handler) src/components/Search.tsx:20
+
+## TodoDetail  src/components/TodoDetail.tsx
+components: TodoDetail
+modules: 2, 1.8 KB
+  src/components/TodoDetail.tsx
+  src/graphql/todos.ts
+packages: @apollo/client
+uses: useRouter (hook) src/components/TodoDetail.tsx:9, useQuery (hook) src/components/TodoDetail.tsx:10, useMutation (hook) src/components/TodoDetail.tsx:11, onClick (event handler) src/components/TodoDetail.tsx:22
+
+## TodoList  src/components/TodoList.tsx
+components: TodoList
+modules: 2, 1.5 KB
+  src/components/TodoList.tsx
+  src/graphql/todos.ts
+packages: @apollo/client
+uses: useQuery (hook) src/components/TodoList.tsx:9
+
+## ViewerBadge  src/components/ViewerBadge.tsx
+components: ViewerBadge
+modules: 2, 1.3 KB
+  src/components/ViewerBadge.tsx
+  src/graphql/todos.ts
+packages: @apollo/client
+uses: useQuery (hook) src/components/ViewerBadge.tsx:8

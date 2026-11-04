@@ -50,6 +50,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M40 | Cache check (runtime) | Runtime reads Next's own records (fetch metrics, cache handlers, `IncrementalCache.get`); served model gets `runtime`.   |
 | M41 | Boundaries            | Model version 15, `Route.boundaries` / `metadata`. Refs carry `suspense` / `errorBoundary`; `scanner/src/boundaries.ts`. |
 | M42 | Release v0.4.0        | Matrix runs `next build` per version (async: it fetches from the script). Publish = tag.                                 |
+| M43 | Client boundaries     | Model version 16, `Route.client`, `AppModel.clientBoundaries`, `Component.clientUses`; `scanner/src/client.ts`.          |
 
 ## Gotchas
 
@@ -558,3 +559,22 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   page that fetches from it): the event loop is blocked and the build retries the page for minutes.
 - New files under `.flow-checker/` need an entry in `GITIGNORE_ENTRIES` (`cli/project.ts`) unless safe to commit;
   M40's `cache-events.jsonl` was missed until here.
+
+## M43 — Client boundaries (branch `feat/client-boundries-m43`)
+
+- Ground truth for client facts comes from `next build`: `.next/server/app/<page>_client-reference-manifest.js`
+  (`clientModules`) lists the boundaries of each page. Production chunks are minified without paths, so check what a
+  chunk holds by grepping a string unique to each file. One build per case in a temporary `app/gt/page.tsx`.
+- Next rejects a server module that merely imports a client-only React API (`useRef`, `useContext`, `createContext`,
+  `useTransition`...), even unused: a test page that imported every hook failed for all of them. `use`, `useMemo`,
+  `useCallback`, `useId` and `useDebugValue` build on the server.
+- Don't `forEachDescendant` whole files in ts-morph on hot paths: wrapping every node was most of the pass's cost
+  (0.35 s per perf-app re-scan). Walk `compilerNode` with `ts.forEachChild`, keep candidates, and wrap only those
+  (`sf.getDescendantAtPos(start)` then climb parents to the same `compilerNode`).
+- A cached array returned from a memo must not be pushed to by a caller: `#boundaryUses` did, and one file's uses
+  leaked into another's (the planted "could move lower" vanished).
+- Timing helpers that `Math.round` on each accumulation hide sub-millisecond calls (they summed to 0 ms); round only
+  when printing.
+- `pnpm install` for a new fixture rewrites `pnpm-lock.yaml` with single quotes (7,000-line diff):
+  `pnpm biome format --write pnpm-lock.yaml` leaves only the new importer.
+- The `'\n'` heredoc trap struck twice more (glossary apostrophes, exporter `join`): use the Edit tool for such lines.

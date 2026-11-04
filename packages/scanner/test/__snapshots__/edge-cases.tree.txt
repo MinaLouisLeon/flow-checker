@@ -66,6 +66,8 @@ access: open
 render: static
 boundaries: (none)
 title: none
+client: 1 boundary, 3 components, 3 modules, 0.2 KB
+  ClientBox  from Home (page)  src/app/page.tsx:22
 
 ## /dashboard  src/app/dashboard/page.tsx
 layouts: src/app/layout.tsx > src/app/dashboard/layout.tsx > src/app/dashboard/template.tsx
@@ -74,6 +76,7 @@ access: open
 render: static
 boundaries: (none)
 title: none
+client: (none)
 
 ## /docs/[[...path]]  src/app/docs/[[...path]]/page.tsx
 layouts: src/app/layout.tsx
@@ -83,6 +86,7 @@ render: dynamic
   dynamic: has the dynamic segment `[[...path]]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: none
+client: (none)
 
 ## /feed  src/app/feed/page.tsx
 layouts: src/app/layout.tsx
@@ -91,6 +95,7 @@ access: open
 render: static
 boundaries: (none)
 title: none
+client: (none)
 
 ## /memo  src/app/memo/page.tsx
 layouts: src/app/layout.tsx
@@ -99,6 +104,7 @@ access: open
 render: static
 boundaries: (none)
 title: none
+client: (none)
 
 ## /no-default  src/app/no-default/page.tsx
 layouts: src/app/layout.tsx
@@ -107,6 +113,7 @@ access: open
 render: static
 boundaries: (none)
 title: none
+client: (none)
 
 ## /photo/[id] @modal  src/app/@modal/(.)photo/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -116,6 +123,7 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: none
+client: (none)
 
 ## /photo/[id]  src/app/feed/(..)photo/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -125,6 +133,7 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: none
+client: (none)
 
 ## /photo/[id]  src/app/photo/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -134,6 +143,7 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: none
+client: (none)
 
 ## /shop/[...slug]  src/app/(shop)/shop/[...slug]/page.tsx
 layouts: src/app/layout.tsx
@@ -143,3 +153,15 @@ render: dynamic
   dynamic: has the dynamic segment `[...slug]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: none
+client: (none)
+
+# Client boundaries
+
+## ClientBox  src/components/ClientBox.tsx
+components: ClientBox, Shared, Inner  (also on the server: Shared)
+modules: 3, 0.2 KB
+  src/components/ClientBox.tsx
+  src/components/Inner.tsx
+  src/components/Shared.tsx
+uses: (none)
+could move lower: into (nothing: drop it); on the server: ClientBox, Shared, Inner

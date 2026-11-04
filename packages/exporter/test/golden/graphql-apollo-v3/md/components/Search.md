@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/Search.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useLazyQuery` (hook), `onSubmit` (event handler), `onChange` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 1.9 KB, packages `@apollo/client` |
 | Used on | [`/search`](../pages/search.md) |
 | Rendered by | [`SearchPage`](SearchPage.md) |
 

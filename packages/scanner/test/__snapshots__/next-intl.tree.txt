@@ -42,6 +42,7 @@ render: static
 boundaries: (none)
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
 title: none
+client: (none)
 
 ## /[locale]/dashboard  src/app/[locale]/dashboard/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -55,6 +56,8 @@ render: static
 boundaries: (none)
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
 title: none
+client: 1 boundary, 1 component, 4 modules, 2.5 KB, packages next-intl
+  DashboardProfile  from DashboardPage (page)  src/app/[locale]/dashboard/page.tsx:6
 
 ## /[locale]/login  src/app/[locale]/login/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -67,6 +70,8 @@ render: static
 boundaries: (none)
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
 title: none
+client: 1 boundary, 1 component, 4 modules, 2.8 KB, packages next-intl
+  LoginForm  from LoginPage (page)  src/app/[locale]/login/page.tsx:6
 
 ## /[locale]/verify  src/app/[locale]/verify/page.tsx
 layouts: src/app/[locale]/layout.tsx
@@ -81,3 +86,37 @@ render: dynamic
 boundaries: (none)
   ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout)  src/app/[locale]/layout.tsx:19
 title: none
+client: 1 boundary, 1 component, 4 modules, 2.9 KB, packages next-intl
+  VerifyOtpForm  from VerifyPage (page)  src/app/[locale]/verify/page.tsx:11
+
+# Client boundaries
+
+## DashboardProfile  src/components/DashboardProfile.tsx
+components: DashboardProfile
+modules: 4, 2.5 KB
+  src/components/DashboardProfile.tsx
+  src/i18n/navigation.ts
+  src/i18n/routing.ts
+  src/lib/auth-api.ts
+packages: next-intl
+uses: useRouter (hook) src/components/DashboardProfile.tsx:12, useState (hook) src/components/DashboardProfile.tsx:13, useEffect (hook) src/components/DashboardProfile.tsx:15, onClick (event handler) src/components/DashboardProfile.tsx:31
+
+## LoginForm  src/components/LoginForm.tsx
+components: LoginForm
+modules: 4, 2.8 KB
+  src/components/LoginForm.tsx
+  src/i18n/navigation.ts
+  src/i18n/routing.ts
+  src/lib/auth-api.ts
+packages: next-intl
+uses: useRouter (hook) src/components/LoginForm.tsx:11, useState (hook) src/components/LoginForm.tsx:12, onSubmit (event handler) src/components/LoginForm.tsx:29
+
+## VerifyOtpForm  src/components/VerifyOtpForm.tsx
+components: VerifyOtpForm
+modules: 4, 2.9 KB
+  src/components/VerifyOtpForm.tsx
+  src/i18n/navigation.ts
+  src/i18n/routing.ts
+  src/lib/auth-api.ts
+packages: next-intl
+uses: useRouter (hook) src/components/VerifyOtpForm.tsx:15, useState (hook) src/components/VerifyOtpForm.tsx:16, onSubmit (event handler) src/components/VerifyOtpForm.tsx:36

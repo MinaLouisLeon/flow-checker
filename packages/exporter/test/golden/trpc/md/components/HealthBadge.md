@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/HealthBadge.tsx:6` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useTRPC` (hook), `useQuery` (hook) |
+| Brings to the browser | 1 component · 2 modules · 0.5 KB, packages `@tanstack/react-query`, `@trpc/tanstack-react-query` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

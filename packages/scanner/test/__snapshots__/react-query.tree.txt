@@ -31,6 +31,10 @@ access: open
 render: static
 boundaries: (none)
 title: react-query fixture  (layout metadata)
+client: 3 boundaries, 3 components, 4 modules, 4.2 KB, packages @tanstack/react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  AddTodoForm  from TodosPage (page)  src/app/page.tsx:8
+  TodoList  from TodosPage (page)  src/app/page.tsx:9
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -41,6 +45,10 @@ access: open
 render: static
 boundaries: (none)
 title: react-query fixture  (layout metadata)
+client: 3 boundaries, 3 components, 8 modules, 5.3 KB, packages @tanstack/react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  SettingsBadge  from SettingsPage (page)  src/app/settings/page.tsx:8
+  SettingsPanel  from SettingsPage (page)  src/app/settings/page.tsx:9
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -52,6 +60,9 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: react-query fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 2.7 KB, packages @tanstack/react-query, swr
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoDetail  from TodoPage (page)  src/app/todos/[id]/page.tsx:7
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -62,3 +73,71 @@ access: open
 render: static
 boundaries: (none)
 title: react-query fixture  (layout metadata)
+client: 2 boundaries, 2 components, 4 modules, 4.4 KB, packages @tanstack/react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  UserList  from UsersPage (page)  src/app/users/page.tsx:13
+
+# Client boundaries
+
+## Providers  src/app/providers.tsx
+components: Providers
+modules: 1, 0.3 KB
+  src/app/providers.tsx
+packages: @tanstack/react-query
+uses: useState (hook) src/app/providers.tsx:7
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+components: AddTodoForm
+modules: 2, 2.8 KB
+  src/components/AddTodoForm.tsx
+  src/services/todos.ts
+packages: @tanstack/react-query
+uses: useRouter (hook) src/components/AddTodoForm.tsx:10, useQueryClient (hook) src/components/AddTodoForm.tsx:11, useState (hook) src/components/AddTodoForm.tsx:12, useMutation (hook) src/components/AddTodoForm.tsx:14, onSubmit (event handler) src/components/AddTodoForm.tsx:28, onChange (event handler) src/components/AddTodoForm.tsx:29
+
+## SettingsBadge  src/components/SettingsBadge.tsx
+components: SettingsBadge
+modules: 5, 2.9 KB
+  src/components/SettingsBadge.tsx
+  src/hooks/useApiQuery.ts
+  src/services/keys.ts
+  src/services/settings.ts
+  src/services/todos.ts
+packages: @tanstack/react-query
+uses: useApiQuery (hook) src/components/SettingsBadge.tsx:9, useQuery (hook) src/hooks/useApiQuery.ts:6
+
+## SettingsPanel  src/components/SettingsPanel.tsx
+components: SettingsPanel
+modules: 6, 4.6 KB
+  src/components/SettingsPanel.tsx
+  src/hooks/useApiQuery.ts
+  src/services/keys.ts
+  src/services/settings.ts
+  src/services/todos.ts
+  src/services/users.ts
+packages: @tanstack/react-query
+uses: useQueryClient (hook) src/components/SettingsPanel.tsx:14, useApiQuery (hook) src/components/SettingsPanel.tsx:15, useQuery (hook) src/components/SettingsPanel.tsx:16, onClick (event handler) src/components/SettingsPanel.tsx:24
+
+## TodoDetail  src/components/TodoDetail.tsx
+components: TodoDetail
+modules: 2, 2.4 KB
+  src/components/TodoDetail.tsx
+  src/services/todos.ts
+packages: @tanstack/react-query, swr
+uses: useSWR (hook) src/components/TodoDetail.tsx:14
+
+## TodoList  src/components/TodoList.tsx
+components: TodoList
+modules: 2, 2.8 KB
+  src/components/TodoList.tsx
+  src/services/todos.ts
+packages: @tanstack/react-query
+uses: useQueryClient (hook) src/components/TodoList.tsx:10, useQuery (hook) src/components/TodoList.tsx:11, useMutation (hook) src/components/TodoList.tsx:13, onChange (event handler) src/components/TodoList.tsx:28
+
+## UserList  src/components/UserList.tsx
+components: UserList
+modules: 3, 4.1 KB
+  src/components/UserList.tsx
+  src/services/todos.ts
+  src/services/users.ts
+packages: @tanstack/react-query
+uses: useQueryClient (hook) src/components/UserList.tsx:8, useQuery (hook) src/components/UserList.tsx:9, useQueries (hook) src/components/UserList.tsx:10, onMouseEnter (event handler) src/components/UserList.tsx:29, onClick (event handler) src/components/UserList.tsx:30

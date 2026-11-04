@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/SettingsPanel.tsx:13` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQueryClient` (hook), `useApiQuery` (hook), `useQuery` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 6 modules · 4.6 KB, packages `@tanstack/react-query` |
 | Used on | [`/settings`](../pages/settings.md) |
 | Rendered by | [`SettingsPage`](SettingsPage.md) |
 

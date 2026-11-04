@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/Chat.tsx:9` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRef` (hook), `useState` (hook), `useEffect` (hook), `onSubmit` (event handler), `onClick` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 1.8 KB, packages `socket.io-client` |
 | Used on | [`/chat`](../pages/chat.md) |
 | Rendered by | [`ChatPage`](ChatPage.md) |
 

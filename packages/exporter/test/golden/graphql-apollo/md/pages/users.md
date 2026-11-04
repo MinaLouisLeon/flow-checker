@@ -17,6 +17,15 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 2 components and 7 project modules (about 22 KB of source) to the browser, plus 3 packages (`@apollo/client`, `@graphql-typed-document-node/core`, `graphql`).
+
+- [`Providers`](../components/Providers.md), rendered by `RootLayout` (layout): 1 component · 2 modules · 0.7 KB, `src/app/layout.tsx:10`
+  - packages: `@apollo/client`
+- [`UserSearch`](../components/UserSearch.md), rendered by `UsersPage` (page): 1 component · 5 modules · 21 KB, `src/app/users/page.tsx:7`
+  - packages: `@apollo/client`, `@graphql-typed-document-node/core`, `graphql`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

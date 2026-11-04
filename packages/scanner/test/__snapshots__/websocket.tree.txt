@@ -24,6 +24,9 @@ access: open
 render: static
 boundaries: (none)
 title: WebSocket fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 2.0 KB
+  Ticker  from HomePage (page)  app/page.tsx:9
+  Ping  from HomePage (page)  app/page.tsx:10
 
 ## /chat  app/chat/page.tsx
 layouts: app/layout.tsx
@@ -33,3 +36,29 @@ access: open
 render: static
 boundaries: (none)
 title: WebSocket fixture  (layout metadata)
+client: 1 boundary, 1 component, 2 modules, 1.8 KB, packages socket.io-client
+  Chat  from ChatPage (page)  app/chat/page.tsx:7
+
+# Client boundaries
+
+## Chat  components/Chat.tsx
+components: Chat
+modules: 2, 1.8 KB
+  components/Chat.tsx
+  lib/config.ts
+packages: socket.io-client
+uses: useRef (hook) components/Chat.tsx:10, useState (hook) components/Chat.tsx:11, useEffect (hook) components/Chat.tsx:15, onSubmit (event handler) components/Chat.tsx:46, onClick (event handler) components/Chat.tsx:50
+
+## Ping  components/Ping.tsx
+components: Ping
+modules: 2, 0.8 KB
+  components/Ping.tsx
+  lib/config.ts
+uses: useState (hook) components/Ping.tsx:8, onClick (event handler) components/Ping.tsx:21
+
+## Ticker  components/Ticker.tsx
+components: Ticker
+modules: 2, 1.4 KB
+  components/Ticker.tsx
+  lib/config.ts
+uses: useState (hook) components/Ticker.tsx:11, useEffect (hook) components/Ticker.tsx:14

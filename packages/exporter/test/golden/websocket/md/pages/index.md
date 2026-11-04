@@ -17,6 +17,13 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 2 components and 3 project modules (about 2.0 KB of source) to the browser.
+
+- [`Ticker`](../components/Ticker.md), rendered by `HomePage` (page): 1 component · 2 modules · 1.4 KB, `app/page.tsx:9`
+- [`Ping`](../components/Ping.md), rendered by `HomePage` (page): 1 component · 2 modules · 0.8 KB, `app/page.tsx:10`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

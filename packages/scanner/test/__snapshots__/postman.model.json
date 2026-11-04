@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -138,6 +138,34 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1n9jz878unm",
+            "parentId": "cmp_0ku4o3jpe9o",
+            "in": "page",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 21,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_1t97i8o4yqd",
+            "parentId": "cmp_0ku4o3jpe9o",
+            "in": "page",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 22,
+              "column": 7
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 5,
+        "bytes": 3113,
+        "packages": []
       }
     },
     {
@@ -251,6 +279,24 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0yr9r67zb7l",
+            "parentId": "cmp_0vmo84pmvzo",
+            "in": "page",
+            "loc": {
+              "file": "app/users/[id]/page.tsx",
+              "line": 14,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 3,
+        "bytes": 1640,
+        "packages": []
       }
     }
   ],
@@ -414,7 +460,27 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 8,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 12,
+            "column": 7
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1n9jz878unm",
@@ -430,6 +496,26 @@
       "children": [],
       "usedTypes": [
         "typ_1f1vojxmn7g"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/ProductPanel.tsx",
+            "line": 8,
+            "column": 35
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/ProductPanel.tsx",
+            "line": 10,
+            "column": 3
+          }
+        }
       ]
     },
     {
@@ -446,6 +532,35 @@
       "children": [],
       "usedTypes": [
         "typ_29n1iw0u1hd"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 11,
+            "column": 3
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 30,
+            "column": 13
+          }
+        }
       ]
     }
   ],
@@ -1088,5 +1203,119 @@
     "lib/todos.ts": [
       "types/index.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_0yr9r67zb7l",
+      "file": "components/DeleteUserButton.tsx",
+      "componentIds": [
+        "cmp_0yr9r67zb7l"
+      ],
+      "modules": [
+        "components/DeleteUserButton.tsx",
+        "lib/api.ts",
+        "lib/config.ts"
+      ],
+      "packages": [],
+      "bytes": 1640,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 8,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "components/DeleteUserButton.tsx",
+            "line": 12,
+            "column": 7
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1n9jz878unm",
+      "file": "components/ProductPanel.tsx",
+      "componentIds": [
+        "cmp_1n9jz878unm"
+      ],
+      "modules": [
+        "components/ProductPanel.tsx",
+        "lib/api.ts",
+        "lib/config.ts"
+      ],
+      "packages": [],
+      "bytes": 1763,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/ProductPanel.tsx",
+            "line": 8,
+            "column": 35
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/ProductPanel.tsx",
+            "line": 10,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1t97i8o4yqd",
+      "file": "components/TodoPanel.tsx",
+      "componentIds": [
+        "cmp_1t97i8o4yqd"
+      ],
+      "modules": [
+        "components/TodoPanel.tsx",
+        "lib/api.ts",
+        "lib/config.ts",
+        "lib/todos.ts"
+      ],
+      "packages": [],
+      "bytes": 2583,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 11,
+            "column": 3
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 30,
+            "column": 13
+          }
+        }
+      ]
+    }
+  ]
 }

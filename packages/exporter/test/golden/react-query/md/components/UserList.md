@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/UserList.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQueryClient` (hook), `useQuery` (hook), `useQueries` (hook), `onMouseEnter` (event handler), `onClick` (event handler) |
+| Brings to the browser | 1 component · 3 modules · 4.1 KB, packages `@tanstack/react-query` |
 | Used on | [`/users`](../pages/users.md) |
 | Rendered by | [`UsersPage`](UsersPage.md) |
 

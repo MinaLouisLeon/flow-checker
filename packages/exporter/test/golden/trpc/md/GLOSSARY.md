@@ -127,6 +127,23 @@ What Next shows while a page loads, when it throws or when it calls `notFound()`
 | <a id="boundary-slot-no-match"></a>**slot without default** (`slot-no-match`) | A parallel slot (`@name`) of a layout around the page has no page for its URL and no `default` file. Next 16 fails the build; earlier versions show 404 on a full page load. | Add a `default` file to the slot (returning `null` or calling `notFound()`). |
 | <a id="boundary-no-canonical"></a>**no page to intercept** (`no-canonical`) | An intercepting route (`(.)`) has no plain page at the URL it intercepts, so a refresh or shared link has nothing to show. Next 16 fails the build. | Add the page at that URL, outside the slot. |
 
+## Client boundaries
+
+Where a page's browser part starts, what it brings to the browser, and the code that needs the browser.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="client-boundary"></a>**client boundary** (`boundary`) | A server component (or the page, a layout) renders a component whose file starts with `'use client'`. That component and everything it renders and imports is sent to the browser. |  |
+| <a id="client-bundle"></a>**brings** (`bundle`) | The components, project modules and packages a boundary sends to the browser, and the size of their source (before minifying, types and comments included, packages left out): an estimate to compare boundaries, not the size of the built files. |  |
+| <a id="client-barrel"></a>**through a barrel** (`barrel`) | Imported from a file that re-exports it (`components/index.ts`). The boundary is the component's own file; in the browser, a barrel imports everything it re-exports. |  |
+| <a id="client-lower"></a>**could move lower** (`lower`) | Nothing in this file, or in what it imports, needs the browser, so it could render on the server and `'use client'` could go on the components below that do. | Move `'use client'` into the files listed (or remove it when none are) and check the page still builds. |
+| <a id="client-hook"></a>**hook** | A hook a server component can't call (`useState`, `useEffect`, `useRef`, `useContext`, `usePathname`...), or a project hook that calls one. `use`, `useMemo`, `useCallback` and `useId` work on the server. |  |
+| <a id="client-event"></a>**event handler** (`event`) | An `on*` handler on an HTML element (`onClick`, `onChange`): it runs in the browser. |  |
+| <a id="client-function-prop"></a>**function prop** (`function-prop`) | A function handed to a component. A server component can't hand one to a client component (only a server action), so this one has to stay in the browser. |  |
+| <a id="client-browser-api"></a>**browser API** (`browser-api`) | `window`, `document`, `localStorage` and the like, read while rendering: they don't exist on the server. |  |
+| <a id="client-class-component"></a>**class component** (`class-component`) | Class components only work as client components. |  |
+| <a id="client-context"></a>**context** | `createContext()`: React contexts only work in client components. |  |
+
 ## Server cache
 
 What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).

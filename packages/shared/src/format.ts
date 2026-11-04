@@ -2,6 +2,7 @@
 import { accessOf, guardText } from './access'
 import { gapLine, titleText } from './boundaries'
 import { formatCache } from './cache'
+import { CLIENT_USE_LABELS, sizeText } from './client'
 import { urlText } from './format-requests'
 import type {
   AppModel,
@@ -49,10 +50,12 @@ export function formatModel(model: AppModel): string {
     out.push(...formatAccess(route))
     out.push(...formatRender(route))
     out.push(...formatBoundaries(route))
+    out.push(...formatClient(route, components))
   }
 
   const cache = formatCache(model)
   if (cache.length > 0) out.push('', ...cache)
+  if (model.clientBoundaries) out.push('', ...formatClientBoundaries(model, components))
 
   return `${out.join('\n')}\n`
 }
@@ -93,6 +96,51 @@ function formatBoundaries(route: Route): string[] {
   if (meta) {
     const from = meta.sources.map((m) => `${m.in} ${m.kind}`).join(', ')
     out.push(`title: ${titleText(meta)}${from ? `  (${from})` : ''}`)
+  }
+  return out
+}
+
+const count = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`
+
+/** Where the page's browser part starts (M43). */
+function formatClient(route: Route, components: Map<string, Component>): string[] {
+  const client = route.client
+  if (!client) return []
+  if (client.boundaries.length === 0) return ['client: (none)']
+  const name = (id: string) => components.get(id)?.name ?? '?'
+  const packages = client.packages.length > 0 ? `, packages ${client.packages.join(', ')}` : ''
+  const out = [
+    `client: ${count(client.boundaries.length, 'boundary', 'boundaries')}, ${count(client.components, 'component')}, ${count(client.modules, 'module')}, ${sizeText(client.bytes)}${packages}`,
+  ]
+  for (const edge of client.boundaries) {
+    const from = edge.parentId ? `from ${name(edge.parentId)} (${edge.in})` : `is the ${edge.in}`
+    const via = edge.via ? ` through ${edge.via}` : ''
+    const lazy = edge.dynamic ? ' [dynamic]' : ''
+    out.push(`  ${name(edge.componentId)}  ${from}${via}${lazy}  ${edge.loc.file}:${edge.loc.line}`)
+  }
+  return out
+}
+
+/** Each boundary: what it brings to the browser, why it needs it, and whether it could move lower. */
+function formatClientBoundaries(model: AppModel, components: Map<string, Component>): string[] {
+  const name = (id: string) => components.get(id)?.name ?? '?'
+  const out = ['# Client boundaries']
+  for (const b of model.clientBoundaries ?? []) {
+    out.push('', `## ${name(b.componentId)}  ${b.file}`)
+    const shared = b.componentIds.filter((id) => components.get(id)?.kind === 'shared')
+    out.push(
+      `components: ${b.componentIds.map(name).join(', ')}${shared.length > 0 ? `  (also on the server: ${shared.map(name).join(', ')})` : ''}`,
+    )
+    out.push(`modules: ${b.modules.length}, ${sizeText(b.bytes)}`)
+    for (const file of b.modules) out.push(`  ${file}`)
+    if (b.packages.length > 0) out.push(`packages: ${b.packages.join(', ')}`)
+    out.push(
+      `uses: ${b.uses.length > 0 ? b.uses.map((u) => `${u.name} (${CLIENT_USE_LABELS[u.kind]}) ${u.loc.file}:${u.loc.line}`).join(', ') : '(none)'}`,
+    )
+    if (b.lower) {
+      const into = b.lower.into.length > 0 ? b.lower.into.map(name).join(', ') : '(nothing: drop it)'
+      out.push(`could move lower: into ${into}; on the server: ${b.lower.server.map(name).join(', ')}`)
+    }
   }
   return out
 }

@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "websocket",
   "model": {
-    "version": 15,
+    "version": 16,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -82,6 +82,34 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [
+            {
+              "componentId": "cmp_0v03dzyy6xu",
+              "parentId": "cmp_0ku4o3jpe9o",
+              "in": "page",
+              "loc": {
+                "file": "app/page.tsx",
+                "line": 9,
+                "column": 7
+              }
+            },
+            {
+              "componentId": "cmp_24ds4vfe8jw",
+              "parentId": "cmp_0ku4o3jpe9o",
+              "in": "page",
+              "loc": {
+                "file": "app/page.tsx",
+                "line": 10,
+                "column": 7
+              }
+            }
+          ],
+          "components": 2,
+          "modules": 3,
+          "bytes": 2052,
+          "packages": []
         }
       },
       {
@@ -133,6 +161,26 @@
                 "column": 14
               }
             }
+          ]
+        },
+        "client": {
+          "boundaries": [
+            {
+              "componentId": "cmp_25ygt4ib9ws",
+              "parentId": "cmp_071fu3pg2y0",
+              "in": "page",
+              "loc": {
+                "file": "app/chat/page.tsx",
+                "line": 7,
+                "column": 7
+              }
+            }
+          ],
+          "components": 1,
+          "modules": 2,
+          "bytes": 1892,
+          "packages": [
+            "socket.io-client"
           ]
         }
       }
@@ -257,6 +305,53 @@
           "typ_0z1w2tfwh0s",
           "typ_0m3wwrt3nt8",
           "typ_165m1q160hg"
+        ],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useRef",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 10,
+              "column": 21
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 11,
+              "column": 27
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useEffect",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 15,
+              "column": 3
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onSubmit",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 46,
+              "column": 13
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 50,
+              "column": 29
+            }
+          }
         ]
       },
       {
@@ -271,7 +366,27 @@
         "kind": "client",
         "clientBoundary": true,
         "children": [],
-        "usedTypes": []
+        "usedTypes": [],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/Ping.tsx",
+              "line": 8,
+              "column": 31
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "components/Ping.tsx",
+              "line": 21,
+              "column": 29
+            }
+          }
+        ]
       },
       {
         "id": "cmp_0v03dzyy6xu",
@@ -288,6 +403,26 @@
         "usedTypes": [
           "typ_1kri650o74u",
           "typ_01lxex28a31"
+        ],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/Ticker.tsx",
+              "line": 11,
+              "column": 31
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useEffect",
+            "loc": {
+              "file": "components/Ticker.tsx",
+              "line": 14,
+              "column": 3
+            }
+          }
         ]
       }
     ],
@@ -863,7 +998,137 @@
         "lib/config.ts",
         "lib/types.ts"
       ]
-    }
+    },
+    "clientBoundaries": [
+      {
+        "componentId": "cmp_25ygt4ib9ws",
+        "file": "components/Chat.tsx",
+        "componentIds": [
+          "cmp_25ygt4ib9ws"
+        ],
+        "modules": [
+          "components/Chat.tsx",
+          "lib/config.ts"
+        ],
+        "packages": [
+          "socket.io-client"
+        ],
+        "bytes": 1892,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useRef",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 10,
+              "column": 21
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 11,
+              "column": 27
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useEffect",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 15,
+              "column": 3
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onSubmit",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 46,
+              "column": 13
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "components/Chat.tsx",
+              "line": 50,
+              "column": 29
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_24ds4vfe8jw",
+        "file": "components/Ping.tsx",
+        "componentIds": [
+          "cmp_24ds4vfe8jw"
+        ],
+        "modules": [
+          "components/Ping.tsx",
+          "lib/config.ts"
+        ],
+        "packages": [],
+        "bytes": 798,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/Ping.tsx",
+              "line": 8,
+              "column": 31
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "components/Ping.tsx",
+              "line": 21,
+              "column": 29
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_0v03dzyy6xu",
+        "file": "components/Ticker.tsx",
+        "componentIds": [
+          "cmp_0v03dzyy6xu"
+        ],
+        "modules": [
+          "components/Ticker.tsx",
+          "lib/config.ts"
+        ],
+        "packages": [],
+        "bytes": 1394,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/Ticker.tsx",
+              "line": 11,
+              "column": 31
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useEffect",
+            "loc": {
+              "file": "components/Ticker.tsx",
+              "line": 14,
+              "column": 3
+            }
+          }
+        ]
+      }
+    ]
   },
   "verification": {
     "sites": {

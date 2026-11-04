@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "middleware",
   "model": {
-    "version": 15,
+    "version": 16,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -142,6 +142,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       },
       {
@@ -295,6 +302,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       },
       {
@@ -431,6 +445,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       },
       {
@@ -498,6 +519,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       },
       {
@@ -600,6 +628,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       }
     ],

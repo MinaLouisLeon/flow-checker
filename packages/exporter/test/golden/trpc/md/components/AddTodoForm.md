@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/AddTodoForm.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useRouter` (hook), `useTRPC` (hook), `useQueryClient` (hook), `useMutation` (hook), `onSubmit` (event handler), `onChange` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 1.1 KB, packages `@tanstack/react-query`, `@trpc/tanstack-react-query` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

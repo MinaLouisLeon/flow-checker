@@ -4,6 +4,7 @@ export * from './boundaries'
 export * from './cache'
 export * from './cache-check'
 export * from './capture'
+export * from './client'
 export type {
   ApiClientConfig,
   AreasConfig,

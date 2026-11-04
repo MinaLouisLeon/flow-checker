@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoList.tsx:9` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQueryClient` (hook), `useQuery` (hook), `useMutation` (hook), `onChange` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 2.8 KB, packages `@tanstack/react-query` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`TodosPage`](TodosPage.md) |
 | Renders | `Link` (`next/link`) |

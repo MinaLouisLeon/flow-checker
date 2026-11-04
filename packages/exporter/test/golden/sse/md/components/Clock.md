@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/Clock.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useEffect` (hook) |
+| Brings to the browser | 1 component · 1 module · 1.1 KB |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

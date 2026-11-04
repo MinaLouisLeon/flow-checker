@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -123,6 +123,58 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_08pr6kh6ave",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0l3kw3n479w",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 10,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0r1iugj2rde",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          }
+        ],
+        "components": 5,
+        "modules": 10,
+        "bytes": 23261,
+        "packages": [
+          "@apollo/client",
+          "@graphql-typed-document-node/core",
+          "graphql"
+        ]
       }
     },
     {
@@ -225,6 +277,38 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_1gqfw2iamk9",
+            "parentId": "cmp_1an2304y5ca",
+            "in": "page",
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 4,
+        "modules": 8,
+        "bytes": 22310,
+        "packages": [
+          "@apollo/client",
+          "@graphql-typed-document-node/core",
+          "graphql"
+        ]
       }
     },
     {
@@ -276,6 +360,38 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_0os1adocqp5",
+            "parentId": "cmp_0zsf7mc3ftx",
+            "in": "page",
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 7,
+        "bytes": 22378,
+        "packages": [
+          "@apollo/client",
+          "@graphql-typed-document-node/core",
+          "graphql"
         ]
       }
     }
@@ -410,7 +526,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 8,
+            "column": 20
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1an2304y5ca",
@@ -505,7 +632,54 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 18,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 19,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 20,
+            "column": 21
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 31,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 32,
+            "column": 51
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1k31ddi4qwc",
@@ -543,7 +717,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useSyncExternalStore",
+          "loc": {
+            "file": "src/components/ClientOnly.tsx",
+            "line": 9,
+            "column": 20
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1hizq4x2yrv",
@@ -572,7 +757,36 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useSuspenseQuery",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 33,
+            "column": 20
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 34,
+            "column": 24
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 42,
+            "column": 29
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1gqfw2iamk9",
@@ -691,7 +905,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useFragment",
+          "loc": {
+            "file": "src/components/TodoItem.tsx",
+            "line": 16,
+            "column": 30
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0l3kw3n479w",
@@ -717,7 +942,36 @@
           }
         }
       ],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 18,
+            "column": 35
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 19,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 25,
+            "column": 51
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0os1adocqp5",
@@ -733,6 +987,62 @@
       "children": [],
       "usedTypes": [
         "typ_0y0dnmxm2ov"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 35,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useApolloClient",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 37,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useLazyQuery",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 38,
+            "column": 30
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 52,
+            "column": 13
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 53,
+            "column": 50
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 65,
+            "column": 29
+          }
+        }
       ]
     },
     {
@@ -747,7 +1057,18 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/ViewerBadge.tsx",
+            "line": 16,
+            "column": 20
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -2428,5 +2749,310 @@
     "src/server/resolvers.ts": [
       "src/server/data.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_27t3g1lua9i",
+      "file": "src/app/providers.tsx",
+      "componentIds": [
+        "cmp_27t3g1lua9i"
+      ],
+      "modules": [
+        "src/app/providers.tsx",
+        "src/lib/apollo.ts"
+      ],
+      "packages": [
+        "@apollo/client"
+      ],
+      "bytes": 735,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 8,
+            "column": 20
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0r1iugj2rde",
+      "file": "src/components/AddTodoForm.tsx",
+      "componentIds": [
+        "cmp_0r1iugj2rde"
+      ],
+      "modules": [
+        "src/components/AddTodoForm.tsx",
+        "src/gql/fragment-masking.ts",
+        "src/gql/gql.ts",
+        "src/gql/graphql.ts",
+        "src/gql/index.ts"
+      ],
+      "packages": [
+        "@apollo/client",
+        "@graphql-typed-document-node/core",
+        "graphql"
+      ],
+      "bytes": 20795,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 18,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 19,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 20,
+            "column": 21
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 31,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 32,
+            "column": 51
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1gqfw2iamk9",
+      "file": "src/components/TodoDetail.tsx",
+      "componentIds": [
+        "cmp_1gqfw2iamk9",
+        "cmp_1k31ddi4qwc",
+        "cmp_1hizq4x2yrv"
+      ],
+      "modules": [
+        "src/components/TodoDetail.tsx",
+        "src/components/ClientOnly.tsx",
+        "src/gql/fragment-masking.ts",
+        "src/gql/gql.ts",
+        "src/gql/graphql.ts",
+        "src/gql/index.ts"
+      ],
+      "packages": [
+        "@apollo/client",
+        "@graphql-typed-document-node/core",
+        "graphql"
+      ],
+      "bytes": 21575,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useSuspenseQuery",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 33,
+            "column": 20
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 34,
+            "column": 24
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 42,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0l3kw3n479w",
+      "file": "src/components/TodoList.tsx",
+      "componentIds": [
+        "cmp_0l3kw3n479w",
+        "cmp_2dylb1mdvz0"
+      ],
+      "modules": [
+        "src/components/TodoList.tsx",
+        "src/components/TodoItem.tsx",
+        "src/gql/fragment-masking.ts",
+        "src/gql/gql.ts",
+        "src/gql/graphql.ts",
+        "src/gql/index.ts"
+      ],
+      "packages": [
+        "@apollo/client",
+        "@graphql-typed-document-node/core",
+        "graphql"
+      ],
+      "bytes": 21294,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 18,
+            "column": 35
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 19,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 25,
+            "column": 51
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0os1adocqp5",
+      "file": "src/components/UserSearch.tsx",
+      "componentIds": [
+        "cmp_0os1adocqp5"
+      ],
+      "modules": [
+        "src/components/UserSearch.tsx",
+        "src/gql/fragment-masking.ts",
+        "src/gql/gql.ts",
+        "src/gql/graphql.ts",
+        "src/gql/index.ts"
+      ],
+      "packages": [
+        "@apollo/client",
+        "@graphql-typed-document-node/core",
+        "graphql"
+      ],
+      "bytes": 21643,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 35,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useApolloClient",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 37,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useLazyQuery",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 38,
+            "column": 30
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 52,
+            "column": 13
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 53,
+            "column": 50
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/UserSearch.tsx",
+            "line": 65,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_08pr6kh6ave",
+      "file": "src/components/ViewerBadge.tsx",
+      "componentIds": [
+        "cmp_08pr6kh6ave"
+      ],
+      "modules": [
+        "src/components/ViewerBadge.tsx",
+        "src/gql/fragment-masking.ts",
+        "src/gql/gql.ts",
+        "src/gql/graphql.ts",
+        "src/gql/index.ts"
+      ],
+      "packages": [
+        "@apollo/client",
+        "@graphql-typed-document-node/core",
+        "graphql"
+      ],
+      "bytes": 20207,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/ViewerBadge.tsx",
+            "line": 16,
+            "column": 20
+          }
+        }
+      ]
+    }
+  ]
 }
