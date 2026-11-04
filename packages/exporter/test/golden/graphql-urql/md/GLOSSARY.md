@@ -185,6 +185,26 @@ Every server action (a `'use server'` function), with the auth check and the inp
 | <a id="action-unused"></a>**unused** | No code imports or uses the action, so Next leaves it out of the build and it can't be called. It isn't flagged. |  |
 | <a id="action-wrapped"></a>**wrapped** | The action is the result of a helper (`export const save = withAuth(async () => ...)`). The helper runs first, so its checks count for the action. |  |
 
+## Request performance
+
+Requests that wait for each other for no reason, run once per item of a list, or are sent twice on one page load, found in the code and checked against the timings of live captures.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="perf-waterfall"></a>**waterfall** | Requests awaited one after the other in the same function, where a later one doesn't use what an earlier one returned. Each waits for the one before, so the page takes as long as all of them together. | Start them together: `const [user, posts] = await Promise.all([getUser(), getPosts()])`, or render them in separate components inside `<Suspense>`. |
+| <a id="perf-n-plus-one"></a>**N+1** (`n-plus-one`) | A request sent once for each item of a list (in a loop, in `.map()`, or by a component rendered once per item), usually after one request for the list itself. Ten items make eleven requests. | Fetch the items in one request (an endpoint that takes a list of ids, or one that includes them), or at least start them together with `Promise.all`. |
+| <a id="perf-duplicate"></a>**duplicate** | The same request (method and URL, called with the same arguments) is sent from more than one place on one page load, and nothing dedupes it. Next dedupes a server component's `GET` `fetch`, and query libraries dedupe the same key, but not other calls. | Wrap the function that sends it in React's `cache()` (server), share one query (client), or fetch it once higher up and pass the result down. |
+| <a id="perf-sequential"></a>**one after another** (`sequential`) | The N+1 requests are awaited inside a `for` loop, so each one waits for the one before: the time adds up with each item. | Start them together (`await Promise.all(items.map(...))`) if they must stay separate. |
+| <a id="perf-loop-for"></a>**for loop** (`loop-for`) | A `for`, `for...of` or `for...in` loop. |  |
+| <a id="perf-loop-while"></a>**while loop** (`loop-while`) | A `while` or `do ... while` loop. |  |
+| <a id="perf-loop-callback"></a>**array callback** (`loop-callback`) | A callback of an array method that runs once per item: `.map()`, `.forEach()`, `.flatMap()`, `.filter()`... |  |
+| <a id="perf-loop-render"></a>**rendered per item** (`loop-render`) | A component rendered once per item (`items.map((item) => <Row item={item} />)`) that sends the request itself, so each row sends its own. |  |
+| <a id="perf-confirmed"></a>**confirmed at runtime** (`confirmed`) | Live capture showed it: the requests ran one after the other, or one load sent the request for several items, or the same request twice. |  |
+| <a id="perf-not-confirmed"></a>**not confirmed** (`not-confirmed`) | Its requests were captured, but not the way the scan says: they overlapped, or a load sent only one. It may only happen with other data (a longer list), or the scan read the code wrong. | Use the page with more data, or check the code: if it is fine, the finding can be ignored. |
+| <a id="perf-not-seen"></a>**not seen yet** (`not-seen`) | No capture of its requests yet, so the timings say nothing about it. | Open the page with capture on. |
+| <a id="perf-p50"></a>**p50** | The median time: half the captured calls of the endpoint were faster than this, half slower. |  |
+| <a id="perf-p95"></a>**p95** | The 95th percentile: 95 of 100 captured calls were faster than this. It shows the slow calls users hit now and then, which the median hides. |  |
+
 ## Environment variables
 
 Every `process.env` name the code reads, on which side, and which `.env` files define it. Only names are read: values never leave the `.env` files.

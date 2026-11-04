@@ -1,0 +1,13 @@
+# Navigation
+
+## RootLayout  src/app/layout.tsx
+link / -> /  event onClick
+link /users/1 -> /users/[id]  event onClick
+link /products -> /products  event onClick
+link /catalog -> /catalog  event onClick
+link /todos -> /todos  event onClick
+link /settings -> /settings  event onClick
+
+# Flows
+
+(none)

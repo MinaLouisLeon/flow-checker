@@ -312,6 +312,17 @@ const scripts = {
     await page.waitForSelector('text=Left the chat')
     await settle(page)
   },
+  // M47: each page twice (the first load also compiles it), so every finding has two loads to check.
+  perf: async (page) => {
+    for (const path of ['/', '/users/1', '/products', '/catalog', '/todos', '/settings']) {
+      for (let i = 0; i < 2; i++) {
+        await page.goto(`${app}${path}`)
+        if (path === '/todos')
+          await page.waitForFunction(() => !document.body.textContent?.includes('Loading...'))
+        await settle(page)
+      }
+    }
+  },
 }
 
 /** A session token from the mock API (login + OTP), for fixtures that read it from a cookie. */

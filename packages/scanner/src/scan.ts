@@ -35,6 +35,7 @@ import {
   routesUnder,
 } from './middleware'
 import { compare, relativeTo, resolveFrom, toPosix } from './paths'
+import { buildPerf } from './perf'
 import { createProject } from './project'
 import { addRouteRender, cacheComponentsOn } from './render'
 import { RequestScanner } from './requests'
@@ -521,6 +522,13 @@ function analyze(
     sites,
     scanned: settings.scanned,
   })
+  // Request performance (M47): waterfalls, N+1 and duplicate requests, from each site's call path.
+  const perf = buildPerf({
+    routes,
+    components,
+    sites,
+    fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
+  })
   const cache = buildCacheMap({
     routes,
     components,
@@ -564,6 +572,7 @@ function analyze(
     ...(client.leaks.length > 0 ? { leaks: client.leaks } : {}),
     ...(env ? { env } : {}),
     ...(actions.length > 0 ? { actions } : {}),
+    ...(perf ? { perf } : {}),
   }
 }
 

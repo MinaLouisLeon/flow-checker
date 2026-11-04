@@ -76,6 +76,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 [2 server actions](actions.md), 1 note to check.
 
+## Request performance
+
+[No waterfalls, N+1 or duplicate requests, 6 endpoints timed](perf.md).
+
 ## Backends
 
 | Host | Endpoints | Called from the browser |

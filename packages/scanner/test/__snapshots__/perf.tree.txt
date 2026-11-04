@@ -1,0 +1,165 @@
+# Route tree
+
+src/app [layout, page]
+├─ catalog [page]
+├─ products [page]
+├─ settings [layout, page]
+├─ todos [page]
+└─ users
+   └─ [id] (dynamic) [page]
+
+# Routes
+
+/  page  src/app/page.tsx
+/catalog  page  src/app/catalog/page.tsx
+/products  page  src/app/products/page.tsx
+/settings  page  src/app/settings/page.tsx
+/todos  page  src/app/todos/page.tsx
+/users/[id]  page  src/app/users/[id]/page.tsx
+
+# Layouts
+
+RootLayout  server  src/app/layout.tsx:9
+└─ Link  external next/link
+
+SettingsLayout  server  src/app/settings/layout.tsx:7
+
+# Pages
+
+## /  src/app/page.tsx
+layouts: src/app/layout.tsx
+Home  server  src/app/page.tsx:4
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:8
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) (and 1 more) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:8
+  ! no error boundary: fetches on the server (`fetch`) (and 1 more), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/api.ts:8
+title: Perf  (layout metadata)
+client: (none)
+perf: waterfall in Home
+
+## /catalog  src/app/catalog/page.tsx
+layouts: src/app/layout.tsx
+CatalogPage  server  src/app/catalog/page.tsx:4
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:8
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) (and 1 more) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:8
+  ! no error boundary: fetches on the server (`fetch`) (and 1 more), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/api.ts:8
+title: Perf  (layout metadata)
+client: (none)
+perf: n-plus-one in CatalogPage
+
+## /products  src/app/products/page.tsx
+layouts: src/app/layout.tsx
+ProductsPage  server  src/app/products/page.tsx:5
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:8
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) (and 1 more) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:8
+  ! no error boundary: fetches on the server (`fetch`) (and 1 more), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/api.ts:8
+title: Perf  (layout metadata)
+client: (none)
+perf: n-plus-one in ProductsPage
+
+## /settings  src/app/settings/page.tsx
+layouts: src/app/layout.tsx > src/app/settings/layout.tsx
+SettingsPage  server  src/app/settings/page.tsx:4
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (layout)  src/lib/api.ts:8
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) (and 5 more) with no `loading` file or `<Suspense>` to show meanwhile (layout)  src/lib/api.ts:8
+  ! no error boundary: fetches on the server (`fetch`) (and 5 more), and no `error` file, error boundary or `global-error` catches a failure (layout)  src/lib/api.ts:8
+title: Perf  (layout metadata)
+client: (none)
+perf: duplicate
+
+## /todos  src/app/todos/page.tsx
+layouts: src/app/layout.tsx
+TodosPage  server  src/app/todos/page.tsx:5
+└─ TodoRow  client (use client)  src/components/todo-row.tsx:5
+access: open
+render: dynamic
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:8
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:8
+  ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/api.ts:8
+title: Perf  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.4 KB
+  TodoRow  from TodosPage (page)  src/app/todos/page.tsx:10
+perf: n-plus-one in TodosPage
+
+## /users/[id]  src/app/users/[id]/page.tsx
+layouts: src/app/layout.tsx
+UserPage  server  src/app/users/[id]/page.tsx:5
+access: guarded
+  shows the not-found page (404) when `!user` (page)  src/app/users/[id]/page.tsx:8
+render: dynamic
+  dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
+  dynamic: fetches with `cache: 'no-store'` (page)  src/lib/api.ts:8
+boundaries: (none)
+  ! no loading state: waits for a request (`fetch`) (and 3 more) with no `loading` file or `<Suspense>` to show meanwhile (page)  src/lib/api.ts:8
+  ! no error boundary: fetches on the server (`fetch`) (and 3 more), and no `error` file, error boundary or `global-error` catches a failure (page)  src/lib/api.ts:8
+  ! no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page)  src/app/users/[id]/page.tsx:8
+title: Perf  (layout metadata)
+client: (none)
+
+# Client boundaries
+
+## TodoRow  src/components/todo-row.tsx
+components: TodoRow
+modules: 1, 0.4 KB
+  src/components/todo-row.tsx
+uses: useState (hook) src/components/todo-row.tsx:6, useEffect (hook) src/components/todo-row.tsx:7
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+# Request performance
+
+n-plus-one (server) in CatalogPage src/app/catalog/page.tsx:6
+  callback products.map() over products
+  sends GET http://localhost:4010/products/:id?delay=40
+  list from GET http://localhost:4010/products?delay=80
+  pages: /catalog
+
+waterfall (server) in Home src/app/page.tsx:6
+  1. await getUser(1)  src/app/page.tsx:5
+  2. await getProducts()  src/app/page.tsx:6
+  sends GET http://localhost:4010/products?delay=80
+  sends GET http://localhost:4010/users/1?delay=80
+  pages: /
+
+n-plus-one (server) in ProductsPage src/app/products/page.tsx:8
+  for for (const product of products) over products sequential
+  sends GET http://localhost:4010/products/:id?delay=40
+  list from GET http://localhost:4010/products?delay=80
+  pages: /products
+
+duplicate (server) src/app/settings/page.tsx:5
+  request GET http://localhost:4010/settings?delay=40
+  sends GET http://localhost:4010/settings?delay=40
+  sends GET http://localhost:4010/settings?delay=40
+  pages: /settings
+
+n-plus-one (client) in TodosPage src/app/todos/page.tsx:10
+  render <TodoRow> over todos
+  sends GET http://localhost:4010/todos/:id?delay=30
+  pages: /todos

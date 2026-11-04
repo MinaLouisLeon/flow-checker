@@ -37,6 +37,7 @@ const FIXTURES = [
   'leaks',
   'env',
   'action-safety',
+  'perf',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -537,5 +538,56 @@ describe('server action safety (M46)', () => {
         else expect(action.routeIds.length, `${fixture} ${action.name}`).toBeGreaterThan(0)
       }
     }
+  })
+})
+
+describe('request performance (M47)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  const label = (f: NonNullable<AppModel['perf']>['findings'][number]) =>
+    `${f.kind} ${f.side} ${f.loc.file}:${f.loc.line}${f.loop ? ` ${f.loop.kind}` : ''}${f.sequential ? ' sequential' : ''}`
+
+  it('finds the planted cases on the perf fixture, and nothing on the other fixtures', () => {
+    const found = FIXTURES.flatMap((fixture) =>
+      (scan(fixture).perf?.findings ?? []).map((f) => `${fixture} ${label(f)}`),
+    )
+    expect(found).toEqual([
+      'perf n-plus-one server src/app/catalog/page.tsx:6 callback',
+      'perf waterfall server src/app/page.tsx:6',
+      'perf n-plus-one server src/app/products/page.tsx:8 for sequential',
+      'perf duplicate server src/app/settings/page.tsx:5',
+      'perf n-plus-one client src/app/todos/page.tsx:10 render',
+    ])
+  })
+
+  it('links each finding to its requests, the list it loops over and its pages', () => {
+    const model = scan('perf')
+    const sites = new Map(model.requests.map((s) => [s.id, s]))
+    const paths = new Map(model.routes.map((r) => [r.id, r.path]))
+    const url = (id: string) => sites.get(id)?.url?.path
+    const findings = model.perf?.findings ?? []
+    const byKind = (kind: string, page: string) =>
+      findings.find((f) => f.kind === kind && f.routeIds.map((id) => paths.get(id)).includes(page))
+    const waterfall = byKind('waterfall', '/')
+    expect(waterfall?.steps?.map((s) => `${s.text} needs [${s.needs.join(',')}]`)).toEqual([
+      'getUser(1) needs []',
+      'getProducts() needs []',
+    ])
+    const loop = byKind('n-plus-one', '/products')
+    expect(loop?.siteIds.map(url)).toEqual(['/products/:id'])
+    expect(loop?.listSiteIds?.map(url)).toEqual(['/products'])
+    expect(loop?.loop?.over).toBe('products')
+    const rows = byKind('n-plus-one', '/todos')
+    expect(rows?.loop?.text).toBe('<TodoRow>')
+    expect(rows?.siteIds.map((id) => sites.get(id)?.trigger.kind)).toEqual(['effect'])
+    const duplicate = byKind('duplicate', '/settings')
+    // The layout's and the page's axios call; not the GET fetch (Next dedupes it) or `getAccount` (`cache()`).
+    expect(duplicate?.siteIds.map((id) => sites.get(id)?.callStack[0]?.file)).toEqual([
+      'src/app/settings/layout.tsx',
+      'src/app/settings/page.tsx',
+    ])
+    for (const f of findings) expect(f.routeIds.length, f.id).toBeGreaterThan(0)
   })
 })

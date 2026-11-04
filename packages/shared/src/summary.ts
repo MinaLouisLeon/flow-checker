@@ -574,6 +574,7 @@ const NOTE_ORDER: NoteKind[] = [
   'leak',
   'action',
   'env',
+  'perf',
   'needs-recheck',
   'missing-page-component',
   'boundary',
@@ -595,6 +596,7 @@ const NOTE_LABEL: Record<NoteKind, string> = {
   leak: 'Leak',
   action: 'Action',
   env: 'Env',
+  perf: 'Performance',
   'unresolved-component': 'Component',
   'unresolved-type': 'Type',
 }

@@ -54,6 +54,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M44 | Server/client leaks   | Model version 17, `AppModel.leaks` (module + prop); rules in `scanner/src/leaks.ts`, run from M43's client pass.         |
 | M45 | Environment variables | Model version 18, `AppModel.env`; `scanner/src/env.ts` walks value imports itself; `.env` parsed for names only.         |
 | M46 | Server action safety  | Model version 19, `AppModel.actions`; `scanner/src/actions.ts` reads each action; reuses M31's `stops()` for exits.      |
+| M47 | Request performance   | Model version 20, `AppModel.perf`; findings from call-path frames; captures grouped per load (`requestId` / `view`).     |
 
 ## Gotchas
 
@@ -639,3 +640,28 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Several existing fixtures get real `unprotected` flags (demo actions with no auth): server-actions `deleteProduct`,
   caching / caching-15 `createTodo` and `toggleTodo`, leaks `archiveOrder`. The dashboard's clean-fixture test skips
   `action` notes like `boundary` ones.
+
+## M47 — Request performance (branch `feat/request-preformance-m47`)
+
+- Findings come from each site's `callStack`: every frame's `file:line:column` is the start of a call, so the pass finds
+  the call node there (compiler nodes, cached per position) and looks at the awaits and loops around it. Group
+  waterfalls by the function the awaits are in, not by call path, or a helper's waterfall repeats for every caller.
+- Server captures carry `parent.requestId` and browser captures `view` (M47) so they group per page load. The very first
+  request after `dev` starts runs before `register()` hooks the server: its fetches have no `parent` at all, and the
+  runtime check groups them by time instead.
+- A duplicate is the same call from two files, and Node's async stack loses the caller after an `await`: its captures
+  are `ambiguous` between the two sites. The runtime check counts an ambiguous capture for the sites tied at the top
+  (`capturedSites()`); without that the planted duplicate stayed "not seen".
+- React's dev double effects send each effect's request twice: an N+1 is only confirmed by two different URLs in a load,
+  and `maxCalls` counts distinct requests.
+- Next's request memoization was seen in the recording: a server component's `GET` `fetch` in a layout and its page went
+  out once per load, and a `cache()`-wrapped axios call once; the axios call without `cache()` twice.
+- The capture store keeps only the newest 2,000 captures in memory (5,000 cache events), so that is the worst case for
+  `/api/perf`; the server test times it.
+- `requestLabel()` text can contain `??` (`{NEXT_PUBLIC_API_URL ?? http://...}`): never strip a query with `/\?.*$/`;
+  rebuild the label from the URL without `query` (`timingLabel()`).
+- The mock API takes `?delay=<ms>` (any route) so fixture timings show; the endpoint key drops the query, so it doesn't
+  split endpoints.
+- Fixtures with recordings now get `perf.md` in their goldens (endpoint timings), even with no findings.
+- Bash heredocs with backticks broke a docs patch again (`unexpected EOF`) and turned `'\n'` into line breaks in the
+  exporter: patch scripts go to the scratchpad through the Write tool.

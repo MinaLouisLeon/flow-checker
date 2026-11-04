@@ -65,6 +65,10 @@ Green: every request verified. Red: a type mismatch. Amber: needs a re-check. Gr
 
 [5 names read, 0 `.env` files](env.md).
 
+## Request performance
+
+[No waterfalls, N+1 or duplicate requests, 13 endpoints timed](perf.md).
+
 ## Route handlers
 
 | Route | Methods | File | Requests it sends |

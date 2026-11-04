@@ -24,6 +24,9 @@ import {
   type GlossaryGroupId,
   glossaryTerms,
   PageBoundarySchema,
+  PerfFindingKindSchema,
+  PerfFindingRuntimeSchema,
+  PerfLoopSchema,
   RequestSiteSchema,
   RequestUrlSchema,
   RouteAccessSchema,
@@ -59,6 +62,10 @@ const COVERED: [GlossaryGroupId, readonly string[]][] = [
   ['action', ActionInputSchema.shape.status.options.map((s) => `input-${s}`)],
   ['action', ActionChangeSchema.shape.kind.options.map((k) => `change-${k}`)],
   ['action', ActionFlagKindSchema.options],
+  ['perf', PerfFindingKindSchema.options],
+  ['perf', PerfFindingRuntimeSchema.shape.status.options],
+  ['perf', PerfLoopSchema.shape.kind.options.map((k) => `loop-${k}`)],
+  ['perf', ['sequential', 'p50', 'p95']],
 ]
 
 describe('glossary', () => {

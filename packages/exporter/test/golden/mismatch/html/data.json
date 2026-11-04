@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "mismatch",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -1050,6 +1050,72 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_16nzt1zcm62",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_13cmzl2vi57"
+          ],
+          "count": 2,
+          "p50": 29,
+          "p95": 294,
+          "max": 294,
+          "errors": 0,
+          "browser": 0,
+          "server": 2,
+          "slowestCaptureId": "cap_mvtj507a3gmo6giz"
+        },
+        {
+          "key": "ep_014n09i1jig",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings",
+          "siteIds": [
+            "req_23elzbn49tu"
+          ],
+          "count": 2,
+          "p50": 12,
+          "p95": 16,
+          "max": 16,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvtj5165eg3pk26a"
+        },
+        {
+          "key": "ep_0i0im2g2p7v",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_1a4xvnngrvj"
+          ],
+          "count": 2,
+          "p50": 9,
+          "p95": 14,
+          "max": 14,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvtj5168xxk4tesi"
+        },
+        {
+          "key": "ep_1tgnolqki2r",
+          "label": "POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_1m9d40sdmxx"
+          ],
+          "count": 1,
+          "p50": 10,
+          "p95": 10,
+          "max": 10,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvtj53314evqnk74"
+        }
+      ],
+      "loads": 3
     }
   },
   "flows": {

@@ -3,6 +3,7 @@
 // declared types (M8), and derives each request site's status. Captures taken before a site's
 // code last changed are stale, and a site with only stale captures needs a re-check (M9).
 // Server cache events (M40) are matched to the scan's cache entries and summed up per entry.
+// Capture timings, grouped per page load, confirm the scan's performance findings (M47).
 
 import { splitTrpcCapture } from '@flow-checker/runtime/trpc'
 import {
@@ -15,10 +16,12 @@ import {
   type CaptureSummary,
   checkCapture,
   matchedSiteIds,
+  type PerfSummary,
   pairRenamedSites,
   type RequestSite,
   type SiteVerification,
   summarizeCapture,
+  summarizePerf,
   summarizeTypeChecks,
   type TypeCheck,
   type TypeTable,
@@ -60,6 +63,7 @@ export class Verifier {
   private renamed: Record<string, string> = {}
   private served: AppModel | undefined
   private cacheChecks: Record<string, CacheRuntime> | undefined
+  private perfSummary: PerfSummary | undefined
   private readonly listeners = new Set<() => void>()
 
   constructor(options: VerifierOptions) {
@@ -101,6 +105,7 @@ export class Verifier {
     this.types = typeTable(model.types)
     this.renamed = renamed
     this.cacheChecks = undefined
+    this.perfSummary = undefined
     try {
       this.rematch(this.store.all(), true)
     } finally {
@@ -212,14 +217,21 @@ export class Verifier {
     this.changed()
   }
 
+  /** Performance findings checked against capture timings, and each endpoint's timings (M47). */
+  perfResults(): PerfSummary {
+    this.perfSummary ??= summarizePerf(this.model, this.store.all())
+    return this.perfSummary
+  }
+
   /**
-   * The model with each site's status (and type-mismatch flag) from its matched captures, and
-   * each cache entry's runtime results (M40).
+   * The model with each site's status (and type-mismatch flag) from its matched captures, each
+   * cache entry's runtime results (M40) and each performance finding's (M47).
    */
   servedModel(): AppModel {
     this.served ??= applyVerification(this.model, {
       sites: this.siteVerification(),
       cache: this.cacheResults(),
+      perf: this.perfResults(),
     })
     return this.served
   }
@@ -234,10 +246,12 @@ export class Verifier {
       if (match.by === 'manual') counts.manual++
     }
     const cache = this.cacheResults()
+    const perf = this.perfResults()
     return {
       sites: this.siteVerification(),
       counts,
       ...(Object.keys(cache).length > 0 ? { cache } : {}),
+      ...(perf.loads > 0 ? { perf } : {}),
     }
   }
 
@@ -390,6 +404,7 @@ export class Verifier {
   private changed() {
     this.served = undefined
     this.cacheChecks = undefined
+    this.perfSummary = undefined
     for (const listener of this.listeners) {
       try {
         listener()

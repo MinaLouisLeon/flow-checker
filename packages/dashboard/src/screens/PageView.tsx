@@ -26,6 +26,7 @@ import { LeaksSection } from '../LeaksView'
 import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
 import { MiddlewareSection } from '../MiddlewareView'
 import { appUrl, type ModelIndex } from '../model-index'
+import { PerfSection } from '../PerfView'
 import { ownerHref, QueryLinkList, RequestList, RequestSummary, siteHref, triggerLabel } from '../RequestView'
 import { href } from '../router'
 import {
@@ -127,6 +128,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         <LeaksSection route={route} />
         <EnvSection route={route} />
         <ActionsSection route={route} />
+        <PerfSection route={route} />
         <CacheSection route={route} index={index} />
         <MetadataSection route={route} />
 

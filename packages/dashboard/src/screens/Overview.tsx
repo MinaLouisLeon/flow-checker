@@ -19,6 +19,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   leak: "Server-only code that client code imports, and props that can't cross to the browser",
   env: 'Environment variables read where they have no value',
   action: 'Server actions that change data with no auth check and no input check',
+  perf: 'Requests that wait for each other, run once per item, or are sent twice on one page load',
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
@@ -306,7 +307,8 @@ function NoteLink({ note }: { note: ScanNote }) {
     note.kind === 'client' ||
     note.kind === 'leak' ||
     note.kind === 'env' ||
-    note.kind === 'action' ? (
+    note.kind === 'action' ||
+    note.kind === 'perf' ? (
       <CodeText text={note.message} />
     ) : (
       note.message

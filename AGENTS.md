@@ -118,3 +118,4 @@ re-run them on their own before assuming a regression.
 | M44 | Server/client leaks                               | Done   |
 | M45 | Environment variables                             | Done   |
 | M46 | Server action safety                              | Done   |
+| M47 | Request performance                               | Done   |
