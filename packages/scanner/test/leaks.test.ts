@@ -439,6 +439,77 @@ describe('props that cannot cross to a client component', () => {
     expect(propNames(app('{...{ onSave: save }}', destructured))).toEqual(['Widget.v: function'])
   })
 
+  it("follows the rest of a server wrapper's props back to what its callers pass", () => {
+    // A link wrapper typed with all of Link's props hands on the rest: only what callers pass counts.
+    const app = (passed: string, wrapper: string) =>
+      scan({
+        'src/app/page.tsx': lines(
+          "import { AppLink } from '@/components/app-link'",
+          'export default function Home() {',
+          `  return <AppLink href="/" ${passed}>home</AppLink>`,
+          '}',
+        ),
+        'src/components/app-link.tsx': lines(
+          "import Link from 'next/link'",
+          "type Props = Parameters<typeof Link>[0] & { variant?: 'button' }",
+          wrapper,
+        ),
+      })
+    const rest =
+      'export function AppLink({ variant, ...props }: Props) { return <Link className={variant} {...props} /> }'
+    const whole = 'export function AppLink(props: Props) { return <Link {...props} /> }'
+    expect(propNames(app('', rest))).toEqual([])
+    expect(propNames(app('', whole))).toEqual([])
+    expect(propNames(app('onClick={() => 1}', rest))).toEqual(['Link.onClick: function'])
+    expect(propNames(app('onClick={() => 1}', whole))).toEqual(['Link.onClick: function'])
+    // A client component rendering the wrapper hands its props over in the browser: nothing crosses.
+    const fromClient = scan({
+      'src/app/page.tsx': lines(
+        "import { AppLink } from '@/components/app-link'",
+        "import { Menu } from '@/components/menu'",
+        'export default function Home() {',
+        '  return <><AppLink href="/" /><Menu /></>',
+        '}',
+      ),
+      'src/components/menu.tsx': lines(
+        "'use client'",
+        "import { useState } from 'react'",
+        "import { AppLink } from './app-link'",
+        'export function Menu() {',
+        '  const [n, setN] = useState(0)',
+        '  return <AppLink href="/a" onClick={() => setN(n + 1)} />',
+        '}',
+      ),
+      'src/components/app-link.tsx': lines(
+        "import Link from 'next/link'",
+        "type Props = Parameters<typeof Link>[0] & { variant?: 'button' }",
+        rest,
+      ),
+    })
+    expect(propNames(fromClient)).toEqual([])
+    // A caller that spreads hides what it passes: a prop the type requires is still judged by its type.
+    const required = (wrapper: string) =>
+      scan({
+        'src/app/page.tsx': lines(
+          "import { Panel } from '@/components/panel'",
+          'const props = { onClose: () => 1 }',
+          'export default function Home() { return <Panel {...props} /> }',
+        ),
+        'src/components/panel.tsx': lines("import { Widget } from './widget'", wrapper),
+        'src/components/widget.tsx': lines(
+          "'use client'",
+          'export function Widget(p: { onClose: () => void; onOpen?: () => void }) { return <p onClick={p.onClose} /> }',
+        ),
+      })
+    expect(
+      propNames(
+        required(
+          'export function Panel(props: { onClose: () => void; onOpen?: () => void }) { return <Widget {...props} /> }',
+        ),
+      ),
+    ).toEqual(['Widget.onClose: function'])
+  })
+
   it('only checks where a server component renders a client one', () => {
     const model = scan({
       'src/app/page.tsx': lines(

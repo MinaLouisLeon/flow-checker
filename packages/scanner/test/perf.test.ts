@@ -39,6 +39,7 @@ const BASE: Record<string, string> = {
   }),
   'node_modules/@tanstack/react-query/index.d.ts': lines(
     'export function useQuery<T>(o: { queryKey: unknown[]; queryFn: () => Promise<T> }): { data: T | undefined }',
+    'export function useInfiniteQuery<T>(o: { queryKey: unknown[]; queryFn: (c: { pageParam: unknown }) => Promise<T> }): { data: T | undefined }',
   ),
   'src/lib/api.ts': lines(
     "const API = 'https://api.test'",
@@ -283,6 +284,51 @@ describe('N+1 requests', () => {
     ])
   })
 
+  it('leaves loops that go on by what the requests answered: pages of one list and retries', () => {
+    // Each page needs the cursor the one before returned.
+    expect(
+      loops(
+        scan(
+          page(
+            'let cursor: string | null = null',
+            'do {',
+            '  const res = await getTeam(cursor ?? "first")',
+            '  cursor = res.id',
+            '} while (cursor)',
+          ),
+        ),
+      ),
+    ).toEqual([])
+    expect(
+      loops(
+        scan(page('let next = "a"', 'while (next) { const team = await getTeam(next); next = team.id }')),
+      ),
+    ).toEqual([])
+    // A retry that only runs again on some answers.
+    expect(
+      loops(
+        scan(
+          page(
+            'for (let again = false; ; again = true) { const t = await getTeam("a"); if (t.id || again) break }',
+          ),
+        ),
+      ),
+    ).toEqual([])
+    expect(loops(scan(page('while (true) { const t = await getTeam("a"); if (t.id) break }')))).toEqual([])
+    // A counter or a list consumed in the loop is still one request per item.
+    expect(
+      loops(
+        scan(
+          page(
+            'const ids = await getPosts()',
+            'let i = 0',
+            'while (i < ids.length) { await getTeam(ids[i].id); i = i + 1 }',
+          ),
+        ),
+      ),
+    ).toEqual(['server while while (i < ids.length) sequential'])
+  })
+
   it('leaves loops over a list written in the code', () => {
     expect(loops(scan(page("await Promise.all(['a', 'b'].map((id) => getTeam(id)))")))).toEqual([])
     expect(loops(scan(page("const ids = ['a', 'b']", 'for (const id of ids) await getTeam(id)')))).toEqual([])
@@ -436,6 +482,88 @@ describe('duplicate requests', () => {
       ),
     })
     expect(duplicates(model)).toEqual(['client GET /api/me on 1 page(s)'])
+  })
+
+  it("leaves a request a shared helper only sends on one branch, but not a branch in the component's own code", () => {
+    const client = (name: string, body: string) =>
+      lines(
+        "'use client'",
+        "import { useEffect, useState } from 'react'",
+        "import { getFeed, getAlerts } from '@/lib/client'",
+        `export function ${name}({ open }: { open: boolean }) {`,
+        '  const [x, setX] = useState<unknown>(null)',
+        body,
+        '  return <div>{String(x)}</div>',
+        '}',
+      )
+    const model = scan({
+      // Uploads get a token first; everything else goes straight to the proxy.
+      'src/lib/client.ts': lines(
+        'async function upload(endpoint: string, body: FormData) {',
+        "  const token = await (await fetch('/api/upload-token')).json()",
+        '  return fetch(`/api/proxy/${endpoint}`, { method: "POST", body, headers: { token } })',
+        '}',
+        'export async function request(endpoint: string, body?: FormData) {',
+        '  if (body instanceof FormData) {',
+        '    return upload(endpoint, body)',
+        '  }',
+        '  return fetch(`/api/proxy/${endpoint}`)',
+        '}',
+        "export const getFeed = () => request('feed')",
+        "export const getAlerts = () => request('alerts')",
+      ),
+      'src/components/feed.tsx': client('Feed', '  useEffect(() => { getFeed().then(setX) }, [])'),
+      'src/components/alerts.tsx': client('Alerts', '  useEffect(() => { getAlerts().then(setX) }, [])'),
+      'src/components/a.tsx': client(
+        'A',
+        "  useEffect(() => { if (open) fetch('/api/me').then(setX) }, [open])",
+      ),
+      'src/components/b.tsx': client(
+        'B',
+        "  useEffect(() => { if (open) fetch('/api/me').then(setX) }, [open])",
+      ),
+      'src/app/page.tsx': lines(
+        "import { A } from '@/components/a'",
+        "import { Alerts } from '@/components/alerts'",
+        "import { B } from '@/components/b'",
+        "import { Feed } from '@/components/feed'",
+        'export default function Home() {',
+        '  return <main><Feed open /><Alerts open /><A open /><B open /></main>',
+        '}',
+      ),
+    })
+    expect(duplicates(model)).toEqual(['client GET /api/me on 1 page(s)'])
+  })
+
+  it('leaves a request handed to a query hook as `queryFn`, also through a project wrapper', () => {
+    const client = (name: string) =>
+      lines(
+        "'use client'",
+        "import { usePaged } from '@/lib/paged'",
+        `export function ${name}() {`,
+        "  const { data } = usePaged({ queryKey: ['alerts'], queryFn: (cursor) => fetch(`/api/alerts?c=${cursor}`) })",
+        '  return <div>{String(data)}</div>',
+        '}',
+      )
+    const model = scan({
+      'src/lib/paged.ts': lines(
+        "import { useInfiniteQuery } from '@tanstack/react-query'",
+        'export function usePaged<T>(o: { queryKey: unknown[]; queryFn: (cursor: unknown) => Promise<T> }) {',
+        '  return useInfiniteQuery({ queryKey: o.queryKey, queryFn: ({ pageParam }) => o.queryFn(pageParam) })',
+        '}',
+      ),
+      'src/components/a.tsx': client('A'),
+      'src/components/b.tsx': client('B'),
+      'src/app/page.tsx': lines(
+        "import { A } from '@/components/a'",
+        "import { B } from '@/components/b'",
+        'export default function Home() {',
+        '  return <main><A /><B /></main>',
+        '}',
+      ),
+    })
+    expect(model.requests.filter((s) => s.url?.path === '/api/alerts').length).toBeGreaterThan(0)
+    expect(duplicates(model)).toEqual([])
   })
 })
 

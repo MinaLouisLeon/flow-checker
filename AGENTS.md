@@ -119,3 +119,4 @@ re-run them on their own before assuming a regression.
 | M45 | Environment variables                             | Done   |
 | M46 | Server action safety                              | Done   |
 | M47 | Request performance                               | Done   |
+| M48 | Release v0.5.0                                    | Done   |

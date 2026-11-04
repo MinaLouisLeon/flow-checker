@@ -70,6 +70,9 @@ const EXIT_CALLS = new Set(['redirect', 'permanentRedirect', 'notFound', 'forbid
 /** React's `cache()` and Next's `unstable_cache()` dedupe calls of the function they wrap. */
 const DEDUPE_WRAPPERS = /^(React\.)?cache$|^unstable_cache$/
 
+/** Options that hand a query library the function it runs. */
+const QUERY_FN_PROPS = new Set(['queryFn', 'fetcher'])
+
 interface Located {
   file: string
   sf: ts.SourceFile
@@ -225,7 +228,7 @@ class PerfFinder {
         const at = this.#call(frame)
         if (!at) continue
         const loop = loopAround(at.node)
-        if (!loop || overLiteral(loop, at.sf)) continue
+        if (!loop || overLiteral(loop, at.sf) || goesOnByAnswer(loop)) continue
         let entry = byLoop.get(loop.node)
         if (!entry) {
           entry = { file: at.file, sf: at.sf, loop, sites: [], sequential: false }
@@ -277,7 +280,7 @@ class PerfFinder {
         const at = this.#element(ref.loc)
         if (!at) continue
         const loop = loopAround(at.node)
-        if (!loop || overLiteral(loop, at.sf)) continue
+        if (!loop || overLiteral(loop, at.sf) || goesOnByAnswer(loop)) continue
         const child = this.#componentsById.get(ref.componentId)
         yield {
           id: makeId('pf', 'n-plus-one', at.file, String(at.node.pos)),
@@ -305,7 +308,7 @@ class PerfFinder {
     const byComponent = new Map<string, RequestSite[]>()
     for (const site of this.#input.sites) {
       if (!site.componentId || !PAGE_LOAD_TRIGGERS.has(site.trigger.kind) || site.conditional) continue
-      if (!this.#mayRepeat(site)) continue
+      if (!this.#mayRepeat(site) || this.#branchInHelper(site)) continue
       const list = byComponent.get(site.componentId)
       if (list) list.push(site)
       else byComponent.set(site.componentId, [site])
@@ -369,7 +372,40 @@ class PerfFinder {
     if (server && site.transport === 'fetch' && (method === 'GET' || method === 'HEAD')) return false
     // A function wrapped in React's `cache()` runs once per render.
     if (server && site.callStack.some((frame) => this.#dedupedCall(frame))) return false
+    // Handed to a hook as `queryFn` (often through a project hook the scan doesn't read as a query):
+    // the query library runs it, and dedupes by key.
+    if (site.callStack.some((frame) => this.#inQueryFn(frame))) return false
     return true
+  }
+
+  #inQueryFn(frame: SourceLoc): boolean {
+    const at = this.#call(frame)
+    for (let fn = at && enclosingFunction(at.node); fn; fn = enclosingFunction(fn)) {
+      let holder = fn.parent
+      while (holder && ts.isParenthesizedExpression(holder)) holder = holder.parent
+      if (
+        holder &&
+        ts.isPropertyAssignment(holder) &&
+        (ts.isIdentifier(holder.name) || ts.isStringLiteral(holder.name)) &&
+        QUERY_FN_PROPS.has(holder.name.text)
+      )
+        return true
+    }
+    return false
+  }
+
+  /**
+   * The call path goes through a branch inside a function the component calls (`if (isUpload)
+   * return upload(...)` in a shared `request()`): whether it runs depends on each caller's
+   * arguments, so two callers aren't known to send it. A branch in the component's own code
+   * (the first frame) still counts.
+   */
+  #branchInHelper(site: RequestSite): boolean {
+    for (const frame of site.callStack.slice(1)) {
+      const at = this.#call(frame)
+      if (at && inBranch(at.node)) return true
+    }
+    return false
   }
 
   /**
@@ -654,6 +690,45 @@ function loopAround(start: ts.Node): LoopFound | undefined {
   return undefined
 }
 
+/**
+ * A `for` / `while` / `do` loop that goes on by what its own requests answered, not over items: no
+ * condition or `while (true)` (a retry or polling that `break`s), or a condition that reads a name the
+ * body sets from a value it got in the loop (`cursor = page.next`: the pages of one list).
+ */
+function goesOnByAnswer(loop: LoopFound): boolean {
+  const node = loop.node
+  let condition: ts.Expression | undefined
+  if (ts.isForStatement(node)) {
+    if (!node.condition) return true
+    condition = node.condition
+  } else if (ts.isWhileStatement(node) || ts.isDoStatement(node)) condition = node.expression
+  else return false
+  if (condition.kind === ts.SyntaxKind.TrueKeyword) return true
+  const read = new Set<string>()
+  const collect = (n: ts.Node) => {
+    if (ts.isIdentifier(n) && isReference(n)) read.add(n.text)
+    ts.forEachChild(n, collect)
+  }
+  collect(condition)
+  const body = (node as ts.IterationStatement).statement
+  const declared = new Set<string>()
+  const assigned: ts.BinaryExpression[] = []
+  const visit = (n: ts.Node) => {
+    if (isFunctionNode(n)) return
+    if (ts.isVariableDeclaration(n)) for (const name of bindingNames(n.name)) declared.add(name)
+    if (
+      ts.isBinaryExpression(n) &&
+      n.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+      ts.isIdentifier(n.left) &&
+      read.has(n.left.text)
+    )
+      assigned.push(n)
+    ts.forEachChild(n, visit)
+  }
+  visit(body)
+  return assigned.some((a) => references(a.right, declared))
+}
+
 /** A loop over a list written in the code (`['a', 'b'].map(...)`): a fixed number of requests. */
 function overLiteral(loop: LoopFound, sf: ts.SourceFile): boolean {
   const over = loop.over && skipParens(loop.over)
@@ -846,6 +921,29 @@ function isFunctionNode(node: ts.Node): boolean {
     ts.isGetAccessorDeclaration(node) ||
     ts.isSetAccessorDeclaration(node)
   )
+}
+
+/**
+ * Runs on some paths of its function only: inside an `if` / `switch`, a ternary branch or the right
+ * side of `&&` / `||` / `??` (code after an early `return` doesn't count).
+ */
+function inBranch(node: ts.Node): boolean {
+  let child = node
+  for (let parent = node.parent; parent && !isFunctionNode(parent); parent = parent.parent) {
+    if (ts.isConditionalExpression(parent) && child !== parent.condition) return true
+    if (
+      ts.isBinaryExpression(parent) &&
+      child === parent.right &&
+      (parent.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken ||
+        parent.operatorToken.kind === ts.SyntaxKind.BarBarToken ||
+        parent.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken)
+    )
+      return true
+    if (ts.isIfStatement(parent) && child !== parent.expression) return true
+    if (ts.isCaseClause(parent) || ts.isDefaultClause(parent)) return true
+    child = parent
+  }
+  return false
 }
 
 function enclosingFunction(node: ts.Node): ts.Node | undefined {

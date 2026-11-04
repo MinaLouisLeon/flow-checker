@@ -55,6 +55,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M45 | Environment variables | Model version 18, `AppModel.env`; `scanner/src/env.ts` walks value imports itself; `.env` parsed for names only.         |
 | M46 | Server action safety  | Model version 19, `AppModel.actions`; `scanner/src/actions.ts` reads each action; reuses M31's `stops()` for exits.      |
 | M47 | Request performance   | Model version 20, `AppModel.perf`; findings from call-path frames; captures grouped per load (`requestId` / `view`).     |
+| M48 | Release v0.5.0        | Matrix app has an action, an env name, a waterfall; boundaries checked against client manifests. Publish = tag.          |
 
 ## Gotchas
 
@@ -665,3 +666,20 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - Fixtures with recordings now get `perf.md` in their goldens (endpoint timings), even with no findings.
 - Bash heredocs with backticks broke a docs patch again (`unexpected EOF`) and turned `'\n'` into line breaks in the
   exporter: patch scripts go to the scratchpad through the Write tool.
+
+## M48 — Release v0.5.0 (branch `feat/release-050`)
+
+- `next build` writes the client boundaries it found in `*client-reference-manifest.js`: `readClientReferences()` and
+  `compareClientBoundaries()` in `scripts/next-build-table.mjs` compare them with a model (`render-check` and the matrix
+  use them). Webpack lists every page's references in each manifest and Turbopack only the page's own, so only the
+  union compares. Keys are absolute paths (webpack) or `[project]/<path from the workspace root>` (Turbopack); Next 13.4
+  stores each manifest as a JSON string. `error` / `global-error` files are left out.
+- `render-check` needs the mock API on port 4010 for the `caching` fixtures: their build prerenders pages that fetch.
+- The matrix app needs `experimental.serverActions: true` on Next 13 for its `'use server'` file.
+- Neither real-app clone (nor the working copies) has a `.env`: every name is set by the shell or hosting, so "not
+  defined" is right for the repo. Compare `.env` names only with a `sed` that keeps the part before `=`; never print
+  values.
+- Checking each real-app finding against the code found six false patterns (see the M48 Built note); each fix has a
+  scanner test that fails without it. Run the matrix and real-app timings with nothing else running.
+- The heredoc backslash trap struck again (`[\\/]` became `[\/]`), even in this note: write patch scripts and any
+  text with backslashes with the Write or Edit tool.

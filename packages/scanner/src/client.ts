@@ -319,7 +319,10 @@ class ClientPass {
     for (const leak of found) if (!leak.routeIds.includes(page.id)) leak.routeIds.push(page.id)
   }
 
-  /** What the callers of a component (by its function) pass for one of its props. */
+  /**
+   * What the callers of a component (by its function) pass for one of its props. Client callers
+   * hand their props over in the browser, so only the ones that render on the server count.
+   */
   readonly #forwarded = (fn: Node, prop: string): Node[] | undefined => {
     if (!this.#bodyIds || !this.#renderedBy) {
       this.#bodyIds = new Map([...this.#in.bodies].map(([id, node]) => [node.compilerNode, id]))
@@ -339,6 +342,7 @@ class ClientPass {
     const out: Node[] = []
     for (const callerId of callers) {
       const caller = this.#components.get(callerId)
+      if (caller?.kind === 'client') continue
       const body = this.#in.bodies.get(callerId)
       if (!caller || !body) return undefined
       const tags = new Set(caller.children.filter((r) => r.componentId === id).map((r) => r.name))

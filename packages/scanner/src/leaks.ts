@@ -241,8 +241,7 @@ export function propLeaksIn(body: Node, tag: string, forwarded?: Forwarded): Fou
   for (const node of jsxElements(body, tag)) {
     for (const attr of node.getAttributes()) {
       if (N.isJsxSpreadAttribute(attr)) {
-        const expr = attr.getExpression()
-        const found = checker().type(expr.getType(), expr, '', 0, true)
+        const found = checker().spread(attr.getExpression())
         if (found) out.push({ ...found, node: attr })
         continue
       }
@@ -392,6 +391,47 @@ class Checker {
       }
     }
     return this.type(e.getType(), e, path, depth, false)
+  }
+
+  /**
+   * A spread attribute. The server component's own props (`{...props}`, or the rest of them,
+   * `({ variant, ...props })`) are checked by what its callers pass for each one: their type often
+   * lists every handler of the element they end up on (`ComponentProps<typeof Link>`). When the
+   * callers can't be read, only the props they must pass are judged by type.
+   */
+  spread(expr: Node): Found | undefined {
+    const fn = this.#ownProps(expr)
+    if (!fn || !this.#forwarded) return this.type(expr.getType(), expr, '', 0, true)
+    for (const prop of expr.getType().getProperties()) {
+      const name = prop.getName()
+      const passed = this.#forwarded(fn, name)
+      if (passed) {
+        for (const value of passed) {
+          const found = this.value(value, name, 1)
+          if (found) return found
+        }
+      } else if (!prop.isOptional()) {
+        const found = this.property(prop, expr, name, 0)
+        if (found) return found
+      }
+    }
+    return undefined
+  }
+
+  /** The component whose props parameter `expr` is, or the rest of whose destructured props it is. */
+  #ownProps(expr: Node): Node | undefined {
+    const e = skipOuter(expr)
+    if (!N.isIdentifier(e)) return undefined
+    const decl = declarationOf(e)
+    let param: Node | undefined
+    if (decl && N.isParameterDeclaration(decl)) param = decl
+    else if (decl && N.isBindingElement(decl) && decl.getDotDotDotToken()) {
+      const pattern = decl.getParent()
+      if (N.isObjectBindingPattern(pattern)) param = pattern.getParent()
+    }
+    if (!param || !N.isParameterDeclaration(param)) return undefined
+    const fn = param.getParent()
+    return N.isFunctionLikeDeclaration(fn) && fn.getParameters()[0] === param ? fn : undefined
   }
 
   /** `onSave` from `({ onSave })` or `props.onSave`: the values the component's callers pass. */
