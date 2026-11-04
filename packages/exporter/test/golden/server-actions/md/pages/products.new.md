@@ -23,6 +23,12 @@
 
 - [`CreateProductForm`](../components/CreateProductForm.md), rendered by `NewProductPage` (page): 1 component · 1 module · 1.0 KB, `src/app/products/new/page.tsx:7`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `API_URL` (server): not defined, `src/lib/backend.ts:4`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:3`

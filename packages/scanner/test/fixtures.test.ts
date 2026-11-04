@@ -35,6 +35,7 @@ const FIXTURES = [
   'boundaries',
   'client-boundaries',
   'leaks',
+  'env',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -429,5 +430,58 @@ describe('server/client leaks (M44)', () => {
       'src/lib/format-size.ts',
       'src/lib/disk.ts',
     ])
+  })
+})
+
+describe('environment variables (M45)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  it('flags the env fixture’s planted cases and the real ones on the leaks fixture, nothing else', () => {
+    const found = FIXTURES.flatMap((fixture) =>
+      (scan(fixture).env?.vars ?? []).flatMap((v) =>
+        (v.flags ?? []).map((f) => `${fixture} ${v.name} ${f.kind} ${f.loc.file}:${f.loc.line}`),
+      ),
+    )
+    expect(found).toEqual([
+      // Server files the leaks fixture's client code reaches on purpose read private names.
+      'leaks API_KEY private-in-client src/lib/keys.ts:3',
+      'leaks DATABASE_URL private-in-client src/lib/stats.ts:3',
+      'leaks DATABASE_URL not-defined src/lib/db.ts:5',
+      // `next build`: the value is not in the browser bundle.
+      'env API_URL private-in-client src/lib/config.ts:2',
+      // No .env file defines it, and the read has no fallback.
+      'env DATABASE_URL not-defined src/lib/db.ts:2',
+      // `next build`: destructuring is not inlined.
+      'env NEXT_PUBLIC_SITE_NAME not-inlined src/components/site-name.tsx:5',
+      'env STRIPE_SECRET_KEY private-in-client src/components/checkout-button.tsx:6',
+    ])
+  })
+
+  it('reads every form the env fixture uses and the files it has', () => {
+    const env = scan('env').env
+    const access = (name: string) =>
+      env?.vars.find((v) => v.name === name)?.reads.map((r) => `${r.side} ${r.access}`)
+    expect(access('NEXT_PUBLIC_SUPPORT_EMAIL')).toEqual(['client literal'])
+    expect(access('NEXT_PUBLIC_THEME')).toEqual(['client alias'])
+    expect(access('BUILD_LABEL')).toEqual(['client direct'])
+    expect(access('POWERED_BY')).toEqual(['config direct'])
+    expect(env?.files.map((f) => f.file)).toEqual([
+      '.env',
+      '.env.development',
+      '.env.production',
+      '.env.example',
+    ])
+    expect(env?.unknown.map((r) => `${r.side} ${r.loc.file}`)).toEqual(['server src/lib/flags.ts'])
+    // A name inside a multi-line quoted value isn't a name.
+    expect(env?.vars.some((v) => v.name === 'NOT_A_NAME')).toBe(false)
+  })
+
+  it('never puts a value from a .env file into the model or the tree text', () => {
+    const model = scan('env')
+    const text = `${JSON.stringify(model)}\n${formatModel(model)}`
+    expect(text).not.toContain('fixture-value-')
+    expect(text).not.toContain('localhost:4010')
   })
 })

@@ -20,6 +20,7 @@ import { CacheEntryRow, InvalidationRow } from '../CacheView'
 import { ClientSection } from '../ClientView'
 import { useData } from '../context'
 import { useShowDetails } from '../details'
+import { EnvSection } from '../EnvView'
 import { LeaksSection } from '../LeaksView'
 import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
 import { MiddlewareSection } from '../MiddlewareView'
@@ -123,6 +124,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         <BoundariesSection route={route} />
         <ClientSection route={route} />
         <LeaksSection route={route} />
+        <EnvSection route={route} />
         <CacheSection route={route} index={index} />
         <MetadataSection route={route} />
 

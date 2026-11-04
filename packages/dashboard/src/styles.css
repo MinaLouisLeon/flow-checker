@@ -1838,7 +1838,8 @@ kbd {
 /* Server cache map (M39) */
 .list.cache-list li,
 .list.client-list li,
-.list.leak-list li {
+.list.leak-list li,
+.list.env-list li {
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
@@ -1882,4 +1883,17 @@ details.client-details > summary {
 .list .client-modules li {
   border: 0;
   padding: 1px 0;
+}
+
+/* Environment variables (M45) */
+.env-reads {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0 0 0 12px;
+}
+.env-reads .env-read {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
 }

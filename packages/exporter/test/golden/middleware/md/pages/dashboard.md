@@ -33,6 +33,12 @@
 
 Nothing runs in the browser: every component renders on the server.
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `API_URL` (server): not defined, `lib/config.ts:1`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:4`

@@ -33,6 +33,12 @@
 - [`LoginForm`](../components/LoginForm.md), rendered by `LoginPage` (page): 1 component · 4 modules · 2.8 KB, `src/app/[locale]/login/page.tsx:6`
   - packages: `next-intl`
 
+## Environment variables
+
+Names only ([all](../env.md)).
+
+- `NEXT_PUBLIC_API_URL` (client): not defined, `src/lib/auth-api.ts:3`
+
 ## Component tree
 
 - [`LoginPage`](../components/LoginPage.md) · server

@@ -23,6 +23,7 @@ import { buildCacheMap } from './cache'
 import { addClientBoundaries } from './client'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
+import { buildEnvMap } from './env'
 import { inferFlows } from './flows'
 import { findGraphql, type GraphqlScanOptions } from './graphql-setup'
 import {
@@ -464,6 +465,44 @@ function analyze(
     resolveModule: resolveImport,
     readFile: (path) => (fs.fileExistsSync(path) ? fs.readFileSync(path) : undefined),
   })
+  const env = buildEnvMap({
+    root,
+    appDir: discovery.appDir,
+    routes,
+    appFiles: project
+      .getSourceFiles()
+      .filter(
+        (f) =>
+          f.getFilePath().startsWith(`${discovery.appDir}/`) &&
+          !f.isInNodeModules() &&
+          !f.isDeclarationFile() &&
+          settings.scanned(f.getFilePath()),
+      ),
+    ...(middlewareFile && middleware
+      ? {
+          middleware: {
+            file: middlewareFile.getFilePath(),
+            routeIds: middleware.routes.map((r) => r.routeId),
+          },
+        }
+      : {}),
+    fileAt: (path) => {
+      const file = project.getSourceFile(path) ?? project.addSourceFileAtPathIfExists(path)
+      return file && !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(path)
+        ? file
+        : undefined
+    },
+    resolveModule: resolveImport,
+    listDir: (dir) =>
+      fs.directoryExistsSync(dir)
+        ? fs
+            .readDirSync(dir)
+            .filter((e) => e.isFile)
+            .map((e) => e.name.replaceAll('\\', '/').split('/').pop() as string)
+        : [],
+    readFile: (path) => (fs.fileExistsSync(path) ? fs.readFileSync(path) : undefined),
+    ...(discovery.nextConfig ? { nextConfig: discovery.nextConfig } : {}),
+  })
   const cache = buildCacheMap({
     routes,
     components,
@@ -505,6 +544,7 @@ function analyze(
     ...(cache ? { cache } : {}),
     ...(client.boundaries.length > 0 ? { clientBoundaries: client.boundaries } : {}),
     ...(client.leaks.length > 0 ? { leaks: client.leaks } : {}),
+    ...(env ? { env } : {}),
   }
 }
 

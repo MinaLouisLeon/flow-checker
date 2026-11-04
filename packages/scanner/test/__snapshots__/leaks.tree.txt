@@ -44,6 +44,7 @@ title: Leaks  (layout metadata)
 client: 2 boundaries, 2 components, 2 modules, 2.1 KB, packages path
   OrderList  from Home (page)  src/app/page.tsx:15
   ArchiveButton  from OrderActions (component)  src/components/order-actions.tsx:5
+env: DATABASE_URL [not-defined]
 
 ## /account  src/app/account/page.tsx
 layouts: src/app/layout.tsx
@@ -122,6 +123,7 @@ client: 1 boundary, 1 component, 2 modules, 0.4 KB, packages server-only
   ApiKeyField  from KeysPage (page)  src/app/keys/page.tsx:5
 leaks: 1
   module server-only in src/lib/keys.ts:1
+env: API_KEY [private-in-client]
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -161,6 +163,7 @@ client: 1 boundary, 1 component, 2 modules, 0.5 KB, packages pg
   StatsCard  from StatsPage (page)  src/app/stats/page.tsx:5
 leaks: 1
   module pg in src/lib/stats.ts:1
+env: DATABASE_URL [private-in-client] [not-defined]
 
 # Server cache
 
@@ -272,3 +275,26 @@ prop onSelect: function, from ProductsPage to ProductPicker  src/app/products/pa
 
 prop total: class-instance Money, from ReceiptPage to ReceiptTotal  src/app/receipt/page.tsx:6
   pages: /receipt
+
+# Environment variables
+
+API_KEY: not defined [private-in-client]
+  client optional  src/lib/keys.ts:3  /keys
+
+DATABASE_URL: not defined [private-in-client] [not-defined]
+  server  src/lib/db.ts:5  /
+  client  src/lib/stats.ts:3  /stats
+
+FLOW_CHECKER: set by flow-checker
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  src/instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  src/instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  src/instrumentation.ts:3
+  server optional  src/instrumentation.ts:8

@@ -572,6 +572,7 @@ function commonFolder(files: string[]): string {
 const NOTE_ORDER: NoteKind[] = [
   'type-mismatch',
   'leak',
+  'env',
   'needs-recheck',
   'missing-page-component',
   'boundary',
@@ -591,6 +592,7 @@ const NOTE_LABEL: Record<NoteKind, string> = {
   boundary: 'Boundary',
   client: 'Client',
   leak: 'Leak',
+  env: 'Env',
   'unresolved-component': 'Component',
   'unresolved-type': 'Type',
 }

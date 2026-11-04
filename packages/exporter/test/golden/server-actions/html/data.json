@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "server-actions",
   "model": {
-    "version": 17,
+    "version": 18,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -1555,7 +1555,126 @@
           }
         ]
       }
-    ]
+    ],
+    "env": {
+      "files": [],
+      "vars": [
+        {
+          "name": "API_URL",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/lib/backend.ts",
+                "line": 4,
+                "column": 17
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": [
+                "rt_0te2vdgan2u",
+                "rt_1kdazzrvrkg",
+                "rt_0pq5p0nm2h4"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 7
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "FLOW_CHECKER_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 10,
+                "column": 25
+              },
+              "side": "server",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_PUBLIC_FLOW_CHECKER",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation-client.ts",
+                "line": 5,
+                "column": 22
+              },
+              "side": "client",
+              "access": "direct",
+              "routeIds": []
+            }
+          ],
+          "setBy": "flow-checker"
+        },
+        {
+          "name": "NEXT_RUNTIME",
+          "definedIn": [],
+          "reads": [
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 3,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            },
+            {
+              "loc": {
+                "file": "src/instrumentation.ts",
+                "line": 8,
+                "column": 43
+              },
+              "side": "server",
+              "access": "direct",
+              "optional": true,
+              "routeIds": []
+            }
+          ],
+          "setBy": "next"
+        }
+      ],
+      "unknown": []
+    }
   },
   "verification": {
     "sites": {

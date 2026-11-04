@@ -62,3 +62,19 @@ modules: 2, 1.4 KB
   components/Ticker.tsx
   lib/config.ts
 uses: useState (hook) components/Ticker.tsx:11, useEffect (hook) components/Ticker.tsx:14
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

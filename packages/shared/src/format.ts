@@ -3,6 +3,7 @@ import { accessOf, guardText } from './access'
 import { gapLine, titleText } from './boundaries'
 import { formatCache } from './cache'
 import { CLIENT_USE_LABELS, sizeText } from './client'
+import { envFlagsOn, envOn, formatEnv } from './env'
 import { urlText } from './format-requests'
 import { importText, leaksOn, SERVER_MODULE_LABELS } from './leaks'
 import type {
@@ -53,12 +54,14 @@ export function formatModel(model: AppModel): string {
     out.push(...formatBoundaries(route))
     out.push(...formatClient(route, components))
     out.push(...formatPageLeaks(model, route))
+    out.push(...formatPageEnv(model, route))
   }
 
   const cache = formatCache(model)
   if (cache.length > 0) out.push('', ...cache)
   if (model.clientBoundaries) out.push('', ...formatClientBoundaries(model, components))
   if (model.leaks) out.push('', ...formatLeaks(model, components))
+  if (model.env) out.push('', ...formatEnv(model))
 
   return `${out.join('\n')}\n`
 }
@@ -160,6 +163,19 @@ function formatPageLeaks(model: AppModel, route: Route): string[] {
         : `  prop ${l.name}.${l.prop} (${l.value})  ${l.loc.file}:${l.loc.line}`,
     ),
   ]
+}
+
+/** The environment variables the page's code reads, with the flags that show up on it (M45). */
+function formatPageEnv(model: AppModel, route: Route): string[] {
+  const vars = envOn(model, route.id)
+  if (vars.length === 0) return []
+  const line = vars
+    .map((v) => {
+      const flags = envFlagsOn(v, route.id).map((f) => ` [${f.kind}]`)
+      return `${v.name}${flags.join('')}`
+    })
+    .join(', ')
+  return [`env: ${line}`]
 }
 
 /** Every leak: server-only modules client code imports, then props that can't cross (M44). */

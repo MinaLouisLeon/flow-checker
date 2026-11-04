@@ -47,6 +47,9 @@ const IGNORED_DIRS = new Set([
 
 const WATCHED_FILE = /\.(tsx?|jsx?|mts|cts|mjs|cjs)$|(^|[\\/])(tsconfig\.json|jsconfig\.json|package\.json)$/
 
+/** `.env` files in the root: the scan reads the names they define (M45). */
+const ENV_FILE = /^\.env(\.[^\\/]+)?$/
+
 /** Whether a path matters for the scan. Directories count unless they are ignored. */
 export function isWatched(root: string, path: string, isFile: boolean | undefined): boolean {
   const rel = relative(root, path)
@@ -56,7 +59,7 @@ export function isWatched(root: string, path: string, isFile: boolean | undefine
   if (isFile === false) return true
   // Unknown kind (e.g. a removal): keep source-looking paths and anything without an extension.
   if (isFile === undefined && !/\.[^\\/]+$/.test(rel)) return true
-  return WATCHED_FILE.test(rel) && !rel.endsWith('.d.ts')
+  return (WATCHED_FILE.test(rel) && !rel.endsWith('.d.ts')) || ENV_FILE.test(rel)
 }
 
 /** Starts watching. Resolves once the initial walk is done, so later edits are seen. */

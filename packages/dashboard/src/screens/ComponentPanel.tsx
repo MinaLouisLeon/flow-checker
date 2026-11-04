@@ -61,7 +61,7 @@ export function ComponentPanel({
           {notes.map((n) => (
             <li key={`${n.file}:${n.line}:${n.message}`}>
               ⚠{' '}
-              {n.kind === 'boundary' || n.kind === 'client' || n.kind === 'leak' ? (
+              {n.kind === 'boundary' || n.kind === 'client' || n.kind === 'leak' || n.kind === 'env' ? (
                 <CodeText text={n.message} />
               ) : (
                 n.message

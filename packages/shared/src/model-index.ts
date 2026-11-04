@@ -1,6 +1,7 @@
 // Lookup tables and derived facts the dashboard screens and the exporter need, built once per model.
 import { GAP_LABELS, gapText } from './boundaries'
 import { lowerText } from './client'
+import { envFlagText, envOf, flagRouteIds, unknownInClient, unknownText } from './env'
 import { isInfoFlag, urlText } from './format-requests'
 import { leakText } from './leaks'
 import type {
@@ -47,6 +48,7 @@ export type NoteKind =
   | 'boundary'
   | 'client'
   | 'leak'
+  | 'env'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -478,6 +480,31 @@ function scanNotes(model: AppModel): ScanNote[] {
         ...(leak.routeIds[0] ? { routeId: leak.routeIds[0] } : {}),
       })
     }
+  }
+  // Environment variables (M45): one note per flag, and one per name built at run time in client code.
+  const env = envOf(model)
+  for (const variable of env.vars) {
+    for (const flag of variable.flags ?? []) {
+      const routeIds = flagRouteIds(variable, flag.kind)
+      notes.push({
+        kind: 'env',
+        message: `${envFlagText(variable, flag.kind)}${routeIds.length > 1 ? ` (on ${routeIds.length} pages)` : ''}`,
+        file: flag.loc.file,
+        line: flag.loc.line,
+        column: flag.loc.column,
+        ...(routeIds[0] ? { routeId: routeIds[0] } : {}),
+      })
+    }
+  }
+  for (const read of unknownInClient(env)) {
+    notes.push({
+      kind: 'env',
+      message: unknownText(read),
+      file: read.loc.file,
+      line: read.loc.line,
+      column: read.loc.column,
+      ...(read.routeIds[0] ? { routeId: read.routeIds[0] } : {}),
+    })
   }
   const mw = model.middleware
   if (mw?.matcherText !== undefined) {

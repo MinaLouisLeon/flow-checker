@@ -28,6 +28,7 @@ title: mismatch fixture  (layout metadata)
 client: 2 boundaries, 2 components, 4 modules, 2.5 KB
   SettingsPanel  from HomePage (page)  app/page.tsx:20
   TodoPanel  from HomePage (page)  app/page.tsx:21
+env: NEXT_PUBLIC_API_URL
 
 # Client boundaries
 
@@ -46,3 +47,22 @@ modules: 3, 2.0 KB
   lib/api.ts
   lib/config.ts
 uses: useState (hook) components/TodoPanel.tsx:10, useEffect (hook) components/TodoPanel.tsx:12, onSubmit (event handler) components/TodoPanel.tsx:34
+
+# Environment variables
+
+FLOW_CHECKER: set by flow-checker
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8
+
+FLOW_CHECKER_RUNTIME: set by flow-checker
+  server  instrumentation.ts:10
+
+NEXT_PUBLIC_API_URL: not defined
+  both optional  lib/config.ts:1  /
+
+NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
+  client  instrumentation-client.ts:5
+
+NEXT_RUNTIME: set by Next
+  server optional  instrumentation.ts:3
+  server optional  instrumentation.ts:8

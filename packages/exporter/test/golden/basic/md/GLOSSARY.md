@@ -162,6 +162,27 @@ Server-only code that client code imports, and props a server component hands to
 | <a id="leak-symbol"></a>**symbol prop** (`symbol`) | A symbol made with `Symbol()`. Only symbols from `Symbol.for()` cross. |  |
 | <a id="leak-null-prototype"></a>**prop without a prototype** (`null-prototype`) | `Object.create(null)`: React only sends plain objects. |  |
 
+## Environment variables
+
+Every `process.env` name the code reads, on which side, and which `.env` files define it. Only names are read: values never leave the `.env` files.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="env-server"></a>**server** | Read in server code: server components, route handlers, server actions, middleware or `instrumentation`. Every name the server process has is available there. |  |
+| <a id="env-client"></a>**client** | Read in client code: a `'use client'` file, a file it imports, or `instrumentation-client`. In the browser, Next only has the names it inlined when it built the app: `NEXT_PUBLIC_` names, the `env` names in `next.config`, and `NODE_ENV`. |  |
+| <a id="env-both"></a>**server and client** (`both`) | Read in a module that server code and client code both import. It has a value on the server and, unless Next inlines the name, none in the browser. |  |
+| <a id="env-config"></a>**next.config** (`config`) | Read in `next.config`, when Next starts or builds the app. |  |
+| <a id="env-private-in-client"></a>**private name in client code** (`private-in-client`) | A name without the `NEXT_PUBLIC_` prefix is read in client code. Next leaves it out of the browser bundle, so it is undefined there; while rendering on the server it has a value, so the page can also differ between the two. | Read it in server code and pass the result down as a prop, or, if it isn't a secret, rename it with the `NEXT_PUBLIC_` prefix. |
+| <a id="env-not-defined"></a>**not defined** (`not-defined`) | No `.env` file Next loads defines the name, it isn't in `next.config` `env`, Next doesn't set it, and a read has no fallback. Unless the environment the app runs in sets it, the code gets undefined. Often a typo, or a name missing from `.env.example`. | Check the spelling, add it to a `.env` file (or `.env.example` for others to fill in), or give the read a fallback. |
+| <a id="env-not-inlined"></a>**not inlined** (`not-inlined`) | A name Next inlines (`NEXT_PUBLIC_`...) is destructured from `process.env` in client code. Next only replaces `process.env.NAME` and `process.env['NAME']` when it builds the app, so in the browser the value is undefined. | Read it as `process.env.NAME`. |
+| <a id="env-direct"></a>**direct** | `process.env.NAME`. |  |
+| <a id="env-literal"></a>**literal key** (`literal`) | `process.env['NAME']`: Next inlines it like `process.env.NAME`. |  |
+| <a id="env-constant"></a>**constant key** (`constant`) | `process.env[KEY]` where `KEY` holds a fixed name. Turbopack inlines it in client code; webpack (Next 15's default bundler) doesn't. |  |
+| <a id="env-alias"></a>**through a variable** (`alias`) | `env.NAME` after `const env = process.env`. Next inlines it like `process.env.NAME`. |  |
+| <a id="env-destructured"></a>**destructured** | `const { NAME } = process.env`. Fine on the server; in client code Next doesn't inline it. |  |
+| <a id="env-unknown-name"></a>**name built at run time** (`unknown-name`) | `process.env[name]` with a name the code builds while it runs, so the scan can't tell which variable it is. In client code it is always undefined in the browser. |  |
+| <a id="env-listed"></a>**only listed** (`listed`) | Listed in a file Next doesn't load, such as `.env.example`: the project expects each developer to define it, so it isn't flagged. |  |
+
 ## Server cache
 
 What Next keeps on the server between requests, the tags on it, and the calls that refresh it (`revalidateTag`, `updateTag`, `revalidatePath`).

@@ -116,3 +116,4 @@ re-run them on their own before assuming a regression.
 | M42 | Release v0.4.0                                    | Done   |
 | M43 | Client boundaries                                 | Done   |
 | M44 | Server/client leaks                               | Done   |
+| M45 | Environment variables                             | Done   |
