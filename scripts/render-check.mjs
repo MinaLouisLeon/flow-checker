@@ -8,13 +8,17 @@ import { compareRenderModes, readBuildTable } from './next-build-table.mjs'
 
 const repo = resolve(fileURLToPath(import.meta.url), '../..')
 const fixtures = join(repo, 'fixtures')
+// Its planted server/client leaks (M44) make `next build` fail on purpose.
+const UNBUILDABLE = new Set(['leaks'])
 const names =
   process.argv.length > 2
     ? process.argv.slice(2)
     : readdirSync(fixtures).filter(
         // Only the Next.js apps (`mock-api` is a plain server the fixtures call).
         (n) =>
-          statSync(join(fixtures, n)).isDirectory() && existsSync(join(fixtures, n, 'node_modules/next')),
+          !UNBUILDABLE.has(n) &&
+          statSync(join(fixtures, n)).isDirectory() &&
+          existsSync(join(fixtures, n, 'node_modules/next')),
       )
 
 let failed = 0

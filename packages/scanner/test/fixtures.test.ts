@@ -34,6 +34,7 @@ const FIXTURES = [
   'caching-15',
   'boundaries',
   'client-boundaries',
+  'leaks',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -380,5 +381,53 @@ describe('client boundaries (M43)', () => {
         }
       }
     }
+  })
+})
+
+describe('server/client leaks (M44)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  it('flags exactly the pages `next dev` rejects in the leaks fixture, and nothing on the others', () => {
+    const found = FIXTURES.flatMap((fixture) => {
+      const model = scan(fixture)
+      const name = (id: string) => model.components.find((c) => c.id === id)?.name ?? id
+      const path = (id: string) => model.routes.find((r) => r.id === id)?.path ?? id
+      return (model.leaks ?? []).map((l) =>
+        l.kind === 'module'
+          ? `${fixture} ${l.routeIds.map(path).join(',')}: ${l.module} in ${l.file} (${l.category})`
+          : `${fixture} ${l.routeIds.map(path).join(',')}: ${name(l.parentId)} -> ${l.name}.${l.prop} (${l.value})`,
+      )
+    })
+    // `next dev` (16.4.3) on the fixture: `/` renders; each of these pages fails with the error noted.
+    expect(found).toEqual([
+      // "You're importing a module that depends on \"revalidatePath\""
+      'leaks /admin: next/cache in src/components/refresh-button.tsx (next-server)',
+      // "Module not found: Can't resolve 'fs'"
+      'leaks /files: fs in src/lib/disk.ts (node)',
+      // "You're importing a module that depends on \"server-only\""
+      'leaks /keys: server-only in src/lib/keys.ts (server-only)',
+      // "You're importing a module that depends on \"next/headers\""
+      'leaks /account: next/headers in src/lib/session.ts (next-server)',
+      // "Module not found: Can't resolve 'dns'"
+      'leaks /stats: pg in src/lib/stats.ts (database)',
+      // "Event handlers cannot be passed to Client Component props"
+      'leaks /filters: FiltersPage -> FilterBar.config.onChange (function)',
+      'leaks /help: HelpPage -> Link.onClick (function)',
+      'leaks /products: ProductsPage -> ProductPicker.onSelect (function)',
+      // "Only plain objects, and a few built-ins, can be passed to Client Components"
+      'leaks /receipt: ReceiptPage -> ReceiptTotal.total (class-instance)',
+    ])
+  })
+
+  it('gives each module leak the import chain from the boundary', () => {
+    const model = scan('leaks')
+    const files = (model.leaks ?? []).find((l) => l.kind === 'module' && l.module === 'fs')
+    expect(files?.kind === 'module' && files.chain).toEqual([
+      'src/components/file-badge.tsx',
+      'src/lib/format-size.ts',
+      'src/lib/disk.ts',
+    ])
   })
 })

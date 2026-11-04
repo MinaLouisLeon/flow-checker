@@ -51,6 +51,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M41 | Boundaries            | Model version 15, `Route.boundaries` / `metadata`. Refs carry `suspense` / `errorBoundary`; `scanner/src/boundaries.ts`. |
 | M42 | Release v0.4.0        | Matrix runs `next build` per version (async: it fetches from the script). Publish = tag.                                 |
 | M43 | Client boundaries     | Model version 16, `Route.client`, `AppModel.clientBoundaries`, `Component.clientUses`; `scanner/src/client.ts`.          |
+| M44 | Server/client leaks   | Model version 17, `AppModel.leaks` (module + prop); rules in `scanner/src/leaks.ts`, run from M43's client pass.         |
 
 ## Gotchas
 
@@ -578,3 +579,19 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 - `pnpm install` for a new fixture rewrites `pnpm-lock.yaml` with single quotes (7,000-line diff):
   `pnpm biome format --write pnpm-lock.yaml` leaves only the new importer.
 - The `'\n'` heredoc trap struck twice more (glossary apostrophes, exporter `join`): use the Edit tool for such lines.
+
+## M44 — Server/client leaks (branch `feat/server-client-leaks-m44`)
+
+- Check leak rules with `next dev`, one page per case, a fresh server per module case: Turbopack keeps a compile error
+  (and panics on `node:fs` in client code), so later pages fail with the earlier error. Prop errors are per request.
+- React 19 sends `Date`, `Map`, `Set`, `URL` (as its `toJSON()` string), `Error`, typed arrays, iterables, promises,
+  `Symbol.for()` and any object with `toJSON`: the plan's "Date / Map" examples are wrong for Next 15/16. React's
+  serializer (`renderModelDestructive` in `react-server-dom-*-server.*.js`) is the reference.
+- Client code may import a `'use server'` file: the browser only gets action references. M43's module walk followed it
+  (the server-actions fixture "brought" `server-only` to the browser); it now stops there, or M44 flags false leaks.
+- `path`, `crypto`, `buffer`... have browser versions (Next's webpack `fallback` list); Turbopack also maps `node:path`,
+  webpack rejects every `node:` import in client code. The scan follows Turbopack (Next 16's default).
+- The leaks fixture can't build: `render-check` (`UNBUILDABLE`) and CI's fixture build (`--filter "!@fixtures/leaks"`)
+  skip it. A new fixture that must fail needs both.
+- Component types (`forwardRef`, icon components) have call signatures: test callability before excusing React's types.
+- Map and Set are iterable: check built-in containers' type arguments before the "iterable crosses" shortcut.

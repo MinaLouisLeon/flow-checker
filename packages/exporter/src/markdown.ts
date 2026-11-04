@@ -62,6 +62,12 @@ import {
   isBuildError,
   isInfoFlag,
   isVerified,
+  LEAK_LABELS,
+  leakKind,
+  leaksOfComponent,
+  leaksOn,
+  leakText,
+  leakWhy,
   lowerText,
   type MatcherCondition,
   type MiddlewareMatcher,
@@ -673,6 +679,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ...renderSection(route),
     ...boundarySection(route),
     ...clientSection(ctx, route, from),
+    ...leakSection(ctx, route),
     ...cacheSection(ctx, route, from),
     ...metadataSection(route),
     '## Component tree',
@@ -766,6 +773,21 @@ function clientSection(ctx: Ctx, route: Route, from: string): string[] {
   return [
     '## Client boundaries',
     [clientSummary(client), ...(lines.length > 0 ? ['', ...lines] : [])].join('\n'),
+  ]
+}
+
+/** Server-only code the page's client code imports, and props that can't cross (M44). */
+function leakSection(ctx: Ctx, route: Route): string[] {
+  const leaks = leaksOn(ctx.index.model, route.id)
+  if (leaks.length === 0) return []
+  const name = (id: string) => ctx.index.components.get(id)?.name ?? '?'
+  const lines = leaks.map(
+    (leak) =>
+      `- ⚠ **${LEAK_LABELS[leakKind(leak)]}**: ${leakText(leak, name)}, ${code(`${leak.loc.file}:${leak.loc.line}`)}\n  - ${leakWhy(leak)}`,
+  )
+  return [
+    '## Server/client leaks',
+    ['Next rejects these, so the page fails to build or render.', '', ...lines].join('\n'),
   ]
 }
 
@@ -1405,6 +1427,7 @@ function componentDoc(ctx: Ctx, component: Component, from: string): string {
       ['Kind', `${component.kind}${component.clientBoundary ? ` (${code("'use client'")})` : ''}`],
       ['Needs the browser for', component.clientUses?.map(clientUseText).join(', ')],
       ['Brings to the browser', clientBrings(ctx, component.id)],
+      ['Leaks', componentLeaks(ctx, component.id)],
       ['Used on', routes.map((r) => routeLink(ctx, r, from)).join(', ') || undefined],
       ['Rendered by', renderedBy.map((id) => componentLink(ctx, id, from)).join(', ') || undefined],
       ['Renders', [...new Set(children)].join(', ') || undefined],
@@ -1422,6 +1445,14 @@ function componentDoc(ctx: Ctx, component: Component, from: string): string {
     sites.length === 0 ? 'Sends no requests.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
   ])
+}
+
+/** Leaks through a boundary, or that a component hands on or receives (M44). */
+function componentLeaks(ctx: Ctx, componentId: string): string | undefined {
+  const leaks = leaksOfComponent(ctx.index.model, componentId)
+  if (leaks.length === 0) return undefined
+  const name = (id: string) => ctx.index.components.get(id)?.name ?? '?'
+  return leaks.map((leak) => `⚠ ${leakText(leak, name)}`).join('; ')
 }
 
 /** A client boundary's components, modules and size, packages, and whether it could move lower (M43). */
@@ -2076,6 +2107,11 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: 'Captured data does not fit the declared types.',
   },
   {
+    title: 'Server/client leaks',
+    kinds: ['leak'],
+    hint: "Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both.",
+  },
+  {
     title: 'Needs a re-check',
     kinds: ['needs-recheck'],
     hint: 'The code changed after every capture. Use the app again to re-check.',
@@ -2183,7 +2219,7 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     }
   } else if (note.typeId) {
     target = typeLink(ctx, note.typeId, from)
-  } else if (note.componentId) {
+  } else if (note.componentId && note.kind !== 'leak') {
     target = componentLink(ctx, note.componentId, from)
     // Client notes start with the component, which the link already shows.
     const prefix = `\`${ctx.index.components.get(note.componentId)?.name}\`: `
@@ -2197,8 +2233,9 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
       if (message.startsWith(prefix)) message = message.slice(prefix.length)
     }
   }
-  // Boundary notes are the tool's own wording, with code in backticks (M41).
-  const body = note.kind === 'boundary' || note.kind === 'client' ? message : text(message)
+  // Boundary, client and leak notes are the tool's own wording, with code in backticks (M41).
+  const body =
+    note.kind === 'boundary' || note.kind === 'client' || note.kind === 'leak' ? message : text(message)
   return `${target ? `${target}: ` : ''}${body} (${where})`
 }
 

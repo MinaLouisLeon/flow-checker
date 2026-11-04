@@ -1,0 +1,27 @@
+{
+  "name": "@fixtures/leaks",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: server/client leaks. Each page but / has one planted leak that `next dev` and `next build` reject (a server-only module reached from client code, or a prop that can't cross to a client component), so render-check skips it.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "catalog:",
+    "pg": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@integr8-media/flow-checker": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

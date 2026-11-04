@@ -1,0 +1,2788 @@
+{
+  "version": 17,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "account",
+          "kind": "static",
+          "name": "account"
+        },
+        "dir": "src/app/account",
+        "files": {
+          "page": "src/app/account/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "admin",
+          "kind": "static",
+          "name": "admin"
+        },
+        "dir": "src/app/admin",
+        "files": {
+          "page": "src/app/admin/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "files",
+          "kind": "static",
+          "name": "files"
+        },
+        "dir": "src/app/files",
+        "files": {
+          "page": "src/app/files/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "filters",
+          "kind": "static",
+          "name": "filters"
+        },
+        "dir": "src/app/filters",
+        "files": {
+          "page": "src/app/filters/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "help",
+          "kind": "static",
+          "name": "help"
+        },
+        "dir": "src/app/help",
+        "files": {
+          "page": "src/app/help/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "keys",
+          "kind": "static",
+          "name": "keys"
+        },
+        "dir": "src/app/keys",
+        "files": {
+          "page": "src/app/keys/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        },
+        "dir": "src/app/products",
+        "files": {
+          "page": "src/app/products/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "receipt",
+          "kind": "static",
+          "name": "receipt"
+        },
+        "dir": "src/app/receipt",
+        "files": {
+          "page": "src/app/receipt/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "stats",
+          "kind": "static",
+          "name": "stats"
+        },
+        "dir": "src/app/stats",
+        "files": {
+          "page": "src/app/stats/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bvhjg8zu96",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0d17ihmgom2",
+            "parentId": "cmp_1bvhjg8zu96",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 15,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_1vhdswr267i",
+            "parentId": "cmp_102419qf3e2",
+            "in": "component",
+            "loc": {
+              "file": "src/components/order-actions.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 2,
+        "bytes": 2186,
+        "packages": [
+          "path"
+        ]
+      }
+    },
+    {
+      "id": "rt_1cis2tinktq",
+      "path": "/account",
+      "kind": "page",
+      "file": "src/app/account/page.tsx",
+      "segments": [
+        {
+          "raw": "account",
+          "kind": "static",
+          "name": "account"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0azm4ecqz6g",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_2bm6byfpnod",
+            "parentId": "cmp_0azm4ecqz6g",
+            "in": "page",
+            "loc": {
+              "file": "src/app/account/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 2,
+        "bytes": 426,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_1vstxm5jg4s",
+      "path": "/admin",
+      "kind": "page",
+      "file": "src/app/admin/page.tsx",
+      "segments": [
+        {
+          "raw": "admin",
+          "kind": "static",
+          "name": "admin"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1bjye2kzkl7",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0cs8vu9b1fn",
+            "parentId": "cmp_1bjye2kzkl7",
+            "in": "page",
+            "loc": {
+              "file": "src/app/admin/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 201,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_19fb3kq7t7h",
+      "path": "/files",
+      "kind": "page",
+      "file": "src/app/files/page.tsx",
+      "segments": [
+        {
+          "raw": "files",
+          "kind": "static",
+          "name": "files"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0vbvhf6q3mv",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_06c0p4q1rgq",
+            "parentId": "cmp_0vbvhf6q3mv",
+            "in": "page",
+            "loc": {
+              "file": "src/app/files/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 3,
+        "bytes": 796,
+        "packages": [
+          "fs"
+        ]
+      }
+    },
+    {
+      "id": "rt_06lrmirmxeq",
+      "path": "/filters",
+      "kind": "page",
+      "file": "src/app/filters/page.tsx",
+      "segments": [
+        {
+          "raw": "filters",
+          "kind": "static",
+          "name": "filters"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0s9wd2omhih",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_2440cm4qrn4",
+            "parentId": "cmp_0s9wd2omhih",
+            "in": "page",
+            "loc": {
+              "file": "src/app/filters/page.tsx",
+              "line": 8,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 412,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_2cmil0fhcvl",
+      "path": "/help",
+      "kind": "page",
+      "file": "src/app/help/page.tsx",
+      "segments": [
+        {
+          "raw": "help",
+          "kind": "static",
+          "name": "help"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_22h1c1q9i1t",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_118xhn7ft71",
+      "path": "/keys",
+      "kind": "page",
+      "file": "src/app/keys/page.tsx",
+      "segments": [
+        {
+          "raw": "keys",
+          "kind": "static",
+          "name": "keys"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_20ozgprsk3s",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0lw5ynqi6em",
+            "parentId": "cmp_20ozgprsk3s",
+            "in": "page",
+            "loc": {
+              "file": "src/app/keys/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 2,
+        "bytes": 398,
+        "packages": [
+          "server-only"
+        ]
+      }
+    },
+    {
+      "id": "rt_0te2vdgan2u",
+      "path": "/products",
+      "kind": "page",
+      "file": "src/app/products/page.tsx",
+      "segments": [
+        {
+          "raw": "products",
+          "kind": "static",
+          "name": "products"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_115a9noj763",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_18kcavufcpi",
+            "parentId": "cmp_115a9noj763",
+            "in": "page",
+            "loc": {
+              "file": "src/app/products/page.tsx",
+              "line": 6,
+              "column": 5
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 398,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_1f7m1o687x1",
+      "path": "/receipt",
+      "kind": "page",
+      "file": "src/app/receipt/page.tsx",
+      "segments": [
+        {
+          "raw": "receipt",
+          "kind": "static",
+          "name": "receipt"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_0zqbyjijxz1",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1s76w1etqwp",
+            "parentId": "cmp_0zqbyjijxz1",
+            "in": "page",
+            "loc": {
+              "file": "src/app/receipt/page.tsx",
+              "line": 6,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 326,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_0zuy2kvnsns",
+      "path": "/stats",
+      "kind": "page",
+      "file": "src/app/stats/page.tsx",
+      "segments": [
+        {
+          "raw": "stats",
+          "kind": "static",
+          "name": "stats"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_1hvimjebdjo",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Leaks",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Leaks",
+            "template": "%s | Leaks",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 4,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1n9th0stvf8",
+            "parentId": "cmp_1hvimjebdjo",
+            "in": "page",
+            "loc": {
+              "file": "src/app/stats/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 2,
+        "bytes": 557,
+        "packages": [
+          "pg"
+        ]
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_0azm4ecqz6g",
+      "name": "AccountPage",
+      "file": "src/app/account/page.tsx",
+      "loc": {
+        "file": "src/app/account/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "UserMenu",
+          "resolution": "project",
+          "componentId": "cmp_2bm6byfpnod",
+          "module": "@/components/user-menu",
+          "loc": {
+            "file": "src/app/account/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1bjye2kzkl7",
+      "name": "AdminPage",
+      "file": "src/app/admin/page.tsx",
+      "loc": {
+        "file": "src/app/admin/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "RefreshButton",
+          "resolution": "project",
+          "componentId": "cmp_0cs8vu9b1fn",
+          "module": "@/components/refresh-button",
+          "loc": {
+            "file": "src/app/admin/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0vbvhf6q3mv",
+      "name": "FilesPage",
+      "file": "src/app/files/page.tsx",
+      "loc": {
+        "file": "src/app/files/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "FileBadge",
+          "resolution": "project",
+          "componentId": "cmp_06c0p4q1rgq",
+          "module": "@/components/file-badge",
+          "loc": {
+            "file": "src/app/files/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0s9wd2omhih",
+      "name": "FiltersPage",
+      "file": "src/app/filters/page.tsx",
+      "loc": {
+        "file": "src/app/filters/page.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "FilterShell",
+          "resolution": "project",
+          "componentId": "cmp_1qqbzh0radp",
+          "module": "@/components/filter-shell",
+          "loc": {
+            "file": "src/app/filters/page.tsx",
+            "line": 7,
+            "column": 5
+          }
+        },
+        {
+          "name": "FilterBar",
+          "resolution": "project",
+          "componentId": "cmp_2440cm4qrn4",
+          "module": "@/components/filter-bar",
+          "loc": {
+            "file": "src/app/filters/page.tsx",
+            "line": 8,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_22h1c1q9i1t",
+      "name": "HelpPage",
+      "file": "src/app/help/page.tsx",
+      "loc": {
+        "file": "src/app/help/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/help/page.tsx",
+            "line": 6,
+            "column": 5
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_20ozgprsk3s",
+      "name": "KeysPage",
+      "file": "src/app/keys/page.tsx",
+      "loc": {
+        "file": "src/app/keys/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "ApiKeyField",
+          "resolution": "project",
+          "componentId": "cmp_0lw5ynqi6em",
+          "module": "@/components/api-key-field",
+          "loc": {
+            "file": "src/app/keys/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 8,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1bvhjg8zu96",
+      "name": "Home",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 10,
+        "column": 31
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "OrderList",
+          "resolution": "project",
+          "componentId": "cmp_0d17ihmgom2",
+          "module": "@/components/order-list",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 15,
+            "column": 7
+          }
+        },
+        {
+          "name": "OrderActions",
+          "resolution": "project",
+          "componentId": "cmp_102419qf3e2",
+          "module": "@/components/order-actions",
+          "conditional": true,
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 29,
+            "column": 21
+          }
+        },
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 30,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_115a9noj763",
+      "name": "ProductsPage",
+      "file": "src/app/products/page.tsx",
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "ProductPicker",
+          "resolution": "project",
+          "componentId": "cmp_18kcavufcpi",
+          "module": "@/components/product-picker",
+          "loc": {
+            "file": "src/app/products/page.tsx",
+            "line": 6,
+            "column": 5
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0zqbyjijxz1",
+      "name": "ReceiptPage",
+      "file": "src/app/receipt/page.tsx",
+      "loc": {
+        "file": "src/app/receipt/page.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "ReceiptTotal",
+          "resolution": "project",
+          "componentId": "cmp_1s76w1etqwp",
+          "module": "@/components/receipt-total",
+          "loc": {
+            "file": "src/app/receipt/page.tsx",
+            "line": 6,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_1hvimjebdjo",
+      "name": "StatsPage",
+      "file": "src/app/stats/page.tsx",
+      "loc": {
+        "file": "src/app/stats/page.tsx",
+        "line": 4,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "StatsCard",
+          "resolution": "project",
+          "componentId": "cmp_1n9th0stvf8",
+          "module": "@/components/stats-card",
+          "loc": {
+            "file": "src/app/stats/page.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_0lw5ynqi6em",
+      "name": "ApiKeyField",
+      "file": "src/components/api-key-field.tsx",
+      "loc": {
+        "file": "src/components/api-key-field.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/api-key-field.tsx",
+            "line": 7,
+            "column": 25
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/api-key-field.tsx",
+            "line": 8,
+            "column": 38
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1vhdswr267i",
+      "name": "ArchiveButton",
+      "file": "src/components/archive-button.tsx",
+      "loc": {
+        "file": "src/components/archive-button.tsx",
+        "line": 3,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: number; action: (id: number) => Promise<void> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "action",
+              "type": {
+                "kind": "function",
+                "params": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  }
+                ],
+                "returns": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "primitive",
+                      "name": "void"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/archive-button.tsx",
+            "line": 5,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_06c0p4q1rgq",
+      "name": "FileBadge",
+      "file": "src/components/file-badge.tsx",
+      "loc": {
+        "file": "src/components/file-badge.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ name: string; bytes: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "name",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "bytes",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/file-badge.tsx",
+            "line": 7,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/file-badge.tsx",
+            "line": 9,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_2440cm4qrn4",
+      "name": "FilterBar",
+      "file": "src/components/filter-bar.tsx",
+      "loc": {
+        "file": "src/components/filter-bar.tsx",
+        "line": 9,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ config: FilterConfig }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "config",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_0tf0umru7ol",
+                "name": "FilterConfig"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/filter-bar.tsx",
+            "line": 13,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1qqbzh0radp",
+      "name": "FilterShell",
+      "file": "src/components/filter-shell.tsx",
+      "loc": {
+        "file": "src/components/filter-shell.tsx",
+        "line": 4,
+        "column": 17
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ title: string; children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_102419qf3e2",
+      "name": "OrderActions",
+      "file": "src/components/order-actions.tsx",
+      "loc": {
+        "file": "src/components/order-actions.tsx",
+        "line": 4,
+        "column": 17
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "ArchiveButton",
+          "resolution": "project",
+          "componentId": "cmp_1vhdswr267i",
+          "module": "./archive-button",
+          "loc": {
+            "file": "src/components/order-actions.tsx",
+            "line": 5,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ id: number; onArchive: (id: number) => Promise<void> }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            },
+            {
+              "name": "onArchive",
+              "type": {
+                "kind": "function",
+                "params": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  }
+                ],
+                "returns": {
+                  "kind": "external",
+                  "name": "Promise",
+                  "typeArguments": [
+                    {
+                      "kind": "primitive",
+                      "name": "void"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0d17ihmgom2",
+      "name": "OrderList",
+      "file": "src/components/order-list.tsx",
+      "loc": {
+        "file": "src/components/order-list.tsx",
+        "line": 25,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "Props",
+        "shape": {
+          "kind": "ref",
+          "typeId": "typ_1m1sldxhxyy",
+          "name": "Props"
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/order-list.tsx",
+            "line": 36,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/order-list.tsx",
+            "line": 47,
+            "column": 35
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_18kcavufcpi",
+      "name": "ProductPicker",
+      "file": "src/components/product-picker.tsx",
+      "loc": {
+        "file": "src/components/product-picker.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ products: Product[]; onSelect: (id: number) => void }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "products",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "ref",
+                  "typeId": "typ_1u14fn5rnwc",
+                  "name": "Product"
+                }
+              }
+            },
+            {
+              "name": "onSelect",
+              "type": {
+                "kind": "function",
+                "params": [
+                  {
+                    "name": "id",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "number"
+                    }
+                  }
+                ],
+                "returns": {
+                  "kind": "primitive",
+                  "name": "void"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/product-picker.tsx",
+            "line": 16,
+            "column": 13
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1s76w1etqwp",
+      "name": "ReceiptTotal",
+      "file": "src/components/receipt-total.tsx",
+      "loc": {
+        "file": "src/components/receipt-total.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ total: Money }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "total",
+              "type": {
+                "kind": "ref",
+                "typeId": "typ_0we231pv1jj",
+                "name": "Money"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/receipt-total.tsx",
+            "line": 7,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/receipt-total.tsx",
+            "line": 9,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_0cs8vu9b1fn",
+      "name": "RefreshButton",
+      "file": "src/components/refresh-button.tsx",
+      "loc": {
+        "file": "src/components/refresh-button.tsx",
+        "line": 5,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/refresh-button.tsx",
+            "line": 7,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1n9th0stvf8",
+      "name": "StatsCard",
+      "file": "src/components/stats-card.tsx",
+      "loc": {
+        "file": "src/components/stats-card.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/stats-card.tsx",
+            "line": 7,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/stats-card.tsx",
+            "line": 8,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_2bm6byfpnod",
+      "name": "UserMenu",
+      "file": "src/components/user-menu.tsx",
+      "loc": {
+        "file": "src/components/user-menu.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/user-menu.tsx",
+            "line": 7,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/user-menu.tsx",
+            "line": 8,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_0tf0umru7ol",
+      "name": "FilterConfig",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/filter-bar.tsx",
+        "line": 3,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "label",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "options",
+            "type": {
+              "kind": "array",
+              "element": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "name": "onChange",
+            "type": {
+              "kind": "function",
+              "params": [
+                {
+                  "name": "value",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "string"
+                  }
+                }
+              ],
+              "returns": {
+                "kind": "primitive",
+                "name": "void"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1m1sldxhxyy",
+      "name": "Props",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/order-list.tsx",
+        "line": 13,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "orders",
+            "type": {
+              "kind": "array",
+              "element": {
+                "kind": "ref",
+                "typeId": "typ_0yorxh85agd",
+                "name": "Order"
+              }
+            }
+          },
+          {
+            "name": "updatedAt",
+            "type": {
+              "kind": "external",
+              "name": "Date"
+            }
+          },
+          {
+            "name": "byStatus",
+            "type": {
+              "kind": "external",
+              "name": "Map",
+              "typeArguments": [
+                {
+                  "kind": "primitive",
+                  "name": "number"
+                },
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "tags",
+            "type": {
+              "kind": "external",
+              "name": "Set",
+              "typeArguments": [
+                {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "source",
+            "type": {
+              "kind": "external",
+              "name": "URL"
+            }
+          },
+          {
+            "name": "archive",
+            "type": {
+              "kind": "function",
+              "params": [
+                {
+                  "name": "id",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                }
+              ],
+              "returns": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "primitive",
+                    "name": "void"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "archiveFirst",
+            "type": {
+              "kind": "function",
+              "params": [],
+              "returns": {
+                "kind": "external",
+                "name": "Promise",
+                "typeArguments": [
+                  {
+                    "kind": "primitive",
+                    "name": "void"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "format",
+            "type": {
+              "kind": "function",
+              "params": [
+                {
+                  "name": "cents",
+                  "type": {
+                    "kind": "primitive",
+                    "name": "number"
+                  }
+                }
+              ],
+              "returns": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          },
+          {
+            "name": "total",
+            "type": {
+              "kind": "ref",
+              "typeId": "typ_08tjvqh20xh",
+              "name": "Amount"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_1u14fn5rnwc",
+      "name": "Product",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/components/product-picker.tsx",
+        "line": 3,
+        "column": 11
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_08tjvqh20xh",
+      "name": "Amount",
+      "declarationKind": "class",
+      "definedAt": {
+        "file": "src/lib/amount.ts",
+        "line": 2,
+        "column": 14
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "cents",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "toJSON",
+            "type": {
+              "kind": "function",
+              "params": [],
+              "returns": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0we231pv1jj",
+      "name": "Money",
+      "declarationKind": "class",
+      "definedAt": {
+        "file": "src/lib/amount.ts",
+        "line": 10,
+        "column": 14
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "cents",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "currency",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "format",
+            "type": {
+              "kind": "function",
+              "params": [],
+              "returns": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "typ_0yorxh85agd",
+      "name": "Order",
+      "declarationKind": "interface",
+      "definedAt": {
+        "file": "src/lib/orders.ts",
+        "line": 3,
+        "column": 18
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "kind": "union",
+              "types": [
+                {
+                  "kind": "literal",
+                  "value": "new"
+                },
+                {
+                  "kind": "literal",
+                  "value": "paid"
+                }
+              ]
+            }
+          },
+          {
+            "name": "total",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "createdAt",
+            "type": {
+              "kind": "external",
+              "name": "Date"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1adaskwjlzp",
+      "origin": "component",
+      "componentId": "cmp_0d17ihmgom2",
+      "serverAction": {
+        "name": "refreshOrders",
+        "loc": {
+          "file": "src/actions/orders.ts",
+          "line": 13,
+          "column": 23
+        }
+      },
+      "transport": "server-action",
+      "method": "POST",
+      "trigger": {
+        "kind": "event",
+        "event": "action",
+        "loc": {
+          "file": "src/components/order-list.tsx",
+          "line": 61,
+          "column": 13
+        }
+      },
+      "responseType": {
+        "text": "void",
+        "shape": {
+          "kind": "primitive",
+          "name": "void"
+        }
+      },
+      "callStack": [
+        {
+          "file": "src/components/order-list.tsx",
+          "line": 61,
+          "column": 13,
+          "callee": "refreshOrders"
+        }
+      ],
+      "status": "inferred",
+      "flags": [],
+      "hash": "0c6hyyqgowp"
+    }
+  ],
+  "navigations": [
+    {
+      "id": "nav_12vxdr5agqh",
+      "origin": "component",
+      "componentId": "cmp_22h1c1q9i1t",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/\"",
+        "confidence": "exact",
+        "path": "/"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/help/page.tsx",
+          "line": 6,
+          "column": 5
+        }
+      },
+      "loc": {
+        "file": "src/app/help/page.tsx",
+        "line": 6,
+        "column": 5
+      },
+      "callStack": [
+        {
+          "file": "src/app/help/page.tsx",
+          "line": 6,
+          "column": 5,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0h4e5x5madf"
+    },
+    {
+      "id": "nav_151tk3mghbd",
+      "origin": "component",
+      "componentId": "cmp_1bvhjg8zu96",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "\"/products\"",
+        "confidence": "exact",
+        "path": "/products"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/app/page.tsx",
+          "line": 30,
+          "column": 7
+        }
+      },
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 30,
+        "column": 7
+      },
+      "callStack": [
+        {
+          "file": "src/app/page.tsx",
+          "line": 30,
+          "column": 7,
+          "callee": "<Link>"
+        }
+      ],
+      "targetRouteId": "rt_0te2vdgan2u"
+    }
+  ],
+  "flows": [
+    {
+      "id": "flw_1ifixwann2h",
+      "name": "OrderList submit",
+      "routeId": "rt_0h4e5x5madf",
+      "componentId": "cmp_0d17ihmgom2",
+      "steps": [
+        {
+          "kind": "interaction",
+          "routeId": "rt_0h4e5x5madf",
+          "componentId": "cmp_0d17ihmgom2",
+          "event": "action",
+          "loc": {
+            "file": "src/components/order-list.tsx",
+            "line": 61,
+            "column": 13
+          }
+        },
+        {
+          "kind": "request",
+          "siteId": "req_1adaskwjlzp"
+        }
+      ],
+      "branches": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ]
+    }
+  ],
+  "queryLinks": [],
+  "imports": {
+    "src/actions/orders.ts": [
+      "src/lib/db.ts"
+    ],
+    "src/app/account/page.tsx": [
+      "src/components/user-menu.tsx"
+    ],
+    "src/app/admin/page.tsx": [
+      "src/components/refresh-button.tsx"
+    ],
+    "src/app/files/page.tsx": [
+      "src/components/file-badge.tsx"
+    ],
+    "src/app/filters/page.tsx": [
+      "src/components/filter-bar.tsx",
+      "src/components/filter-shell.tsx"
+    ],
+    "src/app/keys/page.tsx": [
+      "src/components/api-key-field.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/actions/orders.ts",
+      "src/components/format-total.ts",
+      "src/components/order-actions.tsx",
+      "src/components/order-list.tsx",
+      "src/lib/amount.ts",
+      "src/lib/orders.ts"
+    ],
+    "src/app/products/page.tsx": [
+      "src/components/product-picker.tsx"
+    ],
+    "src/app/receipt/page.tsx": [
+      "src/components/receipt-total.tsx",
+      "src/lib/amount.ts"
+    ],
+    "src/app/stats/page.tsx": [
+      "src/components/stats-card.tsx"
+    ],
+    "src/components/api-key-field.tsx": [
+      "src/lib/keys.ts"
+    ],
+    "src/components/file-badge.tsx": [
+      "src/lib/format-size.ts"
+    ],
+    "src/components/order-actions.tsx": [
+      "src/components/archive-button.tsx"
+    ],
+    "src/components/order-list.tsx": [
+      "src/actions/orders.ts",
+      "src/lib/amount.ts",
+      "src/lib/orders.ts"
+    ],
+    "src/components/receipt-total.tsx": [
+      "src/lib/amount.ts"
+    ],
+    "src/components/stats-card.tsx": [
+      "src/lib/stats.ts"
+    ],
+    "src/components/user-menu.tsx": [
+      "src/lib/session.ts"
+    ],
+    "src/lib/format-size.ts": [
+      "src/lib/disk.ts"
+    ]
+  },
+  "cache": {
+    "entries": [],
+    "invalidations": [
+      {
+        "id": "ci_1o8dtrknbvf",
+        "api": "revalidatePath",
+        "path": {
+          "text": "'/'",
+          "value": "/",
+          "confidence": "exact"
+        },
+        "origin": "server-action",
+        "serverAction": {
+          "name": "refreshOrders",
+          "loc": {
+            "file": "src/actions/orders.ts",
+            "line": 13,
+            "column": 23
+          }
+        },
+        "callStack": [
+          {
+            "file": "src/actions/orders.ts",
+            "line": 14,
+            "column": 3,
+            "callee": "revalidatePath"
+          }
+        ],
+        "loc": {
+          "file": "src/actions/orders.ts",
+          "line": 14,
+          "column": 3
+        },
+        "entryIds": [],
+        "pageIds": [
+          "rt_0h4e5x5madf"
+        ],
+        "handlerIds": [],
+        "flags": []
+      }
+    ]
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_0lw5ynqi6em",
+      "file": "src/components/api-key-field.tsx",
+      "componentIds": [
+        "cmp_0lw5ynqi6em"
+      ],
+      "modules": [
+        "src/components/api-key-field.tsx",
+        "src/lib/keys.ts"
+      ],
+      "packages": [
+        "server-only"
+      ],
+      "bytes": 398,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/api-key-field.tsx",
+            "line": 7,
+            "column": 25
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/api-key-field.tsx",
+            "line": 8,
+            "column": 38
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1vhdswr267i",
+      "file": "src/components/archive-button.tsx",
+      "componentIds": [
+        "cmp_1vhdswr267i"
+      ],
+      "modules": [
+        "src/components/archive-button.tsx"
+      ],
+      "packages": [],
+      "bytes": 222,
+      "uses": [
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/archive-button.tsx",
+            "line": 5,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_06c0p4q1rgq",
+      "file": "src/components/file-badge.tsx",
+      "componentIds": [
+        "cmp_06c0p4q1rgq"
+      ],
+      "modules": [
+        "src/components/file-badge.tsx",
+        "src/lib/disk.ts",
+        "src/lib/format-size.ts"
+      ],
+      "packages": [
+        "fs"
+      ],
+      "bytes": 796,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/file-badge.tsx",
+            "line": 7,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/file-badge.tsx",
+            "line": 9,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_2440cm4qrn4",
+      "file": "src/components/filter-bar.tsx",
+      "componentIds": [
+        "cmp_2440cm4qrn4"
+      ],
+      "modules": [
+        "src/components/filter-bar.tsx"
+      ],
+      "packages": [],
+      "bytes": 412,
+      "uses": [
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/filter-bar.tsx",
+            "line": 13,
+            "column": 15
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0d17ihmgom2",
+      "file": "src/components/order-list.tsx",
+      "componentIds": [
+        "cmp_0d17ihmgom2"
+      ],
+      "modules": [
+        "src/components/order-list.tsx"
+      ],
+      "packages": [
+        "path"
+      ],
+      "bytes": 1964,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/order-list.tsx",
+            "line": 36,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/order-list.tsx",
+            "line": 47,
+            "column": 35
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_18kcavufcpi",
+      "file": "src/components/product-picker.tsx",
+      "componentIds": [
+        "cmp_18kcavufcpi"
+      ],
+      "modules": [
+        "src/components/product-picker.tsx"
+      ],
+      "packages": [],
+      "bytes": 398,
+      "uses": [
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/product-picker.tsx",
+            "line": 16,
+            "column": 13
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1s76w1etqwp",
+      "file": "src/components/receipt-total.tsx",
+      "componentIds": [
+        "cmp_1s76w1etqwp"
+      ],
+      "modules": [
+        "src/components/receipt-total.tsx"
+      ],
+      "packages": [],
+      "bytes": 326,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/receipt-total.tsx",
+            "line": 7,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/receipt-total.tsx",
+            "line": 9,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0cs8vu9b1fn",
+      "file": "src/components/refresh-button.tsx",
+      "componentIds": [
+        "cmp_0cs8vu9b1fn"
+      ],
+      "modules": [
+        "src/components/refresh-button.tsx"
+      ],
+      "packages": [],
+      "bytes": 201,
+      "uses": [
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/refresh-button.tsx",
+            "line": 7,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1n9th0stvf8",
+      "file": "src/components/stats-card.tsx",
+      "componentIds": [
+        "cmp_1n9th0stvf8"
+      ],
+      "modules": [
+        "src/components/stats-card.tsx",
+        "src/lib/stats.ts"
+      ],
+      "packages": [
+        "pg"
+      ],
+      "bytes": 557,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/stats-card.tsx",
+            "line": 7,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/stats-card.tsx",
+            "line": 8,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_2bm6byfpnod",
+      "file": "src/components/user-menu.tsx",
+      "componentIds": [
+        "cmp_2bm6byfpnod"
+      ],
+      "modules": [
+        "src/components/user-menu.tsx",
+        "src/lib/session.ts"
+      ],
+      "packages": [],
+      "bytes": 426,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/user-menu.tsx",
+            "line": 7,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/user-menu.tsx",
+            "line": 8,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ],
+  "leaks": [
+    {
+      "kind": "module",
+      "module": "next/cache",
+      "category": "next-server",
+      "names": [
+        "revalidatePath"
+      ],
+      "file": "src/components/refresh-button.tsx",
+      "loc": {
+        "file": "src/components/refresh-button.tsx",
+        "line": 3,
+        "column": 1
+      },
+      "boundaries": [
+        "cmp_0cs8vu9b1fn"
+      ],
+      "chain": [
+        "src/components/refresh-button.tsx"
+      ],
+      "routeIds": [
+        "rt_1vstxm5jg4s"
+      ]
+    },
+    {
+      "kind": "module",
+      "module": "fs",
+      "category": "node",
+      "file": "src/lib/disk.ts",
+      "loc": {
+        "file": "src/lib/disk.ts",
+        "line": 2,
+        "column": 1
+      },
+      "boundaries": [
+        "cmp_06c0p4q1rgq"
+      ],
+      "chain": [
+        "src/components/file-badge.tsx",
+        "src/lib/format-size.ts",
+        "src/lib/disk.ts"
+      ],
+      "routeIds": [
+        "rt_19fb3kq7t7h"
+      ]
+    },
+    {
+      "kind": "module",
+      "module": "server-only",
+      "category": "server-only",
+      "file": "src/lib/keys.ts",
+      "loc": {
+        "file": "src/lib/keys.ts",
+        "line": 1,
+        "column": 1
+      },
+      "boundaries": [
+        "cmp_0lw5ynqi6em"
+      ],
+      "chain": [
+        "src/components/api-key-field.tsx",
+        "src/lib/keys.ts"
+      ],
+      "routeIds": [
+        "rt_118xhn7ft71"
+      ]
+    },
+    {
+      "kind": "module",
+      "module": "next/headers",
+      "category": "next-server",
+      "file": "src/lib/session.ts",
+      "loc": {
+        "file": "src/lib/session.ts",
+        "line": 1,
+        "column": 1
+      },
+      "boundaries": [
+        "cmp_2bm6byfpnod"
+      ],
+      "chain": [
+        "src/components/user-menu.tsx",
+        "src/lib/session.ts"
+      ],
+      "routeIds": [
+        "rt_1cis2tinktq"
+      ]
+    },
+    {
+      "kind": "module",
+      "module": "pg",
+      "category": "database",
+      "file": "src/lib/stats.ts",
+      "loc": {
+        "file": "src/lib/stats.ts",
+        "line": 1,
+        "column": 1
+      },
+      "boundaries": [
+        "cmp_1n9th0stvf8"
+      ],
+      "chain": [
+        "src/components/stats-card.tsx",
+        "src/lib/stats.ts"
+      ],
+      "routeIds": [
+        "rt_0zuy2kvnsns"
+      ]
+    },
+    {
+      "kind": "prop",
+      "value": "function",
+      "prop": "config.onChange",
+      "name": "FilterBar",
+      "componentId": "cmp_2440cm4qrn4",
+      "parentId": "cmp_0s9wd2omhih",
+      "loc": {
+        "file": "src/app/filters/page.tsx",
+        "line": 9,
+        "column": 9
+      },
+      "routeIds": [
+        "rt_06lrmirmxeq"
+      ]
+    },
+    {
+      "kind": "prop",
+      "value": "function",
+      "prop": "onClick",
+      "name": "Link",
+      "module": "next/link",
+      "parentId": "cmp_22h1c1q9i1t",
+      "loc": {
+        "file": "src/app/help/page.tsx",
+        "line": 6,
+        "column": 20
+      },
+      "routeIds": [
+        "rt_2cmil0fhcvl"
+      ]
+    },
+    {
+      "kind": "prop",
+      "value": "function",
+      "prop": "onSelect",
+      "name": "ProductPicker",
+      "componentId": "cmp_18kcavufcpi",
+      "parentId": "cmp_115a9noj763",
+      "loc": {
+        "file": "src/app/products/page.tsx",
+        "line": 11,
+        "column": 7
+      },
+      "routeIds": [
+        "rt_0te2vdgan2u"
+      ]
+    },
+    {
+      "kind": "prop",
+      "value": "class-instance",
+      "prop": "total",
+      "type": "Money",
+      "name": "ReceiptTotal",
+      "componentId": "cmp_1s76w1etqwp",
+      "parentId": "cmp_0zqbyjijxz1",
+      "loc": {
+        "file": "src/app/receipt/page.tsx",
+        "line": 6,
+        "column": 24
+      },
+      "routeIds": [
+        "rt_1f7m1o687x1"
+      ]
+    }
+  ]
+}

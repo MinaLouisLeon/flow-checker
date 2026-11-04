@@ -26,10 +26,9 @@
 
 ## Client boundaries
 
-1 `'use client'` boundary brings 1 component and 3 project modules (about 2.5 KB of source) to the browser, plus 1 package (`server-only`).
+1 `'use client'` boundary brings 1 component and 1 project module (about 0.4 KB of source) to the browser.
 
-- [`DeleteProductButton`](../components/DeleteProductButton.md), rendered by `ProductsPage` (page): 1 component · 3 modules · 2.5 KB, `src/app/products/page.tsx:17`
-  - packages: `server-only`
+- [`DeleteProductButton`](../components/DeleteProductButton.md), rendered by `ProductsPage` (page): 1 component · 1 module · 0.4 KB, `src/app/products/page.tsx:17`
 
 ## Server cache
 

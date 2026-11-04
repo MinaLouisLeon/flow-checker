@@ -4,6 +4,7 @@ import { gapLine, titleText } from './boundaries'
 import { formatCache } from './cache'
 import { CLIENT_USE_LABELS, sizeText } from './client'
 import { urlText } from './format-requests'
+import { importText, leaksOn, SERVER_MODULE_LABELS } from './leaks'
 import type {
   AppModel,
   Component,
@@ -51,11 +52,13 @@ export function formatModel(model: AppModel): string {
     out.push(...formatRender(route))
     out.push(...formatBoundaries(route))
     out.push(...formatClient(route, components))
+    out.push(...formatPageLeaks(model, route))
   }
 
   const cache = formatCache(model)
   if (cache.length > 0) out.push('', ...cache)
   if (model.clientBoundaries) out.push('', ...formatClientBoundaries(model, components))
+  if (model.leaks) out.push('', ...formatLeaks(model, components))
 
   return `${out.join('\n')}\n`
 }
@@ -140,6 +143,47 @@ function formatClientBoundaries(model: AppModel, components: Map<string, Compone
     if (b.lower) {
       const into = b.lower.into.length > 0 ? b.lower.into.map(name).join(', ') : '(nothing: drop it)'
       out.push(`could move lower: into ${into}; on the server: ${b.lower.server.map(name).join(', ')}`)
+    }
+  }
+  return out
+}
+
+/** The page's server/client leaks, one line each (M44). */
+function formatPageLeaks(model: AppModel, route: Route): string[] {
+  const leaks = leaksOn(model, route.id)
+  if (leaks.length === 0) return []
+  return [
+    `leaks: ${leaks.length}`,
+    ...leaks.map((l) =>
+      l.kind === 'module'
+        ? `  module ${l.module} in ${l.file}:${l.loc.line}`
+        : `  prop ${l.name}.${l.prop} (${l.value})  ${l.loc.file}:${l.loc.line}`,
+    ),
+  ]
+}
+
+/** Every leak: server-only modules client code imports, then props that can't cross (M44). */
+function formatLeaks(model: AppModel, components: Map<string, Component>): string[] {
+  const name = (id: string) => components.get(id)?.name ?? '?'
+  const paths = (ids: string[]) => {
+    const routes = new Map(model.routes.map((r) => [r.id, r.path]))
+    return ids.map((id) => routes.get(id) ?? '?').join(', ') || '(none)'
+  }
+  const out = ['# Server/client leaks']
+  for (const l of model.leaks ?? []) {
+    out.push('')
+    if (l.kind === 'module') {
+      out.push(
+        `module ${importText(l).replaceAll('`', '')}: ${SERVER_MODULE_LABELS[l.category].replaceAll('`', '')}  ${l.file}:${l.loc.line}`,
+        `  chain: ${l.chain.join(' > ')}`,
+        `  boundaries: ${l.boundaries.map(name).join(', ')}; pages: ${paths(l.routeIds)}`,
+      )
+    } else {
+      const to = l.module ? `${l.name} (${l.module})` : l.name
+      out.push(
+        `prop ${l.prop}: ${l.value}${l.type ? ` ${l.type}` : ''}, from ${name(l.parentId)} to ${to}  ${l.loc.file}:${l.loc.line}`,
+        `  pages: ${paths(l.routeIds)}`,
+      )
     }
   }
   return out

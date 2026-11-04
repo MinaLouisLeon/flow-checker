@@ -13,10 +13,12 @@ import type {
   Component,
   Flag,
   PageBoundary,
+  PropLeak,
   RequestSite,
   RequestUrl,
   RouteAccess,
   RouteRender,
+  ServerModuleKind,
   Trigger,
 } from './model'
 import type { TypeCheckStatus } from './type-check'
@@ -49,6 +51,7 @@ export type GlossaryGroupId =
   | 'render'
   | 'boundary'
   | 'client'
+  | 'leak'
   | 'cache'
   | 'flow-status'
   | 'endpoint-status'
@@ -452,6 +455,69 @@ const CLIENT: GlossaryGroup<ClientUse['kind'] | 'boundary' | 'lower' | 'barrel' 
   },
 }
 
+const LEAK: GlossaryGroup<'module' | 'prop' | ServerModuleKind | PropLeak['value']> = {
+  id: 'leak',
+  title: 'Server/client leaks',
+  intro:
+    "Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both, so the page fails to build or render.",
+  entries: {
+    module: {
+      label: 'server-only module',
+      means:
+        "A `'use client'` file, or a file it imports, imports something that only works on the server. Everything client code imports is sent to the browser, except a `'use server'` file (only a reference to its actions is) and type-only imports.",
+      todo: "Move the server part into a server component or a server action (a `'use server'` file), and pass the result to the client component as a prop.",
+    },
+    prop: {
+      label: "prop that can't cross",
+      means:
+        "A server component renders a client component with a prop React cannot send to the browser. Plain data crosses (also `Date`, `Map`, `Set`, `URL`, `Error`, promises, JSX), and so do server actions and functions from a `'use client'` file.",
+      todo: 'Pass plain data instead: a server action instead of a function, the fields of an object instead of a class instance; or create the value in the client component.',
+    },
+    'server-only': {
+      label: 'server-only',
+      means:
+        'The file imports `server-only`, which marks it as server code: Next fails the build when client code imports it.',
+    },
+    node: {
+      label: 'Node.js module',
+      means:
+        "A Node.js module with no browser version (`fs`, `child_process`, `net`...). Next has browser versions of a few (`path`, `crypto`, `buffer`, `url`...), which aren't flagged.",
+    },
+    database: {
+      label: 'database client',
+      means:
+        'A database client (`pg`, `mysql2`, `mongoose`, `@prisma/client`...). In client code it fails to build, or it sends a database connection to the browser.',
+    },
+    'next-server': {
+      label: 'server API',
+      means:
+        'An API Next only allows in server code: `next/headers` (`cookies()`, `headers()`), `revalidatePath`, `revalidateTag`, `cacheTag`, `cacheLife` from `next/cache`, `after` from `next/server`.',
+    },
+    'node-package': {
+      label: 'Node.js package',
+      means: 'A package that only runs on Node.js (`bcrypt`, `sharp`, `firebase-admin`, `nodemailer`...).',
+    },
+    function: {
+      label: 'function prop',
+      means:
+        "A function handed to a client component (inline, a named function, a component, or one inside an object or array). Only server actions and functions exported from a `'use client'` file cross.",
+    },
+    'class-instance': {
+      label: 'class instance prop',
+      means:
+        'An instance of a class (or a built-in such as `RegExp` or `WeakMap`). React only sends plain objects, unless the class has `toJSON` (then it sends what that returns) or can be iterated.',
+    },
+    symbol: {
+      label: 'symbol prop',
+      means: 'A symbol made with `Symbol()`. Only symbols from `Symbol.for()` cross.',
+    },
+    'null-prototype': {
+      label: 'prop without a prototype',
+      means: '`Object.create(null)`: React only sends plain objects.',
+    },
+  },
+}
+
 const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
@@ -679,6 +745,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   RENDER,
   BOUNDARY,
   CLIENT,
+  LEAK,
   CACHE,
   FLOW_STATUS,
   ENDPOINT_STATUS,

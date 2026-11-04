@@ -1,5 +1,5 @@
 {
-  "version": 16,
+  "version": 17,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -242,11 +242,9 @@
           }
         ],
         "components": 1,
-        "modules": 3,
-        "bytes": 2595,
-        "packages": [
-          "server-only"
-        ]
+        "modules": 1,
+        "bytes": 423,
+        "packages": []
       }
     },
     {
@@ -464,11 +462,9 @@
           }
         ],
         "components": 1,
-        "modules": 3,
-        "bytes": 3183,
-        "packages": [
-          "server-only"
-        ]
+        "modules": 1,
+        "bytes": 1011,
+        "packages": []
       }
     }
   ],
@@ -1506,14 +1502,10 @@
         "cmp_014pegw9zf7"
       ],
       "modules": [
-        "src/components/CreateProductForm.tsx",
-        "src/actions/products.ts",
-        "src/lib/backend.ts"
+        "src/components/CreateProductForm.tsx"
       ],
-      "packages": [
-        "server-only"
-      ],
-      "bytes": 3183,
+      "packages": [],
+      "bytes": 1011,
       "uses": [
         {
           "kind": "hook",
@@ -1533,14 +1525,10 @@
         "cmp_0jz34mtqlno"
       ],
       "modules": [
-        "src/components/DeleteProductButton.tsx",
-        "src/actions/products.ts",
-        "src/lib/backend.ts"
+        "src/components/DeleteProductButton.tsx"
       ],
-      "packages": [
-        "server-only"
-      ],
-      "bytes": 2595,
+      "packages": [],
+      "bytes": 423,
       "uses": [
         {
           "kind": "hook",
