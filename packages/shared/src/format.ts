@@ -17,6 +17,7 @@ import type {
   Route,
   RouteTreeNode,
 } from './model'
+import { formatPerf, perfOn } from './perf'
 import { renderLabel, renderOf, renderReasonLine } from './render'
 
 export function formatModel(model: AppModel): string {
@@ -57,6 +58,7 @@ export function formatModel(model: AppModel): string {
     out.push(...formatPageLeaks(model, route))
     out.push(...formatPageEnv(model, route))
     out.push(...formatPageActions(model, route))
+    out.push(...formatPagePerf(model, route))
   }
 
   const cache = formatCache(model)
@@ -65,6 +67,7 @@ export function formatModel(model: AppModel): string {
   if (model.leaks) out.push('', ...formatLeaks(model, components))
   if (model.env) out.push('', ...formatEnv(model))
   if (model.actions) out.push('', ...formatActions(model))
+  if (model.perf) out.push('', ...formatPerf(model))
 
   return `${out.join('\n')}\n`
 }
@@ -192,6 +195,12 @@ function formatPageActions(model: AppModel, route: Route): string[] {
     })
     .join(', ')
   return [`actions: ${line}`]
+}
+
+function formatPagePerf(model: AppModel, route: Route): string[] {
+  const findings = perfOn(model, route.id)
+  if (findings.length === 0) return []
+  return [`perf: ${findings.map((f) => `${f.kind}${f.fn ? ` in ${f.fn}` : ''}`).join(', ')}`]
 }
 
 /** Every leak: server-only modules client code imports, then props that can't cross (M44). */

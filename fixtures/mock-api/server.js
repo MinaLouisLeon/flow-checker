@@ -1,6 +1,6 @@
 // In-memory REST backend for the fixture apps (default http://localhost:4010).
 // Routes are intentionally small but cover GET/POST/PATCH/DELETE, path params,
-// query strings, auth headers, validation errors and a two-step login.
+// query strings, auth headers, validation errors and a two-step login. `?delay=<ms>` slows any answer.
 import { randomUUID } from 'node:crypto'
 import { createServer } from 'node:http'
 
@@ -142,6 +142,9 @@ const server = createServer(async (req, res) => {
   if (req.method === 'OPTIONS') return res.writeHead(204).end()
 
   const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
+  // `?delay=80`: answer after 80 ms (at most 2 s), so request timings show up (the perf fixture, M47).
+  const delay = Math.min(2000, Number(url.searchParams.get('delay')) || 0)
+  if (delay > 0) await new Promise((done) => setTimeout(done, delay))
   for (const [method, pattern, handler] of routes) {
     const match = req.method === method && pattern.exec(url.pathname)
     if (!match) continue

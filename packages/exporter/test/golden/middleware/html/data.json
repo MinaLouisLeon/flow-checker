@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "middleware",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -1658,6 +1658,72 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_16a5uohh2s8",
+          "label": "GET {API_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_263u38ocrza"
+          ],
+          "count": 1,
+          "p50": 36,
+          "p95": 36,
+          "max": 36,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvudae12lsfdpnnd"
+        },
+        {
+          "key": "ep_1ummwnixxxj",
+          "label": "GET {API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_02gshaf9oil"
+          ],
+          "count": 2,
+          "p50": 18,
+          "p95": 23,
+          "max": 23,
+          "errors": 0,
+          "browser": 0,
+          "server": 2,
+          "slowestCaptureId": "cap_mvudanypkqyx2t3p"
+        },
+        {
+          "key": "ep_0hbwt9tdbrl",
+          "label": "GET {API_URL ?? http://localhost:4010}/settings",
+          "siteIds": [
+            "req_0q6t9lmdld7"
+          ],
+          "count": 1,
+          "p50": 14,
+          "p95": 14,
+          "max": 14,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvudamp5otwly1xi"
+        },
+        {
+          "key": "ep_1lugt3jwhog",
+          "label": "GET {API_URL ?? http://localhost:4010}/me",
+          "siteIds": [
+            "req_0pdaq2dj6vz"
+          ],
+          "count": 4,
+          "p50": 3,
+          "p95": 6,
+          "max": 6,
+          "errors": 1,
+          "browser": 0,
+          "server": 4,
+          "slowestCaptureId": "cap_mvudai0ksviv4a9c"
+        }
+      ],
+      "loads": 4
     }
   },
   "flows": {

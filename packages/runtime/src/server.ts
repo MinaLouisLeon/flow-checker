@@ -206,7 +206,8 @@ function start(config: RuntimeConfig): ServerRuntime {
       const url = request.url ?? '/'
       if (url.startsWith('/_next/') || url.startsWith('/__nextjs')) return
       const headers = request.headers
-      const parent: CaptureParent = { method: request.method ?? 'GET', url }
+      // The id groups what this one request sends (M47: per page load timings).
+      const parent: CaptureParent = { method: request.method ?? 'GET', url, requestId: nextId('in') }
       const link = header(headers[LINK_HEADER])
       let sessionId = 'server'
       if (link) {

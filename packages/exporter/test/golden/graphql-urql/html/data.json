@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "graphql-urql",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -2350,6 +2350,87 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_2c5ny8u59q2",
+          "label": "GET /api/graphql",
+          "siteIds": [
+            "req_19g4fbnqrgn"
+          ],
+          "count": 2,
+          "p50": 30,
+          "p95": 373,
+          "max": 373,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4rnx2c9t2ids"
+        },
+        {
+          "key": "ep_2dska22im0v",
+          "label": "GET /api/graphql",
+          "siteIds": [
+            "req_13zx8cl90id"
+          ],
+          "count": 2,
+          "p50": 43,
+          "p95": 57,
+          "max": 57,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4vdauhs2lpd4"
+        },
+        {
+          "key": "ep_1jutox0n6zl",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_1ncc9k5xsh8"
+          ],
+          "count": 1,
+          "p50": 36,
+          "p95": 36,
+          "max": 36,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4u08x3vxk2l1"
+        },
+        {
+          "key": "ep_0dra48drhl8",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_0pkoq320yzc"
+          ],
+          "count": 1,
+          "p50": 27,
+          "p95": 27,
+          "max": 27,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4wjt7yz0xct6"
+        },
+        {
+          "key": "ep_2fwm7w18i75",
+          "label": "GET /api/graphql",
+          "siteIds": [
+            "req_0m0edcldv9l"
+          ],
+          "count": 1,
+          "p50": 25,
+          "p95": 25,
+          "max": 25,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu4ztz8ypm2m0n"
+        }
+      ],
+      "loads": 3
     }
   },
   "flows": {

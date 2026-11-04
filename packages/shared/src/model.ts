@@ -657,6 +657,106 @@ export const ServerActionSchema = z.object({
 })
 export type ServerAction = z.infer<typeof ServerActionSchema>
 
+// Request performance (M47): requests that wait for each other for no reason, run once per item, or
+// are sent twice on one page load. Found from each site's call path; captures confirm them with
+// their timings (`runtime`, only in the served model).
+
+/** One awaited request of a waterfall, in code order. */
+export const PerfStepSchema = z.object({
+  /** The awaited call as written: `getPosts()`. */
+  text: z.string(),
+  /** The request sites it sends. */
+  siteIds: z.array(z.string()),
+  /** Earlier steps (indexes) whose results it uses. It waits for the others for nothing. */
+  needs: z.array(z.number().int().nonnegative()),
+  loc: SourceLocSchema,
+})
+export type PerfStep = z.infer<typeof PerfStepSchema>
+
+/**
+ * The loop of an N+1. `for`: a `for` / `for...of` / `for...in` loop. `while`: `while` / `do`.
+ * `callback`: a callback of `.map()`, `.forEach()`, `.flatMap()`... `render`: a component rendered
+ * once per item (`items.map((i) => <Row id={i.id} />)`) that sends the request itself.
+ */
+export const PerfLoopSchema = z.object({
+  kind: z.enum(['for', 'while', 'callback', 'render']),
+  /** As written: `for (const post of posts)`, `posts.map()`, `<PostRow>`. */
+  text: z.string(),
+  /** The list it goes through, as written: `posts`. */
+  over: z.string().optional(),
+  loc: SourceLocSchema,
+})
+export type PerfLoop = z.infer<typeof PerfLoopSchema>
+
+/** What captures showed for a finding (M47). Only in the served model. */
+export const PerfFindingRuntimeSchema = z.object({
+  /**
+   * `confirmed`: a page load (or request) showed it. `not-confirmed`: its requests were captured,
+   * but never as the scan said (they overlapped, or one request per load). `not-seen`: no capture yet.
+   */
+  status: z.enum(['confirmed', 'not-confirmed', 'not-seen']),
+  /** Page loads (or incoming requests) in which its requests were captured. */
+  loads: z.number().int().nonnegative(),
+  /** Of those, the ones that showed it. */
+  confirmed: z.number().int().nonnegative(),
+  /** Waterfall: median time that starting the requests together would have saved, in ms. */
+  savedMs: z.number().nonnegative().optional(),
+  /** N+1 and duplicate: the most requests one load sent for it. */
+  maxCalls: z.number().int().nonnegative().optional(),
+  /** N+1 and duplicate: median time those requests took together in a load (first start to last end), in ms. */
+  totalMs: z.number().nonnegative().optional(),
+  /** The newest capture of a load that showed it. */
+  captureId: z.string().optional(),
+  lastAt: z.string().optional(),
+})
+export type PerfFindingRuntime = z.infer<typeof PerfFindingRuntimeSchema>
+
+export const PerfFindingKindSchema = z.enum(['waterfall', 'n-plus-one', 'duplicate'])
+export type PerfFindingKind = z.infer<typeof PerfFindingKindSchema>
+
+/**
+ * `waterfall`: awaited requests in one function where a later one doesn't use an earlier one's
+ * result, so it could start at the same time (`steps`). `n-plus-one`: a request sent once per item
+ * of a list (`loop`; `sequential` when each waits for the one before). `duplicate`: the same request
+ * (method and URL, or procedure / operation) sent from more than one place on one page load, where
+ * nothing dedupes it (Next dedupes a server component's `GET` `fetch`, query libraries dedupe by key).
+ */
+export const PerfFindingSchema = z.object({
+  id: z.string(),
+  kind: PerfFindingKindSchema,
+  /** Where the requests run. Waterfalls are only looked for on the server. */
+  side: z.enum(['server', 'client']),
+  /** The function the awaits or the loop are in (`Home`, `getDashboard`); for `render`, the parent component. */
+  fn: z.string().optional(),
+  /** The component the function is in or called from, when there is one. */
+  componentId: z.string().optional(),
+  /** Origin `route-handler`: the handler's route. */
+  routeId: z.string().optional(),
+  /** Every request site involved. */
+  siteIds: z.array(z.string()),
+  /** Waterfall: the awaited requests in code order. */
+  steps: z.array(PerfStepSchema).optional(),
+  /** N+1: the loop. */
+  loop: PerfLoopSchema.optional(),
+  /** N+1: each request waits for the one before (`await` in a `for` loop). */
+  sequential: z.literal(true).optional(),
+  /** N+1: the request the list came from, when the scan saw it (the "1"). */
+  listSiteIds: z.array(z.string()).optional(),
+  /** Duplicate: the request, e.g. `GET /users/:id`. */
+  request: z.string().optional(),
+  /** Pages it slows down: pages whose load runs it, or that call the route handler / action. */
+  routeIds: z.array(z.string()),
+  loc: SourceLocSchema,
+  runtime: PerfFindingRuntimeSchema.optional(),
+})
+export type PerfFinding = z.infer<typeof PerfFindingSchema>
+
+export const PerfMapSchema = z.object({
+  /** By file and line. */
+  findings: z.array(PerfFindingSchema),
+})
+export type PerfMap = z.infer<typeof PerfMapSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -1832,7 +1932,7 @@ export const AppModelSchema = z.object({
    * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
    * `boundaries` or `metadata`, version 15 (before M43) no page `client`, `clientBoundaries` or
    * component `clientUses`, version 16 (before M44) no `leaks`, version 17 (before M45) no `env`,
-   * version 18 (before M46) no `actions`.
+   * version 18 (before M46) no `actions`, version 19 (before M47) no `perf`.
    */
   version: z
     .union([
@@ -1854,6 +1954,7 @@ export const AppModelSchema = z.object({
       z.literal(16),
       z.literal(17),
       z.literal(18),
+      z.literal(19),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1909,5 +2010,10 @@ export const AppModelSchema = z.object({
    * each with its auth check, input check and what it changes. Absent when there are none.
    */
   actions: z.array(ServerActionSchema).optional(),
+  /**
+   * Request performance (M47): waterfalls, N+1 requests and duplicate requests found in the code.
+   * Absent when there are none.
+   */
+  perf: PerfMapSchema.optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

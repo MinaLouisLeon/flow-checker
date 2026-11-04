@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "react-query",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -3451,6 +3451,123 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_16nzt1zcm62",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_01zlsrjrncf",
+            "req_0m4arr015hb",
+            "req_2a0uqvzh6dw"
+          ],
+          "count": 4,
+          "p50": 8,
+          "p95": 30,
+          "max": 30,
+          "errors": 0,
+          "browser": 3,
+          "server": 1,
+          "slowestCaptureId": "cap_mvwzwt01gxpi90sn"
+        },
+        {
+          "key": "ep_1am9fi3i0v3",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id",
+          "siteIds": [
+            "req_27sy7hb0xsq"
+          ],
+          "count": 1,
+          "p50": 11,
+          "p95": 11,
+          "max": 11,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwrpxnle9c3tv"
+        },
+        {
+          "key": "ep_014n09i1jig",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/settings",
+          "siteIds": [
+            "req_092dy6av59n",
+            "req_1psqg80jksx"
+          ],
+          "count": 2,
+          "p50": 7,
+          "p95": 10,
+          "max": 10,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwz4nvcbyvap3"
+        },
+        {
+          "key": "ep_0i0im2g2p7v",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_0ht2fssv0ja",
+            "req_1dhqpyygtma",
+            "req_1di2bq7b96m"
+          ],
+          "count": 6,
+          "p50": 7,
+          "p95": 9,
+          "max": 9,
+          "errors": 0,
+          "browser": 6,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwnnxvwo53wnc"
+        },
+        {
+          "key": "ep_1xqlxqpqvbv",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_0ka937821vy",
+            "req_1g8keamimjw"
+          ],
+          "count": 4,
+          "p50": 5,
+          "p95": 9,
+          "max": 9,
+          "errors": 0,
+          "browser": 4,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwxfeph8ibhco"
+        },
+        {
+          "key": "ep_04gtw68xyhb",
+          "label": "PATCH {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos/:id",
+          "siteIds": [
+            "req_2bvpz71hbm1"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwpkuxw51iha9"
+        },
+        {
+          "key": "ep_1tgnolqki2r",
+          "label": "POST {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_1ybk9xw63lt"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvwzwqt1xmjcq66o"
+        }
+      ],
+      "loads": 5
     }
   },
   "flows": {

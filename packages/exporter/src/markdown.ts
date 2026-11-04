@@ -12,6 +12,7 @@
 //   ONBOARDING.md        Start here: stack, areas, entry pages, main flows, backends, where things live (M32)
 //   GLOSSARY.md          what each status, note, trigger, transport and badge means, and what to do (M34)
 //   cache.md             server cache: tags, cached data, revalidation calls and what they refresh (M39)
+//   perf.md              waterfalls, N+1 and duplicate requests, and endpoint timings from captures (M47)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
   ACTION_AUTH_LABELS,
@@ -54,6 +55,7 @@ import {
   type EndpointHost,
   type EndpointList,
   type EndpointStatus,
+  type EndpointTiming,
   type EndpointTransport,
   type ExportCapture,
   type ExportData,
@@ -95,12 +97,20 @@ import {
   type ModelIndex,
   matchedSiteIds,
   mismatchField,
+  ms,
   type Navigation,
   type PageBoundary,
+  PERF_KIND_LABELS,
+  PERF_RUNTIME_LABELS,
+  type PerfFinding,
   type PostmanContract,
   type PostmanRequest,
   type PostmanSource,
   pageCache,
+  perfFindings,
+  perfOn,
+  perfRuntimeText,
+  perfText,
   queryLinkTarget,
   queryLinkVerb,
   type RecordedFlow,
@@ -142,6 +152,7 @@ import {
   ISSUES,
   MIDDLEWARE,
   ONBOARDING,
+  PERF,
   POSTMAN,
   README,
   RECORDED,
@@ -225,6 +236,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.cache) files[CACHE] = cacheDoc(ctx)
   if (model.env) files[ENV] = envDoc(ctx)
   if (model.actions?.length) files[ACTIONS] = actionsDoc(ctx)
+  if (model.perf || data.verification?.perf) files[PERF] = perfDoc(ctx)
   files[ENDPOINTS] = endpointsDoc(ctx)
   files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
@@ -459,6 +471,17 @@ function readme(ctx: Ctx): string {
       '## Server actions',
       `${link(plural(model.actions.length, 'server action'), from, ACTIONS)}${flagged > 0 ? `, ${plural(flagged, 'note')} to check` : ''}.`,
     )
+  }
+  if (model.perf || ctx.data.verification?.perf) {
+    const findings = perfFindings(model).length
+    const timed = ctx.data.verification?.perf?.endpoints.length ?? 0
+    const parts = [
+      findings > 0
+        ? plural(findings, 'request performance note')
+        : 'No waterfalls, N+1 or duplicate requests',
+      ...(timed > 0 ? [`${plural(timed, 'endpoint')} timed`] : []),
+    ]
+    sections.push('## Request performance', `${link(parts.join(', '), from, PERF)}.`)
   }
   if (handlers.length > 0) {
     sections.push(
@@ -727,6 +750,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ...leakSection(ctx, route),
     ...envSection(ctx, route, from),
     ...actionSection(ctx, route, from),
+    ...perfSection(ctx, route, from),
     ...cacheSection(ctx, route, from),
     ...metadataSection(route),
     '## Component tree',
@@ -954,6 +978,88 @@ function actionsDoc(ctx: Ctx): string {
         routes(a.routeIds),
       ]),
     ),
+  ])
+}
+
+/** The waterfalls, N+1 and duplicate requests that slow the page down (M47). */
+function perfSection(ctx: Ctx, route: Route, from: string): string[] {
+  const findings = perfOn(ctx.index.model, route.id)
+  if (findings.length === 0) return []
+  return [
+    '## Request performance',
+    [
+      `Requests that slow this page down (${link('all', from, PERF)}).`,
+      '',
+      ...findings.map((f) => perfLine(ctx, f, from)),
+    ].join('\n'),
+  ]
+}
+
+function perfLine(ctx: Ctx, f: PerfFinding, from: string): string {
+  const term = (key: string, label: string) => link(label, from, GLOSSARY_DOC, termId('perf', key))
+  const badges = [
+    `⚠ **${term(f.kind, PERF_KIND_LABELS[f.kind])}**`,
+    ...(f.sequential ? [term('sequential', 'one after another')] : []),
+    ...(f.runtime ? [term(f.runtime.status, PERF_RUNTIME_LABELS[f.runtime.status])] : []),
+  ].join(', ')
+  const runtime = f.runtime?.status === 'confirmed' ? perfRuntimeText(f.runtime) : undefined
+  const lines = [`- ${badges} (${code(`${f.loc.file}:${f.loc.line}`)}): ${perfText(f, ctx.model)}.`]
+  if (runtime) lines.push(`  - ${runtime}.`)
+  for (const [i, step] of (f.steps ?? []).entries()) {
+    const needs = step.needs.length ? `, uses ${step.needs.map((n) => n + 1).join(', ')}` : ''
+    lines.push(
+      `  ${i + 1}. ${code(`await ${step.text}`)} (${code(`${step.loc.file}:${step.loc.line}`)}${needs})`,
+    )
+  }
+  return lines.join('\n')
+}
+
+/** Every performance finding, and the endpoints captures timed, slowest first (M47). */
+function perfDoc(ctx: Ctx): string {
+  const findings = perfFindings(ctx.model)
+  const from = PERF
+  const timings = ctx.data.verification?.perf
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = ctx.index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  return doc([
+    '# Request performance',
+    link('← Overview', from, README),
+    'Requests that wait for each other for no reason (waterfalls), run once per item of a list (N+1), or are sent twice on one page load, found in the code. Capture timings of each page load confirm them, and give each endpoint its median (p50) and slow-call (p95) time.',
+    `## To check (${findings.length})`,
+    findings.length > 0
+      ? table(
+          ['Finding', 'Where', 'At runtime', 'Pages'],
+          findings.map((f) => [
+            `${PERF_KIND_LABELS[f.kind]}: ${codeText(perfText(f, ctx.model))}`,
+            `${f.fn ? `${code(f.fn)}<br>` : ''}${code(`${f.loc.file}:${f.loc.line}`)}`,
+            f.runtime ? text(perfRuntimeText(f.runtime) ?? '') : '—',
+            routes(f.routeIds),
+          ]),
+        )
+      : 'The scan found no waterfalls, N+1 requests or duplicate requests.',
+    '## Slowest endpoints',
+    timings?.endpoints.length
+      ? [
+          `From ${plural(timings.loads, 'page load')} and server requests. Times in dev include compiling, so compare endpoints with each other.`,
+          '',
+          table(
+            ['Endpoint', 'p50', 'p95', 'Slowest', 'Calls', 'Failed'],
+            timings.endpoints.map((e: EndpointTiming) => [
+              code(e.label),
+              ms(e.p50),
+              ms(e.p95),
+              ms(e.max),
+              String(e.count),
+              String(e.errors),
+            ]),
+          ),
+        ].join('\n')
+      : 'No request was captured. Run the app with capture on to time its endpoints.',
   ])
 }
 
@@ -2316,6 +2422,11 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: 'Server actions that change data with no auth check and no input check. A server action is a public `POST` endpoint: anyone can call it with any arguments.',
   },
   {
+    title: 'Request performance',
+    kinds: ['perf'],
+    hint: 'Requests that wait for each other for no reason, run once per item of a list, or are sent twice on one page load.',
+  },
+  {
     title: 'Environment variables',
     kinds: ['env'],
     hint: "Names read where they have no value: private names in client code, names Next doesn't inline there, and names nothing defines.",
@@ -2448,7 +2559,8 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     note.kind === 'client' ||
     note.kind === 'leak' ||
     note.kind === 'env' ||
-    note.kind === 'action'
+    note.kind === 'action' ||
+    note.kind === 'perf'
       ? message
       : text(message)
   return `${target ? `${target}: ` : ''}${body} (${where})`

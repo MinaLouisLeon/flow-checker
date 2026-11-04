@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "graphql-apollo",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -3238,6 +3238,117 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_1mvljeijms0",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_235i024m0l6"
+          ],
+          "count": 1,
+          "p50": 315,
+          "p95": 315,
+          "max": 315,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3aejss1ylf5u-0"
+        },
+        {
+          "key": "ep_2c5ny8u59q2",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_1cmdvpo38br"
+          ],
+          "count": 3,
+          "p50": 22,
+          "p95": 315,
+          "max": 315,
+          "errors": 0,
+          "browser": 3,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3aejss1ylf5u-1"
+        },
+        {
+          "key": "ep_2cve50sbne6",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_27iyr9uuhkz"
+          ],
+          "count": 1,
+          "p50": 47,
+          "p95": 47,
+          "max": 47,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3jk6jq6fg2vd"
+        },
+        {
+          "key": "ep_2dska22im0v",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_0y9v4qo3n8x"
+          ],
+          "count": 1,
+          "p50": 21,
+          "p95": 21,
+          "max": 21,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3f3matlhbev4"
+        },
+        {
+          "key": "ep_1jutox0n6zl",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_1se0zfbjglz"
+          ],
+          "count": 1,
+          "p50": 20,
+          "p95": 20,
+          "max": 20,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3e2yebmpepxf"
+        },
+        {
+          "key": "ep_0dra48drhl8",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_08vp0aultnf"
+          ],
+          "count": 1,
+          "p50": 20,
+          "p95": 20,
+          "max": 20,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3gagvl173jzt"
+        },
+        {
+          "key": "ep_2fwm7w18i75",
+          "label": "POST /api/graphql",
+          "siteIds": [
+            "req_0qoh2ov7p3i"
+          ],
+          "count": 1,
+          "p50": 20,
+          "p95": 20,
+          "max": 20,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvuu3kr3um50tawn"
+        }
+      ],
+      "loads": 3
     }
   },
   "flows": {

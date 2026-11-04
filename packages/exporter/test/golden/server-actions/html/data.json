@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "server-actions",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -1876,6 +1876,102 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_09hajlev2r5",
+          "label": "POST createProduct (server action)",
+          "siteIds": [
+            "req_07o63rveyo8"
+          ],
+          "count": 1,
+          "p50": 1511,
+          "p95": 1511,
+          "max": 1511,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs026no4p15coso"
+        },
+        {
+          "key": "ep_0ukrbhfpyjv",
+          "label": "POST deleteProduct (server action)",
+          "siteIds": [
+            "req_0b08g87h2vb"
+          ],
+          "count": 1,
+          "p50": 82,
+          "p95": 82,
+          "max": 82,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs02b3t4kswzebd"
+        },
+        {
+          "key": "ep_16a5uohh2s8",
+          "label": "GET {API_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_1u9qpywsqwd"
+          ],
+          "count": 4,
+          "p50": 30,
+          "p95": 58,
+          "max": 58,
+          "errors": 0,
+          "browser": 0,
+          "server": 4,
+          "slowestCaptureId": "cap_mvs0222tn9gfyq85"
+        },
+        {
+          "key": "ep_16zjeuqipey",
+          "label": "GET {API_URL ?? http://localhost:4010}/products/:id",
+          "siteIds": [
+            "req_25a1hdpohd6"
+          ],
+          "count": 1,
+          "p50": 18,
+          "p95": 18,
+          "max": 18,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs027scd3jvgvu2"
+        },
+        {
+          "key": "ep_1b8rxbacsrz",
+          "label": "POST {API_URL ?? http://localhost:4010}/products",
+          "siteIds": [
+            "req_0h59cmicyii"
+          ],
+          "count": 1,
+          "p50": 8,
+          "p95": 8,
+          "max": 8,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs026pcgvkd324w"
+        },
+        {
+          "key": "ep_24zdsb1p2vt",
+          "label": "DELETE {API_URL ?? http://localhost:4010}/products/:id",
+          "siteIds": [
+            "req_11sozx68f2s"
+          ],
+          "count": 1,
+          "p50": 3,
+          "p95": 3,
+          "max": 3,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs02b4jthsdx0q5"
+        }
+      ],
+      "loads": 7
     }
   },
   "flows": {

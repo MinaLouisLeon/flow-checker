@@ -1,0 +1,71 @@
+# Requests
+
+## CatalogPage  src/app/catalog/page.tsx:4
+GET http://localhost:4010/products?delay=80  fetch  server-render
+  response: Product[]
+  via: getProducts src/app/catalog/page.tsx:5 > get src/lib/api.ts:18 > fetch src/lib/api.ts:8
+GET http://localhost:4010/products/:id?delay=40  fetch  server-render
+  response: Product
+  via: getProduct src/app/catalog/page.tsx:6 > get src/lib/api.ts:22 > fetch src/lib/api.ts:8
+
+## Home  src/app/page.tsx:4
+GET http://localhost:4010/users/1?delay=80  fetch  server-render
+  response: User
+  via: getUser src/app/page.tsx:5 > get src/lib/api.ts:14 > fetch src/lib/api.ts:8
+GET http://localhost:4010/products?delay=80  fetch  server-render
+  response: Product[]
+  via: getProducts src/app/page.tsx:6 > get src/lib/api.ts:18 > fetch src/lib/api.ts:8
+
+## ProductsPage  src/app/products/page.tsx:5
+GET http://localhost:4010/products?delay=80  fetch  server-render
+  response: Product[]
+  via: getProducts src/app/products/page.tsx:6 > get src/lib/api.ts:18 > fetch src/lib/api.ts:8
+GET http://localhost:4010/products/:id?delay=40  fetch  server-render
+  response: Product
+  via: getProduct src/app/products/page.tsx:9 > get src/lib/api.ts:22 > fetch src/lib/api.ts:8
+
+## SettingsLayout  src/app/settings/layout.tsx:7
+GET http://localhost:4010/settings?delay=40  axios  server-render
+  response: Settings
+  via: getSettings src/app/settings/layout.tsx:8 > axios.get src/lib/settings.ts:9
+GET http://localhost:4010/users/2?delay=80  fetch  server-render
+  response: User
+  via: getUser src/app/settings/layout.tsx:8 > get src/lib/api.ts:14 > fetch src/lib/api.ts:8
+GET http://localhost:4010/users/1?delay=20  axios  server-render
+  response: User
+  via: getAccount src/app/settings/layout.tsx:8 > axios.get src/lib/settings.ts:15
+
+## SettingsPage  src/app/settings/page.tsx:4
+GET http://localhost:4010/settings?delay=40  axios  server-render
+  response: Settings
+  via: getSettings src/app/settings/page.tsx:5 > axios.get src/lib/settings.ts:9
+GET http://localhost:4010/users/2?delay=80  fetch  server-render
+  response: User
+  via: getUser src/app/settings/page.tsx:5 > get src/lib/api.ts:14 > fetch src/lib/api.ts:8
+GET http://localhost:4010/users/1?delay=20  axios  server-render
+  response: User
+  via: getAccount src/app/settings/page.tsx:5 > axios.get src/lib/settings.ts:15
+
+## TodosPage  src/app/todos/page.tsx:5
+GET http://localhost:4010/todos?delay=40  fetch  server-render
+  response: Todo[]
+  via: getTodos src/app/todos/page.tsx:6 > get src/lib/api.ts:26 > fetch src/lib/api.ts:8
+
+## UserPage  src/app/users/[id]/page.tsx:5
+GET http://localhost:4010/users/:id?delay=80  fetch  server-render
+  response: User
+  via: getUser src/app/users/[id]/page.tsx:7 > get src/lib/api.ts:14 > fetch src/lib/api.ts:8
+GET http://localhost:4010/todos?userId=:userId&delay=40  fetch  server-render
+  response: Todo[]
+  via: getUserTodos src/app/users/[id]/page.tsx:9 > get src/lib/api.ts:30 > fetch src/lib/api.ts:8
+GET http://localhost:4010/products?delay=80  fetch  server-render
+  response: Product[]
+  via: getProducts src/app/users/[id]/page.tsx:9 > get src/lib/api.ts:18 > fetch src/lib/api.ts:8
+GET http://localhost:4010/users/:id?delay=80  fetch  server-render
+  response: User
+  via: getUser src/app/users/[id]/page.tsx:10 > get src/lib/api.ts:14 > fetch src/lib/api.ts:8
+
+## TodoRow  src/components/todo-row.tsx:5
+GET http://localhost:4010/todos/:id?delay=30  fetch  effect
+  response: Todo
+  via: fetch src/components/todo-row.tsx:8

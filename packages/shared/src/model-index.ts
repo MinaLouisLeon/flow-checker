@@ -20,6 +20,7 @@ import type {
   Route,
   TypeShape,
 } from './model'
+import { perfFindings, perfRuntimeText, perfText } from './perf'
 
 export interface RenderSite {
   /** The component that renders this one. */
@@ -51,6 +52,7 @@ export type NoteKind =
   | 'leak'
   | 'env'
   | 'action'
+  | 'perf'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -494,6 +496,20 @@ function scanNotes(model: AppModel): ScanNote[] {
       column: action.loc.column,
       ...(action.componentId ? { componentId: action.componentId } : {}),
       ...(action.routeIds[0] ? { routeId: action.routeIds[0] } : {}),
+    })
+  }
+  // Request performance (M47): one note per finding, with what capture timings showed.
+  for (const finding of perfFindings(model)) {
+    const pages = finding.routeIds.length
+    const runtime = perfRuntimeText(finding.runtime)
+    notes.push({
+      kind: 'perf',
+      message: `${perfText(finding, model)}${pages > 1 ? ` (on ${pages} pages)` : ''}${runtime ? `; ${runtime}` : ''}`,
+      file: finding.loc.file,
+      line: finding.loc.line,
+      column: finding.loc.column,
+      ...(finding.componentId ? { componentId: finding.componentId } : {}),
+      ...(finding.routeIds[0] ? { routeId: finding.routeIds[0] } : {}),
     })
   }
   // Environment variables (M45): one note per flag, and one per name built at run time in client code.

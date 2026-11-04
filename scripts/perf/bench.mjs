@@ -3,7 +3,8 @@
 //
 //   cold scan    `flow-checker scan`, wall time and peak memory as reported by the scan
 //   re-scan      `flow-checker dev --no-app`, after editing one component (median of 5 edits)
-//   responsive   the dashboard API's slowest answer while those re-scans run
+//   responsive   the dashboard API's slowest answer while those re-scans run, for `/api/health` and
+//                the Perf screen's `/api/perf` (M47)
 //
 // Run after `pnpm build`:
 //   node scripts/perf/bench.mjs [features=200] [--json]
@@ -83,11 +84,21 @@ try {
     // Poll the API while re-scanning to see how long it stays unanswered.
     let polling = true
     let slowestApiMs = 0
+    let slowestPerfMs = 0
+    let perfAnswers = 0
     const poll = (async () => {
       while (polling) {
-        const t = performance.now()
+        let t = performance.now()
         await fetch(`http://127.0.0.1:${port}/api/health`).catch(() => {})
         slowestApiMs = Math.max(slowestApiMs, performance.now() - t)
+        t = performance.now()
+        await fetch(`http://127.0.0.1:${port}/api/perf`)
+          .then(async (res) => {
+            await res.json()
+            if (res.ok) perfAnswers++
+          })
+          .catch(() => {})
+        slowestPerfMs = Math.max(slowestPerfMs, performance.now() - t)
         await sleep(20)
       }
     })()
@@ -105,6 +116,8 @@ try {
     rescans.sort((a, b) => a - b)
     result.rescanMs = { median: rescans[2], max: rescans[4], all: rescans }
     result.slowestApiMs = Math.round(slowestApiMs)
+    result.slowestPerfMs = Math.round(slowestPerfMs)
+    if (perfAnswers === 0) throw new Error('/api/perf never answered: is capture on in `dev --no-app`?')
   } finally {
     await stop(dev)
   }
@@ -120,12 +133,14 @@ else {
   console.log(`  dev start to watching: ${result.devStartMs} ms`)
   console.log(`  re-scan after an edit: median ${result.rescanMs.median} ms, max ${result.rescanMs.max} ms`)
   console.log(`  slowest API answer during re-scans: ${result.slowestApiMs} ms`)
+  console.log(`  slowest /api/perf answer during re-scans: ${result.slowestPerfMs} ms`)
 }
 
 const budgets = [
   ['FLOW_CHECKER_BUDGET_SCAN_MS', result.scanReportedMs, 'scan'],
   ['FLOW_CHECKER_BUDGET_RESCAN_MS', result.rescanMs.median, 're-scan'],
   ['FLOW_CHECKER_BUDGET_API_MS', result.slowestApiMs, 'API answer'],
+  ['FLOW_CHECKER_BUDGET_API_MS', result.slowestPerfMs, 'Perf screen answer'],
 ]
 for (const [env, value, what] of budgets) {
   const budget = Number(process.env[env])

@@ -1,0 +1,3446 @@
+{
+  "fixture": "perf",
+  "actions": {},
+  "captures": [
+    {
+      "id": "cap_mw210cf85kij5vkl0",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:13.500Z",
+      "durationMs": 206,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:13 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Home (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:20:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "Home",
+          "file": "src/app/page.tsx",
+          "line": 5,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_23ca0tetmxk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl1",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:13.716Z",
+      "durationMs": 100,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:13 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Home (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:21:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "Home",
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0kd0ltojnrd",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl3",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:13.983Z",
+      "durationMs": 97,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:14 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/",
+        "requestId": "in_mw210cf85kij5vkl2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Home (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:20:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "Home",
+          "file": "src/app/page.tsx",
+          "line": 5,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_23ca0tetmxk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl4",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:14.086Z",
+      "durationMs": 103,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:14 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/",
+        "requestId": "in_mw210cf85kij5vkl2"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Home (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:21:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "Home",
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0kd0ltojnrd",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl6",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:16.789Z",
+      "durationMs": 93,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:16 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/",
+        "requestId": "in_mw210cf85kij5vkl5"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Home (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:20:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "Home",
+          "file": "src/app/page.tsx",
+          "line": 5,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_23ca0tetmxk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl7",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:16.890Z",
+      "durationMs": 101,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:16 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/",
+        "requestId": "in_mw210cf85kij5vkl5"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Home (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:21:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "Home",
+          "file": "src/app/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_0kd0ltojnrd",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl9",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:20.101Z",
+      "durationMs": 124,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:20 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkl8"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:24:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 7,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1n4wecz1zex",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkla",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:20.238Z",
+      "durationMs": 66,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=1&delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:20 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            }
+          ],
+          "size": 67
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkl8"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 0)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:26:31)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 29
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_00405rt0lsa",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklb",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:20.241Z",
+      "durationMs": 109,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:20 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkl8"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:26:31)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 29
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21fpvnjjwok",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklc",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:20.367Z",
+      "durationMs": 92,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:20 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkl8"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:30:20)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 10,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_228s24jz87h",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkle",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:23.035Z",
+      "durationMs": 103,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:23 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkld"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:24:18)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 7,
+          "column": 16
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1n4wecz1zex",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklf",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:23.149Z",
+      "durationMs": 50,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?userId=1&delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:23 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            }
+          ],
+          "size": 67
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkld"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 0)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:26:31)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 29
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_00405rt0lsa",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklg",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:23.153Z",
+      "durationMs": 93,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:23 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkld"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:26:31)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 9,
+          "column": 29
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21fpvnjjwok",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklh",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:23.257Z",
+      "durationMs": 99,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:23 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/users/1",
+        "requestId": "in_mw210cf85kij5vkld"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async UserPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0nh9ot2zn2-94._.js:30:20)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "UserPage",
+          "file": "src/app/users/[id]/page.tsx",
+          "line": 10,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_228s24jz87h",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklj",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:25.934Z",
+      "durationMs": 98,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products",
+        "requestId": "in_mw210cf85kij5vkli"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async ProductsPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0m34gjji1zf5s._.js:20:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_14b37uscwxs",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklk",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:26.042Z",
+      "durationMs": 53,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/1?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Keyboard",
+            "price": 49.9,
+            "stock": 12
+          },
+          "size": 50
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products",
+        "requestId": "in_mw210cf85kij5vkli"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async ProductsPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0m34gjji1zf5s._.js:23:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 9,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_16g2mworngz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkll",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:26.106Z",
+      "durationMs": 49,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/2?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:26 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Mouse",
+            "price": 19.5,
+            "stock": 0
+          },
+          "size": 46
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products",
+        "requestId": "in_mw210cf85kij5vkli"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async ProductsPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0m34gjji1zf5s._.js:23:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 9,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_16g2mworngz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkln",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:28.706Z",
+      "durationMs": 97,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:28 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products",
+        "requestId": "in_mw210cf85kij5vklm"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async ProductsPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0m34gjji1zf5s._.js:20:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 6,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_14b37uscwxs",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklo",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:28.818Z",
+      "durationMs": 62,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/1?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:28 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Keyboard",
+            "price": 49.9,
+            "stock": 12
+          },
+          "size": 50
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products",
+        "requestId": "in_mw210cf85kij5vklm"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async ProductsPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0m34gjji1zf5s._.js:23:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 9,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_16g2mworngz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklp",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:28.895Z",
+      "durationMs": 49,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/2?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:28 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Mouse",
+            "price": 19.5,
+            "stock": 0
+          },
+          "size": 46
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/products",
+        "requestId": "in_mw210cf85kij5vklm"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async ProductsPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0m34gjji1zf5s._.js:23:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "ProductsPage",
+          "file": "src/app/products/page.tsx",
+          "line": 9,
+          "column": 18
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_16g2mworngz",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklr",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:31.540Z",
+      "durationMs": 99,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/catalog",
+        "requestId": "in_mw210cf85kij5vklq"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async CatalogPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0n44b_3792sas._.js:20:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "CatalogPage",
+          "file": "src/app/catalog/page.tsx",
+          "line": 5,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1nrjkflsk7s",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkls",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:31.651Z",
+      "durationMs": 51,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/1?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Keyboard",
+            "price": 49.9,
+            "stock": 12
+          },
+          "size": 50
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/catalog",
+        "requestId": "in_mw210cf85kij5vklq"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 0)",
+        "at async CatalogPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0n44b_3792sas._.js:21:21)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "CatalogPage",
+          "file": "src/app/catalog/page.tsx",
+          "line": 6,
+          "column": 19
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_07e7tpm2bap",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklt",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:31.654Z",
+      "durationMs": 65,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/2?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:31 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Mouse",
+            "price": 19.5,
+            "stock": 0
+          },
+          "size": 46
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/catalog",
+        "requestId": "in_mw210cf85kij5vklq"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async CatalogPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0n44b_3792sas._.js:21:21)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "CatalogPage",
+          "file": "src/app/catalog/page.tsx",
+          "line": 6,
+          "column": 19
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_07e7tpm2bap",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklv",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:34.285Z",
+      "durationMs": 92,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:34 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "name": "Keyboard",
+              "price": 49.9,
+              "stock": 12
+            },
+            {
+              "id": 2,
+              "name": "Mouse",
+              "price": 19.5,
+              "stock": 0
+            }
+          ],
+          "size": 99
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/catalog",
+        "requestId": "in_mw210cf85kij5vklu"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async CatalogPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0n44b_3792sas._.js:20:22)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "CatalogPage",
+          "file": "src/app/catalog/page.tsx",
+          "line": 5,
+          "column": 20
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1nrjkflsk7s",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklx",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:34.391Z",
+      "durationMs": 47,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/2?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:34 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Mouse",
+            "price": 19.5,
+            "stock": 0
+          },
+          "size": 46
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/catalog",
+        "requestId": "in_mw210cf85kij5vklu"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async CatalogPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0n44b_3792sas._.js:21:21)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "CatalogPage",
+          "file": "src/app/catalog/page.tsx",
+          "line": 6,
+          "column": 19
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_07e7tpm2bap",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklw",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:34.388Z",
+      "durationMs": 59,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/products/1?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:34 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Keyboard",
+            "price": 49.9,
+            "stock": 12
+          },
+          "size": 50
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/catalog",
+        "requestId": "in_mw210cf85kij5vklu"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 0)",
+        "at async CatalogPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0n44b_3792sas._.js:21:21)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "CatalogPage",
+          "file": "src/app/catalog/page.tsx",
+          "line": 6,
+          "column": 19
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_07e7tpm2bap",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Product",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vklz",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:37.035Z",
+      "durationMs": 59,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:37 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/todos",
+        "requestId": "in_mw210cf85kij5vkly"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async TodosPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0d3diy2nvd0m_._.js:17:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "TodosPage",
+          "file": "src/app/todos/page.tsx",
+          "line": 6,
+          "column": 17
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_14km2kuqtgu",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210v6w069e73y8",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:37.256Z",
+      "durationMs": 45,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210v4eyhumatuw",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/2?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "userId": 2,
+            "title": "Break Enigma",
+            "done": false
+          },
+          "size": 55
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210v6suhgkb4p0",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:37.252Z",
+      "durationMs": 48,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210v4eyhumatuw",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210v70c7806b59",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:37.260Z",
+      "durationMs": 85,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210v4eyhumatuw",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/2?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "userId": 2,
+            "title": "Break Enigma",
+            "done": false
+          },
+          "size": 55
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210v6yjwhxlkb6",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:37.258Z",
+      "durationMs": 87,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210v4eyhumatuw",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl11",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:39.765Z",
+      "durationMs": 60,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos?delay=40",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:39 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": [
+            {
+              "id": 1,
+              "userId": 1,
+              "title": "Write the first program",
+              "done": true
+            },
+            {
+              "id": 2,
+              "userId": 2,
+              "title": "Break Enigma",
+              "done": false
+            }
+          ],
+          "size": 123
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/todos",
+        "requestId": "in_mw210cf85kij5vkl10"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async TodosPage (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0d3diy2nvd0m_._.js:17:19)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "TodosPage",
+          "file": "src/app/todos/page.tsx",
+          "line": 6,
+          "column": 17
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_14km2kuqtgu",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo[]",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210xbewkhs4iy7",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:40.010Z",
+      "durationMs": 50,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210x9exz2hyfin",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/2?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "userId": 2,
+            "title": "Break Enigma",
+            "done": false
+          },
+          "size": 55
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210xbdknqw88bh",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:40.009Z",
+      "durationMs": 52,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210x9exz2hyfin",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8572:33)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8633:17)",
+        "at recursivelyTraversePassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8559:316)",
+        "at commitPassiveMountOnFiber (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8571:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210xbhpezs3n2z",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:40.013Z",
+      "durationMs": 94,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210x9exz2hyfin",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/1?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "userId": 1,
+            "title": "Write the first program",
+            "done": true
+          },
+          "size": 65
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210xbjl9tgky33",
+      "sessionId": "ses_mw210dht6edeo4vh",
+      "origin": "browser",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:40.015Z",
+      "durationMs": 94,
+      "pageUrl": "http://localhost:3077/todos",
+      "view": "pv_mw210x9exz2hyfin",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/todos/2?delay=30",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "userId": 2,
+            "title": "Break Enigma",
+            "done": false
+          },
+          "size": 55
+        }
+      },
+      "stack": [
+        "at callerStack (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:252:19)",
+        "at baseCapture (http://localhost:3077/_next/static/chunks/_0lc9v5qe-li7p._.js:1799:195)",
+        "at TodoRow.useEffect (http://localhost:3077/_next/static/chunks/_16ony41xs12cv._.js:20:13)",
+        "at Object.react_stack_bottom_frame (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:15063:22)",
+        "at runWithFiberInDEV (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:777:74)",
+        "at commitHookEffectListMount (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7113:167)",
+        "at commitHookPassiveMountEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:7148:60)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8662:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8676:17)",
+        "at recursivelyTraverseReconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8649:13)",
+        "at reconnectPassiveEffects (http://localhost:3077/_next/static/chunks/1v1x_next_dist_compiled_react-dom_cjs_react-dom-client_development_0za-s330tlzvh.js:8661:17)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "TodoRow.useEffect",
+          "file": "src/components/todo-row.tsx",
+          "line": 8,
+          "column": 5
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_21cujfajgmg",
+        "parts": [
+          {
+            "part": "response",
+            "type": "Todo",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl15",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "http",
+      "timestamp": "2026-11-04T11:21:42.562Z",
+      "durationMs": 45,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=20",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "user-agent": "axios/1.20.0",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "localhost:4010"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:42 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl12"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1874:29",
+        "at ClientRequest._finish (node:_http_client:465:33)",
+        "at ClientRequest._flush (node:_http_outgoing:1204:12)",
+        "at onSocketNT (node:_http_client:990:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl16",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "http",
+      "timestamp": "2026-11-04T11:21:42.562Z",
+      "durationMs": 74,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings?delay=40",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "user-agent": "axios/1.20.0",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "localhost:4010"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:42 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl12"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1874:29",
+        "at ClientRequest._finish (node:_http_client:465:33)",
+        "at ClientRequest._flush (node:_http_outgoing:1204:12)",
+        "at onSocketNT (node:_http_client:990:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl14",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "http",
+      "timestamp": "2026-11-04T11:21:42.561Z",
+      "durationMs": 76,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings?delay=40",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "user-agent": "axios/1.20.0",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "localhost:4010"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:42 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl12"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1874:29",
+        "at ClientRequest._finish (node:_http_client:465:33)",
+        "at ClientRequest._flush (node:_http_outgoing:1204:12)",
+        "at onSocketNT (node:_http_client:990:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl13",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:42.553Z",
+      "durationMs": 117,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:42 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl12"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async SettingsLayout (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0zt0emlx12o-e._.js:17:40)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "SettingsLayout",
+          "file": "src/app/settings/layout.tsx",
+          "line": 8,
+          "column": 38
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1rc36qnaspk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl1a",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "http",
+      "timestamp": "2026-11-04T11:21:45.375Z",
+      "durationMs": 37,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/1?delay=20",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "user-agent": "axios/1.20.0",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "localhost:4010"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 1,
+            "name": "Ada Lovelace",
+            "email": "ada@example.com",
+            "role": "admin"
+          },
+          "size": 71
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl17"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1874:29",
+        "at ClientRequest._finish (node:_http_client:465:33)",
+        "at ClientRequest._flush (node:_http_outgoing:1204:12)",
+        "at onSocketNT (node:_http_client:990:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl1b",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "http",
+      "timestamp": "2026-11-04T11:21:45.376Z",
+      "durationMs": 51,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings?delay=40",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "user-agent": "axios/1.20.0",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "localhost:4010"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl17"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1874:29",
+        "at ClientRequest._finish (node:_http_client:465:33)",
+        "at ClientRequest._flush (node:_http_outgoing:1204:12)",
+        "at onSocketNT (node:_http_client:990:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl19",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "http",
+      "timestamp": "2026-11-04T11:21:45.375Z",
+      "durationMs": 54,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/settings?delay=40",
+        "headers": {
+          "accept": "application/json, text/plain, */*",
+          "user-agent": "axios/1.20.0",
+          "accept-encoding": "gzip, compress, deflate, br",
+          "host": "localhost:4010"
+        },
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:45 GMT",
+          "connection": "keep-alive",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "theme": "dark",
+            "locale": "en",
+            "digest": null
+          },
+          "size": 44
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl17"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1874:29",
+        "at ClientRequest._finish (node:_http_client:465:33)",
+        "at ClientRequest._flush (node:_http_outgoing:1204:12)",
+        "at onSocketNT (node:_http_client:990:9)"
+      ],
+      "redacted": true,
+      "redactedPaths": []
+    },
+    {
+      "id": "cap_mw210cf85kij5vkl18",
+      "sessionId": "server",
+      "origin": "server",
+      "transport": "fetch",
+      "timestamp": "2026-11-04T11:21:45.362Z",
+      "durationMs": 97,
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:4010/users/2?delay=80",
+        "headers": {},
+        "body": {
+          "kind": "none"
+        }
+      },
+      "response": {
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "access-control-allow-headers": "Content-Type, Authorization",
+          "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
+          "access-control-allow-origin": "*",
+          "connection": "keep-alive",
+          "content-type": "application/json",
+          "date": "Wed, 04 Nov 2026 11:21:45 GMT",
+          "keep-alive": "timeout=5",
+          "transfer-encoding": "chunked"
+        },
+        "body": {
+          "kind": "json",
+          "value": {
+            "id": 2,
+            "name": "Alan Turing",
+            "email": "alan@example.com",
+            "role": "member"
+          },
+          "size": 72
+        }
+      },
+      "parent": {
+        "method": "GET",
+        "url": "/settings",
+        "requestId": "in_mw210cf85kij5vkl17"
+      },
+      "stack": [
+        "at callerStack (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:239:19)",
+        "at baseCapture (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\[root-of-the-server]__0-de7im_20bc8._.js:1686:197)",
+        "at dedupeFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:5023:25)",
+        "at doOriginalFetch (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6120:24)",
+        "at <repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\1v1x_next_dist_esm_server_0fmtdh7034rlo._.js:6407:24",
+        "at async get (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__1tyloizh25r5v._.js:75:17)",
+        "at async Promise.all (index 1)",
+        "at async SettingsLayout (<repo>\\fixtures\\perf\\.next\\dev\\server\\chunks\\ssr\\[root-of-the-server]__0zt0emlx12o-e._.js:17:40)"
+      ],
+      "redacted": true,
+      "redactedPaths": [],
+      "sourceStack": [
+        {
+          "fn": "get",
+          "file": "src/lib/api.ts",
+          "line": 8,
+          "column": 15
+        },
+        {
+          "fn": "SettingsLayout",
+          "file": "src/app/settings/layout.tsx",
+          "line": 8,
+          "column": 38
+        }
+      ],
+      "typeCheck": {
+        "siteId": "req_1rc36qnaspk",
+        "parts": [
+          {
+            "part": "response",
+            "type": "User",
+            "status": "ok",
+            "mismatches": []
+          }
+        ]
+      }
+    }
+  ]
+}

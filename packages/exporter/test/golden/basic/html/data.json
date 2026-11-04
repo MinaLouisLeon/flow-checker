@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "basic",
   "model": {
-    "version": 19,
+    "version": 20,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -1493,6 +1493,72 @@
       "unmatched": 0,
       "manual": 0,
       "thirdParty": 0
+    },
+    "perf": {
+      "findings": {},
+      "endpoints": [
+        {
+          "key": "ep_16nzt1zcm62",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users",
+          "siteIds": [
+            "req_23wds4ry0if"
+          ],
+          "count": 3,
+          "p50": 35,
+          "p95": 366,
+          "max": 366,
+          "errors": 0,
+          "browser": 0,
+          "server": 3,
+          "slowestCaptureId": "cap_mvs00uayl8gel13d"
+        },
+        {
+          "key": "ep_1xqlxqpqvbv",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_21o1or0unbb"
+          ],
+          "count": 1,
+          "p50": 45,
+          "p95": 45,
+          "max": 45,
+          "errors": 0,
+          "browser": 0,
+          "server": 1,
+          "slowestCaptureId": "cap_mvs010ajhof7c8yd"
+        },
+        {
+          "key": "ep_0l1jfzv9rl3",
+          "label": "DELETE {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/users/:id",
+          "siteIds": [
+            "req_0l0l4hns6qh"
+          ],
+          "count": 1,
+          "p50": 21,
+          "p95": 21,
+          "max": 21,
+          "errors": 0,
+          "browser": 1,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs012l4glsqdt24"
+        },
+        {
+          "key": "ep_0i0im2g2p7v",
+          "label": "GET {NEXT_PUBLIC_API_URL ?? http://localhost:4010}/todos",
+          "siteIds": [
+            "req_0h7xmjn6pcm"
+          ],
+          "count": 2,
+          "p50": 9,
+          "p95": 12,
+          "max": 12,
+          "errors": 0,
+          "browser": 2,
+          "server": 0,
+          "slowestCaptureId": "cap_mvs010m20uvw20uo"
+        }
+      ],
+      "loads": 5
     }
   },
   "flows": {

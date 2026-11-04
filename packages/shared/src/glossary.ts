@@ -20,6 +20,9 @@ import type {
   EnvSide,
   Flag,
   PageBoundary,
+  PerfFindingKind,
+  PerfFindingRuntime,
+  PerfLoop,
   PropLeak,
   RequestSite,
   RequestUrl,
@@ -60,6 +63,7 @@ export type GlossaryGroupId =
   | 'client'
   | 'leak'
   | 'action'
+  | 'perf'
   | 'env'
   | 'cache'
   | 'flow-status'
@@ -702,6 +706,90 @@ const ACTION: GlossaryGroup<ActionTerm> = {
   },
 }
 
+type PerfTerm =
+  | PerfFindingKind
+  | PerfFindingRuntime['status']
+  | `loop-${PerfLoop['kind']}`
+  | 'sequential'
+  | 'p50'
+  | 'p95'
+
+const PERF: GlossaryGroup<PerfTerm> = {
+  id: 'perf',
+  title: 'Request performance',
+  intro:
+    'Requests that wait for each other for no reason, run once per item of a list, or are sent twice on one page load, found in the code and checked against the timings of live captures.',
+  entries: {
+    waterfall: {
+      label: 'waterfall',
+      means:
+        "Requests awaited one after the other in the same function, where a later one doesn't use what an earlier one returned. Each waits for the one before, so the page takes as long as all of them together.",
+      todo: 'Start them together: `const [user, posts] = await Promise.all([getUser(), getPosts()])`, or render them in separate components inside `<Suspense>`.',
+    },
+    'n-plus-one': {
+      label: 'N+1',
+      means:
+        'A request sent once for each item of a list (in a loop, in `.map()`, or by a component rendered once per item), usually after one request for the list itself. Ten items make eleven requests.',
+      todo: 'Fetch the items in one request (an endpoint that takes a list of ids, or one that includes them), or at least start them together with `Promise.all`.',
+    },
+    duplicate: {
+      label: 'duplicate',
+      means:
+        "The same request (method and URL, called with the same arguments) is sent from more than one place on one page load, and nothing dedupes it. Next dedupes a server component's `GET` `fetch`, and query libraries dedupe the same key, but not other calls.",
+      todo: "Wrap the function that sends it in React's `cache()` (server), share one query (client), or fetch it once higher up and pass the result down.",
+    },
+    sequential: {
+      label: 'one after another',
+      means:
+        'The N+1 requests are awaited inside a `for` loop, so each one waits for the one before: the time adds up with each item.',
+      todo: 'Start them together (`await Promise.all(items.map(...))`) if they must stay separate.',
+    },
+    'loop-for': {
+      label: 'for loop',
+      means: 'A `for`, `for...of` or `for...in` loop.',
+    },
+    'loop-while': {
+      label: 'while loop',
+      means: 'A `while` or `do ... while` loop.',
+    },
+    'loop-callback': {
+      label: 'array callback',
+      means:
+        'A callback of an array method that runs once per item: `.map()`, `.forEach()`, `.flatMap()`, `.filter()`...',
+    },
+    'loop-render': {
+      label: 'rendered per item',
+      means:
+        'A component rendered once per item (`items.map((item) => <Row item={item} />)`) that sends the request itself, so each row sends its own.',
+    },
+    confirmed: {
+      label: 'confirmed at runtime',
+      means:
+        'Live capture showed it: the requests ran one after the other, or one load sent the request for several items, or the same request twice.',
+    },
+    'not-confirmed': {
+      label: 'not confirmed',
+      means:
+        'Its requests were captured, but not the way the scan says: they overlapped, or a load sent only one. It may only happen with other data (a longer list), or the scan read the code wrong.',
+      todo: 'Use the page with more data, or check the code: if it is fine, the finding can be ignored.',
+    },
+    'not-seen': {
+      label: 'not seen yet',
+      means: 'No capture of its requests yet, so the timings say nothing about it.',
+      todo: 'Open the page with capture on.',
+    },
+    p50: {
+      label: 'p50',
+      means: 'The median time: half the captured calls of the endpoint were faster than this, half slower.',
+    },
+    p95: {
+      label: 'p95',
+      means:
+        'The 95th percentile: 95 of 100 captured calls were faster than this. It shows the slow calls users hit now and then, which the median hides.',
+    },
+  },
+}
+
 const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
@@ -931,6 +1019,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   CLIENT,
   LEAK,
   ACTION,
+  PERF,
   ENV,
   CACHE,
   FLOW_STATUS,

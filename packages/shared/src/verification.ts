@@ -3,6 +3,7 @@
 import { applyCacheRuntime } from './cache-check'
 import type { SiteVerification, VerificationSummary } from './match'
 import type { AppModel, Flag, RequestSite } from './model'
+import { applyPerfRuntime } from './perf'
 import type { TypeCheck, TypeCheckPart, TypeMismatch } from './type-check'
 
 /** One distinct mismatch across a site's captures. */
@@ -151,15 +152,17 @@ function staleFlag(verification: SiteVerification): Flag {
 
 /**
  * Applies verification to the scanned sites: status, and a `type-mismatch` flag listing what
- * didn't fit, and to cache entries what Next's cache did at runtime (M40). Safe to call again on a
- * model it already updated. Returns the same model when nothing changed.
+ * didn't fit; to cache entries what Next's cache did at runtime (M40); and to performance findings
+ * what capture timings showed (M47). Safe to call again on a model it already updated. Returns the
+ * same model when nothing changed.
  */
 export function applyVerification(
   model: AppModel,
-  summary: Pick<VerificationSummary, 'sites' | 'cache'>,
+  summary: Pick<VerificationSummary, 'sites' | 'cache' | 'perf'>,
 ): AppModel {
   const withCache = applyCacheRuntime(model, summary.cache ?? {})
-  return applySites(withCache, summary)
+  const withPerf = applyPerfRuntime(withCache, summary.perf?.findings ?? {})
+  return applySites(withPerf, summary)
 }
 
 function applySites(model: AppModel, summary: Pick<VerificationSummary, 'sites'>): AppModel {

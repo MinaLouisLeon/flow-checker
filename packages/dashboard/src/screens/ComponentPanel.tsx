@@ -65,7 +65,8 @@ export function ComponentPanel({
               n.kind === 'client' ||
               n.kind === 'leak' ||
               n.kind === 'env' ||
-              n.kind === 'action' ? (
+              n.kind === 'action' ||
+              n.kind === 'perf' ? (
                 <CodeText text={n.message} />
               ) : (
                 n.message

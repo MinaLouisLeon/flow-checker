@@ -1,0 +1,25 @@
+{
+  "name": "@fixtures/perf",
+  "version": "0.0.0",
+  "private": true,
+  "description": "flow-checker test fixture: request performance. Planted: a server waterfall (two independent awaits in a page), an N+1 awaited in a for loop, an N+1 in Promise.all(list.map()), a client component that fetches once per rendered row, and the same axios request in a layout and its page. Not flagged: dependent awaits, Promise.all, a loop over a literal list, a GET fetch Next dedupes and a call wrapped in React's cache().",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "axios": "catalog:",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@integr8-media/flow-checker": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

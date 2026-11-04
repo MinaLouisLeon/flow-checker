@@ -153,6 +153,9 @@ function start(config: RuntimeConfig) {
 
   // --- Interactions and navigation ----------------------------------------------------------
 
+  /** The page view (M47): a new id on every navigation, so captures can be grouped per page load. */
+  let view = randomId('pv')
+
   let lastInteraction: (Interaction & { time: number }) | undefined
 
   const onInteraction = (event: Event) => {
@@ -185,6 +188,7 @@ function start(config: RuntimeConfig) {
     try {
       if (location.href === lastUrl) return
       lastUrl = location.href
+      view = randomId('pv')
       pushEvent({ kind: 'navigation', at: now(), how, url: location.href })
     } catch {}
   }
@@ -276,6 +280,7 @@ function start(config: RuntimeConfig) {
       timestamp: now(),
       durationMs: 0,
       pageUrl: location.href,
+      view,
       request: { method, url: url.href, headers, body: { kind: 'none' } },
       stack: callerStack(OWN_FRAMES),
       redacted: false,
