@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Client boundaries.** Each page view has a Client boundaries section: where the page's browser part starts (a server component, the page or a layout rendering a `'use client'` component, also through a barrel or `next/dynamic`), and what each boundary brings to the browser: its components (marked when they also render on the server), the project modules its code imports (type-only imports left out), the packages they import and their source size (an estimate). The component tree marks each boundary, and the component panel lists the code that needs the browser: hooks a server component can't call (also through project hooks), event handlers, functions handed to components, browser globals read while rendering, class components and `createContext()`. The rules were checked with `next build` (16.4): its client reference manifests list the same boundaries.
+- **Boundaries that could move lower.** When nothing in a `'use client'` file (or what it imports) needs the browser, a note under To check says so and names the components below that do, where the directive could go instead, and the ones that would then render on the server. Package components only count as fine on the server when the package marks them `'use client'` (or they come from `next`).
+- The page docs have a Client boundaries section, component docs say what needs the browser and what a boundary brings, `issues.md` lists the boundaries that could move lower, and `scan --tree` lists each page's boundaries and, at the end, what each boundary brings. Models saved before still load (pages ask for a new scan).
+
 ## 0.4.0
 
 Rendering and caching: why each page is static, ISR, dynamic or partial, what Next caches on the server and what refreshes it, and what each page shows while it loads, on an error and on `notFound()`, read from the code the way `next build` would see it and checked against Next's cache while you test. Models saved by 0.3 still load (pages read as `render ?` with no boundaries until the next scan).

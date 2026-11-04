@@ -20,6 +20,7 @@ import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { addRouteAccess } from './access'
 import { addRouteBoundaries } from './boundaries'
 import { buildCacheMap } from './cache'
+import { addClientBoundaries } from './client'
 import { ComponentGraph } from './components'
 import { type Discovery, discoverProject } from './discovery'
 import { inferFlows } from './flows'
@@ -447,6 +448,22 @@ function analyze(
     fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
     cacheComponents,
   })
+  const resolveImport = moduleResolver(project, root)
+  const clientBoundaries = addClientBoundaries({
+    root,
+    routes,
+    components,
+    bodies,
+    fileOf: (file) => sourceFile(project, resolveFrom(root, file)),
+    fileAt: (path) => {
+      const file = project.getSourceFile(path) ?? project.addSourceFileAtPathIfExists(path)
+      return file && !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(path)
+        ? file
+        : undefined
+    },
+    resolveModule: resolveImport,
+    readFile: (path) => (fs.fileExistsSync(path) ? fs.readFileSync(path) : undefined),
+  })
   const cache = buildCacheMap({
     routes,
     components,
@@ -486,6 +503,7 @@ function analyze(
     ...(settings.areas ? { areas: settings.areas } : {}),
     imports: importGraph(project, root, discovery, settings),
     ...(cache ? { cache } : {}),
+    ...(clientBoundaries.length > 0 ? { clientBoundaries } : {}),
   }
 }
 
@@ -494,6 +512,22 @@ function analyze(
  * no import, so each one is resolved once. `update()` drops it when files or imports change.
  */
 const resolutionCaches = new WeakMap<Project, ts.ModuleResolutionCache>()
+
+/** Resolves an import as the compiler does, with the project's resolution cache. */
+function moduleResolver(
+  project: Project,
+  root: string,
+): (specifier: string, from: string) => ts.ResolvedModuleFull | undefined {
+  const options = project.getCompilerOptions()
+  const host = project.getModuleResolutionHost()
+  let cache = resolutionCaches.get(project)
+  if (!cache) {
+    cache = ts.createModuleResolutionCache(root, (name) => name, options)
+    resolutionCaches.set(project, cache)
+  }
+  const known = cache
+  return (specifier, from) => ts.resolveModuleName(specifier, from, options, host, known).resolvedModule
+}
 
 /**
  * Project files reached from the app directory and the middleware, each with the project files it
@@ -512,23 +546,11 @@ function importGraph(
 ): Record<string, string[]> {
   const inProject = (file: SourceFile) =>
     !file.isInNodeModules() && !file.isDeclarationFile() && settings.scanned(file.getFilePath())
-  const options = project.getCompilerOptions()
-  const host = project.getModuleResolutionHost()
-  let cache = resolutionCaches.get(project)
-  if (!cache) {
-    cache = ts.createModuleResolutionCache(root, (name) => name, options)
-    resolutionCaches.set(project, cache)
-  }
+  const resolveModule = moduleResolver(project, root)
   const referenced = (file: SourceFile): SourceFile[] => {
     const out: SourceFile[] = []
     for (const literal of file.getImportStringLiterals()) {
-      const resolved = ts.resolveModuleName(
-        literal.getLiteralValue(),
-        file.getFilePath(),
-        options,
-        host,
-        cache,
-      ).resolvedModule
+      const resolved = resolveModule(literal.getLiteralValue(), file.getFilePath())
       if (!resolved || resolved.isExternalLibraryImport) continue
       const target = project.getSourceFile(toPosix(resolved.resolvedFileName))
       if (target) out.push(target)

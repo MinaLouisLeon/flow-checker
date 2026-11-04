@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoDetail.tsx:30` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQuery` (hook), `useMutation` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 1 module · 0.9 KB, packages `urql` |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`TodoPage`](TodoPage.md) |
 

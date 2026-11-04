@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/UserList.tsx:16` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useClient` (hook), `useState` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 1 module · 0.7 KB, packages `urql` |
 | Used on | [`/users`](../pages/users.md) |
 | Rendered by | [`UsersPage`](UsersPage.md) |
 

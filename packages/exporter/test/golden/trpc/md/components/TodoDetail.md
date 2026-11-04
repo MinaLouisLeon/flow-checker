@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoDetail.tsx:6` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useTRPC` (hook), `useTRPCClient` (hook), `useQueryClient` (hook), `useQuery` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 1.1 KB, packages `@tanstack/react-query`, `@trpc/tanstack-react-query` |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`TodoPage`](TodoPage.md) |
 

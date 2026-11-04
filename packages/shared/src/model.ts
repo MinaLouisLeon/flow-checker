@@ -287,6 +287,89 @@ export const RouteMetadataSchema = z.object({
 })
 export type RouteMetadata = z.infer<typeof RouteMetadataSchema>
 
+// Client boundaries (M43): where the browser part of a page starts and what it brings along.
+// Checked against `next build` (16.4.3): its client reference manifest lists exactly the
+// `'use client'` files a server component (or the page, a layout) renders, never the client
+// components below them; a server component can't import `useState`, `useRef`, `useContext`,
+// `createContext`, `useTransition` (or other client hooks), can call `use`, `useMemo`, `useCallback`,
+// `useId` and `useDebugValue`, and can't hand a function to a client component.
+
+/** Code that only works in the browser, found in a component (or anywhere in a file). */
+export const ClientUseSchema = z.object({
+  /**
+   * `hook`: a hook a server component can't call (`useState`, `usePathname`, a project hook that
+   * calls one). `event`: an `on*` handler on an HTML element. `function-prop`: a function handed to a
+   * component (a server component can't hand one to a client component). `browser-api`: `window`,
+   * `document`, `localStorage`... `class-component`: a class component. `context`: `createContext()`.
+   */
+  kind: z.enum(['hook', 'event', 'function-prop', 'browser-api', 'class-component', 'context']),
+  /** As written: `useState`, `onClick`, `window`, the prop name, the class name. */
+  name: z.string(),
+  loc: SourceLocSchema,
+})
+export type ClientUse = z.infer<typeof ClientUseSchema>
+
+/** Where a page's browser part starts: a server component rendering a `'use client'` component. */
+export const PageClientBoundarySchema = z.object({
+  /** The `'use client'` component (see `AppModel.clientBoundaries`). */
+  componentId: z.string(),
+  /** The server component that renders it. Absent when the page or a layout is the boundary itself. */
+  parentId: z.string().optional(),
+  /** Where the boundary starts: in a layout, the page, or a server component they render. */
+  in: z.enum(['layout', 'page', 'component']),
+  /** Imported through a file that re-exports it (a barrel), not from its own file. */
+  via: z.string().optional(),
+  /** Loaded with `next/dynamic` or `React.lazy`. */
+  dynamic: z.literal(true).optional(),
+  /** Where it is rendered (the component itself when it is the page or a layout). */
+  loc: SourceLocSchema,
+})
+export type PageClientBoundary = z.infer<typeof PageClientBoundarySchema>
+
+export const RouteClientSchema = z.object({
+  /** Layouts first (outermost first), then the page, in source order. Empty: all on the server. */
+  boundaries: z.array(PageClientBoundarySchema),
+  /** Over all its boundaries, each counted once: components, project modules, their source size, packages. */
+  components: z.number().int().nonnegative(),
+  modules: z.number().int().nonnegative(),
+  bytes: z.number().int().nonnegative(),
+  packages: z.array(z.string()),
+})
+export type RouteClient = z.infer<typeof RouteClientSchema>
+
+export const ClientLowerSchema = z.object({
+  /**
+   * Components below that need the browser (or have their own `'use client'`), where the directive
+   * would go. Empty: nothing below needs it, so the directive can simply go.
+   */
+  into: z.array(z.string()),
+  /** Components that would then render on the server, the boundary first. */
+  server: z.array(z.string()),
+})
+export type ClientLower = z.infer<typeof ClientLowerSchema>
+
+/** A `'use client'` component that some server component renders, and what it brings to the browser. */
+export const ClientBoundarySchema = z.object({
+  componentId: z.string(),
+  file: z.string(),
+  /** Components it brings to the browser: itself and every component below it. */
+  componentIds: z.array(z.string()),
+  /**
+   * Project modules its code imports, its own file first, then sorted: static and dynamic imports
+   * and re-exports, followed through every file; type-only imports are left out.
+   */
+  modules: z.array(z.string()),
+  /** Packages those modules import, other than `react`, `react-dom` and `next`. Sorted. */
+  packages: z.array(z.string()),
+  /** Source size of `modules` in bytes: an estimate, before minifying, without packages. */
+  bytes: z.number().int().nonnegative(),
+  /** Client-only code in its file and the files it imports, up to a few of each kind. */
+  uses: z.array(ClientUseSchema),
+  /** Nothing in its file needs the browser: `'use client'` could move down. */
+  lower: ClientLowerSchema.optional(),
+})
+export type ClientBoundary = z.infer<typeof ClientBoundarySchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -314,6 +397,8 @@ export const RouteSchema = z.object({
   boundaries: RouteBoundariesSchema.optional(),
   /** Pages: `metadata` / `generateMetadata` from the page and its layouts (M41). Absent in older models. */
   metadata: RouteMetadataSchema.optional(),
+  /** Pages: where its browser part starts and what that brings (M43). Absent in older models. */
+  client: RouteClientSchema.optional(),
 })
 export type Route = z.infer<typeof RouteSchema>
 
@@ -548,6 +633,8 @@ export const ComponentSchema = z.object({
   propsType: TypeRefSchema.optional(),
   /** Ids of named project types referenced in the component's body (not counting `propsType`), in source order. */
   usedTypes: z.array(z.string()),
+  /** Components that run in the browser: the client-only code in its body, one per kind and name (M43). */
+  clientUses: z.array(ClientUseSchema).optional(),
 })
 export type Component = z.infer<typeof ComponentSchema>
 
@@ -1456,7 +1543,8 @@ export const AppModelSchema = z.object({
    * version 10 (before M25) no `upstream` / `conditional` sites or `runtime-url` flags,
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
    * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
-   * `boundaries` or `metadata`.
+   * `boundaries` or `metadata`, version 15 (before M43) no page `client`, `clientBoundaries` or
+   * component `clientUses`.
    */
   version: z
     .union([
@@ -1474,6 +1562,7 @@ export const AppModelSchema = z.object({
       z.literal(12),
       z.literal(13),
       z.literal(14),
+      z.literal(15),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1512,5 +1601,7 @@ export const AppModelSchema = z.object({
   imports: z.record(z.string(), z.array(z.string())).optional(),
   /** Server caching and what refreshes it (M39). Absent when the app caches nothing and revalidates nothing. */
   cache: CacheMapSchema.optional(),
+  /** `'use client'` components that server components render, sorted by file (M43). Absent when there are none. */
+  clientBoundaries: z.array(ClientBoundarySchema).optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

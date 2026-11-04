@@ -35,6 +35,11 @@ access: open
 render: static
 boundaries: (none)
 title: tRPC v11 fixture  (layout metadata)
+client: 4 boundaries, 4 components, 5 modules, 2.5 KB, packages @tanstack/react-query, @trpc/client, @trpc/tanstack-react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  HealthBadge  from HomePage (page)  src/app/page.tsx:9
+  TodoList  from HomePage (page)  src/app/page.tsx:10
+  AddTodoForm  from HomePage (page)  src/app/page.tsx:11
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -45,6 +50,9 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: tRPC v11 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 1.9 KB, packages @tanstack/react-query, @trpc/client, @trpc/tanstack-react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoDetail  from TodoPage (page)  src/app/todos/[id]/page.tsx:5
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -57,3 +65,56 @@ render: dynamic
 boundaries:
   suspense in page around UserList src/app/users/page.tsx:10
 title: tRPC v11 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 1.3 KB, packages @tanstack/react-query, @trpc/client, @trpc/tanstack-react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  UserList  from UsersPage (page)  src/app/users/page.tsx:11
+
+# Client boundaries
+
+## Providers  src/app/providers.tsx
+components: Providers
+modules: 2, 0.9 KB
+  src/app/providers.tsx
+  src/trpc/client.ts
+packages: @tanstack/react-query, @trpc/client, @trpc/tanstack-react-query
+uses: useState (hook) src/app/providers.tsx:10
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+components: AddTodoForm
+modules: 2, 1.1 KB
+  src/components/AddTodoForm.tsx
+  src/trpc/client.ts
+packages: @tanstack/react-query, @trpc/tanstack-react-query
+uses: useState (hook) src/components/AddTodoForm.tsx:9, useRouter (hook) src/components/AddTodoForm.tsx:10, useTRPC (hook) src/components/AddTodoForm.tsx:11, useQueryClient (hook) src/components/AddTodoForm.tsx:12, useMutation (hook) src/components/AddTodoForm.tsx:13, onSubmit (event handler) src/components/AddTodoForm.tsx:28, onChange (event handler) src/components/AddTodoForm.tsx:29
+
+## HealthBadge  src/components/HealthBadge.tsx
+components: HealthBadge
+modules: 2, 0.5 KB
+  src/components/HealthBadge.tsx
+  src/trpc/client.ts
+packages: @tanstack/react-query, @trpc/tanstack-react-query
+uses: useTRPC (hook) src/components/HealthBadge.tsx:7, useQuery (hook) src/components/HealthBadge.tsx:8
+
+## TodoDetail  src/components/TodoDetail.tsx
+components: TodoDetail
+modules: 2, 1.1 KB
+  src/components/TodoDetail.tsx
+  src/trpc/client.ts
+packages: @tanstack/react-query, @trpc/tanstack-react-query
+uses: useTRPC (hook) src/components/TodoDetail.tsx:7, useTRPCClient (hook) src/components/TodoDetail.tsx:8, useQueryClient (hook) src/components/TodoDetail.tsx:9, useQuery (hook) src/components/TodoDetail.tsx:10, onClick (event handler) src/components/TodoDetail.tsx:27
+
+## TodoList  src/components/TodoList.tsx
+components: TodoList
+modules: 2, 0.6 KB
+  src/components/TodoList.tsx
+  src/trpc/client.ts
+packages: @tanstack/react-query, @trpc/tanstack-react-query
+uses: useTRPC (hook) src/components/TodoList.tsx:8, useQuery (hook) src/components/TodoList.tsx:9
+
+## UserList  src/components/UserList.tsx
+components: UserList
+modules: 2, 0.6 KB
+  src/components/UserList.tsx
+  src/trpc/client.ts
+packages: @tanstack/react-query, @trpc/tanstack-react-query
+uses: useTRPC (hook) src/components/UserList.tsx:7, useSuspenseQuery (hook) src/components/UserList.tsx:8

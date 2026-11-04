@@ -114,3 +114,4 @@ re-run them on their own before assuming a regression.
 | M40 | Cache check at runtime                            | Done   |
 | M41 | Special files and boundaries                      | Done   |
 | M42 | Release v0.4.0                                    | Done   |
+| M43 | Client boundaries                                 | Done   |

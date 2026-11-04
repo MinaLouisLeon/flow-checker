@@ -17,6 +17,13 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 2 project modules (about 1.8 KB of source) to the browser, plus 1 package (`socket.io-client`).
+
+- [`Chat`](../components/Chat.md), rendered by `ChatPage` (page): 1 component · 2 modules · 1.8 KB, `app/chat/page.tsx:7`
+  - packages: `socket.io-client`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/ProfileCard.tsx:12` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useEffect` (hook) |
+| Brings to the browser | 1 component · 3 modules · 1.7 KB, packages `axios` |
 | Used on | [`/users/[id]`](../pages/users.%5Bid%5D.md) |
 | Rendered by | [`UserPage`](UserPage.md) |
 

@@ -21,6 +21,12 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 1 project module (about 0.9 KB of source) to the browser.
+
+- [`JobProgress`](../components/JobProgress.md), rendered by `JobPage` (page): 1 component · 1 module · 0.9 KB, `app/jobs/[id]/page.tsx:8`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

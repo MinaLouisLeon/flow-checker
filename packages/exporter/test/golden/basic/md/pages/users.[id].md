@@ -25,6 +25,15 @@
 - ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `lib/api.ts:20`
 - ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `lib/api.ts:20`
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 2 components and 4 project modules (about 2.5 KB of source) to the browser, plus 1 package (`axios`).
+
+- [`ProfileCard`](../components/ProfileCard.md), rendered by `UserPage` (page): 1 component · 3 modules · 1.7 KB, `app/users/[id]/page.tsx:13`
+  - packages: `axios`
+- [`DeleteUserButton`](../components/DeleteUserButton.md), rendered by `UserPage` (page): 1 component · 3 modules · 1.7 KB, `app/users/[id]/page.tsx:14`
+  - packages: `axios`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:4`

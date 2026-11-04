@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -265,6 +265,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -382,6 +389,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -505,6 +519,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -648,6 +669,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -777,6 +805,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -914,6 +949,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -1062,6 +1104,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -1204,6 +1253,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -1307,6 +1363,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -1419,6 +1482,24 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1te0rkmmezj",
+            "parentId": "cmp_1v1mt0xn2dm",
+            "in": "page",
+            "loc": {
+              "file": "src/app/photos/@modal/(.)[id]/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 345,
+        "packages": []
       }
     },
     {
@@ -1573,6 +1654,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -1741,6 +1829,24 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0ywhc0z65tw",
+            "parentId": "cmp_1aodno2cgi1",
+            "in": "page",
+            "loc": {
+              "file": "src/app/reports/page.tsx",
+              "line": 26,
+              "column": 9
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 476,
+        "packages": []
       }
     }
   ],
@@ -2355,7 +2461,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "class-component",
+          "name": "ErrorBoundary",
+          "loc": {
+            "file": "src/components/error-boundary.tsx",
+            "line": 6,
+            "column": 14
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1te0rkmmezj",
@@ -2385,7 +2502,27 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/modal.tsx",
+            "line": 7,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/modal.tsx",
+            "line": 11,
+            "column": 29
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -3085,5 +3222,62 @@
     "src/lib/api.ts": [
       "src/types.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_0ywhc0z65tw",
+      "file": "src/components/error-boundary.tsx",
+      "componentIds": [
+        "cmp_0ywhc0z65tw"
+      ],
+      "modules": [
+        "src/components/error-boundary.tsx"
+      ],
+      "packages": [],
+      "bytes": 476,
+      "uses": [
+        {
+          "kind": "class-component",
+          "name": "ErrorBoundary",
+          "loc": {
+            "file": "src/components/error-boundary.tsx",
+            "line": 6,
+            "column": 14
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1te0rkmmezj",
+      "file": "src/components/modal.tsx",
+      "componentIds": [
+        "cmp_1te0rkmmezj"
+      ],
+      "modules": [
+        "src/components/modal.tsx"
+      ],
+      "packages": [],
+      "bytes": 345,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/modal.tsx",
+            "line": 7,
+            "column": 18
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/modal.tsx",
+            "line": 11,
+            "column": 29
+          }
+        }
+      ]
+    }
+  ]
 }

@@ -24,6 +24,13 @@
 - ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `lib/api.ts:5`
 - ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `lib/api.ts:5`
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 2 components and 4 project modules (about 2.5 KB of source) to the browser.
+
+- [`SettingsPanel`](../components/SettingsPanel.md), rendered by `HomePage` (page): 1 component · 3 modules · 1.4 KB, `app/page.tsx:20`
+- [`TodoPanel`](../components/TodoPanel.md), rendered by `HomePage` (page): 1 component · 3 modules · 2.0 KB, `app/page.tsx:21`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

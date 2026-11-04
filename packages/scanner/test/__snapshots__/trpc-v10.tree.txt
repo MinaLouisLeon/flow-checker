@@ -36,6 +36,12 @@ access: open
 render: static
 boundaries: (none)
 title: tRPC v10 fixture  (layout metadata)
+client: 5 boundaries, 5 components, 6 modules, 2.5 KB, packages @tanstack/react-query, @trpc/client, @trpc/react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  HealthBadge  from HomePage (page)  src/app/page.tsx:10
+  TodoList  from HomePage (page)  src/app/page.tsx:11
+  AddTodoForm  from HomePage (page)  src/app/page.tsx:12
+  UserList  from HomePage (page)  src/app/page.tsx:13
 
 ## /feed  src/app/feed/page.tsx
 layouts: src/app/layout.tsx
@@ -45,6 +51,9 @@ access: open
 render: static
 boundaries: (none)
 title: tRPC v10 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 1.5 KB, packages @tanstack/react-query, @trpc/client, @trpc/react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoFeed  from FeedPage (page)  src/app/feed/page.tsx:4
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -55,3 +64,64 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: tRPC v10 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 1.6 KB, packages @tanstack/react-query, @trpc/client, @trpc/react-query
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoDetail  from TodoPage (page)  src/app/todos/[id]/page.tsx:5
+
+# Client boundaries
+
+## Providers  src/app/providers.tsx
+components: Providers
+modules: 2, 1.0 KB
+  src/app/providers.tsx
+  src/utils/trpc.ts
+packages: @tanstack/react-query, @trpc/client, @trpc/react-query
+uses: useState (hook) src/app/providers.tsx:9
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+components: AddTodoForm
+modules: 2, 1.1 KB
+  src/components/AddTodoForm.tsx
+  src/utils/trpc.ts
+packages: @trpc/client, @trpc/react-query
+uses: useState (hook) src/components/AddTodoForm.tsx:8, useRouter (hook) src/components/AddTodoForm.tsx:9, useUtils (hook) src/components/AddTodoForm.tsx:10, useMutation (hook) src/components/AddTodoForm.tsx:11, onSubmit (event handler) src/components/AddTodoForm.tsx:24, onChange (event handler) src/components/AddTodoForm.tsx:25
+
+## HealthBadge  src/components/HealthBadge.tsx
+components: HealthBadge
+modules: 2, 0.5 KB
+  src/components/HealthBadge.tsx
+  src/utils/trpc.ts
+packages: @trpc/client, @trpc/react-query
+uses: useQuery (hook) src/components/HealthBadge.tsx:6
+
+## TodoDetail  src/components/TodoDetail.tsx
+components: TodoDetail
+modules: 2, 1.0 KB
+  src/components/TodoDetail.tsx
+  src/utils/trpc.ts
+packages: @trpc/client, @trpc/react-query
+uses: useUtils (hook) src/components/TodoDetail.tsx:6, useQuery (hook) src/components/TodoDetail.tsx:7, onClick (event handler) src/components/TodoDetail.tsx:19
+
+## TodoFeed  src/components/TodoFeed.tsx
+components: TodoFeed
+modules: 2, 0.9 KB
+  src/components/TodoFeed.tsx
+  src/utils/trpc.ts
+packages: @trpc/client, @trpc/react-query
+uses: useInfiniteQuery (hook) src/components/TodoFeed.tsx:6, onClick (event handler) src/components/TodoFeed.tsx:15
+
+## TodoList  src/components/TodoList.tsx
+components: TodoList
+modules: 2, 0.7 KB
+  src/components/TodoList.tsx
+  src/utils/trpc.ts
+packages: @trpc/client, @trpc/react-query
+uses: useQuery (hook) src/components/TodoList.tsx:7
+
+## UserList  src/components/UserList.tsx
+components: UserList
+modules: 2, 0.6 KB
+  src/components/UserList.tsx
+  src/utils/trpc.ts
+packages: @trpc/client, @trpc/react-query
+uses: useQuery (hook) src/components/UserList.tsx:6

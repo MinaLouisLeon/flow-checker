@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -138,6 +138,57 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_1k31ddi4qwc",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 10,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0l3kw3n479w",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 12,
+              "column": 11
+            }
+          },
+          {
+            "componentId": "cmp_0r1iugj2rde",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 15,
+              "column": 7
+            }
+          }
+        ],
+        "components": 5,
+        "modules": 6,
+        "bytes": 3355,
+        "packages": [
+          "react-relay",
+          "relay-runtime"
+        ]
       }
     },
     {
@@ -240,6 +291,37 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_1l6j7vj8arn",
+            "parentId": "cmp_138y76orsa8",
+            "in": "page",
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 3,
+        "modules": 4,
+        "bytes": 2867,
+        "packages": [
+          "react-relay",
+          "relay-runtime"
+        ]
       }
     },
     {
@@ -291,6 +373,37 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_20axc0bf4dg",
+            "parentId": "cmp_0zsf7mc3ftx",
+            "in": "page",
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 3,
+        "bytes": 1859,
+        "packages": [
+          "react-relay",
+          "relay-runtime"
         ]
       }
     }
@@ -548,6 +661,53 @@
       "children": [],
       "usedTypes": [
         "typ_0nkk0lukv3w"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 10,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 20
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 30,
+            "column": 51
+          }
+        }
       ]
     },
     {
@@ -586,7 +746,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useSyncExternalStore",
+          "loc": {
+            "file": "src/components/ClientOnly.tsx",
+            "line": 9,
+            "column": 20
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1gqfw2iamk9",
@@ -796,7 +967,36 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRelayEnvironment",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 28,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "usePreloadedQuery",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 29,
+            "column": 16
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 52,
+            "column": 29
+          }
+        }
+      ]
     },
     {
       "id": "cmp_2dylb1mdvz0",
@@ -844,7 +1044,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useFragment",
+          "loc": {
+            "file": "src/components/TodoItem.tsx",
+            "line": 8,
+            "column": 16
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0l3kw3n479w",
@@ -872,6 +1083,17 @@
       ],
       "usedTypes": [
         "typ_1hnuzynwht2"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useLazyLoadQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 8,
+            "column": 16
+          }
+        }
       ]
     },
     {
@@ -943,7 +1165,27 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useQueryLoader",
+          "loc": {
+            "file": "src/components/TodoPage.tsx",
+            "line": 9,
+            "column": 33
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/TodoPage.tsx",
+            "line": 11,
+            "column": 3
+          }
+        }
+      ]
     },
     {
       "id": "cmp_20axc0bf4dg",
@@ -960,6 +1202,35 @@
       "usedTypes": [
         "typ_1fqrz3yzgfq",
         "typ_28cihfc6gsp"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRelayEnvironment",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 8,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 30,
+            "column": 29
+          }
+        }
       ]
     }
   ],
@@ -2490,5 +2761,214 @@
     "src/server/resolvers.ts": [
       "src/server/data.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_27t3g1lua9i",
+      "file": "src/app/providers.tsx",
+      "componentIds": [
+        "cmp_27t3g1lua9i"
+      ],
+      "modules": [
+        "src/app/providers.tsx",
+        "src/relay/environment.ts"
+      ],
+      "packages": [
+        "react-relay",
+        "relay-runtime"
+      ],
+      "bytes": 912,
+      "uses": []
+    },
+    {
+      "componentId": "cmp_0r1iugj2rde",
+      "file": "src/components/AddTodoForm.tsx",
+      "componentIds": [
+        "cmp_0r1iugj2rde"
+      ],
+      "modules": [
+        "src/components/AddTodoForm.tsx"
+      ],
+      "packages": [
+        "react-relay"
+      ],
+      "bytes": 950,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 10,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 20
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 30,
+            "column": 51
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1k31ddi4qwc",
+      "file": "src/components/ClientOnly.tsx",
+      "componentIds": [
+        "cmp_1k31ddi4qwc"
+      ],
+      "modules": [
+        "src/components/ClientOnly.tsx"
+      ],
+      "packages": [],
+      "bytes": 448,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useSyncExternalStore",
+          "loc": {
+            "file": "src/components/ClientOnly.tsx",
+            "line": 9,
+            "column": 20
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0l3kw3n479w",
+      "file": "src/components/TodoList.tsx",
+      "componentIds": [
+        "cmp_0l3kw3n479w",
+        "cmp_2dylb1mdvz0"
+      ],
+      "modules": [
+        "src/components/TodoList.tsx",
+        "src/components/TodoItem.tsx"
+      ],
+      "packages": [
+        "react-relay"
+      ],
+      "bytes": 1045,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useLazyLoadQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 8,
+            "column": 16
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1l6j7vj8arn",
+      "file": "src/components/TodoPage.tsx",
+      "componentIds": [
+        "cmp_1l6j7vj8arn",
+        "cmp_1gqfw2iamk9"
+      ],
+      "modules": [
+        "src/components/TodoPage.tsx",
+        "src/components/TodoDetail.tsx"
+      ],
+      "packages": [
+        "react-relay"
+      ],
+      "bytes": 1955,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useQueryLoader",
+          "loc": {
+            "file": "src/components/TodoPage.tsx",
+            "line": 9,
+            "column": 33
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/TodoPage.tsx",
+            "line": 11,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_20axc0bf4dg",
+      "file": "src/components/UserList.tsx",
+      "componentIds": [
+        "cmp_20axc0bf4dg"
+      ],
+      "modules": [
+        "src/components/UserList.tsx"
+      ],
+      "packages": [
+        "react-relay"
+      ],
+      "bytes": 947,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRelayEnvironment",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 8,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 30,
+            "column": 29
+          }
+        }
+      ]
+    }
+  ]
 }

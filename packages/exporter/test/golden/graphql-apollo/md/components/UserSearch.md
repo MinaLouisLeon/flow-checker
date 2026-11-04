@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/UserSearch.tsx:34` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useApolloClient` (hook), `useLazyQuery` (hook), `onSubmit` (event handler), `onChange` (event handler), `onClick` (event handler) |
+| Brings to the browser | 1 component · 5 modules · 21 KB, packages `@apollo/client`, `@graphql-typed-document-node/core`, `graphql` |
 | Used on | [`/users`](../pages/users.md) |
 | Rendered by | [`UsersPage`](UsersPage.md) |
 

@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/ProductPanel.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useEffect` (hook) |
+| Brings to the browser | 1 component · 3 modules · 1.7 KB |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

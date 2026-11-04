@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -169,6 +169,24 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0r500uzdcnu",
+            "parentId": "cmp_0ku4o3jpe9o",
+            "in": "page",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 8,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 1152,
+        "packages": []
       }
     },
     {
@@ -297,6 +315,24 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_25ygt4ib9ws",
+            "parentId": "cmp_071fu3pg2y0",
+            "in": "page",
+            "loc": {
+              "file": "app/chat/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 2,
+        "bytes": 1984,
+        "packages": []
       }
     },
     {
@@ -361,6 +397,24 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0nezx9p8ogb",
+            "parentId": "cmp_015g2q10jn5",
+            "in": "page",
+            "loc": {
+              "file": "app/jobs/[id]/page.tsx",
+              "line": 8,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 950,
+        "packages": []
       }
     }
   ],
@@ -524,7 +578,36 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 8,
+            "column": 31
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 19,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 20,
+            "column": 57
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0r500uzdcnu",
@@ -541,6 +624,26 @@
       "usedTypes": [
         "typ_1e0lnxsqglq",
         "typ_0hmmneuxlns"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/Clock.tsx",
+            "line": 8,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/Clock.tsx",
+            "line": 11,
+            "column": 3
+          }
+        }
       ]
     },
     {
@@ -572,7 +675,27 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/JobProgress.tsx",
+            "line": 8,
+            "column": 35
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "components/JobProgress.tsx",
+            "line": 27,
+            "column": 29
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -1371,5 +1494,113 @@
     "lib/chat.ts": [
       "lib/types.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_25ygt4ib9ws",
+      "file": "components/Chat.tsx",
+      "componentIds": [
+        "cmp_25ygt4ib9ws"
+      ],
+      "modules": [
+        "components/Chat.tsx",
+        "lib/chat.ts"
+      ],
+      "packages": [],
+      "bytes": 1984,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 8,
+            "column": 31
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 19,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "components/Chat.tsx",
+            "line": 20,
+            "column": 57
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0r500uzdcnu",
+      "file": "components/Clock.tsx",
+      "componentIds": [
+        "cmp_0r500uzdcnu"
+      ],
+      "modules": [
+        "components/Clock.tsx"
+      ],
+      "packages": [],
+      "bytes": 1152,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/Clock.tsx",
+            "line": 8,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/Clock.tsx",
+            "line": 11,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0nezx9p8ogb",
+      "file": "components/JobProgress.tsx",
+      "componentIds": [
+        "cmp_0nezx9p8ogb"
+      ],
+      "modules": [
+        "components/JobProgress.tsx"
+      ],
+      "packages": [],
+      "bytes": 950,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/JobProgress.tsx",
+            "line": 8,
+            "column": 35
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "components/JobProgress.tsx",
+            "line": 27,
+            "column": 29
+          }
+        }
+      ]
+    }
+  ]
 }

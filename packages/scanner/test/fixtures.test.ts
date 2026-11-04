@@ -33,6 +33,7 @@ const FIXTURES = [
   'caching',
   'caching-15',
   'boundaries',
+  'client-boundaries',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -296,5 +297,88 @@ describe('special files and boundaries (M41)', () => {
       (r.boundaries?.gaps ?? []).filter((g) => g.kind === 'blocking-route').map(() => r.path),
     )
     expect(blocking).toEqual([])
+  })
+})
+
+describe('client boundaries (M43)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  const nameOf = (model: AppModel) => (id: string) => model.components.find((c) => c.id === id)?.name ?? id
+
+  it("finds the boundaries `next build` lists in each page's client reference manifest", () => {
+    // `clientModules` of `.next/server/app/<page>_client-reference-manifest.js` (16.4.3).
+    const model = scan('client-boundaries')
+    const files = Object.fromEntries(
+      model.routes
+        .filter((r) => r.kind === 'page')
+        .map((r) => [
+          r.path,
+          (r.client?.boundaries ?? []).map((e) => model.components.find((c) => c.id === e.componentId)?.file),
+        ]),
+    )
+    const nav = 'src/components/nav.tsx'
+    expect(files).toEqual({
+      '/': [
+        nav,
+        'src/components/counter.tsx',
+        'src/components/like-button.tsx',
+        'src/components/shell.tsx',
+        'src/components/toolbar.tsx',
+        'src/components/chart.tsx',
+      ],
+      '/about': [nav],
+      '/cart': [nav, 'src/components/cart.tsx'],
+      '/settings': [nav, 'src/app/settings/page.tsx'],
+    })
+  })
+
+  it('suggests moving only the planted boundary, the way the build accepted it', () => {
+    const suggestions = FIXTURES.flatMap((fixture) => {
+      const model = scan(fixture)
+      const name = nameOf(model)
+      return (model.clientBoundaries ?? []).flatMap((b) =>
+        b.lower ? [`${fixture}: ${name(b.componentId)} -> ${b.lower.into.map(name).join(', ')}`] : [],
+      )
+    })
+    // Moving `'use client'` from shell.tsx to menu.tsx builds, and Menu becomes the boundary.
+    expect(suggestions).toEqual(['client-boundaries: Shell -> Menu'])
+  })
+
+  it('brings what the built client chunks hold', () => {
+    const model = scan('client-boundaries')
+    const cart = model.clientBoundaries?.find((b) => b.file === 'src/components/cart.tsx')
+    // The cart chunk holds the row, the price formatter and zod; the home chunk has no price.
+    expect(cart?.modules).toEqual([
+      'src/components/cart.tsx',
+      'src/components/cart-row.tsx',
+      'src/components/price.tsx',
+      'src/lib/cart-item.ts',
+      'src/lib/format.ts',
+    ])
+    expect(cart?.packages).toEqual(['zod'])
+    const home = model.routes.find((r) => r.path === '/')
+    expect(home?.client?.packages).toEqual([])
+    const price = model.components.find((c) => c.name === 'Price')
+    expect(price?.kind).toBe('shared')
+  })
+
+  it('gives every page a client part, and every boundary is rendered by a server component', () => {
+    for (const fixture of FIXTURES) {
+      const model = scan(fixture)
+      const byId = new Map(model.components.map((c) => [c.id, c]))
+      for (const route of model.routes) {
+        if (route.kind !== 'page') {
+          expect(route.client).toBeUndefined()
+          continue
+        }
+        expect(route.client, `${fixture} ${route.path}`).toBeDefined()
+        for (const edge of route.client?.boundaries ?? []) {
+          expect(byId.get(edge.componentId)?.clientBoundary).toBe(true)
+          if (edge.parentId) expect(byId.get(edge.parentId)?.kind).not.toBe('client')
+        }
+      }
+    }
   })
 })

@@ -21,6 +21,15 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 2 components and 3 project modules (about 1.9 KB of source) to the browser, plus 3 packages (`@tanstack/react-query`, `@trpc/client`, `@trpc/tanstack-react-query`).
+
+- [`Providers`](../components/Providers.md), rendered by `RootLayout` (layout): 1 component · 2 modules · 0.9 KB, `src/app/layout.tsx:10`
+  - packages: `@tanstack/react-query`, `@trpc/client`, `@trpc/tanstack-react-query`
+- [`TodoDetail`](../components/TodoDetail.md), rendered by `TodoPage` (page): 1 component · 2 modules · 1.1 KB, `src/app/todos/[id]/page.tsx:5`
+  - packages: `@tanstack/react-query`, `@trpc/tanstack-react-query`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

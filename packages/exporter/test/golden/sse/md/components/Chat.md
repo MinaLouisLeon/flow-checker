@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/Chat.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `onSubmit` (event handler), `onChange` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 1.9 KB |
 | Used on | [`/chat`](../pages/chat.md) |
 | Rendered by | [`ChatPage`](ChatPage.md) |
 

@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/JobProgress.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 1 module · 0.9 KB |
 | Used on | [`/jobs/[id]`](../pages/jobs.%5Bid%5D.md) |
 | Rendered by | [`JobPage`](JobPage.md) |
 

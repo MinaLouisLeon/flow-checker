@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/app/products/[id]/page.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useEffect` (hook) |
+| Brings to the browser | 1 component · 1 module · 0.7 KB |
 | Used on | [`/products/[id]`](../pages/products.%5Bid%5D.md) |
 | Renders | `Link` (`next/link`) |
 

@@ -20,6 +20,10 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+Nothing runs in the browser: every component renders on the server.
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:3`

@@ -29,6 +29,9 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:5
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:5
 title: postman fixture  (layout metadata)
+client: 2 boundaries, 2 components, 5 modules, 3.0 KB
+  ProductPanel  from HomePage (page)  app/page.tsx:21
+  TodoPanel  from HomePage (page)  app/page.tsx:22
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
@@ -43,3 +46,32 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:12
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:12
 title: postman fixture  (layout metadata)
+client: 1 boundary, 1 component, 3 modules, 1.6 KB
+  DeleteUserButton  from UserPage (page)  app/users/[id]/page.tsx:14
+
+# Client boundaries
+
+## DeleteUserButton  components/DeleteUserButton.tsx
+components: DeleteUserButton
+modules: 3, 1.6 KB
+  components/DeleteUserButton.tsx
+  lib/api.ts
+  lib/config.ts
+uses: useRouter (hook) components/DeleteUserButton.tsx:8, onClick (event handler) components/DeleteUserButton.tsx:12
+
+## ProductPanel  components/ProductPanel.tsx
+components: ProductPanel
+modules: 3, 1.7 KB
+  components/ProductPanel.tsx
+  lib/api.ts
+  lib/config.ts
+uses: useState (hook) components/ProductPanel.tsx:8, useEffect (hook) components/ProductPanel.tsx:10
+
+## TodoPanel  components/TodoPanel.tsx
+components: TodoPanel
+modules: 4, 2.5 KB
+  components/TodoPanel.tsx
+  lib/api.ts
+  lib/config.ts
+  lib/todos.ts
+uses: useState (hook) components/TodoPanel.tsx:9, useEffect (hook) components/TodoPanel.tsx:11, onSubmit (event handler) components/TodoPanel.tsx:30

@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/LoginForm.tsx:9` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRouter` (hook), `useState` (hook), `onSubmit` (event handler) |
+| Brings to the browser | 1 component · 4 modules · 2.8 KB, packages `next-intl` |
 | Used on | [`/[locale]/login`](../pages/%5Blocale%5D.login.md) |
 | Rendered by | [`LoginPage`](LoginPage.md) |
 

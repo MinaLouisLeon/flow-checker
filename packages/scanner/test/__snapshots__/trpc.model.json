@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -134,6 +134,58 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_0w9fnv1w48d",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0l3kw3n479w",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 10,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0r1iugj2rde",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          }
+        ],
+        "components": 4,
+        "modules": 5,
+        "bytes": 2571,
+        "packages": [
+          "@tanstack/react-query",
+          "@trpc/client",
+          "@trpc/tanstack-react-query"
+        ]
       }
     },
     {
@@ -226,6 +278,38 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_1gqfw2iamk9",
+            "parentId": "cmp_1an2304y5ca",
+            "in": "page",
+            "loc": {
+              "file": "src/app/todos/[id]/page.tsx",
+              "line": 5,
+              "column": 10
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 3,
+        "bytes": 1927,
+        "packages": [
+          "@tanstack/react-query",
+          "@trpc/client",
+          "@trpc/tanstack-react-query"
+        ]
       }
     },
     {
@@ -304,6 +388,38 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_27t3g1lua9i",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 10,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_20axc0bf4dg",
+            "parentId": "cmp_0zsf7mc3ftx",
+            "in": "page",
+            "loc": {
+              "file": "src/app/users/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 3,
+        "bytes": 1347,
+        "packages": [
+          "@tanstack/react-query",
+          "@trpc/client",
+          "@trpc/tanstack-react-query"
         ]
       }
     }
@@ -449,7 +565,18 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 10,
+            "column": 25
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1an2304y5ca",
@@ -570,7 +697,72 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 10,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 12,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 13,
+            "column": 15
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 28,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 51
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0w9fnv1w48d",
@@ -584,7 +776,27 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/HealthBadge.tsx",
+            "line": 7,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/HealthBadge.tsx",
+            "line": 8,
+            "column": 16
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1gqfw2iamk9",
@@ -613,7 +825,54 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 7,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useTRPCClient",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 8,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 9,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 10,
+            "column": 16
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 27,
+            "column": 29
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0l3kw3n479w",
@@ -638,7 +897,27 @@
           }
         }
       ],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 8,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 9,
+            "column": 27
+          }
+        }
+      ]
     },
     {
       "id": "cmp_20axc0bf4dg",
@@ -652,7 +931,27 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 7,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useSuspenseQuery",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 8,
+            "column": 27
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -2137,5 +2436,287 @@
     "src/trpc/client.ts": [
       "src/server/root.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_27t3g1lua9i",
+      "file": "src/app/providers.tsx",
+      "componentIds": [
+        "cmp_27t3g1lua9i"
+      ],
+      "modules": [
+        "src/app/providers.tsx",
+        "src/trpc/client.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "@trpc/client",
+        "@trpc/tanstack-react-query"
+      ],
+      "bytes": 955,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/providers.tsx",
+            "line": 10,
+            "column": 25
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0r1iugj2rde",
+      "file": "src/components/AddTodoForm.tsx",
+      "componentIds": [
+        "cmp_0r1iugj2rde"
+      ],
+      "modules": [
+        "src/components/AddTodoForm.tsx",
+        "src/trpc/client.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "@trpc/tanstack-react-query"
+      ],
+      "bytes": 1109,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 10,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 11,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 12,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useMutation",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 13,
+            "column": 15
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 28,
+            "column": 11
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/components/AddTodoForm.tsx",
+            "line": 29,
+            "column": 51
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0w9fnv1w48d",
+      "file": "src/components/HealthBadge.tsx",
+      "componentIds": [
+        "cmp_0w9fnv1w48d"
+      ],
+      "modules": [
+        "src/components/HealthBadge.tsx",
+        "src/trpc/client.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "@trpc/tanstack-react-query"
+      ],
+      "bytes": 470,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/HealthBadge.tsx",
+            "line": 7,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/HealthBadge.tsx",
+            "line": 8,
+            "column": 16
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1gqfw2iamk9",
+      "file": "src/components/TodoDetail.tsx",
+      "componentIds": [
+        "cmp_1gqfw2iamk9"
+      ],
+      "modules": [
+        "src/components/TodoDetail.tsx",
+        "src/trpc/client.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "@trpc/tanstack-react-query"
+      ],
+      "bytes": 1170,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 7,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useTRPCClient",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 8,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQueryClient",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 9,
+            "column": 23
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 10,
+            "column": 16
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/TodoDetail.tsx",
+            "line": 27,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0l3kw3n479w",
+      "file": "src/components/TodoList.tsx",
+      "componentIds": [
+        "cmp_0l3kw3n479w"
+      ],
+      "modules": [
+        "src/components/TodoList.tsx",
+        "src/trpc/client.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "@trpc/tanstack-react-query"
+      ],
+      "bytes": 631,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 8,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useQuery",
+          "loc": {
+            "file": "src/components/TodoList.tsx",
+            "line": 9,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_20axc0bf4dg",
+      "file": "src/components/UserList.tsx",
+      "componentIds": [
+        "cmp_20axc0bf4dg"
+      ],
+      "modules": [
+        "src/components/UserList.tsx",
+        "src/trpc/client.ts"
+      ],
+      "packages": [
+        "@tanstack/react-query",
+        "@trpc/tanstack-react-query"
+      ],
+      "bytes": 590,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTRPC",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 7,
+            "column": 16
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useSuspenseQuery",
+          "loc": {
+            "file": "src/components/UserList.tsx",
+            "line": 8,
+            "column": 27
+          }
+        }
+      ]
+    }
+  ]
 }

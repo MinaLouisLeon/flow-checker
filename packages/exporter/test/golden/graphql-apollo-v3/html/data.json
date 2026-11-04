@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "graphql-apollo-v3",
   "model": {
-    "version": 15,
+    "version": 16,
     "project": {
       "appDir": "src/app",
       "tsconfig": "tsconfig.json",
@@ -128,6 +128,56 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [
+            {
+              "componentId": "cmp_27t3g1lua9i",
+              "parentId": "cmp_17dqv782ua7",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 10,
+                "column": 9
+              }
+            },
+            {
+              "componentId": "cmp_08pr6kh6ave",
+              "parentId": "cmp_2flvqsq9ypc",
+              "in": "page",
+              "loc": {
+                "file": "src/app/page.tsx",
+                "line": 9,
+                "column": 7
+              }
+            },
+            {
+              "componentId": "cmp_0l3kw3n479w",
+              "parentId": "cmp_2flvqsq9ypc",
+              "in": "page",
+              "loc": {
+                "file": "src/app/page.tsx",
+                "line": 10,
+                "column": 7
+              }
+            },
+            {
+              "componentId": "cmp_0r1iugj2rde",
+              "parentId": "cmp_2flvqsq9ypc",
+              "in": "page",
+              "loc": {
+                "file": "src/app/page.tsx",
+                "line": 11,
+                "column": 7
+              }
+            }
+          ],
+          "components": 4,
+          "modules": 6,
+          "bytes": 3804,
+          "packages": [
+            "@apollo/client"
+          ]
         }
       },
       {
@@ -203,6 +253,36 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [
+            {
+              "componentId": "cmp_27t3g1lua9i",
+              "parentId": "cmp_17dqv782ua7",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 10,
+                "column": 9
+              }
+            },
+            {
+              "componentId": "cmp_0kv1d6bvioy",
+              "parentId": "cmp_2bfruin4l64",
+              "in": "page",
+              "loc": {
+                "file": "src/app/search/page.tsx",
+                "line": 7,
+                "column": 7
+              }
+            }
+          ],
+          "components": 2,
+          "modules": 4,
+          "bytes": 3053,
+          "packages": [
+            "@apollo/client"
+          ]
         }
       },
       {
@@ -266,6 +346,36 @@
                 "column": 14
               }
             }
+          ]
+        },
+        "client": {
+          "boundaries": [
+            {
+              "componentId": "cmp_27t3g1lua9i",
+              "parentId": "cmp_17dqv782ua7",
+              "in": "layout",
+              "loc": {
+                "file": "src/app/layout.tsx",
+                "line": 10,
+                "column": 9
+              }
+            },
+            {
+              "componentId": "cmp_1gqfw2iamk9",
+              "parentId": "cmp_1an2304y5ca",
+              "in": "page",
+              "loc": {
+                "file": "src/app/todos/[id]/page.tsx",
+                "line": 5,
+                "column": 10
+              }
+            }
+          ],
+          "components": 2,
+          "modules": 4,
+          "bytes": 2973,
+          "packages": [
+            "@apollo/client"
           ]
         }
       }
@@ -400,7 +510,18 @@
               }
             ]
           }
-        }
+        },
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "src/app/providers.tsx",
+              "line": 8,
+              "column": 20
+            }
+          }
+        ]
       },
       {
         "id": "cmp_2bfruin4l64",
@@ -498,6 +619,53 @@
         "usedTypes": [
           "typ_0wlmt9r8y2s",
           "typ_1bkwuejlfje"
+        ],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 10,
+              "column": 29
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useRouter",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 11,
+              "column": 18
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useMutation",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 12,
+              "column": 21
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onSubmit",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 23,
+              "column": 11
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onChange",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 24,
+              "column": 51
+            }
+          }
         ]
       },
       {
@@ -515,6 +683,44 @@
         "usedTypes": [
           "typ_23i4ebffrfm",
           "typ_1wwzgmtm01j"
+        ],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 9,
+              "column": 27
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useLazyQuery",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 10,
+              "column": 30
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onSubmit",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 19,
+              "column": 13
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onChange",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 20,
+              "column": 50
+            }
+          }
         ]
       },
       {
@@ -548,7 +754,45 @@
               }
             ]
           }
-        }
+        },
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useRouter",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 9,
+              "column": 18
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useQuery",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 10,
+              "column": 29
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useMutation",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 11,
+              "column": 24
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 22,
+              "column": 29
+            }
+          }
+        ]
       },
       {
         "id": "cmp_0l3kw3n479w",
@@ -576,6 +820,17 @@
         ],
         "usedTypes": [
           "typ_1qf74f1isvg"
+        ],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useQuery",
+            "loc": {
+              "file": "src/components/TodoList.tsx",
+              "line": 9,
+              "column": 29
+            }
+          }
         ]
       },
       {
@@ -592,6 +847,17 @@
         "children": [],
         "usedTypes": [
           "typ_1y0i7pm0ntp"
+        ],
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useQuery",
+            "loc": {
+              "file": "src/components/ViewerBadge.tsx",
+              "line": 8,
+              "column": 20
+            }
+          }
         ]
       }
     ],
@@ -1970,7 +2236,255 @@
       "src/server/resolvers.ts": [
         "src/server/data.ts"
       ]
-    }
+    },
+    "clientBoundaries": [
+      {
+        "componentId": "cmp_27t3g1lua9i",
+        "file": "src/app/providers.tsx",
+        "componentIds": [
+          "cmp_27t3g1lua9i"
+        ],
+        "modules": [
+          "src/app/providers.tsx",
+          "src/lib/apollo.ts"
+        ],
+        "packages": [
+          "@apollo/client"
+        ],
+        "bytes": 1091,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "src/app/providers.tsx",
+              "line": 8,
+              "column": 20
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_0r1iugj2rde",
+        "file": "src/components/AddTodoForm.tsx",
+        "componentIds": [
+          "cmp_0r1iugj2rde"
+        ],
+        "modules": [
+          "src/components/AddTodoForm.tsx",
+          "src/graphql/todos.ts"
+        ],
+        "packages": [
+          "@apollo/client"
+        ],
+        "bytes": 1903,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 10,
+              "column": 29
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useRouter",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 11,
+              "column": 18
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useMutation",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 12,
+              "column": 21
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onSubmit",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 23,
+              "column": 11
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onChange",
+            "loc": {
+              "file": "src/components/AddTodoForm.tsx",
+              "line": 24,
+              "column": 51
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_0kv1d6bvioy",
+        "file": "src/components/Search.tsx",
+        "componentIds": [
+          "cmp_0kv1d6bvioy"
+        ],
+        "modules": [
+          "src/components/Search.tsx",
+          "src/graphql/todos.ts"
+        ],
+        "packages": [
+          "@apollo/client"
+        ],
+        "bytes": 1962,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 9,
+              "column": 27
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useLazyQuery",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 10,
+              "column": 30
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onSubmit",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 19,
+              "column": 13
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onChange",
+            "loc": {
+              "file": "src/components/Search.tsx",
+              "line": 20,
+              "column": 50
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_1gqfw2iamk9",
+        "file": "src/components/TodoDetail.tsx",
+        "componentIds": [
+          "cmp_1gqfw2iamk9"
+        ],
+        "modules": [
+          "src/components/TodoDetail.tsx",
+          "src/graphql/todos.ts"
+        ],
+        "packages": [
+          "@apollo/client"
+        ],
+        "bytes": 1882,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useRouter",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 9,
+              "column": 18
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useQuery",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 10,
+              "column": 29
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useMutation",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 11,
+              "column": 24
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "src/components/TodoDetail.tsx",
+              "line": 22,
+              "column": 29
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_0l3kw3n479w",
+        "file": "src/components/TodoList.tsx",
+        "componentIds": [
+          "cmp_0l3kw3n479w"
+        ],
+        "modules": [
+          "src/components/TodoList.tsx",
+          "src/graphql/todos.ts"
+        ],
+        "packages": [
+          "@apollo/client"
+        ],
+        "bytes": 1518,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useQuery",
+            "loc": {
+              "file": "src/components/TodoList.tsx",
+              "line": 9,
+              "column": 29
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_08pr6kh6ave",
+        "file": "src/components/ViewerBadge.tsx",
+        "componentIds": [
+          "cmp_08pr6kh6ave"
+        ],
+        "modules": [
+          "src/components/ViewerBadge.tsx",
+          "src/graphql/todos.ts"
+        ],
+        "packages": [
+          "@apollo/client"
+        ],
+        "bytes": 1294,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useQuery",
+            "loc": {
+              "file": "src/components/ViewerBadge.tsx",
+              "line": 8,
+              "column": 20
+            }
+          }
+        ]
+      }
+    ]
   },
   "verification": {
     "sites": {

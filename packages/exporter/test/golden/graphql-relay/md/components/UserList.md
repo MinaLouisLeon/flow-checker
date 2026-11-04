@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/UserList.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRelayEnvironment` (hook), `useState` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 1 module · 0.9 KB, packages `react-relay` |
 | Used on | [`/users`](../pages/users.md) |
 | Rendered by | [`UsersPage`](UsersPage.md) |
 

@@ -17,6 +17,7 @@ import {
 import { useState } from 'react'
 import { BoundariesSection, MetadataSection } from '../BoundariesView'
 import { CacheEntryRow, InvalidationRow } from '../CacheView'
+import { ClientSection } from '../ClientView'
 import { useData } from '../context'
 import { useShowDetails } from '../details'
 import { areasOf, CAP, callerGroups, groupNavigations, sendLine, siteOwner } from '../lists'
@@ -119,6 +120,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         <AccessSection route={route} index={index} routeId={routeId} />
         <RenderSection route={route} index={index} />
         <BoundariesSection route={route} />
+        <ClientSection route={route} />
         <CacheSection route={route} index={index} />
         <MetadataSection route={route} />
 
@@ -458,12 +460,15 @@ function TreeItem({
   selected,
   ancestors,
   site,
+  parentClient = false,
 }: {
   componentId: string
   routeId: string
   selected?: string
   ancestors: Set<string>
   site?: ComponentRef
+  /** The parent runs in the browser, so this isn't where the browser part starts. */
+  parentClient?: boolean
 }) {
   const { index } = useData()
   const [open, setOpen] = useState(true)
@@ -495,6 +500,11 @@ function TreeItem({
         )}
         <a href={href({ name: 'page', routeId, componentId })}>{component.name}</a>
         <KindBadge component={component} details={details} />
+        {component.clientBoundary && !parentClient && (
+          <Badge tone="client" term={['client', 'boundary']}>
+            client boundary
+          </Badge>
+        )}
         {site && <RefBadges site={site} details={details} />}
         {details && requestCount > 0 && (
           <Badge tone="neutral" title={`Sends ${requestCount} request${requestCount === 1 ? '' : 's'}`}>
@@ -523,6 +533,7 @@ function TreeItem({
                 selected={selected}
                 ancestors={nextAncestors}
                 site={ref}
+                parentClient={parentClient || component.clientBoundary || component.kind === 'client'}
               />
             ) : (
               <li key={`${ref.name}:${ref.loc.line}:${ref.loc.column}`}>

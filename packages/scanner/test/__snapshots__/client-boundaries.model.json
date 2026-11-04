@@ -1,0 +1,1655 @@
+{
+  "version": 16,
+  "project": {
+    "appDir": "src/app",
+    "tsconfig": "tsconfig.json",
+    "nextConfig": "next.config.ts",
+    "nextVersion": "<next-version>"
+  },
+  "routeTree": {
+    "segment": {
+      "raw": "",
+      "kind": "static",
+      "name": ""
+    },
+    "dir": "src/app",
+    "files": {
+      "layout": "src/app/layout.tsx",
+      "page": "src/app/page.tsx"
+    },
+    "children": [
+      {
+        "segment": {
+          "raw": "about",
+          "kind": "static",
+          "name": "about"
+        },
+        "dir": "src/app/about",
+        "files": {
+          "page": "src/app/about/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "cart",
+          "kind": "static",
+          "name": "cart"
+        },
+        "dir": "src/app/cart",
+        "files": {
+          "page": "src/app/cart/page.tsx"
+        },
+        "children": []
+      },
+      {
+        "segment": {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        },
+        "dir": "src/app/settings",
+        "files": {
+          "page": "src/app/settings/page.tsx"
+        },
+        "children": []
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "rt_0h4e5x5madf",
+      "path": "/",
+      "kind": "page",
+      "file": "src/app/page.tsx",
+      "segments": [],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_2flvqsq9ypc",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Client boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Client boundaries",
+            "template": "%s | Client boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1sfjoh2hy40",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 14,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_2czhb38arlg",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 15,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_0aklbmghq1e",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "via": "src/components/index.ts",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 17,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_1ds6m54be52",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 21,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_08po6tfznt1",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 25,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_1nccmo087mu",
+            "parentId": "cmp_2flvqsq9ypc",
+            "in": "page",
+            "dynamic": true,
+            "loc": {
+              "file": "src/app/page.tsx",
+              "line": 26,
+              "column": 7
+            }
+          }
+        ],
+        "components": 9,
+        "modules": 10,
+        "bytes": 3615,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_03ym4srarue",
+      "path": "/about",
+      "kind": "page",
+      "file": "src/app/about/page.tsx",
+      "segments": [
+        {
+          "raw": "about",
+          "kind": "static",
+          "name": "about"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_144w6ps6wv2",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "About | Client boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Client boundaries",
+            "template": "%s | Client boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "page",
+            "file": "src/app/about/page.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "About",
+            "loc": {
+              "file": "src/app/about/page.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1sfjoh2hy40",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 14,
+              "column": 9
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 1,
+        "bytes": 539,
+        "packages": []
+      }
+    },
+    {
+      "id": "rt_1ywm6yo7d6u",
+      "path": "/cart",
+      "kind": "page",
+      "file": "src/app/cart/page.tsx",
+      "segments": [
+        {
+          "raw": "cart",
+          "kind": "static",
+          "name": "cart"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_13mz17s7n8n",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Cart | Client boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Client boundaries",
+            "template": "%s | Client boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          },
+          {
+            "kind": "metadata",
+            "in": "page",
+            "file": "src/app/cart/page.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Cart",
+            "loc": {
+              "file": "src/app/cart/page.tsx",
+              "line": 3,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1sfjoh2hy40",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 14,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_08tm1swb3vf",
+            "parentId": "cmp_13mz17s7n8n",
+            "in": "page",
+            "loc": {
+              "file": "src/app/cart/page.tsx",
+              "line": 9,
+              "column": 7
+            }
+          }
+        ],
+        "components": 4,
+        "modules": 6,
+        "bytes": 2248,
+        "packages": [
+          "zod"
+        ]
+      }
+    },
+    {
+      "id": "rt_14nb5m1ywic",
+      "path": "/settings",
+      "kind": "page",
+      "file": "src/app/settings/page.tsx",
+      "segments": [
+        {
+          "raw": "settings",
+          "kind": "static",
+          "name": "settings"
+        }
+      ],
+      "layoutChain": [
+        {
+          "kind": "layout",
+          "file": "src/app/layout.tsx",
+          "componentId": "cmp_17dqv782ua7"
+        }
+      ],
+      "componentId": "cmp_12h7lqgksec",
+      "access": {
+        "status": "open",
+        "guards": []
+      },
+      "render": {
+        "mode": "static",
+        "reasons": []
+      },
+      "boundaries": {
+        "items": [],
+        "gaps": []
+      },
+      "metadata": {
+        "title": "Client boundaries",
+        "sources": [
+          {
+            "kind": "metadata",
+            "in": "layout",
+            "file": "src/app/layout.tsx",
+            "fields": [
+              "title"
+            ],
+            "title": "Client boundaries",
+            "template": "%s | Client boundaries",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 5,
+              "column": 14
+            }
+          }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1sfjoh2hy40",
+            "parentId": "cmp_17dqv782ua7",
+            "in": "layout",
+            "loc": {
+              "file": "src/app/layout.tsx",
+              "line": 14,
+              "column": 9
+            }
+          },
+          {
+            "componentId": "cmp_12h7lqgksec",
+            "in": "page",
+            "loc": {
+              "file": "src/app/settings/page.tsx",
+              "line": 6,
+              "column": 25
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 2,
+        "bytes": 934,
+        "packages": []
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "cmp_144w6ps6wv2",
+      "name": "AboutPage",
+      "file": "src/app/about/page.tsx",
+      "loc": {
+        "file": "src/app/about/page.tsx",
+        "line": 6,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Heading",
+          "resolution": "project",
+          "componentId": "cmp_23zb54pctoo",
+          "module": "@/components/heading",
+          "loc": {
+            "file": "src/app/about/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_13mz17s7n8n",
+      "name": "CartPage",
+      "file": "src/app/cart/page.tsx",
+      "loc": {
+        "file": "src/app/cart/page.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Cart",
+          "resolution": "project",
+          "componentId": "cmp_08tm1swb3vf",
+          "module": "@/components/cart",
+          "loc": {
+            "file": "src/app/cart/page.tsx",
+            "line": 9,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_17dqv782ua7",
+      "name": "RootLayout",
+      "file": "src/app/layout.tsx",
+      "loc": {
+        "file": "src/app/layout.tsx",
+        "line": 9,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Nav",
+          "resolution": "project",
+          "componentId": "cmp_1sfjoh2hy40",
+          "module": "@/components/nav",
+          "loc": {
+            "file": "src/app/layout.tsx",
+            "line": 14,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_2flvqsq9ypc",
+      "name": "HomePage",
+      "file": "src/app/page.tsx",
+      "loc": {
+        "file": "src/app/page.tsx",
+        "line": 10,
+        "column": 25
+      },
+      "kind": "server",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Counter",
+          "resolution": "project",
+          "componentId": "cmp_2czhb38arlg",
+          "module": "@/components/counter",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 15,
+            "column": 7
+          }
+        },
+        {
+          "name": "LikeButton",
+          "resolution": "project",
+          "componentId": "cmp_0aklbmghq1e",
+          "module": "@/components",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 17,
+            "column": 7
+          }
+        },
+        {
+          "name": "Price",
+          "resolution": "project",
+          "componentId": "cmp_2c37lk3acao",
+          "module": "@/components",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 19,
+            "column": 7
+          }
+        },
+        {
+          "name": "Shell",
+          "resolution": "project",
+          "componentId": "cmp_1ds6m54be52",
+          "module": "@/components/shell",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 21,
+            "column": 7
+          }
+        },
+        {
+          "name": "Toolbar",
+          "resolution": "project",
+          "componentId": "cmp_08po6tfznt1",
+          "module": "@/components/toolbar",
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 25,
+            "column": 7
+          }
+        },
+        {
+          "name": "Chart",
+          "resolution": "project",
+          "componentId": "cmp_1nccmo087mu",
+          "module": "@/components/chart",
+          "dynamic": true,
+          "loc": {
+            "file": "src/app/page.tsx",
+            "line": 26,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": []
+    },
+    {
+      "id": "cmp_12h7lqgksec",
+      "name": "SettingsPage",
+      "file": "src/app/settings/page.tsx",
+      "loc": {
+        "file": "src/app/settings/page.tsx",
+        "line": 6,
+        "column": 25
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 7,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 12,
+            "column": 47
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_0w1vla3dkxk",
+      "name": "CartRow",
+      "file": "src/components/cart-row.tsx",
+      "loc": {
+        "file": "src/components/cart-row.tsx",
+        "line": 5,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": false,
+      "children": [
+        {
+          "name": "Price",
+          "resolution": "project",
+          "componentId": "cmp_2c37lk3acao",
+          "module": "./price",
+          "loc": {
+            "file": "src/components/cart-row.tsx",
+            "line": 9,
+            "column": 41
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ item: unknown; onRemove: () => void }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "item",
+              "type": {
+                "kind": "primitive",
+                "name": "unknown"
+              }
+            },
+            {
+              "name": "onRemove",
+              "type": {
+                "kind": "function",
+                "params": [],
+                "returns": {
+                  "kind": "primitive",
+                  "name": "void"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/cart-row.tsx",
+            "line": 10,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_08tm1swb3vf",
+      "name": "Cart",
+      "file": "src/components/cart.tsx",
+      "loc": {
+        "file": "src/components/cart.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "CartRow",
+          "resolution": "project",
+          "componentId": "cmp_0w1vla3dkxk",
+          "module": "./cart-row",
+          "loc": {
+            "file": "src/components/cart.tsx",
+            "line": 15,
+            "column": 11
+          }
+        },
+        {
+          "name": "Price",
+          "resolution": "project",
+          "componentId": "cmp_2c37lk3acao",
+          "module": "./price",
+          "loc": {
+            "file": "src/components/cart.tsx",
+            "line": 23,
+            "column": 16
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ initial: CartItem[] }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "initial",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "ref",
+                  "typeId": "typ_27hulrc4k5b",
+                  "name": "CartItem"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/cart.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "function-prop",
+          "name": "onRemove",
+          "loc": {
+            "file": "src/components/cart.tsx",
+            "line": 18,
+            "column": 13
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1nccmo087mu",
+      "name": "Chart",
+      "file": "src/components/chart.tsx",
+      "loc": {
+        "file": "src/components/chart.tsx",
+        "line": 5,
+        "column": 25
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ points: number[] }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "points",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "primitive",
+                  "name": "number"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRef",
+          "loc": {
+            "file": "src/components/chart.tsx",
+            "line": 6,
+            "column": 15
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/chart.tsx",
+            "line": 7,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_2czhb38arlg",
+      "name": "Counter",
+      "file": "src/components/counter.tsx",
+      "loc": {
+        "file": "src/components/counter.tsx",
+        "line": 5,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ start: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "start",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/counter.tsx",
+            "line": 6,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/counter.tsx",
+            "line": 8,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_23zb54pctoo",
+      "name": "Heading",
+      "file": "src/components/heading.tsx",
+      "loc": {
+        "file": "src/components/heading.tsx",
+        "line": 1,
+        "column": 17
+      },
+      "kind": "shared",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ text: string }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "text",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_0aklbmghq1e",
+      "name": "LikeButton",
+      "file": "src/components/like-button.tsx",
+      "loc": {
+        "file": "src/components/like-button.tsx",
+        "line": 5,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ postId: string }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "postId",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useLikes",
+          "loc": {
+            "file": "src/components/like-button.tsx",
+            "line": 6,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/like-button.tsx",
+            "line": 8,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_0l5ysvrizm3",
+      "name": "Menu",
+      "file": "src/components/menu.tsx",
+      "loc": {
+        "file": "src/components/menu.tsx",
+        "line": 3,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ items: string[] }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "items",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/menu.tsx",
+            "line": 4,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/menu.tsx",
+            "line": 7,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_1sfjoh2hy40",
+      "name": "Nav",
+      "file": "src/components/nav.tsx",
+      "loc": {
+        "file": "src/components/nav.tsx",
+        "line": 13,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Link",
+          "resolution": "external",
+          "module": "next/link",
+          "loc": {
+            "file": "src/components/nav.tsx",
+            "line": 18,
+            "column": 9
+          }
+        }
+      ],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "usePathname",
+          "loc": {
+            "file": "src/components/nav.tsx",
+            "line": 14,
+            "column": 20
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_2c37lk3acao",
+      "name": "Price",
+      "file": "src/components/price.tsx",
+      "loc": {
+        "file": "src/components/price.tsx",
+        "line": 3,
+        "column": 17
+      },
+      "kind": "shared",
+      "clientBoundary": false,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ amount: number }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "amount",
+              "type": {
+                "kind": "primitive",
+                "name": "number"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1ds6m54be52",
+      "name": "Shell",
+      "file": "src/components/shell.tsx",
+      "loc": {
+        "file": "src/components/shell.tsx",
+        "line": 8,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Heading",
+          "resolution": "project",
+          "componentId": "cmp_23zb54pctoo",
+          "module": "./heading",
+          "loc": {
+            "file": "src/components/shell.tsx",
+            "line": 11,
+            "column": 7
+          }
+        },
+        {
+          "name": "Menu",
+          "resolution": "project",
+          "componentId": "cmp_0l5ysvrizm3",
+          "module": "./menu",
+          "loc": {
+            "file": "src/components/shell.tsx",
+            "line": 12,
+            "column": 7
+          }
+        }
+      ],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ title: string; children: ReactNode }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "title",
+              "type": {
+                "kind": "primitive",
+                "name": "string"
+              }
+            },
+            {
+              "name": "children",
+              "type": {
+                "kind": "external",
+                "name": "ReactNode",
+                "module": "react"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp_1rj6eiunqr8",
+      "name": "Tabs",
+      "file": "src/components/tabs.tsx",
+      "loc": {
+        "file": "src/components/tabs.tsx",
+        "line": 5,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [],
+      "usedTypes": [],
+      "propsType": {
+        "text": "{ tabs: string[]; onSelect: (tab: string) => void }",
+        "shape": {
+          "kind": "object",
+          "properties": [
+            {
+              "name": "tabs",
+              "type": {
+                "kind": "array",
+                "element": {
+                  "kind": "primitive",
+                  "name": "string"
+                }
+              }
+            },
+            {
+              "name": "onSelect",
+              "type": {
+                "kind": "function",
+                "params": [
+                  {
+                    "name": "tab",
+                    "type": {
+                      "kind": "primitive",
+                      "name": "string"
+                    }
+                  }
+                ],
+                "returns": {
+                  "kind": "primitive",
+                  "name": "void"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/tabs.tsx",
+            "line": 6,
+            "column": 31
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/tabs.tsx",
+            "line": 15,
+            "column": 11
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp_08po6tfznt1",
+      "name": "Toolbar",
+      "file": "src/components/toolbar.tsx",
+      "loc": {
+        "file": "src/components/toolbar.tsx",
+        "line": 6,
+        "column": 17
+      },
+      "kind": "client",
+      "clientBoundary": true,
+      "children": [
+        {
+          "name": "Tabs",
+          "resolution": "project",
+          "componentId": "cmp_1rj6eiunqr8",
+          "module": "./tabs",
+          "loc": {
+            "file": "src/components/toolbar.tsx",
+            "line": 7,
+            "column": 10
+          }
+        }
+      ],
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "function-prop",
+          "name": "onSelect",
+          "loc": {
+            "file": "src/components/toolbar.tsx",
+            "line": 7,
+            "column": 39
+          }
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "typ_27hulrc4k5b",
+      "name": "CartItem",
+      "declarationKind": "type-alias",
+      "definedAt": {
+        "file": "src/lib/cart-item.ts",
+        "line": 10,
+        "column": 13
+      },
+      "shape": {
+        "kind": "object",
+        "properties": [
+          {
+            "name": "id",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "name",
+            "type": {
+              "kind": "primitive",
+              "name": "string"
+            }
+          },
+          {
+            "name": "price",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          },
+          {
+            "name": "quantity",
+            "type": {
+              "kind": "primitive",
+              "name": "number"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "requests": [],
+  "navigations": [
+    {
+      "id": "nav_1whbrkw5a20",
+      "origin": "component",
+      "componentId": "cmp_1sfjoh2hy40",
+      "kind": "link",
+      "api": "next",
+      "href": {
+        "text": "link.href",
+        "confidence": "unknown"
+      },
+      "trigger": {
+        "kind": "event",
+        "event": "onClick",
+        "loc": {
+          "file": "src/components/nav.tsx",
+          "line": 18,
+          "column": 9
+        }
+      },
+      "loc": {
+        "file": "src/components/nav.tsx",
+        "line": 18,
+        "column": 9
+      },
+      "callStack": [
+        {
+          "file": "src/components/nav.tsx",
+          "line": 18,
+          "column": 9,
+          "callee": "<Link>"
+        }
+      ]
+    }
+  ],
+  "flows": [],
+  "queryLinks": [],
+  "imports": {
+    "src/app/about/page.tsx": [
+      "src/components/heading.tsx"
+    ],
+    "src/app/cart/page.tsx": [
+      "src/components/cart.tsx"
+    ],
+    "src/app/layout.tsx": [
+      "src/components/nav.tsx"
+    ],
+    "src/app/page.tsx": [
+      "src/components/chart.tsx",
+      "src/components/counter.tsx",
+      "src/components/index.ts",
+      "src/components/shell.tsx",
+      "src/components/toolbar.tsx"
+    ],
+    "src/components/cart-row.tsx": [
+      "src/components/price.tsx",
+      "src/lib/cart-item.ts"
+    ],
+    "src/components/cart.tsx": [
+      "src/components/cart-row.tsx",
+      "src/components/price.tsx",
+      "src/lib/cart-item.ts"
+    ],
+    "src/components/index.ts": [
+      "src/components/like-button.tsx",
+      "src/components/price.tsx"
+    ],
+    "src/components/like-button.tsx": [
+      "src/lib/use-likes.ts"
+    ],
+    "src/components/price.tsx": [
+      "src/lib/format.ts"
+    ],
+    "src/components/shell.tsx": [
+      "src/components/heading.tsx",
+      "src/components/menu.tsx"
+    ],
+    "src/components/toolbar.tsx": [
+      "src/components/tabs.tsx"
+    ]
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_12h7lqgksec",
+      "file": "src/app/settings/page.tsx",
+      "componentIds": [
+        "cmp_12h7lqgksec"
+      ],
+      "modules": [
+        "src/app/settings/page.tsx"
+      ],
+      "packages": [],
+      "bytes": 395,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 7,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onChange",
+          "loc": {
+            "file": "src/app/settings/page.tsx",
+            "line": 12,
+            "column": 47
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_08tm1swb3vf",
+      "file": "src/components/cart.tsx",
+      "componentIds": [
+        "cmp_08tm1swb3vf",
+        "cmp_0w1vla3dkxk",
+        "cmp_2c37lk3acao"
+      ],
+      "modules": [
+        "src/components/cart.tsx",
+        "src/components/cart-row.tsx",
+        "src/components/price.tsx",
+        "src/lib/cart-item.ts",
+        "src/lib/format.ts"
+      ],
+      "packages": [
+        "zod"
+      ],
+      "bytes": 1709,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/cart.tsx",
+            "line": 9,
+            "column": 29
+          }
+        },
+        {
+          "kind": "function-prop",
+          "name": "onRemove",
+          "loc": {
+            "file": "src/components/cart.tsx",
+            "line": 18,
+            "column": 13
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1nccmo087mu",
+      "file": "src/components/chart.tsx",
+      "componentIds": [
+        "cmp_1nccmo087mu"
+      ],
+      "modules": [
+        "src/components/chart.tsx"
+      ],
+      "packages": [],
+      "bytes": 428,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRef",
+          "loc": {
+            "file": "src/components/chart.tsx",
+            "line": 6,
+            "column": 15
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/chart.tsx",
+            "line": 7,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_2czhb38arlg",
+      "file": "src/components/counter.tsx",
+      "componentIds": [
+        "cmp_2czhb38arlg"
+      ],
+      "modules": [
+        "src/components/counter.tsx"
+      ],
+      "packages": [],
+      "bytes": 270,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/counter.tsx",
+            "line": 6,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/counter.tsx",
+            "line": 8,
+            "column": 27
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0aklbmghq1e",
+      "file": "src/components/like-button.tsx",
+      "componentIds": [
+        "cmp_0aklbmghq1e"
+      ],
+      "modules": [
+        "src/components/like-button.tsx",
+        "src/lib/use-likes.ts"
+      ],
+      "packages": [],
+      "bytes": 696,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useLikes",
+          "loc": {
+            "file": "src/components/like-button.tsx",
+            "line": 6,
+            "column": 27
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/like-button.tsx",
+            "line": 8,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/lib/use-likes.ts",
+            "line": 7,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/lib/use-likes.ts",
+            "line": 8,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1sfjoh2hy40",
+      "file": "src/components/nav.tsx",
+      "componentIds": [
+        "cmp_1sfjoh2hy40"
+      ],
+      "modules": [
+        "src/components/nav.tsx"
+      ],
+      "packages": [],
+      "bytes": 539,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "usePathname",
+          "loc": {
+            "file": "src/components/nav.tsx",
+            "line": 14,
+            "column": 20
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1ds6m54be52",
+      "file": "src/components/shell.tsx",
+      "componentIds": [
+        "cmp_1ds6m54be52",
+        "cmp_23zb54pctoo",
+        "cmp_0l5ysvrizm3"
+      ],
+      "modules": [
+        "src/components/shell.tsx",
+        "src/components/heading.tsx",
+        "src/components/menu.tsx"
+      ],
+      "packages": [],
+      "bytes": 898,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/menu.tsx",
+            "line": 4,
+            "column": 27
+          }
+        }
+      ],
+      "lower": {
+        "into": [
+          "cmp_0l5ysvrizm3"
+        ],
+        "server": [
+          "cmp_1ds6m54be52",
+          "cmp_23zb54pctoo"
+        ]
+      }
+    },
+    {
+      "componentId": "cmp_08po6tfznt1",
+      "file": "src/components/toolbar.tsx",
+      "componentIds": [
+        "cmp_08po6tfznt1",
+        "cmp_1rj6eiunqr8"
+      ],
+      "modules": [
+        "src/components/toolbar.tsx",
+        "src/components/tabs.tsx"
+      ],
+      "packages": [],
+      "bytes": 784,
+      "uses": [
+        {
+          "kind": "function-prop",
+          "name": "onSelect",
+          "loc": {
+            "file": "src/components/toolbar.tsx",
+            "line": 7,
+            "column": 39
+          }
+        }
+      ]
+    }
+  ]
+}

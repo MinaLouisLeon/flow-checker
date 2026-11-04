@@ -23,6 +23,7 @@ import {
   buildEndpoints,
   buildIndex,
   buildSummary,
+  bundleText,
   CACHE_KIND_LABELS,
   type CacheEntry,
   type CacheInvalidation,
@@ -33,6 +34,9 @@ import {
   cacheLifeText,
   cacheRuntimeText,
   cacheTags,
+  clientBoundaryOf,
+  clientSummary,
+  clientUseText,
   type Endpoint,
   type EndpointHost,
   type EndpointList,
@@ -40,6 +44,7 @@ import {
   type EndpointTransport,
   type ExportCapture,
   type ExportData,
+  edgeWhere,
   endpointLabel,
   explain,
   type Flag,
@@ -57,6 +62,7 @@ import {
   isBuildError,
   isInfoFlag,
   isVerified,
+  lowerText,
   type MatcherCondition,
   type MiddlewareMatcher,
   type ModelIndex,
@@ -666,6 +672,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ...accessSection(ctx, route),
     ...renderSection(route),
     ...boundarySection(route),
+    ...clientSection(ctx, route, from),
     ...cacheSection(ctx, route, from),
     ...metadataSection(route),
     '## Component tree',
@@ -735,6 +742,31 @@ function boundarySection(route: Route): string[] {
     ),
   ]
   return ['## Boundaries', lines.join('\n')]
+}
+
+/** Where the page's browser part starts and what each boundary brings (M43). */
+function clientSection(ctx: Ctx, route: Route, from: string): string[] {
+  const client = route.client
+  if (!client) return []
+  const name = (id: string) => ctx.index.components.get(id)?.name ?? '?'
+  const lines = client.boundaries.map((edge) => {
+    const boundary = clientBoundaryOf(ctx.index.model, edge.componentId)
+    const brings = boundary ? `: ${bundleText(boundary)}` : ''
+    const sub = [
+      edge.via && `  - through ${code(edge.via)}`,
+      edge.dynamic && '  - loaded on demand (`next/dynamic` or `React.lazy`)',
+      boundary && boundary.packages.length > 0 && `  - packages: ${boundary.packages.map(code).join(', ')}`,
+      boundary?.lower && `  - ⚠ could move lower: ${lowerText(boundary, name)}`,
+    ].filter(Boolean)
+    return [
+      `- ${componentLink(ctx, edge.componentId, from)}, ${edgeWhere(edge, name)}${brings}, ${code(`${edge.loc.file}:${edge.loc.line}`)}`,
+      ...sub,
+    ].join('\n')
+  })
+  return [
+    '## Client boundaries',
+    [clientSummary(client), ...(lines.length > 0 ? ['', ...lines] : [])].join('\n'),
+  ]
 }
 
 /** `metadata` / `generateMetadata` from the layouts and the page (M41). */
@@ -1371,6 +1403,8 @@ function componentDoc(ctx: Ctx, component: Component, from: string): string {
     facts([
       ['File', code(`${component.file}:${component.loc.line}`)],
       ['Kind', `${component.kind}${component.clientBoundary ? ` (${code("'use client'")})` : ''}`],
+      ['Needs the browser for', component.clientUses?.map(clientUseText).join(', ')],
+      ['Brings to the browser', clientBrings(ctx, component.id)],
       ['Used on', routes.map((r) => routeLink(ctx, r, from)).join(', ') || undefined],
       ['Rendered by', renderedBy.map((id) => componentLink(ctx, id, from)).join(', ') || undefined],
       ['Renders', [...new Set(children)].join(', ') || undefined],
@@ -1388,6 +1422,16 @@ function componentDoc(ctx: Ctx, component: Component, from: string): string {
     sites.length === 0 ? 'Sends no requests.' : requestTable(ctx, sites, from),
     ...sites.map((s) => requestSection(ctx, s, from, 3)),
   ])
+}
+
+/** A client boundary's components, modules and size, packages, and whether it could move lower (M43). */
+function clientBrings(ctx: Ctx, componentId: string): string | undefined {
+  const boundary = clientBoundaryOf(ctx.index.model, componentId)
+  if (!boundary) return undefined
+  const name = (id: string) => ctx.index.components.get(id)?.name ?? '?'
+  const packages = boundary.packages.length > 0 ? `, packages ${boundary.packages.map(code).join(', ')}` : ''
+  const lower = boundary.lower ? `. ⚠ Could move lower: ${lowerText(boundary, name)}` : ''
+  return `${bundleText(boundary)}${packages}${lower}`
 }
 
 function navigationText(ctx: Ctx, nav: Navigation, from: string): string {
@@ -2042,6 +2086,11 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: 'Pages with nothing to show while they load, nothing to catch an error or a missing page, and slots or intercepting routes `next build` rejects.',
   },
   {
+    title: 'Client boundaries that could move lower',
+    kinds: ['client'],
+    hint: "Nothing in these `'use client'` files needs the browser: moving the directive down keeps more on the server.",
+  },
+  {
     title: 'Requests the scan could not fully resolve',
     kinds: ['request'],
     hint: 'Dynamic URLs, unknown methods or response types. Live capture fills these in.',
@@ -2136,6 +2185,9 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     target = typeLink(ctx, note.typeId, from)
   } else if (note.componentId) {
     target = componentLink(ctx, note.componentId, from)
+    // Client notes start with the component, which the link already shows.
+    const prefix = `\`${ctx.index.components.get(note.componentId)?.name}\`: `
+    if (message.startsWith(prefix)) message = message.slice(prefix.length)
   } else if (note.routeId) {
     const route = ctx.index.routes.get(note.routeId)
     if (route) {
@@ -2146,7 +2198,7 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
     }
   }
   // Boundary notes are the tool's own wording, with code in backticks (M41).
-  const body = note.kind === 'boundary' ? message : text(message)
+  const body = note.kind === 'boundary' || note.kind === 'client' ? message : text(message)
   return `${target ? `${target}: ` : ''}${body} (${where})`
 }
 

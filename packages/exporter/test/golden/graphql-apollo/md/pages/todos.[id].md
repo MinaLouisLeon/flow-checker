@@ -22,6 +22,15 @@
 - On `notFound()`: Next's default 404 page
 - `<Suspense>` around `TodoView` (component), `src/components/TodoDetail.tsx:52`
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 4 components and 8 project modules (about 22 KB of source) to the browser, plus 3 packages (`@apollo/client`, `@graphql-typed-document-node/core`, `graphql`).
+
+- [`Providers`](../components/Providers.md), rendered by `RootLayout` (layout): 1 component · 2 modules · 0.7 KB, `src/app/layout.tsx:10`
+  - packages: `@apollo/client`
+- [`TodoDetail`](../components/TodoDetail.md), rendered by `TodoPage` (page): 3 components · 6 modules · 21 KB, `src/app/todos/[id]/page.tsx:5`
+  - packages: `@apollo/client`, `@graphql-typed-document-node/core`, `graphql`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

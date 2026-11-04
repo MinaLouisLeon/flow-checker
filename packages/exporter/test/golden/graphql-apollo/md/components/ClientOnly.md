@@ -6,6 +6,7 @@
 | --- | --- |
 | File | `src/components/ClientOnly.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useSyncExternalStore` (hook) |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`TodoDetail`](TodoDetail.md) |
 

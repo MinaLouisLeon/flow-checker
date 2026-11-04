@@ -6,6 +6,7 @@
 | --- | --- |
 | File | `src/components/TodoDetail.tsx:27` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRelayEnvironment` (hook), `usePreloadedQuery` (hook), `onClick` (event handler) |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`TodoPage`](TodoPage.md) |
 

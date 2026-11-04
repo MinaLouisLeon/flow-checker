@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/ViewerBadge.tsx:15` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQuery` (hook) |
+| Brings to the browser | 1 component · 5 modules · 20 KB, packages `@apollo/client`, `@graphql-typed-document-node/core`, `graphql` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

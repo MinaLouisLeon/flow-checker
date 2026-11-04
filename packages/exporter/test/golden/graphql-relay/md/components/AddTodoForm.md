@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/AddTodoForm.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useRouter` (hook), `useMutation` (hook), `onSubmit` (event handler), `onChange` (event handler) |
+| Brings to the browser | 1 component · 1 module · 0.9 KB, packages `react-relay` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

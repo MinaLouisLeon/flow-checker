@@ -29,6 +29,10 @@
 - ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `lib/api.ts:5`
 - ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `lib/api.ts:5`
 
+## Client boundaries
+
+Nothing runs in the browser: every component renders on the server.
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:4`

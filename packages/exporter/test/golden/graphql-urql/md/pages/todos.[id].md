@@ -21,6 +21,15 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+2 `'use client'` boundaries bring 2 components and 3 project modules (about 1.5 KB of source) to the browser, plus 1 package (`urql`).
+
+- [`Providers`](../components/Providers.md), rendered by `RootLayout` (layout): 1 component · 2 modules · 0.6 KB, `src/app/layout.tsx:10`
+  - packages: `urql`
+- [`TodoDetail`](../components/TodoDetail.md), rendered by `TodoPage` (page): 1 component · 1 module · 0.9 KB, `src/app/todos/[id]/page.tsx:5`
+  - packages: `urql`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

@@ -22,6 +22,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   request: 'Requests the scan could not fully resolve',
   middleware: 'Middleware the scan could not fully read',
   boundary: 'Pages with nothing to show while loading, or nothing to catch an error or a missing page',
+  client: "`'use client'` boundaries that could move lower",
 }
 
 export function Overview() {
@@ -297,6 +298,7 @@ function NoteLink({ note }: { note: ScanNote }) {
         : note.typeId
           ? href({ name: 'types', typeId: note.typeId, q: '' })
           : undefined
-  const message = note.kind === 'boundary' ? <CodeText text={note.message} /> : note.message
+  const message =
+    note.kind === 'boundary' || note.kind === 'client' ? <CodeText text={note.message} /> : note.message
   return target ? <a href={target}>{message}</a> : <span>{message}</span>
 }

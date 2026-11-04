@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/DeleteProductButton.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useTransition` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 3 modules · 2.5 KB, packages `server-only` |
 | Used on | [`/products`](../pages/products.md) |
 | Rendered by | [`ProductsPage`](ProductsPage.md) |
 

@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/UserList.tsx:6` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useTRPC` (hook), `useSuspenseQuery` (hook) |
+| Brings to the browser | 1 component · 2 modules · 0.6 KB, packages `@tanstack/react-query`, `@trpc/tanstack-react-query` |
 | Used on | [`/users`](../pages/users.md) |
 | Rendered by | [`UsersPage`](UsersPage.md) |
 
