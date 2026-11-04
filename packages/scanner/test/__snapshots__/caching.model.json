@@ -1,5 +1,5 @@
 {
-  "version": 18,
+  "version": 19,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -2900,5 +2900,199 @@
       }
     ],
     "unknown": []
-  }
+  },
+  "actions": [
+    {
+      "id": "sa_04xotk9yfqq",
+      "name": "createTodo",
+      "loc": {
+        "file": "src/app/actions.ts",
+        "line": 6,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_25uyneltd07"
+      ],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "formData",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch POST",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 7,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "updateTag",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 12,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 13,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 6,
+            "column": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_2cu3mbwaouk",
+      "name": "toggleTodo",
+      "loc": {
+        "file": "src/app/actions.ts",
+        "line": 16,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_03tkx1244vu"
+      ],
+      "routeIds": [
+        "rt_0rsc27vk284"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "formData",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch PATCH",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 18,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "updateTag",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 23,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 24,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 16,
+            "column": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_0iyqih2cip5",
+      "name": "refreshUsers",
+      "loc": {
+        "file": "src/app/actions.ts",
+        "line": 27,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_1rnq3uqo47a"
+      ],
+      "routeIds": [
+        "rt_1xs1qhs4r3f"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "no-input",
+        "params": [],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "cache",
+          "text": "revalidateTag",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 28,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidateTag",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 30,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/app/actions.ts",
+            "line": 31,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ]
 }

@@ -44,6 +44,7 @@ boundaries: (none)
 title: caching fixture  (layout metadata)
 client: (none)
 env: API_URL
+actions: createTodo (no auth check, input not checked) [unprotected]
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -87,6 +88,7 @@ boundaries:
 title: caching fixture  (layout metadata)
 client: (none)
 env: API_URL
+actions: toggleTodo (no auth check, input not checked) [unprotected]
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -102,6 +104,7 @@ boundaries:
 title: caching fixture  (layout metadata)
 client: (none)
 env: API_URL
+actions: refreshUsers (no auth check, no input)
 
 # Server cache
 
@@ -172,3 +175,29 @@ NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
 NEXT_RUNTIME: set by Next
   server optional  src/instrumentation.ts:3
   server optional  src/instrumentation.ts:8
+
+# Server actions
+
+createTodo (file) src/app/actions.ts:6 [unprotected]
+  no auth check
+  input not checked (formData?)
+  request fetch POST  src/app/actions.ts:7
+  cache updateTag  src/app/actions.ts:12
+  cache revalidatePath  src/app/actions.ts:13
+  pages: /
+
+toggleTodo (file) src/app/actions.ts:16 [unprotected]
+  no auth check
+  input not checked (formData?)
+  request fetch PATCH  src/app/actions.ts:18
+  cache updateTag  src/app/actions.ts:23
+  cache revalidatePath  src/app/actions.ts:24
+  pages: /todos/[id]
+
+refreshUsers (file) src/app/actions.ts:27
+  no auth check
+  no input
+  cache revalidateTag  src/app/actions.ts:28
+  cache revalidateTag  src/app/actions.ts:30
+  cache revalidatePath  src/app/actions.ts:31
+  pages: /users

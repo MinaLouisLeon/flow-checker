@@ -1,5 +1,5 @@
 {
-  "version": 18,
+  "version": 19,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -2959,5 +2959,110 @@
       }
     ],
     "unknown": []
-  }
+  },
+  "actions": [
+    {
+      "id": "sa_0j3539h9o57",
+      "name": "archiveOrder",
+      "loc": {
+        "file": "src/actions/orders.ts",
+        "line": 7,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "id",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "database",
+          "text": "db.query",
+          "loc": {
+            "file": "src/actions/orders.ts",
+            "line": 8,
+            "column": 9
+          }
+        },
+        {
+          "kind": "file",
+          "text": "appendFileSync",
+          "loc": {
+            "file": "src/actions/orders.ts",
+            "line": 9,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/orders.ts",
+            "line": 10,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/actions/orders.ts",
+            "line": 7,
+            "column": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_1wju2jhppbu",
+      "name": "refreshOrders",
+      "loc": {
+        "file": "src/actions/orders.ts",
+        "line": 13,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_1adaskwjlzp"
+      ],
+      "routeIds": [
+        "rt_0h4e5x5madf"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "no-input",
+        "params": [],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/orders.ts",
+            "line": 14,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ]
 }

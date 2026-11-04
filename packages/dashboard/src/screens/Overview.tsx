@@ -18,6 +18,7 @@ const NOTE_GROUPS: Record<NoteKind, string> = {
   'type-mismatch': "Requests whose data doesn't match the types",
   leak: "Server-only code that client code imports, and props that can't cross to the browser",
   env: 'Environment variables read where they have no value',
+  action: 'Server actions that change data with no auth check and no input check',
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
@@ -301,7 +302,11 @@ function NoteLink({ note }: { note: ScanNote }) {
           ? href({ name: 'types', typeId: note.typeId, q: '' })
           : undefined
   const message =
-    note.kind === 'boundary' || note.kind === 'client' || note.kind === 'leak' || note.kind === 'env' ? (
+    note.kind === 'boundary' ||
+    note.kind === 'client' ||
+    note.kind === 'leak' ||
+    note.kind === 'env' ||
+    note.kind === 'action' ? (
       <CodeText text={note.message} />
     ) : (
       note.message

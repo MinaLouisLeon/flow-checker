@@ -15,6 +15,7 @@ import {
   urlText,
 } from '@flow-checker/shared'
 import { useState } from 'react'
+import { ActionsSection } from '../ActionsView'
 import { BoundariesSection, MetadataSection } from '../BoundariesView'
 import { CacheEntryRow, InvalidationRow } from '../CacheView'
 import { ClientSection } from '../ClientView'
@@ -125,6 +126,7 @@ export function PageView({ routeId, componentId }: { routeId: string; componentI
         <ClientSection route={route} />
         <LeaksSection route={route} />
         <EnvSection route={route} />
+        <ActionsSection route={route} />
         <CacheSection route={route} index={index} />
         <MetadataSection route={route} />
 

@@ -78,6 +78,9 @@ catalogs:
     typescript:
       specifier: 6.0.3
       version: 6.0.3
+    valibot:
+      specifier: ^1.1.0
+      version: 1.5.0
     vite:
       specifier: ^8.3.5
       version: 8.3.5
@@ -109,6 +112,43 @@ importers:
       vitest:
         specifier: "catalog:"
         version: 5.0.5(@types/node@22.20.5)(vite@8.3.5(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  fixtures/action-safety:
+    dependencies:
+      next:
+        specifier: "catalog:"
+        version: 16.4.3(@babel/core@7.29.7)(@playwright/test@1.64.1)(@types/node@22.20.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react:
+        specifier: "catalog:"
+        version: 19.3.1
+      react-dom:
+        specifier: "catalog:"
+        version: 19.3.1(react@19.3.1)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+      valibot:
+        specifier: "catalog:"
+        version: 1.5.0(typescript@6.0.3)
+      zod:
+        specifier: "catalog:"
+        version: 4.6.7
+    devDependencies:
+      "@integr8-media/flow-checker":
+        specifier: workspace:*
+        version: link:../../packages/flow-checker
+      "@types/node":
+        specifier: "catalog:"
+        version: 22.20.5
+      "@types/react":
+        specifier: "catalog:"
+        version: 19.3.0
+      "@types/react-dom":
+        specifier: "catalog:"
+        version: 19.3.0(@types/react@19.3.0)
+      typescript:
+        specifier: "catalog:"
+        version: 6.0.3
 
   fixtures/basic:
     dependencies:
@@ -6041,6 +6081,17 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  valibot@1.5.0:
+    resolution:
+      {
+        integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==,
+      }
+    peerDependencies:
+      typescript: ">=5"
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   vary@1.1.2:
     resolution:
       {
@@ -9223,6 +9274,10 @@ snapshots:
   use-sync-external-store@1.7.0(react@19.3.1):
     dependencies:
       react: 19.3.1
+
+  valibot@1.5.0(typescript@6.0.3):
+    optionalDependencies:
+      typescript: 6.0.3
 
   vary@1.1.2: {}
 

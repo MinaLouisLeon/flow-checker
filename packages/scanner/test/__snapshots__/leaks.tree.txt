@@ -45,6 +45,7 @@ client: 2 boundaries, 2 components, 2 modules, 2.1 KB, packages path
   OrderList  from Home (page)  src/app/page.tsx:15
   ArchiveButton  from OrderActions (component)  src/components/order-actions.tsx:5
 env: DATABASE_URL [not-defined]
+actions: archiveOrder (no auth check, input not checked) [unprotected], refreshOrders (no auth check, no input)
 
 ## /account  src/app/account/page.tsx
 layouts: src/app/layout.tsx
@@ -298,3 +299,19 @@ NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
 NEXT_RUNTIME: set by Next
   server optional  src/instrumentation.ts:3
   server optional  src/instrumentation.ts:8
+
+# Server actions
+
+archiveOrder (file) src/actions/orders.ts:7 [unprotected]
+  no auth check
+  input not checked (id?)
+  database db.query  src/actions/orders.ts:8
+  file appendFileSync  src/actions/orders.ts:9
+  cache revalidatePath  src/actions/orders.ts:10
+  pages: /
+
+refreshOrders (file) src/actions/orders.ts:13
+  no auth check
+  no input
+  cache revalidatePath  src/actions/orders.ts:14
+  pages: /

@@ -162,6 +162,29 @@ Server-only code that client code imports, and props a server component hands to
 | <a id="leak-symbol"></a>**symbol prop** (`symbol`) | A symbol made with `Symbol()`. Only symbols from `Symbol.for()` cross. |  |
 | <a id="leak-null-prototype"></a>**prop without a prototype** (`null-prototype`) | `Object.create(null)`: React only sends plain objects. |  |
 
+## Server actions
+
+Every server action (a `'use server'` function), with the auth check and the input check that run before it changes data. A server action is a public `POST` endpoint: anyone can call it with any arguments, not only your forms.
+
+| Word | Means | What to do |
+| --- | --- | --- |
+| <a id="action-public"></a>**server action** (`public`) | A function in a `'use server'` file, or one that starts with `'use server'`. Next gives each action a page uses an id that ships in the browser bundle, and runs it for any `POST` that sends the id, from anywhere, with whatever arguments the request holds. TypeScript types aren't checked when it runs. |  |
+| <a id="action-auth-checked"></a>**auth checked** (`auth-checked`) | Before it changes anything, the action stops when nobody is signed in: a `return`, `throw`, `redirect()` or `notFound()` under a check of the session or user, a helper that does that (`await requireUser()`), the function it is wrapped in, or a package guard (`auth.protect()`). |  |
+| <a id="action-auth-none"></a>**no auth check** (`auth-none`) | No check of the session or user was found before the action changes data, so it runs for anyone, signed in or not. That's fine for public actions (a newsletter sign-up), not for ones that change someone's data. | Check the session at the top of the action (`const session = await auth(); if (!session) throw ...`), or wrap it in a helper that does. |
+| <a id="action-auth-unclear"></a>**auth unclear** (`auth-unclear`) | The action is wrapped in, or calls, code the scan can't read (a package, a file the config excludes, an import that doesn't resolve), so it can't tell whether that code checks the session. |  |
+| <a id="action-input-checked"></a>**input checked** (`input-checked`) | Every argument the action reads is checked before use: parsed with a validation library (zod, valibot, yup...), or checked by hand with a `return` / `throw` when it is wrong (`typeof id !== 'string'`). |  |
+| <a id="action-input-partial"></a>**input partly checked** (`input-partial`) | Some arguments the action reads are checked, others are used as sent. | Parse all of the input with one schema. |
+| <a id="action-input-none"></a>**input not checked** (`input-none`) | The arguments are used as sent. A caller can send any value: another type than the TypeScript one, another id, extra fields. | Parse the input with a schema (`Schema.parse(input)`) before using it. |
+| <a id="action-input-no-input"></a>**no input** (`input-no-input`) | The action reads no arguments, so there is nothing to check. |  |
+| <a id="action-input-unclear"></a>**input unclear** (`input-unclear`) | A package wrapper hands the action its input, and the scan can't read whether it checks it. |  |
+| <a id="action-change-database"></a>**database** (`change-database`) | A write call on a database client or data object (`create`, `update`, `delete`, `upsert`...) or SQL that writes (`INSERT`, `UPDATE`, `DELETE`). |  |
+| <a id="action-change-request"></a>**request** (`change-request`) | A request to another service that isn't `GET` or `HEAD` (`fetch(url, { method: 'DELETE' })`, `api.post()`). |  |
+| <a id="action-change-file"></a>**file** (`change-file`) | A Node.js `fs` write (`writeFile`, `appendFile`, `unlink`...). |  |
+| <a id="action-change-cache"></a>**cache** (`change-cache`) | `revalidatePath()`, `revalidateTag()` or `updateTag()`: it refreshes cached pages and data. On its own that doesn't count as changing data. |  |
+| <a id="action-unprotected"></a>**open to anyone** (`unprotected`) | The action changes data, has no auth check and uses its input as sent (or takes none), and a page uses it. Anyone who finds its id in the browser bundle can call it with any arguments. | Check the session first and parse the input with a schema; or, if it is meant to be public, check the input so a caller can only do what the form allows. |
+| <a id="action-unused"></a>**unused** | No code imports or uses the action, so Next leaves it out of the build and it can't be called. It isn't flagged. |  |
+| <a id="action-wrapped"></a>**wrapped** | The action is the result of a helper (`export const save = withAuth(async () => ...)`). The helper runs first, so its checks count for the action. |  |
+
 ## Environment variables
 
 Every `process.env` name the code reads, on which side, and which `.env` files define it. Only names are read: values never leave the `.env` files.

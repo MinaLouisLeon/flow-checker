@@ -44,10 +44,10 @@ A short tour of this Next.js 16.4.3 app, read from its code by flow-checker. [Th
 
 ## To check
 
-5 open notes.
+6 open notes.
 
+- Action: [Server action \`deleteProduct\` changes data (\`fetch DELETE\` through \`removeProduct\`) with no auth check and uses its input as sent: a server action is a public \`POST\` endpoint, so anyone can call it with any arguments](pages/products.md) (src/actions/products.ts:30)
 - Boundary: [/products: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/products.md) (src/lib/backend.ts:7)
 - Boundary: [/products: no error boundary: fetches on the server (\`fetch\`), and no \`error\` file, error boundary or \`global-error\` catches a failure](pages/products.md) (src/lib/backend.ts:7)
-- Boundary: [/products/\[id\]: no loading state: waits for a request (\`fetch\`) with no \`loading\` file or \`\<Suspense\>\` to show meanwhile](pages/products.%5Bid%5D.md) (src/lib/backend.ts:12)
 
-2 more: [all open issues](issues.md).
+3 more: [all open issues](issues.md).

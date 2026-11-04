@@ -1,0 +1,17 @@
+# Types
+
+FormState  interface  src/actions/posts.ts:9
+  { error?: string }
+Post  interface  src/lib/db.ts:4
+  { id: string; title: string; body: string; likes: number }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:8
+  props: { children: ReactNode }
+PostPage  src/app/posts/[id]/page.tsx:5
+  props: { params: Promise<{ id: string }> }
+AdminTools  src/components/admin-tools.tsx:6
+  props: { userId: string }
+PostActions  src/components/post-actions.tsx:6
+  props: { id: string }

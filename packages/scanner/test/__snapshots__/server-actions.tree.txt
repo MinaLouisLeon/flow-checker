@@ -44,6 +44,7 @@ title: server-actions fixture  (layout metadata)
 client: 1 boundary, 1 component, 1 module, 0.4 KB
   DeleteProductButton  from ProductsPage (page)  src/app/products/page.tsx:17
 env: API_URL
+actions: deleteProduct (no auth check, input not checked) [unprotected]
 
 ## /products/[id]  src/app/products/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -74,6 +75,7 @@ title: server-actions fixture  (layout metadata)
 client: 1 boundary, 1 component, 1 module, 1.0 KB
   CreateProductForm  from NewProductPage (page)  src/app/products/new/page.tsx:7
 env: API_URL
+actions: createProduct (no auth check, input checked)
 
 # Server cache
 
@@ -115,3 +117,19 @@ NEXT_PUBLIC_FLOW_CHECKER: set by flow-checker
 NEXT_RUNTIME: set by Next
   server optional  src/instrumentation.ts:3
   server optional  src/instrumentation.ts:8
+
+# Server actions
+
+createProduct (file) src/actions/products.ts:9
+  no auth check
+  input checked (formData): Object.keys(fieldErrors).length > 0
+  request fetch POST via insertProduct  src/lib/backend.ts:17
+  cache revalidatePath  src/actions/products.ts:25
+  pages: /products/new
+
+deleteProduct (file) src/actions/products.ts:30 [unprotected]
+  no auth check
+  input not checked (id?)
+  request fetch DELETE via removeProduct  src/lib/backend.ts:27
+  cache revalidatePath  src/actions/products.ts:32
+  pages: /products

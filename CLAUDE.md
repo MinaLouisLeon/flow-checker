@@ -33,8 +33,9 @@ M36 Impact check (branch `feat/m36-impact-check`) · M37 Release v0.3.0 (branch 
 `feat/server-cache-map-m39`) · M40 Cache check at runtime (branch `feat/cache-check-at-runtime-m40`) ·
 M41 Special files and boundaries (branch `feat/special-files-and-boundaries-m41`) ·
 M42 Release v0.4.0 (branch `feat/release-040`; publish = push the `v0.4.0` tag after merging to `main`) ·
-M43 Client boundaries (v0.5.0, branch `feat/client-boundries-m43`) · M44 Server/client leaks (branch `feat/server-client-leaks-m44`) · M45 Environment variables (branch `feat/env-var-m45`).
+M43 Client boundaries (v0.5.0, branch `feat/client-boundries-m43`) · M44 Server/client leaks (branch `feat/server-client-leaks-m44`) · M45 Environment variables (branch `feat/env-var-m45`) ·
+M46 Server action safety (branch `feat/server-action-safety-m46`).
 
-Next: v0.5.0 (boundaries, safety and performance, M46–M48 left), then v0.6.0 (M49–M54) and
+Next: v0.5.0 (boundaries, safety and performance, M47–M48 left), then v0.6.0 (M49–M54) and
 v1.0.0 (`export --llm` + MCP server covering every feature, M55–M57); see `docs/PLAN.md`.
 Fixes must target code patterns, not the app they were found on.

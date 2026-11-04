@@ -2,7 +2,13 @@
 
 [← Overview](README.md)
 
-7 open items.
+8 open items.
+
+## Server actions open to anyone (1)
+
+Server actions that change data with no auth check and no input check. A server action is a public `POST` endpoint: anyone can call it with any arguments.
+
+- [`/products`](pages/products.md): Server action `deleteProduct` changes data (`fetch DELETE` through `removeProduct`) with no auth check and uses its input as sent: a server action is a public `POST` endpoint, so anyone can call it with any arguments (`src/actions/products.ts:30`)
 
 ## Boundary gaps (5)
 

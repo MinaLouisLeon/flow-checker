@@ -5,6 +5,7 @@ import { DataContext } from './context'
 import { GlobalSearch, shortcutLabel, useSearchShortcut } from './GlobalSearch'
 import { buildIndex } from './model-index'
 import { href, type Screen, useScreen } from './router'
+import { ActionsScreen } from './screens/ActionsScreen'
 import { AreasScreen } from './screens/AreasScreen'
 import { CacheScreen } from './screens/CacheScreen'
 import { ChangesScreen } from './screens/ChangesScreen'
@@ -36,6 +37,8 @@ const NAV: {
   needsCache?: boolean
   /** Only when the scan found environment variables (M45). */
   needsEnv?: boolean
+  /** Only when the scan found server actions (M46). */
+  needsActions?: boolean
 }[] = [
   { label: 'Start here', screen: { name: 'start' }, match: ['start'] },
   { label: 'Walk the app', screen: { name: 'walk' }, match: ['walk'] },
@@ -48,6 +51,7 @@ const NAV: {
   { label: 'Flows', screen: { name: 'flows', q: '' }, match: ['flows'] },
   { label: 'Cache', screen: { name: 'cache' }, match: ['cache'], needsCache: true },
   { label: 'Env', screen: { name: 'env' }, match: ['env'], needsEnv: true },
+  { label: 'Actions', screen: { name: 'actions' }, match: ['actions'], needsActions: true },
   { label: 'Types', screen: { name: 'types', q: '' }, match: ['types'] },
   { label: 'Live', screen: { name: 'live', q: '' }, match: ['live'], needsCapture: true },
   { label: 'Export', screen: { name: 'export' }, match: ['export'], needsExport: true },
@@ -90,7 +94,8 @@ export function App() {
               (!item.needsCapture || meta.data?.capture || meta.data?.explore) &&
               (!item.needsExport || meta.data?.export) &&
               (!item.needsCache || Boolean(model.data?.cache)) &&
-              (!item.needsEnv || Boolean(model.data?.env)),
+              (!item.needsEnv || Boolean(model.data?.env)) &&
+              (!item.needsActions || Boolean(model.data?.actions?.length)),
           ).map((item) => (
             <a
               key={item.label}
@@ -246,6 +251,8 @@ function ScreenView({ screen }: { screen: Screen }) {
       return <CacheScreen />
     case 'env':
       return <EnvScreen />
+    case 'actions':
+      return <ActionsScreen />
     case 'glossary':
       return <GlossaryScreen q={screen.q} term={screen.term} />
     case 'not-found':

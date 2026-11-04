@@ -11,7 +11,7 @@ products from /products
   pages: /products, /products/[id], /products/new
   components: ProductPage, NewProductPage, ProductsPage, CreateProductForm, DeleteProductButton
   shared components: RootLayout
-  requests: 6, endpoints: 6, notes: 5
+  requests: 6, endpoints: 6, notes: 6
   flows: CreateProductForm submit, DeleteProductButton click
 
 shared components: RootLayout

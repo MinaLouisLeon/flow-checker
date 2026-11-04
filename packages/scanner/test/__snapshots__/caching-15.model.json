@@ -1,5 +1,5 @@
 {
-  "version": 18,
+  "version": 19,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -1889,5 +1889,181 @@
       }
     ],
     "unknown": []
-  }
+  },
+  "actions": [
+    {
+      "id": "sa_11t0pp42dn0",
+      "name": "createTodo",
+      "loc": {
+        "file": "app/actions.ts",
+        "line": 7,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_2erpzcgyjsg"
+      ],
+      "routeIds": [
+        "rt_12v7saiyoj2"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "formData",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch POST",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 8,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidateTag",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 13,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 14,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 7,
+            "column": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_0hdzdwitce6",
+      "name": "toggleTodo",
+      "loc": {
+        "file": "app/actions.ts",
+        "line": 17,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_1uqq0aa2nmq"
+      ],
+      "routeIds": [
+        "rt_1o3mhu1qw49"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "formData",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch PATCH",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 19,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidateTag",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 24,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 17,
+            "column": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_02e3lyxca9w",
+      "name": "refreshProducts",
+      "loc": {
+        "file": "app/actions.ts",
+        "line": 27,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_28s3rmjndbc"
+      ],
+      "routeIds": [
+        "rt_0pkd6801g1s"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "no-input",
+        "params": [],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "cache",
+          "text": "revalidateTag",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 29,
+            "column": 3
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "app/actions.ts",
+            "line": 30,
+            "column": 3
+          }
+        }
+      ]
+    }
+  ]
 }

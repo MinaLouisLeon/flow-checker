@@ -1,0 +1,51 @@
+# Requests
+
+## server action clearDrafts  src/app/page.tsx:20
+DELETE {API_URL ?? http://localhost:3000}/api/drafts  fetch  server-action
+  via: fetch src/app/page.tsx:22
+  ⚠ unknown-response: No response type was found (annotation, generic or cast).
+
+## HomePage  src/app/page.tsx:7
+POST server action addPost  server-action  event action
+  body: FormData
+  response: void
+  via: addPost src/app/page.tsx:35
+POST server action clearDrafts  server-action  event action
+  response: void
+  then: DELETE {API_URL ?? http://localhost:3000}/api/drafts
+  via: clearDrafts src/app/page.tsx:39
+
+## AdminTools  src/components/admin-tools.tsx:6
+POST server action banUser  server-action  event onClick
+  body: string
+  response: void
+  via: banUser src/components/admin-tools.tsx:10
+POST server action resetLikes  server-action  event onClick
+  response: void
+  via: resetLikes src/components/admin-tools.tsx:13
+
+## NewPostForm  src/components/new-post-form.tsx:8
+POST server action createPost  server-action  event action
+  body: FormData
+  response: FormState
+  via: useActionState src/components/new-post-form.tsx:9
+
+## PostActions  src/components/post-actions.tsx:6
+POST server action likePost  server-action  event action
+  body: FormData
+  response: void
+  via: likePost src/components/post-actions.tsx:11
+POST server action renamePost  server-action  event onClick
+  body: string
+  response: void
+  via: renamePost src/components/post-actions.tsx:16
+POST server action deletePost  server-action  event onClick
+  body: string
+  response: void
+  via: deletePost src/components/post-actions.tsx:19
+
+## SearchBox  src/components/search-box.tsx:6
+POST server action searchPosts  server-action  event onChange
+  body: string
+  response: Post[]
+  via: searchPosts src/components/search-box.tsx:10

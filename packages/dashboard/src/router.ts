@@ -86,6 +86,8 @@ export type Screen =
   | { name: 'cache' }
   /** Environment variables (M45): every name the code reads and the `.env` files that define it. */
   | { name: 'env' }
+  /** Server actions (M46): each action's auth check, input check and what it changes. */
+  | { name: 'actions' }
   | { name: 'export' }
   /** What each status, note and badge means (M34); `term` (`flag-dynamic-url`) is the one shown first. */
   | { name: 'glossary'; q: string; term?: string }
@@ -175,6 +177,8 @@ export function parseHash(hash: string): Screen {
       return { name: 'cache' }
     case 'env':
       return { name: 'env' }
+    case 'actions':
+      return { name: 'actions' }
     case 'glossary':
       return { name: 'glossary', q: params.get('q') ?? '', term: params.get('term') ?? undefined }
     case 'live':
@@ -264,6 +268,8 @@ export function href(screen: Screen): string {
       return '#/cache'
     case 'env':
       return '#/env'
+    case 'actions':
+      return '#/actions'
     case 'glossary':
       return withQuery('/glossary', { q: screen.q, term: screen.term })
     case 'live':
