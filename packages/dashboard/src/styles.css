@@ -1837,7 +1837,8 @@ kbd {
 
 /* Server cache map (M39) */
 .list.cache-list li,
-.list.client-list li {
+.list.client-list li,
+.list.leak-list li {
   flex-direction: column;
   align-items: stretch;
   gap: 2px;

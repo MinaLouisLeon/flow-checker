@@ -1,0 +1,13 @@
+# Navigation
+
+## HelpPage  src/app/help/page.tsx
+link / -> /  event onClick
+
+## Home  src/app/page.tsx
+link /products -> /products  event onClick
+
+# Flows
+
+## OrderList submit  (/)
+1. OrderList action on /
+2. POST server action refreshOrders

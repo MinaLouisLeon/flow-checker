@@ -370,6 +370,80 @@ export const ClientBoundarySchema = z.object({
 })
 export type ClientBoundary = z.infer<typeof ClientBoundarySchema>
 
+// Server/client leaks (M44): server-only code that client code imports, and props a server
+// component hands to a client component that can't cross to the browser. Checked with `next dev`
+// (16.4.3, React 19.3): `server-only`, `next/headers`, `revalidatePath` from `next/cache`, `fs` and
+// `child_process` fail to compile in client code, also through a plain file it imports; `path` and
+// `crypto` have browser versions; a `'use server'` file is only a reference, so what it imports
+// stays on the server. Props: functions (also inside objects and arrays), class instances, objects
+// without a prototype, `Symbol()`, `RegExp` and `WeakMap` fail; `Date`, `Map`, `Set`, `URL`,
+// `Error`, typed arrays, iterables, classes with `toJSON`, `Symbol.for()`, server actions and
+// functions from a `'use client'` file pass.
+
+/**
+ * `server-only`: the marker package. `node`: a Node.js module with no browser version (`fs`,
+ * `child_process`...). `database`: a database client (`pg`, `mongoose`, `@prisma/client`...).
+ * `next-server`: an API Next only allows on the server (`next/headers`, `revalidatePath`...).
+ * `node-package`: a package that only runs on Node.js (`bcrypt`, `sharp`, `firebase-admin`...).
+ */
+export const ServerModuleKindSchema = z.enum([
+  'server-only',
+  'node',
+  'database',
+  'next-server',
+  'node-package',
+])
+export type ServerModuleKind = z.infer<typeof ServerModuleKindSchema>
+
+/** Client code reaches a project file that imports a server-only module. */
+export const ModuleLeakSchema = z.object({
+  kind: z.literal('module'),
+  /** The import as written: `fs`, `node:fs`, `server-only`, `pg`, `next/headers`. */
+  module: z.string(),
+  category: ServerModuleKindSchema,
+  /** For modules where only some exports are server-only (`next/cache`): the ones imported. */
+  names: z.array(z.string()).optional(),
+  /** The project file with the import, and where the import is. */
+  file: z.string(),
+  loc: SourceLocSchema,
+  /** Client boundaries (component ids) whose code imports the file. */
+  boundaries: z.array(z.string()),
+  /** Project files from the first boundary's file to `file`, both included. */
+  chain: z.array(z.string()),
+  /** Pages those boundaries are on. */
+  routeIds: z.array(z.string()),
+})
+export type ModuleLeak = z.infer<typeof ModuleLeakSchema>
+
+/** A server component hands a client component a prop that can't cross to the browser. */
+export const PropLeakSchema = z.object({
+  kind: z.literal('prop'),
+  /**
+   * `function`: a function that isn't a server action. `class-instance`: an instance of a class with
+   * no `toJSON` (also `RegExp`, `WeakMap`). `symbol`: `Symbol()` (only `Symbol.for()` crosses).
+   * `null-prototype`: `Object.create(null)`.
+   */
+  value: z.enum(['function', 'class-instance', 'symbol', 'null-prototype']),
+  /** The prop, with the path inside it: `onSelect`, `children`, `config.onSave`, `items[]`. */
+  prop: z.string(),
+  /** For a class instance: the class name. */
+  type: z.string().optional(),
+  /** The client component as rendered: a project component, or a package one with its module. */
+  name: z.string(),
+  componentId: z.string().optional(),
+  module: z.string().optional(),
+  /** The server component that renders it. */
+  parentId: z.string(),
+  /** The prop as written. */
+  loc: SourceLocSchema,
+  /** Pages the server component renders it on. */
+  routeIds: z.array(z.string()),
+})
+export type PropLeak = z.infer<typeof PropLeakSchema>
+
+export const LeakSchema = z.discriminatedUnion('kind', [ModuleLeakSchema, PropLeakSchema])
+export type Leak = z.infer<typeof LeakSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -1544,7 +1618,7 @@ export const AppModelSchema = z.object({
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
    * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
    * `boundaries` or `metadata`, version 15 (before M43) no page `client`, `clientBoundaries` or
-   * component `clientUses`.
+   * component `clientUses`, version 16 (before M44) no `leaks`.
    */
   version: z
     .union([
@@ -1563,6 +1637,7 @@ export const AppModelSchema = z.object({
       z.literal(13),
       z.literal(14),
       z.literal(15),
+      z.literal(16),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1603,5 +1678,10 @@ export const AppModelSchema = z.object({
   cache: CacheMapSchema.optional(),
   /** `'use client'` components that server components render, sorted by file (M43). Absent when there are none. */
   clientBoundaries: z.array(ClientBoundarySchema).optional(),
+  /**
+   * Server-only modules client code imports and props that can't cross to the browser, modules
+   * first, then props, each by file and line (M44). Absent when there are none.
+   */
+  leaks: z.array(LeakSchema).optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

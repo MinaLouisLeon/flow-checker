@@ -16,6 +16,7 @@ import { CoverageBars } from './WalkScreen'
 const NOTE_GROUPS: Record<NoteKind, string> = {
   'needs-recheck': 'Requests whose code changed since they were captured',
   'type-mismatch': "Requests whose data doesn't match the types",
+  leak: "Server-only code that client code imports, and props that can't cross to the browser",
   'missing-page-component': 'Pages without a component',
   'unresolved-component': 'Components the scan could not trace',
   'unresolved-type': 'Types that are only partly resolved',
@@ -267,7 +268,7 @@ function NoteGroups({ notes }: { notes: ScanNote[] }) {
         return (
           <div key={kind} className="note-group">
             <h3>
-              {NOTE_GROUPS[kind]} <span className="count">{group.length}</span>
+              <CodeText text={NOTE_GROUPS[kind]} /> <span className="count">{group.length}</span>
             </h3>
             <ul className="list">
               {group.map((note) => (
@@ -299,6 +300,10 @@ function NoteLink({ note }: { note: ScanNote }) {
           ? href({ name: 'types', typeId: note.typeId, q: '' })
           : undefined
   const message =
-    note.kind === 'boundary' || note.kind === 'client' ? <CodeText text={note.message} /> : note.message
+    note.kind === 'boundary' || note.kind === 'client' || note.kind === 'leak' ? (
+      <CodeText text={note.message} />
+    ) : (
+      note.message
+    )
   return target ? <a href={target}>{message}</a> : <span>{message}</span>
 }

@@ -449,7 +449,7 @@ function analyze(
     cacheComponents,
   })
   const resolveImport = moduleResolver(project, root)
-  const clientBoundaries = addClientBoundaries({
+  const client = addClientBoundaries({
     root,
     routes,
     components,
@@ -503,7 +503,8 @@ function analyze(
     ...(settings.areas ? { areas: settings.areas } : {}),
     imports: importGraph(project, root, discovery, settings),
     ...(cache ? { cache } : {}),
-    ...(clientBoundaries.length > 0 ? { clientBoundaries } : {}),
+    ...(client.boundaries.length > 0 ? { clientBoundaries: client.boundaries } : {}),
+    ...(client.leaks.length > 0 ? { leaks: client.leaks } : {}),
   }
 }
 

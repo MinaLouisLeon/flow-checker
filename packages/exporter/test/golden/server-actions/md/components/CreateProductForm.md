@@ -7,7 +7,7 @@
 | File | `src/components/CreateProductForm.tsx:10` |
 | Kind | client (`'use client'`) |
 | Needs the browser for | `useActionState` (hook) |
-| Brings to the browser | 1 component · 3 modules · 3.1 KB, packages `server-only` |
+| Brings to the browser | 1 component · 1 module · 1.0 KB |
 | Used on | [`/products/new`](../pages/products.new.md) |
 | Rendered by | [`NewProductPage`](NewProductPage.md) |
 

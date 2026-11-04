@@ -2,6 +2,7 @@
 import { GAP_LABELS, gapText } from './boundaries'
 import { lowerText } from './client'
 import { isInfoFlag, urlText } from './format-requests'
+import { leakText } from './leaks'
 import type {
   AppModel,
   Component,
@@ -45,6 +46,7 @@ export type NoteKind =
   | 'middleware'
   | 'boundary'
   | 'client'
+  | 'leak'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -457,6 +459,23 @@ function scanNotes(model: AppModel): ScanNote[] {
         ...(component ? { line: component.loc.line, column: component.loc.column } : {}),
         componentId: boundary.componentId,
         ...(pages[0] ? { routeId: pages[0].id } : {}),
+      })
+    }
+  }
+  // Server/client leaks (M44): one note each, with the pages they break.
+  if (model.leaks) {
+    const names = new Map(model.components.map((c) => [c.id, c.name]))
+    const name = (id: string) => names.get(id) ?? '?'
+    for (const leak of model.leaks) {
+      const pages = leak.routeIds.length
+      notes.push({
+        kind: 'leak',
+        message: `${leakText(leak, name)}${pages > 1 ? ` (on ${pages} pages)` : ''}`,
+        file: leak.loc.file,
+        line: leak.loc.line,
+        column: leak.loc.column,
+        componentId: leak.kind === 'module' ? (leak.boundaries[0] as string) : leak.parentId,
+        ...(leak.routeIds[0] ? { routeId: leak.routeIds[0] } : {}),
       })
     }
   }

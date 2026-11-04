@@ -33,6 +33,9 @@ catalog:
   yaml: ^2.8.1
   # GraphQL (M17): the scanner parses documents and schemas with graphql-js.
   graphql: ^16.14.2
+  # Server/client leaks (M44): the leaks fixture reaches a database client from client code.
+  pg: ^8.23.1
+  "@types/pg": ^8.23.1
 
 # pnpm 11 blocks dependency install scripts unless listed here.
 allowBuilds:
