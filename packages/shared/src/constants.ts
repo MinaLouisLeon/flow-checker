@@ -1,5 +1,5 @@
 /** Version of the `.flow-checker/*.json` file formats. Bump on breaking changes. */
-export const MODEL_VERSION = 15
+export const MODEL_VERSION = 16
 
 /** Name of the published npm package. */
 export const PACKAGE_NAME = '@integr8-media/flow-checker'

@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "app",
     "tsconfig": "tsconfig.json",
@@ -114,6 +114,34 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1o363mk8ees",
+            "parentId": "cmp_0ku4o3jpe9o",
+            "in": "page",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 20,
+              "column": 7
+            }
+          },
+          {
+            "componentId": "cmp_1t97i8o4yqd",
+            "parentId": "cmp_0ku4o3jpe9o",
+            "in": "page",
+            "loc": {
+              "file": "app/page.tsx",
+              "line": 21,
+              "column": 7
+            }
+          }
+        ],
+        "components": 2,
+        "modules": 4,
+        "bytes": 2599,
+        "packages": []
       }
     }
   ],
@@ -199,6 +227,26 @@
       "children": [],
       "usedTypes": [
         "typ_0xjkp2la9ri"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/SettingsPanel.tsx",
+            "line": 9,
+            "column": 35
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/SettingsPanel.tsx",
+            "line": 11,
+            "column": 3
+          }
+        }
       ]
     },
     {
@@ -215,6 +263,35 @@
       "children": [],
       "usedTypes": [
         "typ_29n1iw0u1hd"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 10,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 12,
+            "column": 3
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 34,
+            "column": 13
+          }
+        }
       ]
     }
   ],
@@ -646,5 +723,84 @@
       "lib/config.ts",
       "types/index.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_1o363mk8ees",
+      "file": "components/SettingsPanel.tsx",
+      "componentIds": [
+        "cmp_1o363mk8ees"
+      ],
+      "modules": [
+        "components/SettingsPanel.tsx",
+        "lib/api.ts",
+        "lib/config.ts"
+      ],
+      "packages": [],
+      "bytes": 1415,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/SettingsPanel.tsx",
+            "line": 9,
+            "column": 35
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/SettingsPanel.tsx",
+            "line": 11,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1t97i8o4yqd",
+      "file": "components/TodoPanel.tsx",
+      "componentIds": [
+        "cmp_1t97i8o4yqd"
+      ],
+      "modules": [
+        "components/TodoPanel.tsx",
+        "lib/api.ts",
+        "lib/config.ts"
+      ],
+      "packages": [],
+      "bytes": 2013,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 10,
+            "column": 29
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 12,
+            "column": 3
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "components/TodoPanel.tsx",
+            "line": 34,
+            "column": 13
+          }
+        }
+      ]
+    }
+  ]
 }

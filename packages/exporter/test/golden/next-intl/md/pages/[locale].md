@@ -25,6 +25,10 @@
 - On `notFound()`: Next's default 404 page
 - ⚠ no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout), `src/app/[locale]/layout.tsx:19`
 
+## Client boundaries
+
+Nothing runs in the browser: every component renders on the server.
+
 ## Component tree
 
 - [`HomePage`](../components/HomePage.md) · server

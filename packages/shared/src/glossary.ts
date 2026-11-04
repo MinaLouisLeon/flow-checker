@@ -9,6 +9,7 @@ import type {
   CacheEntry,
   CacheFlag,
   CacheRuntime,
+  ClientUse,
   Component,
   Flag,
   PageBoundary,
@@ -47,6 +48,7 @@ export type GlossaryGroupId =
   | 'access'
   | 'render'
   | 'boundary'
+  | 'client'
   | 'cache'
   | 'flow-status'
   | 'endpoint-status'
@@ -393,6 +395,63 @@ const BOUNDARY: GlossaryGroup<PageBoundary['kind'] | BoundaryGap['kind']> = {
   },
 }
 
+const CLIENT: GlossaryGroup<ClientUse['kind'] | 'boundary' | 'lower' | 'barrel' | 'bundle'> = {
+  id: 'client',
+  title: 'Client boundaries',
+  intro:
+    "Where a page's browser part starts, what it brings to the browser, and the code that needs the browser.",
+  entries: {
+    boundary: {
+      label: 'client boundary',
+      means:
+        "A server component (or the page, a layout) renders a component whose file starts with `'use client'`. That component and everything it renders and imports is sent to the browser.",
+    },
+    bundle: {
+      label: 'brings',
+      means:
+        'The components, project modules and packages a boundary sends to the browser, and the size of their source (before minifying, types and comments included, packages left out): an estimate to compare boundaries, not the size of the built files.',
+    },
+    barrel: {
+      label: 'through a barrel',
+      means:
+        "Imported from a file that re-exports it (`components/index.ts`). The boundary is the component's own file; in the browser, a barrel imports everything it re-exports.",
+    },
+    lower: {
+      label: 'could move lower',
+      means:
+        "Nothing in this file, or in what it imports, needs the browser, so it could render on the server and `'use client'` could go on the components below that do.",
+      todo: "Move `'use client'` into the files listed (or remove it when none are) and check the page still builds.",
+    },
+    hook: {
+      label: 'hook',
+      means:
+        "A hook a server component can't call (`useState`, `useEffect`, `useRef`, `useContext`, `usePathname`...), or a project hook that calls one. `use`, `useMemo`, `useCallback` and `useId` work on the server.",
+    },
+    event: {
+      label: 'event handler',
+      means: 'An `on*` handler on an HTML element (`onClick`, `onChange`): it runs in the browser.',
+    },
+    'function-prop': {
+      label: 'function prop',
+      means:
+        "A function handed to a component. A server component can't hand one to a client component (only a server action), so this one has to stay in the browser.",
+    },
+    'browser-api': {
+      label: 'browser API',
+      means:
+        "`window`, `document`, `localStorage` and the like, read while rendering: they don't exist on the server.",
+    },
+    'class-component': {
+      label: 'class component',
+      means: 'Class components only work as client components.',
+    },
+    context: {
+      label: 'context',
+      means: '`createContext()`: React contexts only work in client components.',
+    },
+  },
+}
+
 const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
@@ -619,6 +678,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   ACCESS,
   RENDER,
   BOUNDARY,
+  CLIENT,
   CACHE,
   FLOW_STATUS,
   ENDPOINT_STATUS,

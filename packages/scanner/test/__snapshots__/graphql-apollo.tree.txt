@@ -34,6 +34,11 @@ access: open
 render: static
 boundaries: (none)
 title: Apollo Client 4 fixture  (layout metadata)
+client: 4 boundaries, 5 components, 10 modules, 23 KB, packages @apollo/client, @graphql-typed-document-node/core, graphql
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  ViewerBadge  from HomePage (page)  src/app/page.tsx:9
+  TodoList  from HomePage (page)  src/app/page.tsx:10
+  AddTodoForm  from HomePage (page)  src/app/page.tsx:11
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -48,6 +53,9 @@ render: dynamic
 boundaries:
   suspense in component around TodoView src/components/TodoDetail.tsx:52
 title: Apollo Client 4 fixture  (layout metadata)
+client: 2 boundaries, 4 components, 8 modules, 22 KB, packages @apollo/client, @graphql-typed-document-node/core, graphql
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoDetail  from TodoPage (page)  src/app/todos/[id]/page.tsx:5
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -57,3 +65,73 @@ access: open
 render: static
 boundaries: (none)
 title: Apollo Client 4 fixture  (layout metadata)
+client: 2 boundaries, 2 components, 7 modules, 22 KB, packages @apollo/client, @graphql-typed-document-node/core, graphql
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  UserSearch  from UsersPage (page)  src/app/users/page.tsx:7
+
+# Client boundaries
+
+## Providers  src/app/providers.tsx
+components: Providers
+modules: 2, 0.7 KB
+  src/app/providers.tsx
+  src/lib/apollo.ts
+packages: @apollo/client
+uses: useState (hook) src/app/providers.tsx:8
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+components: AddTodoForm
+modules: 5, 20 KB
+  src/components/AddTodoForm.tsx
+  src/gql/fragment-masking.ts
+  src/gql/gql.ts
+  src/gql/graphql.ts
+  src/gql/index.ts
+packages: @apollo/client, @graphql-typed-document-node/core, graphql
+uses: useState (hook) src/components/AddTodoForm.tsx:18, useRouter (hook) src/components/AddTodoForm.tsx:19, useMutation (hook) src/components/AddTodoForm.tsx:20, onSubmit (event handler) src/components/AddTodoForm.tsx:31, onChange (event handler) src/components/AddTodoForm.tsx:32
+
+## TodoDetail  src/components/TodoDetail.tsx
+components: TodoDetail, ClientOnly, TodoView
+modules: 6, 21 KB
+  src/components/TodoDetail.tsx
+  src/components/ClientOnly.tsx
+  src/gql/fragment-masking.ts
+  src/gql/gql.ts
+  src/gql/graphql.ts
+  src/gql/index.ts
+packages: @apollo/client, @graphql-typed-document-node/core, graphql
+uses: useSuspenseQuery (hook) src/components/TodoDetail.tsx:33, useMutation (hook) src/components/TodoDetail.tsx:34, onClick (event handler) src/components/TodoDetail.tsx:42
+
+## TodoList  src/components/TodoList.tsx
+components: TodoList, TodoItem
+modules: 6, 21 KB
+  src/components/TodoList.tsx
+  src/components/TodoItem.tsx
+  src/gql/fragment-masking.ts
+  src/gql/gql.ts
+  src/gql/graphql.ts
+  src/gql/index.ts
+packages: @apollo/client, @graphql-typed-document-node/core, graphql
+uses: useState (hook) src/components/TodoList.tsx:18, useQuery (hook) src/components/TodoList.tsx:19, onChange (event handler) src/components/TodoList.tsx:25
+
+## UserSearch  src/components/UserSearch.tsx
+components: UserSearch
+modules: 5, 21 KB
+  src/components/UserSearch.tsx
+  src/gql/fragment-masking.ts
+  src/gql/gql.ts
+  src/gql/graphql.ts
+  src/gql/index.ts
+packages: @apollo/client, @graphql-typed-document-node/core, graphql
+uses: useState (hook) src/components/UserSearch.tsx:35, useApolloClient (hook) src/components/UserSearch.tsx:37, useLazyQuery (hook) src/components/UserSearch.tsx:38, onSubmit (event handler) src/components/UserSearch.tsx:52, onChange (event handler) src/components/UserSearch.tsx:53, onClick (event handler) src/components/UserSearch.tsx:65
+
+## ViewerBadge  src/components/ViewerBadge.tsx
+components: ViewerBadge
+modules: 5, 20 KB
+  src/components/ViewerBadge.tsx
+  src/gql/fragment-masking.ts
+  src/gql/gql.ts
+  src/gql/graphql.ts
+  src/gql/index.ts
+packages: @apollo/client, @graphql-typed-document-node/core, graphql
+uses: useQuery (hook) src/components/ViewerBadge.tsx:16

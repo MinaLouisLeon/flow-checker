@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -139,6 +139,13 @@
       },
       "metadata": {
         "sources": []
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -217,6 +224,26 @@
       },
       "metadata": {
         "sources": []
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0bpwse6tsg4",
+            "parentId": "cmp_1uzxf8sin17",
+            "in": "page",
+            "loc": {
+              "file": "src/app/[locale]/dashboard/page.tsx",
+              "line": 6,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 4,
+        "bytes": 2582,
+        "packages": [
+          "next-intl"
+        ]
       }
     },
     {
@@ -295,6 +322,26 @@
       },
       "metadata": {
         "sources": []
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0skl5lm1a9a",
+            "parentId": "cmp_01kdhdsgw4y",
+            "in": "page",
+            "loc": {
+              "file": "src/app/[locale]/login/page.tsx",
+              "line": 6,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 4,
+        "bytes": 2820,
+        "packages": [
+          "next-intl"
+        ]
       }
     },
     {
@@ -383,6 +430,26 @@
       },
       "metadata": {
         "sources": []
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_1hlwjtaw6e6",
+            "parentId": "cmp_2awb26rqgh7",
+            "in": "page",
+            "loc": {
+              "file": "src/app/[locale]/verify/page.tsx",
+              "line": 11,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 4,
+        "bytes": 2936,
+        "packages": [
+          "next-intl"
+        ]
       }
     }
   ],
@@ -639,6 +706,44 @@
       ],
       "usedTypes": [
         "typ_1tpxqokvkch"
+      ],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 12,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 13,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 15,
+            "column": 3
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 31,
+            "column": 29
+          }
+        }
       ]
     },
     {
@@ -653,7 +758,36 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 11,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 12,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        }
+      ]
     },
     {
       "id": "cmp_1hlwjtaw6e6",
@@ -688,7 +822,36 @@
           "typeId": "typ_1c9vagn0sce",
           "name": "VerifyOtpFormProps"
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 15,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 16,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -1433,5 +1596,154 @@
     "src/proxy.ts": [
       "src/i18n/routing.ts"
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_0bpwse6tsg4",
+      "file": "src/components/DashboardProfile.tsx",
+      "componentIds": [
+        "cmp_0bpwse6tsg4"
+      ],
+      "modules": [
+        "src/components/DashboardProfile.tsx",
+        "src/i18n/navigation.ts",
+        "src/i18n/routing.ts",
+        "src/lib/auth-api.ts"
+      ],
+      "packages": [
+        "next-intl"
+      ],
+      "bytes": 2582,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 12,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 13,
+            "column": 27
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useEffect",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 15,
+            "column": 3
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/DashboardProfile.tsx",
+            "line": 31,
+            "column": 29
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0skl5lm1a9a",
+      "file": "src/components/LoginForm.tsx",
+      "componentIds": [
+        "cmp_0skl5lm1a9a"
+      ],
+      "modules": [
+        "src/components/LoginForm.tsx",
+        "src/i18n/navigation.ts",
+        "src/i18n/routing.ts",
+        "src/lib/auth-api.ts"
+      ],
+      "packages": [
+        "next-intl"
+      ],
+      "bytes": 2820,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 11,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 12,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/LoginForm.tsx",
+            "line": 29,
+            "column": 11
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_1hlwjtaw6e6",
+      "file": "src/components/VerifyOtpForm.tsx",
+      "componentIds": [
+        "cmp_1hlwjtaw6e6"
+      ],
+      "modules": [
+        "src/components/VerifyOtpForm.tsx",
+        "src/i18n/navigation.ts",
+        "src/i18n/routing.ts",
+        "src/lib/auth-api.ts"
+      ],
+      "packages": [
+        "next-intl"
+      ],
+      "bytes": 2936,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useRouter",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 15,
+            "column": 18
+          }
+        },
+        {
+          "kind": "hook",
+          "name": "useState",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 16,
+            "column": 29
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onSubmit",
+          "loc": {
+            "file": "src/components/VerifyOtpForm.tsx",
+            "line": 36,
+            "column": 11
+          }
+        }
+      ]
+    }
+  ]
 }

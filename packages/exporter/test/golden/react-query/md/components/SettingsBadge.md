@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/SettingsBadge.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useApiQuery` (hook) |
+| Brings to the browser | 1 component · 5 modules · 2.9 KB, packages `@tanstack/react-query` |
 | Used on | [`/settings`](../pages/settings.md) |
 | Rendered by | [`SettingsPage`](SettingsPage.md) |
 

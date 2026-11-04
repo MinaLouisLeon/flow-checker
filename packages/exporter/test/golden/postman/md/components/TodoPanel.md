@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/TodoPanel.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useEffect` (hook), `onSubmit` (event handler) |
+| Brings to the browser | 1 component · 4 modules · 2.5 KB |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

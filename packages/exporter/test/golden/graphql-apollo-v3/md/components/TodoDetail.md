@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoDetail.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRouter` (hook), `useQuery` (hook), `useMutation` (hook), `onClick` (event handler) |
+| Brings to the browser | 1 component · 2 modules · 1.8 KB, packages `@apollo/client` |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`TodoPage`](TodoPage.md) |
 

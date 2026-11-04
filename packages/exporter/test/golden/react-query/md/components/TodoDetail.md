@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoDetail.tsx:13` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useSWR` (hook) |
+| Brings to the browser | 1 component · 2 modules · 2.4 KB, packages `@tanstack/react-query`, `swr` |
 | Used on | [`/todos/[id]`](../pages/todos.%5Bid%5D.md) |
 | Rendered by | [`TodoPage`](TodoPage.md) |
 | Renders | `Link` (`next/link`) |

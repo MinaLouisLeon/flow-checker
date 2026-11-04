@@ -17,6 +17,19 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+4 `'use client'` boundaries bring 4 components and 6 project modules (about 3.7 KB of source) to the browser, plus 1 package (`@apollo/client`).
+
+- [`Providers`](../components/Providers.md), rendered by `RootLayout` (layout): 1 component · 2 modules · 1.1 KB, `src/app/layout.tsx:10`
+  - packages: `@apollo/client`
+- [`ViewerBadge`](../components/ViewerBadge.md), rendered by `HomePage` (page): 1 component · 2 modules · 1.3 KB, `src/app/page.tsx:9`
+  - packages: `@apollo/client`
+- [`TodoList`](../components/TodoList.md), rendered by `HomePage` (page): 1 component · 2 modules · 1.5 KB, `src/app/page.tsx:10`
+  - packages: `@apollo/client`
+- [`AddTodoForm`](../components/AddTodoForm.md), rendered by `HomePage` (page): 1 component · 2 modules · 1.9 KB, `src/app/page.tsx:11`
+  - packages: `@apollo/client`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:4`

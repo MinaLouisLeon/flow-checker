@@ -34,6 +34,7 @@ access: open
 render: static
 boundaries: (none)
 title: caching-15 fixture  (layout metadata)
+client: (none)
 
 ## /products  app/products/page.tsx
 layouts: app/layout.tsx
@@ -43,6 +44,7 @@ render: ISR 5m
   ISR 5m: caches with `unstable_cache` (page)  app/products/page.tsx:9
 boundaries: (none)
 title: caching-15 fixture  (layout metadata)
+client: (none)
 
 ## /profile  app/(account)/profile/page.tsx
 layouts: app/layout.tsx > app/(account)/layout.tsx
@@ -52,6 +54,7 @@ render: ISR 1d
   ISR 1d: caches with `unstable_cache` (component)  lib/viewer.ts:7
 boundaries: (none)
 title: caching-15 fixture  (layout metadata)
+client: (none)
 
 ## /todos/[id]  app/todos/[id]/page.tsx
 layouts: app/layout.tsx
@@ -63,6 +66,7 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/todos.js:12
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/todos.js:12
 title: caching-15 fixture  (layout metadata)
+client: (none)
 
 # Server cache
 

@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `components/Ticker.tsx:10` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useState` (hook), `useEffect` (hook) |
+| Brings to the browser | 1 component · 2 modules · 1.4 KB |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

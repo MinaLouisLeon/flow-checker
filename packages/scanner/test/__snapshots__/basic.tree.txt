@@ -32,6 +32,7 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:14
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:14
 title: basic fixture  (layout metadata)
+client: (none)
 
 ## /about  app/(marketing)/about/page.tsx
 layouts: app/layout.tsx
@@ -40,6 +41,7 @@ access: open
 render: static
 boundaries: (none)
 title: basic fixture  (layout metadata)
+client: (none)
 
 ## /users/[id]  app/users/[id]/page.tsx
 layouts: app/layout.tsx
@@ -55,3 +57,26 @@ boundaries: (none)
   ! no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page)  lib/api.ts:20
   ! no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page)  lib/api.ts:20
 title: basic fixture  (layout metadata)
+client: 2 boundaries, 2 components, 4 modules, 2.5 KB, packages axios
+  ProfileCard  from UserPage (page)  app/users/[id]/page.tsx:13
+  DeleteUserButton  from UserPage (page)  app/users/[id]/page.tsx:14
+
+# Client boundaries
+
+## DeleteUserButton  components/DeleteUserButton.tsx
+components: DeleteUserButton
+modules: 3, 1.7 KB
+  components/DeleteUserButton.tsx
+  lib/api.ts
+  lib/config.ts
+packages: axios
+uses: useRouter (hook) components/DeleteUserButton.tsx:13, useState (hook) components/DeleteUserButton.tsx:14, onClick (event handler) components/DeleteUserButton.tsx:27
+
+## ProfileCard  components/ProfileCard.tsx
+components: ProfileCard
+modules: 3, 1.7 KB
+  components/ProfileCard.tsx
+  lib/api.ts
+  lib/config.ts
+packages: axios
+uses: useState (hook) components/ProfileCard.tsx:13, useEffect (hook) components/ProfileCard.tsx:15

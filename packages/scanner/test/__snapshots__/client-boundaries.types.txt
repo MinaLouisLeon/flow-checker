@@ -1,0 +1,29 @@
+# Types
+
+CartItem  type-alias  src/lib/cart-item.ts:10
+  { id: string; name: string; price: number; quantity: number }
+
+# Component types
+
+RootLayout  src/app/layout.tsx:9
+  props: { children: ReactNode }
+CartRow  src/components/cart-row.tsx:5
+  props: { item: unknown; onRemove: () => void }
+Cart  src/components/cart.tsx:8
+  props: { initial: CartItem[] }
+Chart  src/components/chart.tsx:5
+  props: { points: number[] }
+Counter  src/components/counter.tsx:5
+  props: { start: number }
+Heading  src/components/heading.tsx:1
+  props: { text: string }
+LikeButton  src/components/like-button.tsx:5
+  props: { postId: string }
+Menu  src/components/menu.tsx:3
+  props: { items: string[] }
+Price  src/components/price.tsx:3
+  props: { amount: number }
+Shell  src/components/shell.tsx:8
+  props: { title: string; children: ReactNode }
+Tabs  src/components/tabs.tsx:5
+  props: { tabs: string[]; onSelect: (tab: string) => void }

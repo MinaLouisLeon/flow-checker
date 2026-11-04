@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoList.tsx:7` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useLazyLoadQuery` (hook) |
+| Brings to the browser | 2 components · 2 modules · 1.0 KB, packages `react-relay` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 | Renders | [`TodoItem`](TodoItem.md) |

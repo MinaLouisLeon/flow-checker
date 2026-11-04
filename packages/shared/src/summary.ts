@@ -575,6 +575,7 @@ const NOTE_ORDER: NoteKind[] = [
   'missing-page-component',
   'boundary',
   'request',
+  'client',
   'middleware',
   'unresolved-component',
   'unresolved-type',
@@ -587,6 +588,7 @@ const NOTE_LABEL: Record<NoteKind, string> = {
   request: 'Request',
   middleware: 'Middleware',
   boundary: 'Boundary',
+  client: 'Client',
   'unresolved-component': 'Component',
   'unresolved-type': 'Type',
 }

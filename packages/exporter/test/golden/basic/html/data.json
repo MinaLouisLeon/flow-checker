@@ -4,7 +4,7 @@
   "toolVersion": "0.0.0-test",
   "projectName": "basic",
   "model": {
-    "version": 15,
+    "version": 16,
     "project": {
       "appDir": "app",
       "tsconfig": "tsconfig.json",
@@ -166,6 +166,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       },
       {
@@ -223,6 +230,13 @@
               }
             }
           ]
+        },
+        "client": {
+          "boundaries": [],
+          "components": 0,
+          "modules": 0,
+          "bytes": 0,
+          "packages": []
         }
       },
       {
@@ -335,6 +349,36 @@
                 "column": 14
               }
             }
+          ]
+        },
+        "client": {
+          "boundaries": [
+            {
+              "componentId": "cmp_256fhhuhol5",
+              "parentId": "cmp_0vmo84pmvzo",
+              "in": "page",
+              "loc": {
+                "file": "app/users/[id]/page.tsx",
+                "line": 13,
+                "column": 7
+              }
+            },
+            {
+              "componentId": "cmp_0yr9r67zb7l",
+              "parentId": "cmp_0vmo84pmvzo",
+              "in": "page",
+              "loc": {
+                "file": "app/users/[id]/page.tsx",
+                "line": 14,
+                "column": 7
+              }
+            }
+          ],
+          "components": 2,
+          "modules": 4,
+          "bytes": 2521,
+          "packages": [
+            "axios"
           ]
         }
       }
@@ -507,7 +551,36 @@
             "typeId": "typ_0ywmxvblq29",
             "name": "DeleteUserButtonProps"
           }
-        }
+        },
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useRouter",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 13,
+              "column": 18
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 14,
+              "column": 29
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 27,
+              "column": 29
+            }
+          }
+        ]
       },
       {
         "id": "cmp_256fhhuhol5",
@@ -531,7 +604,27 @@
             "typeId": "typ_12vhl9gsqi3",
             "name": "ProfileCardProps"
           }
-        }
+        },
+        "clientUses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/ProfileCard.tsx",
+              "line": 13,
+              "column": 29
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useEffect",
+            "loc": {
+              "file": "components/ProfileCard.tsx",
+              "line": 15,
+              "column": 3
+            }
+          }
+        ]
       },
       {
         "id": "cmp_1i8zxr0i8pg",
@@ -1145,7 +1238,90 @@
         "lib/config.ts",
         "types/user.ts"
       ]
-    }
+    },
+    "clientBoundaries": [
+      {
+        "componentId": "cmp_0yr9r67zb7l",
+        "file": "components/DeleteUserButton.tsx",
+        "componentIds": [
+          "cmp_0yr9r67zb7l"
+        ],
+        "modules": [
+          "components/DeleteUserButton.tsx",
+          "lib/api.ts",
+          "lib/config.ts"
+        ],
+        "packages": [
+          "axios"
+        ],
+        "bytes": 1777,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useRouter",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 13,
+              "column": 18
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 14,
+              "column": 29
+            }
+          },
+          {
+            "kind": "event",
+            "name": "onClick",
+            "loc": {
+              "file": "components/DeleteUserButton.tsx",
+              "line": 27,
+              "column": 29
+            }
+          }
+        ]
+      },
+      {
+        "componentId": "cmp_256fhhuhol5",
+        "file": "components/ProfileCard.tsx",
+        "componentIds": [
+          "cmp_256fhhuhol5"
+        ],
+        "modules": [
+          "components/ProfileCard.tsx",
+          "lib/api.ts",
+          "lib/config.ts"
+        ],
+        "packages": [
+          "axios"
+        ],
+        "bytes": 1766,
+        "uses": [
+          {
+            "kind": "hook",
+            "name": "useState",
+            "loc": {
+              "file": "components/ProfileCard.tsx",
+              "line": 13,
+              "column": 29
+            }
+          },
+          {
+            "kind": "hook",
+            "name": "useEffect",
+            "loc": {
+              "file": "components/ProfileCard.tsx",
+              "line": 15,
+              "column": 3
+            }
+          }
+        ]
+      }
+    ]
   },
   "verification": {
     "sites": {

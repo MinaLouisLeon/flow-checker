@@ -25,6 +25,12 @@
 - ⚠ no loading state: waits for a request (`fetch`) with no `loading` file or `<Suspense>` to show meanwhile (page), `lib/api.ts:12`
 - ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `lib/api.ts:12`
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 3 project modules (about 1.6 KB of source) to the browser.
+
+- [`DeleteUserButton`](../components/DeleteUserButton.md), rendered by `UserPage` (page): 1 component · 3 modules · 1.6 KB, `app/users/[id]/page.tsx:14`
+
 ## Metadata
 
 - layout `metadata`: title, `app/layout.tsx:3`

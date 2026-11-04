@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/UserList.tsx:5` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQuery` (hook) |
+| Brings to the browser | 1 component · 2 modules · 0.6 KB, packages `@trpc/client`, `@trpc/react-query` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

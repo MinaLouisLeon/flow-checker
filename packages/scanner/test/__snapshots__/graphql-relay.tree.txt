@@ -36,6 +36,11 @@ render: static
 boundaries:
   suspense in page around TodoList src/app/page.tsx:11
 title: Relay fixture  (layout metadata)
+client: 4 boundaries, 5 components, 6 modules, 3.3 KB, packages react-relay, relay-runtime
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  ClientOnly  from HomePage (page)  src/app/page.tsx:10
+  TodoList  from HomePage (page)  src/app/page.tsx:12
+  AddTodoForm  from HomePage (page)  src/app/page.tsx:15
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -49,6 +54,9 @@ render: dynamic
 boundaries:
   suspense in component around TodoDetail src/components/TodoPage.tsx:15
 title: Relay fixture  (layout metadata)
+client: 2 boundaries, 3 components, 4 modules, 2.8 KB, packages react-relay, relay-runtime
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  TodoPage  from Page (page)  src/app/todos/[id]/page.tsx:5
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -58,3 +66,52 @@ access: open
 render: static
 boundaries: (none)
 title: Relay fixture  (layout metadata)
+client: 2 boundaries, 2 components, 3 modules, 1.8 KB, packages react-relay, relay-runtime
+  Providers  from RootLayout (layout)  src/app/layout.tsx:10
+  UserList  from UsersPage (page)  src/app/users/page.tsx:7
+
+# Client boundaries
+
+## Providers  src/app/providers.tsx
+components: Providers
+modules: 2, 0.9 KB
+  src/app/providers.tsx
+  src/relay/environment.ts
+packages: react-relay, relay-runtime
+uses: (none)
+
+## AddTodoForm  src/components/AddTodoForm.tsx
+components: AddTodoForm
+modules: 1, 0.9 KB
+  src/components/AddTodoForm.tsx
+packages: react-relay
+uses: useState (hook) src/components/AddTodoForm.tsx:9, useRouter (hook) src/components/AddTodoForm.tsx:10, useMutation (hook) src/components/AddTodoForm.tsx:11, onSubmit (event handler) src/components/AddTodoForm.tsx:29, onChange (event handler) src/components/AddTodoForm.tsx:30
+
+## ClientOnly  src/components/ClientOnly.tsx
+components: ClientOnly
+modules: 1, 0.4 KB
+  src/components/ClientOnly.tsx
+uses: useSyncExternalStore (hook) src/components/ClientOnly.tsx:9
+
+## TodoList  src/components/TodoList.tsx
+components: TodoList, TodoItem
+modules: 2, 1.0 KB
+  src/components/TodoList.tsx
+  src/components/TodoItem.tsx
+packages: react-relay
+uses: useLazyLoadQuery (hook) src/components/TodoList.tsx:8
+
+## TodoPage  src/components/TodoPage.tsx
+components: TodoPage, TodoDetail
+modules: 2, 1.9 KB
+  src/components/TodoPage.tsx
+  src/components/TodoDetail.tsx
+packages: react-relay
+uses: useQueryLoader (hook) src/components/TodoPage.tsx:9, useEffect (hook) src/components/TodoPage.tsx:11
+
+## UserList  src/components/UserList.tsx
+components: UserList
+modules: 1, 0.9 KB
+  src/components/UserList.tsx
+packages: react-relay
+uses: useRelayEnvironment (hook) src/components/UserList.tsx:8, useState (hook) src/components/UserList.tsx:9, onClick (event handler) src/components/UserList.tsx:30

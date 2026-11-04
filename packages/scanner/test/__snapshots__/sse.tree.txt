@@ -35,6 +35,8 @@ access: open
 render: static
 boundaries: (none)
 title: SSE fixture  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 1.1 KB
+  Clock  from HomePage (page)  app/page.tsx:8
 
 ## /chat  app/chat/page.tsx
 layouts: app/layout.tsx
@@ -44,6 +46,8 @@ access: open
 render: static
 boundaries: (none)
 title: SSE fixture  (layout metadata)
+client: 1 boundary, 1 component, 2 modules, 1.9 KB
+  Chat  from ChatPage (page)  app/chat/page.tsx:7
 
 ## /jobs/[id]  app/jobs/[id]/page.tsx
 layouts: app/layout.tsx
@@ -54,3 +58,26 @@ render: dynamic
   dynamic: has the dynamic segment `[id]` and no `generateStaticParams` (page)
 boundaries: (none)
 title: SSE fixture  (layout metadata)
+client: 1 boundary, 1 component, 1 module, 0.9 KB
+  JobProgress  from JobPage (page)  app/jobs/[id]/page.tsx:8
+
+# Client boundaries
+
+## Chat  components/Chat.tsx
+components: Chat
+modules: 2, 1.9 KB
+  components/Chat.tsx
+  lib/chat.ts
+uses: useState (hook) components/Chat.tsx:8, onSubmit (event handler) components/Chat.tsx:19, onChange (event handler) components/Chat.tsx:20
+
+## Clock  components/Clock.tsx
+components: Clock
+modules: 1, 1.1 KB
+  components/Clock.tsx
+uses: useState (hook) components/Clock.tsx:8, useEffect (hook) components/Clock.tsx:11
+
+## JobProgress  components/JobProgress.tsx
+components: JobProgress
+modules: 1, 0.9 KB
+  components/JobProgress.tsx
+uses: useState (hook) components/JobProgress.tsx:8, onClick (event handler) components/JobProgress.tsx:27

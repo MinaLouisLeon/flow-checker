@@ -1,5 +1,6 @@
 // Lookup tables and derived facts the dashboard screens and the exporter need, built once per model.
 import { GAP_LABELS, gapText } from './boundaries'
+import { lowerText } from './client'
 import { isInfoFlag, urlText } from './format-requests'
 import type {
   AppModel,
@@ -43,6 +44,7 @@ export type NoteKind =
   | 'request'
   | 'middleware'
   | 'boundary'
+  | 'client'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -437,6 +439,26 @@ function scanNotes(model: AppModel): ScanNote[] {
   }
   for (const { note, pages } of gapNotes.values()) {
     notes.push(pages > 1 ? { ...note, message: `${note.message} (on ${pages} pages)` } : note)
+  }
+  // Client boundaries that could move lower (M43): one note per boundary, with the pages it is on.
+  if (model.clientBoundaries?.some((b) => b.lower)) {
+    const names = new Map(model.components.map((c) => [c.id, c]))
+    const name = (id: string) => names.get(id)?.name ?? '?'
+    for (const boundary of model.clientBoundaries) {
+      if (!boundary.lower) continue
+      const pages = model.routes.filter((r) =>
+        r.client?.boundaries.some((e) => e.componentId === boundary.componentId),
+      )
+      const component = names.get(boundary.componentId)
+      notes.push({
+        kind: 'client',
+        message: `\`${name(boundary.componentId)}\`: ${lowerText(boundary, name)}${pages.length > 1 ? ` (on ${pages.length} pages)` : ''}`,
+        file: boundary.file,
+        ...(component ? { line: component.loc.line, column: component.loc.column } : {}),
+        componentId: boundary.componentId,
+        ...(pages[0] ? { routeId: pages[0].id } : {}),
+      })
+    }
   }
   const mw = model.middleware
   if (mw?.matcherText !== undefined) {

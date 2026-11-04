@@ -21,6 +21,12 @@
 - On an error: Next's default error page
 - On `notFound()`: Next's default 404 page
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 1 project module (about 0.7 KB of source) to the browser.
+
+- [`ProductPage`](../components/ProductPage.md), the page itself: 1 component · 1 module · 0.7 KB, `src/app/products/[id]/page.tsx:8`
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:3`

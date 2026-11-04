@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/CreateProductForm.tsx:8` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRouter` (hook), `useState` (hook), `onSubmit` (event handler) |
+| Brings to the browser | 1 component · 1 module · 1.6 KB |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 

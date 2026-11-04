@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/VerifyOtpForm.tsx:13` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useRouter` (hook), `useState` (hook), `onSubmit` (event handler) |
+| Brings to the browser | 1 component · 4 modules · 2.9 KB, packages `next-intl` |
 | Used on | [`/[locale]/verify`](../pages/%5Blocale%5D.verify.md) |
 | Rendered by | [`VerifyPage`](VerifyPage.md) |
 | Renders | `Link` (`@/i18n/navigation`) |

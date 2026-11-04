@@ -1,3 +1,4 @@
+import { UseList } from '../ClientView'
 import { useData } from '../context'
 import { useShowDetails } from '../details'
 import { RequestList } from '../RequestView'
@@ -51,6 +52,14 @@ export function ComponentPanel({
             <li key={`${n.file}:${n.line}:${n.message}`}>⚠ {n.message}</li>
           ))}
         </ul>
+      )}
+
+      {component.clientUses && component.clientUses.length > 0 && (
+        <Section title="Needs the browser for">
+          <p className="muted client-uses">
+            <UseList uses={component.clientUses} />
+          </p>
+        </Section>
       )}
 
       <Section title="Props">

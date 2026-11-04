@@ -6,6 +6,8 @@
 | --- | --- |
 | File | `src/components/TodoList.tsx:6` |
 | Kind | client (`'use client'`) |
+| Needs the browser for | `useQuery` (hook) |
+| Brings to the browser | 1 component · 2 modules · 0.7 KB, packages `@trpc/client`, `@trpc/react-query` |
 | Used on | [`/`](../pages/index.md) |
 | Rendered by | [`HomePage`](HomePage.md) |
 | Renders | `Link` (`next/link`) |

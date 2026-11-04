@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -118,6 +118,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -219,6 +226,26 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_0jz34mtqlno",
+            "parentId": "cmp_115a9noj763",
+            "in": "page",
+            "loc": {
+              "file": "src/app/products/page.tsx",
+              "line": 17,
+              "column": 13
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 3,
+        "bytes": 2595,
+        "packages": [
+          "server-only"
         ]
       }
     },
@@ -358,6 +385,13 @@
             }
           }
         ]
+      },
+      "client": {
+        "boundaries": [],
+        "components": 0,
+        "modules": 0,
+        "bytes": 0,
+        "packages": []
       }
     },
     {
@@ -414,6 +448,26 @@
               "column": 14
             }
           }
+        ]
+      },
+      "client": {
+        "boundaries": [
+          {
+            "componentId": "cmp_014pegw9zf7",
+            "parentId": "cmp_1s7kl9nj8so",
+            "in": "page",
+            "loc": {
+              "file": "src/app/products/new/page.tsx",
+              "line": 7,
+              "column": 7
+            }
+          }
+        ],
+        "components": 1,
+        "modules": 3,
+        "bytes": 3183,
+        "packages": [
+          "server-only"
         ]
       }
     }
@@ -591,7 +645,18 @@
       "kind": "client",
       "clientBoundary": true,
       "children": [],
-      "usedTypes": []
+      "usedTypes": [],
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useActionState",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 11,
+            "column": 40
+          }
+        }
+      ]
     },
     {
       "id": "cmp_0jz34mtqlno",
@@ -620,7 +685,27 @@
             }
           ]
         }
-      }
+      },
+      "clientUses": [
+        {
+          "kind": "hook",
+          "name": "useTransition",
+          "loc": {
+            "file": "src/components/DeleteProductButton.tsx",
+            "line": 8,
+            "column": 38
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/DeleteProductButton.tsx",
+            "line": 11,
+            "column": 46
+          }
+        }
+      ]
     }
   ],
   "types": [
@@ -1412,5 +1497,70 @@
         "flags": []
       }
     ]
-  }
+  },
+  "clientBoundaries": [
+    {
+      "componentId": "cmp_014pegw9zf7",
+      "file": "src/components/CreateProductForm.tsx",
+      "componentIds": [
+        "cmp_014pegw9zf7"
+      ],
+      "modules": [
+        "src/components/CreateProductForm.tsx",
+        "src/actions/products.ts",
+        "src/lib/backend.ts"
+      ],
+      "packages": [
+        "server-only"
+      ],
+      "bytes": 3183,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useActionState",
+          "loc": {
+            "file": "src/components/CreateProductForm.tsx",
+            "line": 11,
+            "column": 40
+          }
+        }
+      ]
+    },
+    {
+      "componentId": "cmp_0jz34mtqlno",
+      "file": "src/components/DeleteProductButton.tsx",
+      "componentIds": [
+        "cmp_0jz34mtqlno"
+      ],
+      "modules": [
+        "src/components/DeleteProductButton.tsx",
+        "src/actions/products.ts",
+        "src/lib/backend.ts"
+      ],
+      "packages": [
+        "server-only"
+      ],
+      "bytes": 2595,
+      "uses": [
+        {
+          "kind": "hook",
+          "name": "useTransition",
+          "loc": {
+            "file": "src/components/DeleteProductButton.tsx",
+            "line": 8,
+            "column": 38
+          }
+        },
+        {
+          "kind": "event",
+          "name": "onClick",
+          "loc": {
+            "file": "src/components/DeleteProductButton.tsx",
+            "line": 11,
+            "column": 46
+          }
+        }
+      ]
+    }
+  ]
 }

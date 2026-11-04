@@ -30,6 +30,10 @@
 - ⚠ no error boundary: fetches on the server (`fetch`), and no `error` file, error boundary or `global-error` catches a failure (page), `src/lib/backend.ts:12`
 - ⚠ no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (page), `src/app/products/[id]/page.tsx:10`
 
+## Client boundaries
+
+Nothing runs in the browser: every component renders on the server.
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:3`

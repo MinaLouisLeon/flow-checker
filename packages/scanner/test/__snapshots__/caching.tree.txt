@@ -42,6 +42,7 @@ render: ISR 15m
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
 boundaries: (none)
 title: caching fixture  (layout metadata)
+client: (none)
 
 ## /products  src/app/products/page.tsx
 layouts: src/app/layout.tsx
@@ -55,6 +56,7 @@ render: ISR 5m
 boundaries:
   suspense in page around ProductList src/app/products/page.tsx:21
 title: caching fixture  (layout metadata)
+client: (none)
 
 ## /settings  src/app/settings/page.tsx
 layouts: src/app/layout.tsx
@@ -65,6 +67,7 @@ render: ISR 15m
   ISR 15m: caches with `use cache` (component)  src/components/site-header.tsx:5
 boundaries: (none)
 title: caching fixture  (layout metadata)
+client: (none)
 
 ## /todos/[id]  src/app/todos/[id]/page.tsx
 layouts: src/app/layout.tsx
@@ -79,6 +82,7 @@ render: partial
 boundaries:
   suspense in page around TodoDetail src/app/todos/[id]/page.tsx:20
 title: caching fixture  (layout metadata)
+client: (none)
 
 ## /users  src/app/users/page.tsx
 layouts: src/app/layout.tsx
@@ -92,6 +96,7 @@ render: ISR 1m
 boundaries:
   suspense in page around UserList src/app/users/page.tsx:20
 title: caching fixture  (layout metadata)
+client: (none)
 
 # Server cache
 

@@ -27,6 +27,13 @@
 - On `notFound()`: Next's default 404 page
 - ⚠ no not-found page: calls `notFound()` with no `not-found` file above it, so Next shows its default page (layout), `src/app/[locale]/layout.tsx:19`
 
+## Client boundaries
+
+1 `'use client'` boundary brings 1 component and 4 project modules (about 2.9 KB of source) to the browser, plus 1 package (`next-intl`).
+
+- [`VerifyOtpForm`](../components/VerifyOtpForm.md), rendered by `VerifyPage` (page): 1 component · 4 modules · 2.9 KB, `src/app/[locale]/verify/page.tsx:11`
+  - packages: `next-intl`
+
 ## Component tree
 
 - [`VerifyPage`](../components/VerifyPage.md) · server
