@@ -29,6 +29,12 @@ Names only ([all](../env.md)).
 
 - `API_URL` (server): not defined, `src/lib/backend.ts:4`
 
+## Server actions
+
+Each one is a public `POST` endpoint ([all](../actions.md)).
+
+- `createProduct` (`src/actions/products.ts:9`): [no auth check](../GLOSSARY.md#action-auth-none), [input checked](../GLOSSARY.md#action-input-checked); changes data through a request
+
 ## Metadata
 
 - layout `metadata`: title, `src/app/layout.tsx:3`

@@ -117,3 +117,4 @@ re-run them on their own before assuming a regression.
 | M43 | Client boundaries                                 | Done   |
 | M44 | Server/client leaks                               | Done   |
 | M45 | Environment variables                             | Done   |
+| M46 | Server action safety                              | Done   |

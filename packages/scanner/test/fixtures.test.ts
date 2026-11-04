@@ -36,6 +36,7 @@ const FIXTURES = [
   'client-boundaries',
   'leaks',
   'env',
+  'action-safety',
 ] as const
 const fixturesDir = resolve(import.meta.dirname, '../../../fixtures')
 
@@ -483,5 +484,58 @@ describe('environment variables (M45)', () => {
     const text = `${JSON.stringify(model)}\n${formatModel(model)}`
     expect(text).not.toContain('fixture-value-')
     expect(text).not.toContain('localhost:4010')
+  })
+})
+
+describe('server action safety (M46)', () => {
+  beforeAll(() => {
+    for (const fixture of FIXTURES) scan(fixture)
+  }, 120_000)
+
+  it('labels every action of the action-safety fixture as planted', () => {
+    const label = (a: NonNullable<AppModel['actions']>[number]) =>
+      `${a.name} ${a.defined}${a.wrappedIn ? ` in ${a.wrappedIn.name}` : ''}: ${a.auth.status} / ${a.input.status}${a.unused ? ' unused' : ''}${a.flags?.length ? ' [unprotected]' : ''}`
+    expect(scan('action-safety').actions?.map(label)).toEqual([
+      'banUser file in withAdmin: checked / checked',
+      'resetLikes file in action: none / no-input [unprotected]',
+      'createPost file: checked / checked',
+      'deletePost file: none / none [unprotected]',
+      'renamePost file: checked / checked',
+      'likePost file: none / checked',
+      'searchPosts file: none / none',
+      // `next build` leaves it out of `server-reference-manifest.json`.
+      'purgePosts file: none / no-input unused',
+      'addPost inline: none / checked',
+      'clearDrafts inline: none / no-input [unprotected]',
+    ])
+  })
+
+  it('flags the planted actions and the real ones on other fixtures, nothing else', () => {
+    const found = FIXTURES.flatMap((fixture) =>
+      (scan(fixture).actions ?? [])
+        .filter((a) => a.flags?.length)
+        .map((a) => `${fixture} ${a.name} ${a.loc.file}:${a.loc.line}`),
+    )
+    expect(found).toEqual([
+      // Demo actions with no auth check that send their input as it came.
+      'server-actions deleteProduct src/actions/products.ts:30',
+      'caching createTodo src/app/actions.ts:6',
+      'caching toggleTodo src/app/actions.ts:16',
+      'caching-15 createTodo app/actions.ts:7',
+      'caching-15 toggleTodo app/actions.ts:17',
+      'leaks archiveOrder src/actions/orders.ts:7',
+      'action-safety resetLikes src/actions/admin.ts:16',
+      'action-safety deletePost src/actions/posts.ts:25',
+      'action-safety clearDrafts src/app/page.tsx:20',
+    ])
+  })
+
+  it('links every used action to the pages that call it', () => {
+    for (const fixture of FIXTURES) {
+      for (const action of scan(fixture).actions ?? []) {
+        if (action.unused) expect(action.routeIds, `${fixture} ${action.name}`).toEqual([])
+        else expect(action.routeIds.length, `${fixture} ${action.name}`).toBeGreaterThan(0)
+      }
+    }
   })
 })

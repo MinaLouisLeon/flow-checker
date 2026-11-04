@@ -87,10 +87,10 @@ describe('buildIndex on fixtures', () => {
   })
 
   it('has no scan notes for the clean fixtures', () => {
-    // Boundary gaps (M41) are about the app, not what the scan could read.
+    // Boundary gaps (M41) and open server actions (M46) are about the app, not what the scan could read.
     for (const name of ['basic', 'bff', 'next-intl', 'react-query', 'server-actions']) {
       expect(
-        buildIndex(fixture(name)).notes.filter((n) => n.kind !== 'boundary'),
+        buildIndex(fixture(name)).notes.filter((n) => n.kind !== 'boundary' && n.kind !== 'action'),
         name,
       ).toEqual([])
     }

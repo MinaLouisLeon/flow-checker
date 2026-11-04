@@ -1,6 +1,10 @@
 // M34: every status, flag kind, trigger kind and transport has a plain explanation.
 import { describe, expect, it } from 'vitest'
 import {
+  ActionAuthSchema,
+  ActionChangeSchema,
+  ActionFlagKindSchema,
+  ActionInputSchema,
   BoundaryGapSchema,
   CacheEntrySchema,
   CacheFlagSchema,
@@ -51,6 +55,10 @@ const COVERED: [GlossaryGroupId, readonly string[]][] = [
   ['env', EnvSideSchema.options],
   ['env', EnvFlagKindSchema.options],
   ['env', EnvAccessSchema.options],
+  ['action', ActionAuthSchema.shape.status.options.map((s) => `auth-${s}`)],
+  ['action', ActionInputSchema.shape.status.options.map((s) => `input-${s}`)],
+  ['action', ActionChangeSchema.shape.kind.options.map((k) => `change-${k}`)],
+  ['action', ActionFlagKindSchema.options],
 ]
 
 describe('glossary', () => {

@@ -1,5 +1,5 @@
 {
-  "version": 18,
+  "version": 19,
   "project": {
     "appDir": "src/app",
     "tsconfig": "tsconfig.json",
@@ -1669,5 +1669,136 @@
       }
     ],
     "unknown": []
-  }
+  },
+  "actions": [
+    {
+      "id": "sa_1u4zx1o3ycz",
+      "name": "createProduct",
+      "loc": {
+        "file": "src/actions/products.ts",
+        "line": 9,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_07o63rveyo8"
+      ],
+      "routeIds": [
+        "rt_0pq5p0nm2h4"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "checked",
+        "params": [
+          {
+            "name": "formData",
+            "checked": true
+          }
+        ],
+        "checks": [
+          {
+            "kind": "manual",
+            "text": "Object.keys(fieldErrors).length > 0",
+            "params": [
+              "formData"
+            ],
+            "loc": {
+              "file": "src/actions/products.ts",
+              "line": 17,
+              "column": 7
+            }
+          }
+        ]
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch POST",
+          "via": [
+            "insertProduct"
+          ],
+          "loc": {
+            "file": "src/lib/backend.ts",
+            "line": 17,
+            "column": 21
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/products.ts",
+            "line": 25,
+            "column": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "sa_0y61g4s8lht",
+      "name": "deleteProduct",
+      "loc": {
+        "file": "src/actions/products.ts",
+        "line": 30,
+        "column": 23
+      },
+      "defined": "file",
+      "siteIds": [
+        "req_0b08g87h2vb"
+      ],
+      "routeIds": [
+        "rt_0te2vdgan2u"
+      ],
+      "auth": {
+        "status": "none",
+        "checks": []
+      },
+      "input": {
+        "status": "none",
+        "params": [
+          {
+            "name": "id",
+            "checked": false
+          }
+        ],
+        "checks": []
+      },
+      "changes": [
+        {
+          "kind": "request",
+          "text": "fetch DELETE",
+          "via": [
+            "removeProduct"
+          ],
+          "loc": {
+            "file": "src/lib/backend.ts",
+            "line": 27,
+            "column": 9
+          }
+        },
+        {
+          "kind": "cache",
+          "text": "revalidatePath",
+          "loc": {
+            "file": "src/actions/products.ts",
+            "line": 32,
+            "column": 3
+          }
+        }
+      ],
+      "flags": [
+        {
+          "kind": "unprotected",
+          "loc": {
+            "file": "src/actions/products.ts",
+            "line": 30,
+            "column": 23
+          }
+        }
+      ]
+    }
+  ]
 }

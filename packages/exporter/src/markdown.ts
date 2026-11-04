@@ -14,10 +14,18 @@
 //   cache.md             server cache: tags, cached data, revalidation calls and what they refresh (M39)
 // Pure: the same snapshot always gives the same files, so fixtures can be compared with golden files.
 import {
+  ACTION_AUTH_LABELS,
+  ACTION_CHANGE_LABELS,
+  ACTION_FLAG_LABELS,
+  ACTION_INPUT_LABELS,
   type AppModel,
   type Area,
   type AreaList,
   accessOf,
+  actionFlagText,
+  actionsOf,
+  actionsOn,
+  authText,
   boundaryText,
   buildAreas,
   buildEndpoints,
@@ -34,6 +42,8 @@ import {
   cacheLifeText,
   cacheRuntimeText,
   cacheTags,
+  changesText,
+  changeText,
   clientBoundaryOf,
   clientSummary,
   clientUseText,
@@ -59,6 +69,7 @@ import {
   type Flow,
   type FlowStatus,
   type FlowStep,
+  flaggedActions,
   formatQueryKey,
   GLOSSARY,
   type GraphqlInfo,
@@ -66,6 +77,7 @@ import {
   gapLine,
   guardText,
   hasSource,
+  inputText,
   invalidationText,
   invalidationWhere,
   isBuildError,
@@ -100,6 +112,7 @@ import {
   renderReasonLine,
   requestLabel,
   type ScanNote,
+  type ServerAction,
   type SiteTypeCheck,
   type SseEndpoint,
   type SummaryLink,
@@ -117,6 +130,7 @@ import {
 } from '@flow-checker/shared'
 import { anchor, anchorId, block, code, doc, facts, link, mermaid, plural, table, text, time } from './md'
 import {
+  ACTIONS,
   AREAS,
   CACHE,
   type DocNames,
@@ -210,6 +224,7 @@ export function renderMarkdown(data: ExportData): ExportFiles {
   if (model.graphql) files[GRAPHQL] = graphqlDoc(ctx, model.graphql)
   if (model.cache) files[CACHE] = cacheDoc(ctx)
   if (model.env) files[ENV] = envDoc(ctx)
+  if (model.actions?.length) files[ACTIONS] = actionsDoc(ctx)
   files[ENDPOINTS] = endpointsDoc(ctx)
   files[AREAS] = areasDoc(ctx)
   files[TYPES] = typesDoc(ctx)
@@ -436,6 +451,13 @@ function readme(ctx: Ctx): string {
     sections.push(
       '## Environment variables',
       `${link(`${plural(read, 'name')} read, ${plural(env.files.length, `${code('.env')} file`)}`, from, ENV)}${toCheck > 0 ? `, ${plural(toCheck, 'note')} to check` : ''}.`,
+    )
+  }
+  if (model.actions?.length) {
+    const flagged = flaggedActions(model).length
+    sections.push(
+      '## Server actions',
+      `${link(plural(model.actions.length, 'server action'), from, ACTIONS)}${flagged > 0 ? `, ${plural(flagged, 'note')} to check` : ''}.`,
     )
   }
   if (handlers.length > 0) {
@@ -704,6 +726,7 @@ function pageDoc(ctx: Ctx, route: Route, from: string): string {
     ...clientSection(ctx, route, from),
     ...leakSection(ctx, route),
     ...envSection(ctx, route, from),
+    ...actionSection(ctx, route, from),
     ...cacheSection(ctx, route, from),
     ...metadataSection(route),
     '## Component tree',
@@ -873,6 +896,65 @@ function cacheRuntimeLabel(e: CacheEntry): string {
 
 function invalidationLine(ctx: Ctx, i: CacheInvalidation): string {
   return `${code(invalidationText(i))} in ${codeText(invalidationWhere(i, ctx.model.routes))}, ${code(`${i.loc.file}:${i.loc.line}`)}`
+}
+
+/** The server actions the page uses, with their labels (M46). */
+function actionSection(ctx: Ctx, route: Route, from: string): string[] {
+  const actions = actionsOn(ctx.index.model, route.id)
+  if (actions.length === 0) return []
+  const lines = actions.map((a) => actionLine(a, from))
+  return [
+    '## Server actions',
+    [`Each one is a public ${code('POST')} endpoint (${link('all', from, ACTIONS)}).`, '', ...lines].join(
+      '\n',
+    ),
+  ]
+}
+
+function actionLine(a: ServerAction, from: string): string {
+  const term = (key: string, label: string) => link(label, from, GLOSSARY_DOC, termId('action', key))
+  const badges = [
+    ...(a.flags ?? []).map((f) => `⚠ **${term(f.kind, ACTION_FLAG_LABELS[f.kind])}**`),
+    term(`auth-${a.auth.status}`, ACTION_AUTH_LABELS[a.auth.status]),
+    term(`input-${a.input.status}`, ACTION_INPUT_LABELS[a.input.status]),
+    ...(a.unused ? [term('unused', 'unused')] : []),
+  ].join(', ')
+  const head = `- ${code(a.name)} (${code(`${a.loc.file}:${a.loc.line}`)}): ${badges}; ${changesText(a)}`
+  return [head, ...(a.flags?.length ? [`  - ${actionFlagText(a)}`] : [])].join('\n')
+}
+
+/** Every server action with its auth check, input check and what it changes (M46). */
+function actionsDoc(ctx: Ctx): string {
+  const actions = actionsOf(ctx.model)
+  const from = ACTIONS
+  const flagged = flaggedActions(ctx.model)
+  const routes = (ids: readonly string[]) =>
+    ids
+      .flatMap((id) => {
+        const route = ctx.index.routes.get(id)
+        return route ? [routeLink(ctx, route, from)] : []
+      })
+      .join(', ') || '—'
+  return doc([
+    '# Server actions',
+    link('← Overview', from, README),
+    `Every server action, with the auth check and the input check that run before it changes data. A server action is a public ${code('POST')} endpoint: once a page uses it, anyone can call it with any arguments, not only your forms. TypeScript types aren't checked when it runs.`,
+    flagged.length > 0 && `## To check (${flagged.length})`,
+    flagged.length > 0 && flagged.map((a) => actionLine(a, from)).join('\n'),
+    '## Actions',
+    table(
+      ['Action', 'Auth', 'Input', 'Changes', 'Pages'],
+      actions.map((a) => [
+        `${code(a.name)}${(a.flags ?? []).map((f) => ` ⚠ ${ACTION_FLAG_LABELS[f.kind]}`).join('')}<br>${code(`${a.loc.file}:${a.loc.line}`)}${a.wrappedIn ? `<br>wrapped in ${code(a.wrappedIn.name)}` : ''}${a.unused ? '<br>unused' : ''}`,
+        codeText(authText(a)),
+        codeText(inputText(a)),
+        a.changes.length === 0
+          ? 'nothing'
+          : a.changes.map((c) => `${ACTION_CHANGE_LABELS[c.kind]}: ${codeText(changeText(c))}`).join('<br>'),
+        routes(a.routeIds),
+      ]),
+    ),
+  ])
 }
 
 /** Every name the code reads or a `.env` file defines (M45). Values are never in the model. */
@@ -2229,6 +2311,11 @@ const NOTE_GROUPS: { title: string; kinds: ScanNote['kind'][]; hint: string }[] 
     hint: "Server-only code that client code imports, and props a server component hands to a client component that can't cross to the browser. Next rejects both.",
   },
   {
+    title: 'Server actions open to anyone',
+    kinds: ['action'],
+    hint: 'Server actions that change data with no auth check and no input check. A server action is a public `POST` endpoint: anyone can call it with any arguments.',
+  },
+  {
     title: 'Environment variables',
     kinds: ['env'],
     hint: "Names read where they have no value: private names in client code, names Next doesn't inline there, and names nothing defines.",
@@ -2357,7 +2444,11 @@ function noteText(ctx: Ctx, note: ScanNote, from: string): string {
   }
   // Boundary, client, leak and env notes are the tool's own wording, with code in backticks (M41).
   const body =
-    note.kind === 'boundary' || note.kind === 'client' || note.kind === 'leak' || note.kind === 'env'
+    note.kind === 'boundary' ||
+    note.kind === 'client' ||
+    note.kind === 'leak' ||
+    note.kind === 'env' ||
+    note.kind === 'action'
       ? message
       : text(message)
   return `${target ? `${target}: ` : ''}${body} (${where})`

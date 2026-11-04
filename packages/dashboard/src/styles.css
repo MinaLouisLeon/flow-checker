@@ -1839,7 +1839,8 @@ kbd {
 .list.cache-list li,
 .list.client-list li,
 .list.leak-list li,
-.list.env-list li {
+.list.env-list li,
+.list.action-list li {
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
@@ -1892,6 +1893,19 @@ details.client-details > summary {
   padding: 0 0 0 12px;
 }
 .env-reads .env-read {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Server actions (M46) */
+.action-details {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0 0 0 12px;
+}
+.action-details .action-change {
   display: flex;
   flex-wrap: wrap;
   align-items: center;

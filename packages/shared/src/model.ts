@@ -539,6 +539,124 @@ export const EnvMapSchema = z.object({
 })
 export type EnvMap = z.infer<typeof EnvMapSchema>
 
+// Server action safety (M46): every server action with the auth check and input check in front of
+// what it changes. Checked with `next build` + `next start` (16.4.3) on the action-safety fixture:
+// each action a page uses gets an id in the browser bundle, and a `POST` to any page with that id in
+// `Next-Action` runs it with whatever arguments the body holds (TypeScript types aren't checked). An
+// action no code imports is left out of the build (`server-reference-manifest.json`), so it can't be
+// called.
+
+/**
+ * `condition`: a `return`, `throw`, `redirect()`, `notFound()`, `forbidden()` or `unauthorized()`
+ * under a condition that reads the session or user (`if (!session) throw ...`), or the change sits
+ * inside `if (session)`. `helper`: a project function the action calls does that (`await
+ * requireUser()`). `wrapper`: the function the action is wrapped in does it (`withAdmin(async () =>
+ * ...)`). `package`: a package call that stops on its own (`auth.protect()`).
+ */
+export const ActionAuthCheckSchema = z.object({
+  kind: z.enum(['condition', 'helper', 'wrapper', 'package']),
+  /** As written: `!session`, `requireUser()`, `withAdmin`. */
+  text: z.string(),
+  loc: SourceLocSchema,
+})
+export type ActionAuthCheck = z.infer<typeof ActionAuthCheckSchema>
+
+/**
+ * `checked`: an auth check runs before the action changes anything. `none`: none was found (or only
+ * after the change, see `late`). `unclear`: the action calls code the scan can't read (a package
+ * wrapper, a file the config excludes, an import that doesn't resolve).
+ */
+export const ActionAuthSchema = z.object({
+  status: z.enum(['checked', 'none', 'unclear']),
+  checks: z.array(ActionAuthCheckSchema),
+  /** Checks found only after the first change, which don't protect it. */
+  late: z.array(ActionAuthCheckSchema).optional(),
+  /** Status `unclear`: why. */
+  reason: z.string().optional(),
+})
+export type ActionAuth = z.infer<typeof ActionAuthSchema>
+
+/**
+ * `schema`: a validation library parses it (`zod`, `valibot`, `yup`, `joi`, `superstruct`,
+ * `arktype`, `@sinclair/typebox`, `effect`), see `library`. `manual`: a `return` / `throw` /
+ * `redirect()` under a condition that reads it (`typeof id !== 'string'`), also through an error
+ * object filled under such a condition. `helper`: a project function it is passed to does either.
+ * `wrapper`: the function the action is wrapped in does either.
+ */
+export const ActionInputCheckSchema = z.object({
+  kind: z.enum(['schema', 'manual', 'helper', 'wrapper']),
+  library: z.string().optional(),
+  /** As written: `PostSchema.safeParse`, `typeof id !== 'string'`. */
+  text: z.string(),
+  /** The parameters it checks. */
+  params: z.array(z.string()),
+  loc: SourceLocSchema,
+})
+export type ActionInputCheck = z.infer<typeof ActionInputCheckSchema>
+
+/**
+ * `checked`: every parameter the action reads is checked. `partial`: some are. `none`: none is.
+ * `no-input`: it reads no parameter. `unclear`: a package wrapper hands it the input.
+ */
+export const ActionInputSchema = z.object({
+  status: z.enum(['checked', 'partial', 'none', 'no-input', 'unclear']),
+  /** The parameters it reads (a destructured one by each name), in order. */
+  params: z.array(z.object({ name: z.string(), checked: z.boolean() })),
+  checks: z.array(ActionInputCheckSchema),
+  reason: z.string().optional(),
+})
+export type ActionInput = z.infer<typeof ActionInputSchema>
+
+/**
+ * `database`: a write call on a database client or project data object (`db.post.delete()`,
+ * `prisma.user.update()`) or SQL that writes (`INSERT`, `UPDATE`, `DELETE`...). `request`: a
+ * request that isn't `GET` / `HEAD` (`fetch(url, { method: 'DELETE' })`, `api.post()`). `file`:
+ * a Node `fs` write. `cache`: `revalidatePath()`, `revalidateTag()`, `updateTag()`: it refreshes
+ * cached data, which doesn't count as changing data on its own.
+ */
+export const ActionChangeSchema = z.object({
+  kind: z.enum(['database', 'request', 'file', 'cache']),
+  /** The call as written: `db.post.delete`, `fetch DELETE`, `revalidatePath`. */
+  text: z.string(),
+  /** The project functions it goes through, from the action down (`removeProduct`). */
+  via: z.array(z.string()).optional(),
+  loc: SourceLocSchema,
+})
+export type ActionChange = z.infer<typeof ActionChangeSchema>
+
+/**
+ * `unprotected`: it changes data (not only the cache) with no auth check and no input check, and
+ * some code uses it, so anyone can send it a `POST` with any arguments.
+ */
+export const ActionFlagKindSchema = z.enum(['unprotected'])
+export type ActionFlagKind = z.infer<typeof ActionFlagKindSchema>
+
+export const ServerActionSchema = z.object({
+  id: z.string(),
+  /** The exported name, or the function's name for an inline action. */
+  name: z.string(),
+  /** The name (or the function, when it has none). */
+  loc: SourceLocSchema,
+  /** `file`: exported from a `'use server'` file. `inline`: a function with its own `'use server'`. */
+  defined: z.enum(['file', 'inline']),
+  /** The function it is wrapped in: `withAdmin` for `export const x = withAdmin(async () => ...)`. */
+  wrappedIn: z.object({ name: z.string(), module: z.string().optional() }).optional(),
+  /** Inline actions: the component it is written in. */
+  componentId: z.string().optional(),
+  /** Request sites that call it. */
+  siteIds: z.array(z.string()),
+  /** Pages whose components call it. */
+  routeIds: z.array(z.string()),
+  /** No code imports or uses it: Next leaves it out of the build, so it can't be called. */
+  unused: z.literal(true).optional(),
+  auth: ActionAuthSchema,
+  input: ActionInputSchema,
+  /** What it changes, in the order the code does it. Empty when it only reads. */
+  changes: z.array(ActionChangeSchema),
+  flags: z.array(z.object({ kind: ActionFlagKindSchema, loc: SourceLocSchema })).optional(),
+})
+export type ServerAction = z.infer<typeof ServerActionSchema>
+
 export const RouteSchema = z.object({
   id: z.string(),
   /** URL path in Next's bracket form, e.g. `/[locale]/users/[id]`. Groups and slots are left out. */
@@ -1713,7 +1831,8 @@ export const AppModelSchema = z.object({
    * version 11 (before M31) no page `access` (read as `unknown`), version 12 (before M38) no page
    * `render` (read as `unknown`), version 13 (before M39) no `cache`, version 14 (before M41) no page
    * `boundaries` or `metadata`, version 15 (before M43) no page `client`, `clientBoundaries` or
-   * component `clientUses`, version 16 (before M44) no `leaks`, version 17 (before M45) no `env`.
+   * component `clientUses`, version 16 (before M44) no `leaks`, version 17 (before M45) no `env`,
+   * version 18 (before M46) no `actions`.
    */
   version: z
     .union([
@@ -1734,6 +1853,7 @@ export const AppModelSchema = z.object({
       z.literal(15),
       z.literal(16),
       z.literal(17),
+      z.literal(18),
       z.literal(MODEL_VERSION),
     ])
     .transform(() => MODEL_VERSION),
@@ -1784,5 +1904,10 @@ export const AppModelSchema = z.object({
    * never stored. Absent when there are neither.
    */
   env: EnvMapSchema.optional(),
+  /**
+   * Server actions (M46): exported from `'use server'` files and written inline, by file and line,
+   * each with its auth check, input check and what it changes. Absent when there are none.
+   */
+  actions: z.array(ServerActionSchema).optional(),
 })
 export type AppModel = z.infer<typeof AppModelSchema>

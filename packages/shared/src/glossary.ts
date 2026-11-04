@@ -5,6 +5,10 @@ import type { EndpointStatus } from './endpoints'
 import type { FlowStatus } from './flow-runs'
 import type { CaptureMatch } from './match'
 import type {
+  ActionAuth,
+  ActionChange,
+  ActionFlagKind,
+  ActionInput,
   BoundaryGap,
   CacheEntry,
   CacheFlag,
@@ -55,6 +59,7 @@ export type GlossaryGroupId =
   | 'boundary'
   | 'client'
   | 'leak'
+  | 'action'
   | 'env'
   | 'cache'
   | 'flow-status'
@@ -599,6 +604,104 @@ const ENV: GlossaryGroup<EnvSide | EnvFlagKind | EnvAccess | 'unknown-name' | 'l
   },
 }
 
+type ActionTerm =
+  | `auth-${ActionAuth['status']}`
+  | `input-${ActionInput['status']}`
+  | `change-${ActionChange['kind']}`
+  | ActionFlagKind
+  | 'public'
+  | 'unused'
+  | 'wrapped'
+
+const ACTION: GlossaryGroup<ActionTerm> = {
+  id: 'action',
+  title: 'Server actions',
+  intro:
+    "Every server action (a `'use server'` function), with the auth check and the input check that run before it changes data. A server action is a public `POST` endpoint: anyone can call it with any arguments, not only your forms.",
+  entries: {
+    public: {
+      label: 'server action',
+      means:
+        "A function in a `'use server'` file, or one that starts with `'use server'`. Next gives each action a page uses an id that ships in the browser bundle, and runs it for any `POST` that sends the id, from anywhere, with whatever arguments the request holds. TypeScript types aren't checked when it runs.",
+    },
+    'auth-checked': {
+      label: 'auth checked',
+      means:
+        'Before it changes anything, the action stops when nobody is signed in: a `return`, `throw`, `redirect()` or `notFound()` under a check of the session or user, a helper that does that (`await requireUser()`), the function it is wrapped in, or a package guard (`auth.protect()`).',
+    },
+    'auth-none': {
+      label: 'no auth check',
+      means:
+        "No check of the session or user was found before the action changes data, so it runs for anyone, signed in or not. That's fine for public actions (a newsletter sign-up), not for ones that change someone's data.",
+      todo: 'Check the session at the top of the action (`const session = await auth(); if (!session) throw ...`), or wrap it in a helper that does.',
+    },
+    'auth-unclear': {
+      label: 'auth unclear',
+      means:
+        "The action is wrapped in, or calls, code the scan can't read (a package, a file the config excludes, an import that doesn't resolve), so it can't tell whether that code checks the session.",
+    },
+    'input-checked': {
+      label: 'input checked',
+      means:
+        "Every argument the action reads is checked before use: parsed with a validation library (zod, valibot, yup...), or checked by hand with a `return` / `throw` when it is wrong (`typeof id !== 'string'`).",
+    },
+    'input-partial': {
+      label: 'input partly checked',
+      means: 'Some arguments the action reads are checked, others are used as sent.',
+      todo: 'Parse all of the input with one schema.',
+    },
+    'input-none': {
+      label: 'input not checked',
+      means:
+        'The arguments are used as sent. A caller can send any value: another type than the TypeScript one, another id, extra fields.',
+      todo: 'Parse the input with a schema (`Schema.parse(input)`) before using it.',
+    },
+    'input-no-input': {
+      label: 'no input',
+      means: 'The action reads no arguments, so there is nothing to check.',
+    },
+    'input-unclear': {
+      label: 'input unclear',
+      means: "A package wrapper hands the action its input, and the scan can't read whether it checks it.",
+    },
+    'change-database': {
+      label: 'database',
+      means:
+        'A write call on a database client or data object (`create`, `update`, `delete`, `upsert`...) or SQL that writes (`INSERT`, `UPDATE`, `DELETE`).',
+    },
+    'change-request': {
+      label: 'request',
+      means:
+        "A request to another service that isn't `GET` or `HEAD` (`fetch(url, { method: 'DELETE' })`, `api.post()`).",
+    },
+    'change-file': {
+      label: 'file',
+      means: 'A Node.js `fs` write (`writeFile`, `appendFile`, `unlink`...).',
+    },
+    'change-cache': {
+      label: 'cache',
+      means:
+        "`revalidatePath()`, `revalidateTag()` or `updateTag()`: it refreshes cached pages and data. On its own that doesn't count as changing data.",
+    },
+    unprotected: {
+      label: 'open to anyone',
+      means:
+        'The action changes data, has no auth check and uses its input as sent (or takes none), and a page uses it. Anyone who finds its id in the browser bundle can call it with any arguments.',
+      todo: 'Check the session first and parse the input with a schema; or, if it is meant to be public, check the input so a caller can only do what the form allows.',
+    },
+    unused: {
+      label: 'unused',
+      means:
+        "No code imports or uses the action, so Next leaves it out of the build and it can't be called. It isn't flagged.",
+    },
+    wrapped: {
+      label: 'wrapped',
+      means:
+        'The action is the result of a helper (`export const save = withAuth(async () => ...)`). The helper runs first, so its checks count for the action.',
+    },
+  },
+}
+
 const CACHE: GlossaryGroup<CacheEntry['kind'] | CacheFlag['kind'] | CacheRuntime['verdict']> = {
   id: 'cache',
   title: 'Server cache',
@@ -827,6 +930,7 @@ export const GLOSSARY: readonly GlossaryGroup[] = [
   BOUNDARY,
   CLIENT,
   LEAK,
+  ACTION,
   ENV,
   CACHE,
   FLOW_STATUS,

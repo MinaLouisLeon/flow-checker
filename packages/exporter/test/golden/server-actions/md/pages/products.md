@@ -36,6 +36,13 @@ Names only ([all](../env.md)).
 
 - `API_URL` (server): not defined, `src/lib/backend.ts:4`
 
+## Server actions
+
+Each one is a public `POST` endpoint ([all](../actions.md)).
+
+- `deleteProduct` (`src/actions/products.ts:30`): ⚠ **[open to anyone](../GLOSSARY.md#action-unprotected)**, [no auth check](../GLOSSARY.md#action-auth-none), [input not checked](../GLOSSARY.md#action-input-none); changes data through a request
+  - Server action `deleteProduct` changes data (`fetch DELETE` through `removeProduct`) with no auth check and uses its input as sent: a server action is a public `POST` endpoint, so anyone can call it with any arguments
+
 ## Server cache
 
 Refreshed by:

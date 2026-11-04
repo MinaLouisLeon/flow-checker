@@ -1,5 +1,6 @@
 // Plain-text rendering of a model: used by `flow-checker scan --tree` and snapshot tests.
 import { accessOf, guardText } from './access'
+import { ACTION_AUTH_LABELS, ACTION_INPUT_LABELS, actionsOn, formatActions } from './actions'
 import { gapLine, titleText } from './boundaries'
 import { formatCache } from './cache'
 import { CLIENT_USE_LABELS, sizeText } from './client'
@@ -55,6 +56,7 @@ export function formatModel(model: AppModel): string {
     out.push(...formatClient(route, components))
     out.push(...formatPageLeaks(model, route))
     out.push(...formatPageEnv(model, route))
+    out.push(...formatPageActions(model, route))
   }
 
   const cache = formatCache(model)
@@ -62,6 +64,7 @@ export function formatModel(model: AppModel): string {
   if (model.clientBoundaries) out.push('', ...formatClientBoundaries(model, components))
   if (model.leaks) out.push('', ...formatLeaks(model, components))
   if (model.env) out.push('', ...formatEnv(model))
+  if (model.actions) out.push('', ...formatActions(model))
 
   return `${out.join('\n')}\n`
 }
@@ -176,6 +179,19 @@ function formatPageEnv(model: AppModel, route: Route): string[] {
     })
     .join(', ')
   return [`env: ${line}`]
+}
+
+/** The server actions the page uses, with their labels (M46). */
+function formatPageActions(model: AppModel, route: Route): string[] {
+  const actions = actionsOn(model, route.id)
+  if (actions.length === 0) return []
+  const line = actions
+    .map((a) => {
+      const flags = (a.flags ?? []).map((f) => ` [${f.kind}]`).join('')
+      return `${a.name} (${ACTION_AUTH_LABELS[a.auth.status]}, ${ACTION_INPUT_LABELS[a.input.status]})${flags}`
+    })
+    .join(', ')
+  return [`actions: ${line}`]
 }
 
 /** Every leak: server-only modules client code imports, then props that can't cross (M44). */

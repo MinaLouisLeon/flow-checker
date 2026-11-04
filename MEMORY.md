@@ -53,6 +53,7 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
 | M43 | Client boundaries     | Model version 16, `Route.client`, `AppModel.clientBoundaries`, `Component.clientUses`; `scanner/src/client.ts`.          |
 | M44 | Server/client leaks   | Model version 17, `AppModel.leaks` (module + prop); rules in `scanner/src/leaks.ts`, run from M43's client pass.         |
 | M45 | Environment variables | Model version 18, `AppModel.env`; `scanner/src/env.ts` walks value imports itself; `.env` parsed for names only.         |
+| M46 | Server action safety  | Model version 19, `AppModel.actions`; `scanner/src/actions.ts` reads each action; reuses M31's `stops()` for exits.      |
 
 ## Gotchas
 
@@ -617,3 +618,24 @@ Full design notes per milestone live in `docs/PLAN.md` ("Built" paragraphs); thi
   `'use client'` and its fixture test fails.
 - Dashboard and shared tests read `scanner/test/__snapshots__/*.model.json`: after a model change, update the scanner
   snapshots first, then run them; in one parallel `-u` run they can read the old file.
+
+## M46 — Server action safety (branch `feat/server-action-safety-m46`)
+
+- Ground truth with `next build` + `next start`: `.next/server/server-reference-manifest.json` lists the actions each
+  page registers, and `curl -X POST <any page> -H 'Next-Action: <id>' -H 'Content-Type: text/plain;charset=UTF-8'
+  --data '["1"]'` runs one with those arguments (an unknown id answers 409). Actions no code imports aren't in the
+  manifest, so they are `unused` and never flagged.
+- Wrapped actions (`export const x = wrap(async () => ...)`) have no function node: `functionOf()` gives nothing, so the
+  request walk missed their calls. `wrappedAction()` / `isWrappedAction()` / `actionFunction()` in `requests.ts` handle
+  them; `#actionRef` names them by the `const`.
+- In a helper, an auth check must stop the caller (`throw`, `redirect()`...): `auth()` itself has `if (!token) return
+  null`, which would otherwise make every `auth()` call a check. Input helpers may `return` early (the caller gets null).
+- Input taint flows through receivers (`formData.get()`) and plain conversions (`String()`, `Object.fromEntries()`),
+  never through other calls' arguments: `fetch(url, { body: input })` made `if (!res.ok) throw` an input check.
+- `isWrappedAction` is a type guard: after `if (isWrappedAction(decl)) continue`, TypeScript narrows `decl` to "not a
+  `VariableDeclaration`"; widen it to `Node` first.
+- Python patch scripts must open files with `encoding='utf-8'`: the default (cp1252) fails on `⚠` / `←` in the exporter.
+  A bare `cat > file` in a bash command waits on stdin and hangs the call.
+- Several existing fixtures get real `unprotected` flags (demo actions with no auth): server-actions `deleteProduct`,
+  caching / caching-15 `createTodo` and `toggleTodo`, leaks `archiveOrder`. The dashboard's clean-fixture test skips
+  `action` notes like `boundary` ones.

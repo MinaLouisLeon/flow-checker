@@ -1,4 +1,5 @@
 // Lookup tables and derived facts the dashboard screens and the exporter need, built once per model.
+import { actionFlagText, flaggedActions } from './actions'
 import { GAP_LABELS, gapText } from './boundaries'
 import { lowerText } from './client'
 import { envFlagText, envOf, flagRouteIds, unknownInClient, unknownText } from './env'
@@ -49,6 +50,7 @@ export type NoteKind =
   | 'client'
   | 'leak'
   | 'env'
+  | 'action'
 
 /** Something the scan could not confirm. Shown as a to-do list on the overview. */
 export interface ScanNote {
@@ -480,6 +482,19 @@ function scanNotes(model: AppModel): ScanNote[] {
         ...(leak.routeIds[0] ? { routeId: leak.routeIds[0] } : {}),
       })
     }
+  }
+  // Server actions (M46): one note per action that changes data with no auth check and no input check.
+  for (const action of flaggedActions(model)) {
+    const pages = action.routeIds.length
+    notes.push({
+      kind: 'action',
+      message: `${actionFlagText(action)}${pages > 1 ? ` (on ${pages} pages)` : ''}`,
+      file: action.loc.file,
+      line: action.loc.line,
+      column: action.loc.column,
+      ...(action.componentId ? { componentId: action.componentId } : {}),
+      ...(action.routeIds[0] ? { routeId: action.routeIds[0] } : {}),
+    })
   }
   // Environment variables (M45): one note per flag, and one per name built at run time in client code.
   const env = envOf(model)

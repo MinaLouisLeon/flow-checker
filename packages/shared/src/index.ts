@@ -1,4 +1,5 @@
 export * from './access'
+export * from './actions'
 export * from './areas'
 export * from './boundaries'
 export * from './cache'

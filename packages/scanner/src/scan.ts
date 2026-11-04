@@ -18,6 +18,7 @@ import {
 } from '@flow-checker/shared'
 import { type FileSystemHost, Project, type SourceFile, ts } from 'ts-morph'
 import { addRouteAccess } from './access'
+import { buildActions } from './actions'
 import { addRouteBoundaries } from './boundaries'
 import { buildCacheMap } from './cache'
 import { addClientBoundaries } from './client'
@@ -503,6 +504,23 @@ function analyze(
     readFile: (path) => (fs.fileExistsSync(path) ? fs.readFileSync(path) : undefined),
     ...(discovery.nextConfig ? { nextConfig: discovery.nextConfig } : {}),
   })
+  // Server actions (M46): every `'use server'` export and inline action in the files the app reaches.
+  const imports = importGraph(project, root, discovery, settings)
+  const reached = new Set<string>([...Object.keys(imports), ...Object.values(imports).flat()])
+  const actionFiles = project.getSourceFiles().filter((f) => {
+    if (f.isInNodeModules() || f.isDeclarationFile() || !settings.scanned(f.getFilePath())) return false
+    return (
+      f.getFilePath().startsWith(`${discovery.appDir}/`) || reached.has(relativeTo(root, f.getFilePath()))
+    )
+  })
+  const actions = buildActions({
+    root,
+    files: actionFiles,
+    routes,
+    components,
+    sites,
+    scanned: settings.scanned,
+  })
   const cache = buildCacheMap({
     routes,
     components,
@@ -540,11 +558,12 @@ function analyze(
     ...(graphql ? { graphql } : {}),
     ...(streams.length > 0 ? { streams } : {}),
     ...(settings.areas ? { areas: settings.areas } : {}),
-    imports: importGraph(project, root, discovery, settings),
+    imports,
     ...(cache ? { cache } : {}),
     ...(client.boundaries.length > 0 ? { clientBoundaries: client.boundaries } : {}),
     ...(client.leaks.length > 0 ? { leaks: client.leaks } : {}),
     ...(env ? { env } : {}),
+    ...(actions.length > 0 ? { actions } : {}),
   }
 }
 
